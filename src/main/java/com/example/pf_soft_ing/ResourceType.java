@@ -1,0 +1,45 @@
+package com.example.pf_soft_ing;
+
+public enum ResourceType {
+    ANIMAL(0, "A"),
+    PLANT(1, "P"),
+    FUNGI(2, "F"),
+    INSECT(3, "I"),
+    QUILL(4, "Q"),
+    INKWELL(5, "Ink"),
+    MANUSCRIPT(6, "M");
+
+    /**
+     * index for playerModel resource array
+     */
+    private final int value;
+    /**
+     * string value for TUI output
+     */
+    private final String str;
+
+    /**
+     * Constructor for ResourceType enum
+     * @param value initialize value as resource arr index
+     * @param str initialize value as TUI string output
+     */
+    private ResourceType(int value, String str){
+        this.value = value;
+        this.str = str;
+    }
+
+    /**
+     * @return index value
+     */
+    public int getValue(){
+        return value;
+    }
+
+    /**
+     * @return string value to display in TUI
+     */
+    @Override
+    public String toString() {
+        return str;
+    }
+}
