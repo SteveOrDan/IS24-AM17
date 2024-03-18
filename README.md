@@ -17,7 +17,7 @@ class PlaceableCard{
     + changeCurrSide() void
     + getCurrSide() Side
     + canPlace(availableResources : int[]) bool
-    + getPoints()    
+    + getPoints() int
     + flipCard() void
 }
 
@@ -28,6 +28,13 @@ class PlaceableCard{
 class GoldenCard{
     - requiredResources: int[]
     - coveredCorner : int
+
+    - isPointPerResource : bool
+    - pointPerResourceAmt : int
+    - pointPerResourceRes : ResourceType
+
+    - isPointPerCoveredCorner : bool
+    - pointPerCoveredCornerAmt : int
     
     + evaluatePoints() int
 }
@@ -75,13 +82,13 @@ Side *-->"4" CardCorner
 
 class CardCorner{
     <<abstract>>
-    + canPlace() bool
-    + getResource() CardElementType
+    + isAvailable() bool
+    + getResource() ResourceType
 }
 
-class ResourceCorner{
-    - resource : CardElementType
-}
+%% class ResourceCorner{
+    
+%% }
 
 
 CardCorner <|-- VisibleCorner
@@ -91,7 +98,6 @@ VisibleCorner <|-- EmptyCorner
 
 class VisibleCorner{
     <<abstract>>
-    connectedCard : PlaceableCard
 }
 
 class Position{
@@ -151,7 +157,6 @@ class PlayerModel{
     - isFirstPlayer : bool
 
     + drawCard(card : Card)
-    + placeCard(card : PlaceableCard, x : int, y : int) void
     + flipStarterCard() void
     + setStarterCard(starterCard : PlaceableCard) void
     + placeStarterCard() void

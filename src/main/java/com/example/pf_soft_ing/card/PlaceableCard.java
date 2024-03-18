@@ -3,6 +3,7 @@ package com.example.pf_soft_ing.card;
 import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.side.Side;
 
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class PlaceableCard extends Card{
@@ -11,13 +12,15 @@ public abstract class PlaceableCard extends Card{
     public int priority;
     public Side front;
     public Side back;
+    public HashMap<ResourceType, Integer> requiredResources;
 
-    public PlaceableCard(int points, int priority, int id, Side front, Side back){
+    public PlaceableCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources){
         super(id);
         this.points = points;
         this.priority = priority;
         this.front = front;
         this.back = back;
+        this.requiredResources = requiredResources;
     }
 
     @Override
@@ -28,7 +31,7 @@ public abstract class PlaceableCard extends Card{
     /**
      * getter of resources
      */
-    public List<ResourceType> getResources(){
+    public HashMap<ResourceType, Integer> getResources(){
         return null;
     }
 
@@ -52,6 +55,10 @@ public abstract class PlaceableCard extends Card{
         return currSide;
     }
 
+    public HashMap<ResourceType, Integer> getRequiredResources(){
+        return requiredResources;
+    }
+
 //    public void exportCard(){
 //        Gson gson = new Gson();
 //
@@ -65,4 +72,6 @@ public abstract class PlaceableCard extends Card{
 //            throw new RuntimeException(e);
 //        }
 //    }
+
+    public abstract boolean isGolden();
 }
