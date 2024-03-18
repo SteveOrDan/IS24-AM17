@@ -6,16 +6,17 @@ import com.example.pf_soft_ing.card.side.Side;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class PlaceableCard extends Card{
-    public Side currSide;
-    public int points;
-    public int priority;
-    public Side front;
-    public Side back;
-    public HashMap<ResourceType, Integer> requiredResources;
+public abstract class PlaceableCard{
+    private final int id;
+    private Side currSide;
+    private final int points;
+    private int priority;
+    private final Side front;
+    private final Side back;
+    private final HashMap<ResourceType, Integer> requiredResources;
 
     public PlaceableCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources){
-        super(id);
+        this.id = id;
         this.points = points;
         this.priority = priority;
         this.front = front;
@@ -74,4 +75,8 @@ public abstract class PlaceableCard extends Card{
 //    }
 
     public abstract boolean isGolden();
+
+    public int getId() {
+        return id;
+    }
 }

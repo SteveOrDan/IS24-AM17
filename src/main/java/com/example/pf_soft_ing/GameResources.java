@@ -4,17 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.pf_soft_ing.card.ResourceCard;
+import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.side.Back;
-import com.example.pf_soft_ing.card.Card;
 import com.example.pf_soft_ing.card.side.Front;
-import com.example.pf_soft_ing.card.GoldenCard;
 
 public class GameResources {
-    private List<Card> goldenDeck;
-    private List<Card> objectiveDeck;
-    private List<Card> starterDeck;
-    private List<Card> resourcesDeck;
+    private List<PlaceableCard> goldenDeck;
+    private List<ObjectiveCard> objectiveDeck;
+    private List<PlaceableCard> starterDeck;
+    private List<PlaceableCard> resourcesDeck;
 
 
     public static void main(String[] args){

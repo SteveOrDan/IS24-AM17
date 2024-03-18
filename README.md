@@ -3,22 +3,23 @@
 ```mermaid
 classDiagram
 
-class Card{
-    - id : int
-}
-
 class PlaceableCard{
     - currSide : Side
     - points : int
     - priority : int
+    - requiredResources : Map <ResourceType, Integer>
 
-    + toString() String
     + getResources() List ~ ResourceType ~
     + changeCurrSide() void
     + getCurrSide() Side
     + canPlace(availableResources : int[]) bool
     + getPoints() int
     + flipCard() void
+    + getPriority() int
+    + getBack() Side
+    + getFront() Side
+    + getRequiredResources() List ~ ResourceType ~
+    + isGolden() boolean
 }
 
 %% class ResourceCard{
@@ -26,17 +27,13 @@ class PlaceableCard{
 %% }
 
 class GoldenCard{
-    - requiredResources: int[]
-    - coveredCorner : int
-
-    - isPointPerResource : bool
-    - pointPerResourceAmt : int
+    - isPointPerResource : boolean
     - pointPerResourceRes : ResourceType
-
-    - isPointPerCoveredCorner : bool
-    - pointPerCoveredCornerAmt : int
+    - isPointPerCoveredCorner : boolean
     
-    + evaluatePoints() int
+    + isPointPerResource() boolean
+    + getPointPerResourceRes() ResourceType
+    + isPointPerCoveredCorner() boolean
 }
 
 %% class StarterCard{
@@ -47,8 +44,6 @@ class ObjectiveCard{
     + getPoints() int
 }
 
-Card <|-- PlaceableCard
-Card <|-- ObjectiveCard
 PlaceableCard <|-- ResourceCard
 PlaceableCard <|-- GoldenCard
 PlaceableCard <|-- StarterCard
@@ -59,22 +54,20 @@ GoldenCard "cardType"*-->"1" CardElementType
 
 class Side{
     <<abstract>>
+    + getTRCorner() CardCorner
+    + getBRCorner() CardCorner
+    + getBLCorner() CardCorner
+    + getTLCorner() CardCorner
     + getResources() List ~ ResourceType ~
-    + getCorner(corner : int) Corner
-    + canPlace(reqRes : int[], avRes : int[]) bool
 }
 
 class Back{
     - permanentResources : List ~ ResourceType ~
-
-    @override()
-    + getResources() List ~ ResourceType ~
 }
 
-class Front{
-    @override()
-    + getResources() List ~ ResourceType ~
-}
+%% class Front{
+    
+%% }
 
 Side <|-- Front
 Side <|-- Back
@@ -82,13 +75,13 @@ Side *-->"4" CardCorner
 
 class CardCorner{
     <<abstract>>
-    + isAvailable() bool
+    + isAvailable() boolean
     + getResource() ResourceType
 }
 
-%% class ResourceCorner{
-    
-%% }
+class ResourceCorner{
+    - resourceType : ResourceType    
+}
 
 
 CardCorner <|-- VisibleCorner
@@ -104,7 +97,7 @@ class Position{
     - xPos : int
     - yPos : int
 
-    + equals(obj : Object) bool
+    + equals(obj : Object) boolean
     + setX(x : int) void
     + setY(y : int) void
     + getX() int
@@ -154,7 +147,6 @@ class PlayerModel{
 
     - token : Token
     - firstPlayerToken : Token
-    - isFirstPlayer : bool
 
     + drawCard(card : Card)
     + flipStarterCard() void
@@ -165,6 +157,8 @@ class PlayerModel{
     + placeCard(card : PlaceableCard, pos : Position) void
     + setAsFirstPlayer() void
     + endTurn() void
+    + getId() int
+    + getNickname() String
 }
 
 %% class PlayerView{

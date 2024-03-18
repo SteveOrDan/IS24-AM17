@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlayerModel {
+    private static final int pointsPerResource = 1;
+    private static final int pointsPerCoveredCorner = 2;
     private final String nickname;
     private final int id;
 
@@ -41,9 +43,14 @@ public class PlayerModel {
 
     /**
      * Checks if the playArea already has the key "pos"  -->  throw PositionAlreadyTakenException
-     * Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
-     * Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
+     * getAdjacentCorner:
+     *      Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
+     *      Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
      * Checks if the player has the required resources to place the card, else  -->  throw MissingResourcesException
+     * Removes resources covered by the placed card from the player's possession
+     * Adds the placed card's resources to the player's possession
+     * Adds either normal points or objective points based on the card
+     * Adds card to play area
      * @param card: Card to place in the player's playArea
      * @param pos: Card's position to add to the player's playArea
      */
@@ -79,16 +86,16 @@ public class PlayerModel {
             }
 
             // Add card points
-            currScore += card.points;
+            currScore += card.getPoints();
 
-            if (card.isGolden() && card.points == 0){
+            if (card.isGolden() && card.getPoints() == 0){
                 GoldenCard gCard = (GoldenCard) card;
 
                 if (gCard.isPointPerResource()){
-                    currScore += numOfResourcesArr[gCard.getPointPerResourceRes().getValue()];
+                    currScore += numOfResourcesArr[gCard.getPointPerResourceRes().getValue()] * pointsPerResource;
                 }
                 else {
-                    currScore += adjacentCorners.size() * 2;
+                    currScore += adjacentCorners.size() * pointsPerCoveredCorner;
                 }
             }
 
@@ -96,10 +103,18 @@ public class PlayerModel {
             playArea.put(pos, card);
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
-            System.out.println(e.toString());
+            System.out.println(e.getMessage());
         }
     }
 
+    /**
+     * Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
+     * Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
+     * @param pos : position of reference card
+     * @return list of adjacent corners to be covered by card
+     * @throws NoAdjacentCardsException : if there are no adjacent cards to the reference card
+     * @throws PlacingOnInvalidCornerException : if a corner is hidden
+     */
     private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
             PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
@@ -108,16 +123,16 @@ public class PlayerModel {
             PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
 
             if (TRCard != null){
-                add(TRCard.currSide.getBLCorner());
+                add(TRCard.getCurrSide().getBLCorner());
             }
             if (BRCard != null){
-                add(BRCard.currSide.getTLCorner());
+                add(BRCard.getCurrSide().getTLCorner());
             }
             if (BLCard != null){
-                add(BLCard.currSide.getTRCorner());
+                add(BLCard.getCurrSide().getTRCorner());
             }
             if (TLCard != null){
-                add(TLCard.currSide.getBRCorner());
+                add(TLCard.getCurrSide().getBRCorner());
             }
         }};
 
