@@ -3,7 +3,6 @@ package com.example.pf_soft_ing.card.objectiveCards;
 import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.ResourceCard;
 
 import java.util.HashMap;
 
@@ -20,7 +19,7 @@ public class ResourcesCountObjectiveCard extends ObjectiveCard {
     }
 
     @Override
-    public int calculateObjectivePoints(HashMap<PlaceableCard, Position> playArea, int[] numOfResourcesArr) {
+    public int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int[] numOfResourcesArr) {
         return points * (numOfResourcesArr[resourceType.getValue()] / requiredResourceCount);
     }
 }

@@ -2,7 +2,6 @@ package com.example.pf_soft_ing.card.objectiveCards;
 
 import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.card.PlaceableCard;
-import javafx.geometry.Pos;
 
 import java.util.HashMap;
 
@@ -17,5 +16,5 @@ public abstract class ObjectiveCard {
         return id;
     }
 
-    public abstract int calculateObjectivePoints(HashMap<PlaceableCard, Position> playArea, int[] numOfResourcesArr);
+    public abstract int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int[] numOfResourcesArr);
 }

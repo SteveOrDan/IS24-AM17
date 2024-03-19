@@ -4,18 +4,19 @@ import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.side.Side;
 
 import java.util.HashMap;
-import java.util.List;
 
 public abstract class PlaceableCard{
     private final int id;
+    private final CardElementType elementType;
     private Side currSide;
     private int priority;
     private final Side front;
     private final Side back;
 
-    public PlaceableCard(int priority, int id, Side front, Side back){
+    public PlaceableCard(CardElementType element, int id, Side front, Side back){
+        this.priority = 0;
+        this.elementType = element;
         this.id = id;
-        this.priority = priority;
         this.front = front;
         this.back = back;
     }
@@ -36,6 +37,14 @@ public abstract class PlaceableCard{
         return priority;
     }
 
+    public void setPriority(int newPriority){
+        priority = newPriority;
+    }
+
+    public CardElementType getElementType(){
+        return elementType;
+    }
+
     public Side getBack() {
         return back;
     }
@@ -46,6 +55,10 @@ public abstract class PlaceableCard{
 
     public Side getCurrSide() {
         return currSide;
+    }
+
+    public void changeCurrSide(){
+
     }
 
 //    public void exportCard(){

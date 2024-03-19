@@ -6,7 +6,7 @@ public enum ResourceType {
     FUNGI(2, "F"),
     INSECT(3, "I"),
     QUILL(4, "Q"),
-    INKWELL(5, "Ink"),
+    INKWELL(5, "K"),
     MANUSCRIPT(6, "M");
 
     /**
@@ -23,7 +23,7 @@ public enum ResourceType {
      * @param value initialize value as resource arr index
      * @param str initialize value as TUI string output
      */
-    private ResourceType(int value, String str){
+    ResourceType(int value, String str){
         this.value = value;
         this.str = str;
     }

@@ -1,23 +1,28 @@
 # IS24-AM17
 
 ```mermaid
+
 classDiagram
 
 class PlaceableCard{
     - id : int
+    - elementType : CardElementType
     - currSide : Side
     - priority : int
+    - front : Side
+    - back : Side
 
     + getResources() List ~ ResourceType ~
-    + changeCurrSide() void
-    + getCurrSide() Side
-    + canPlace(availableResources : int[]) bool
-    + getPoints() int
-    + flipCard() void
     + getPriority() int
+    + setPriority() int
+    + getElementType() CardElementType
     + getBack() Side
     + getFront() Side
-    + getRequiredResources() List ~ ResourceType ~
+    + getCurrSide() Side
+    + changeCurrSide() void
+    + canPlace(availableResources : int[]) bool
+    + flipCard() void
+    + getId() int
 }
 
 class ResourceCard{
@@ -29,22 +34,17 @@ class ResourceCard{
 class GoldenCard{
     - isPointPerResource : boolean
     - pointPerResourceRes : ResourceType
-    - isPointPerCoveredCorner : boolean
     - requiredResources : HashMap ~ ResourceType, Integer ~
     - points : int
     
     + isPointPerResource() boolean
     + getPointPerResourceRes() ResourceType
-    + isPointPerCoveredCorner() boolean
     + getRequiredResources() HashMap ~ ResourceType, Integer ~
     + getPoints() int
 }
 
-%% class StarterCard{
-
-%% }
-
 class ObjectiveCard{
+    <<abstract>>
     - id : int
 
     + calculateObjectivePoints(playArea : HashMap<PlaceableCard, Position>, numOfResourcesArr : int[]) int
@@ -61,10 +61,63 @@ class TrinityObjectiveCard{
     - points : int
 }
 
+class DiagonalObjectiveCard{
+    <<abstract>>
+    - points : int
+    - elementType: CardElementType
+
+    + calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, direction : int) int
+}
+
+class TLBRDiagonalObjectiveCard{
+    - direction : int
+}
+
+class TRBLDiagonalObjectiveCard{
+    - direction : int
+}
+
+class LShapeObjectiveCard{
+    <<abstract>>
+    - points : int
+    - mainElementType: CardElementType
+    - secondaryElementType: CardElementType
+    
+    + calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, xDirection : int, yDirection : int) int
+}
+
+class TLLShapeObjectiveCard{
+    - xDirection : int
+    - yDirection : int
+}
+
+class TRLShapeObjectiveCard{
+    - xDirection : int
+    - yDirection : int
+}
+
+class BLLShapeObjectiveCard{
+    - xDirection : int
+    - yDirection : int
+}
+
+class BRLShapeObjectiveCard{
+    - xDirection : int
+    - yDirection : int
+}
+
 ObjectiveCard <|-- DiagonalObjectiveCard
 ObjectiveCard <|-- LShapeObjectiveCard
 ObjectiveCard <|-- ResourcesCountObjectiveCard
 ObjectiveCard <|-- TrinityObjectiveCard
+
+DiagonalObjectiveCard <|-- TLBRDiagonalObjectiveCard
+DiagonalObjectiveCard <|-- TRBLDiagonalObjectiveCard
+
+LShapeObjectiveCard <|-- TLLShapeObjectiveCard
+LShapeObjectiveCard <|-- TRLShapeObjectiveCard
+LShapeObjectiveCard <|-- BLLShapeObjectiveCard
+LShapeObjectiveCard <|-- BRLShapeObjectiveCard
 
 PlaceableCard <|-- ResourceCard
 PlaceableCard <|-- GoldenCard
@@ -119,19 +172,17 @@ class Position{
     - xPos : int
     - yPos : int
 
-    + equals(obj : Object) boolean
-    + setX(x : int) void
-    + setY(y : int) void
     + getX() int
     + getY() int
 }
 
 class CardElementType{
     <<enumeration>>
-    ANIMAL = 0
-    PLANT = 1
-    FUNGI = 2
-    INSECT = 3
+    STARTER
+    ANIMAL
+    PLANT
+    FUNGI
+    INSECT
 }
 
 class ResourceType{
