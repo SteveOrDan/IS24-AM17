@@ -11,13 +11,15 @@ public class GoldenCard extends PlaceableCard{
 
     private boolean isPointPerCoveredCorner;
 
-    public GoldenCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources) {
-        super(points, priority, id, front, back, requiredResources);
-    }
+    private final HashMap<ResourceType, Integer> requiredResources;
 
-    @Override
-    public boolean isGolden(){
-        return true;
+    private final int points;
+
+    public GoldenCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources) {
+        super(priority, id, front, back);
+
+        this.requiredResources = requiredResources;
+        this.points = points;
     }
 
     public boolean isPointPerResource() {
@@ -30,5 +32,13 @@ public class GoldenCard extends PlaceableCard{
 
     public boolean isPointPerCoveredCorner() {
         return isPointPerCoveredCorner;
+    }
+
+    public HashMap<ResourceType, Integer> getRequiredResources(){
+        return requiredResources;
+    }
+
+    public int getPoints() {
+        return points;
     }
 }

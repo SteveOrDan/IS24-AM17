@@ -1,8 +1,9 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.GoldenCard;
-import com.example.pf_soft_ing.card.ObjectiveCard;
+import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.exceptions.MissingResourcesException;
 import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
@@ -15,6 +16,7 @@ import java.util.HashMap;
 public class PlayerModel {
     private static final int pointsPerResource = 1;
     private static final int pointsPerCoveredCorner = 2;
+
     private final String nickname;
     private final int id;
 
@@ -46,15 +48,14 @@ public class PlayerModel {
      * getAdjacentCorner:
      *      Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
      *      Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
-     * Checks if the player has the required resources to place the card, else  -->  throw MissingResourcesException
      * Removes resources covered by the placed card from the player's possession
      * Adds the placed card's resources to the player's possession
-     * Adds either normal points or objective points based on the card
+     * Adds points if needed
      * Adds card to play area
-     * @param card: Card to place in the player's playArea
+     * @param rCard: Resource card to place in the player's playArea
      * @param pos: Card's position to add to the player's playArea
      */
-    public void placeCard(PlaceableCard card, Position pos){
+    public void placeCard(ResourceCard rCard, Position pos){
         try {
             if (playArea.containsKey(pos)){
                 throw new PositionAlreadyTakenException();
@@ -62,7 +63,51 @@ public class PlayerModel {
 
             ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
 
-            HashMap<ResourceType, Integer> requiredResources = card.getRequiredResources();
+            // Remove resources of covered corners
+            for (CardCorner corner : adjacentCorners){
+                if (corner.getResource() != null){
+                    numOfResourcesArr[corner.getResource().getValue()]--;
+                }
+            }
+
+            // Add resources on placed card's corners
+            for (ResourceType resource : rCard.getResources().keySet()){
+                numOfResourcesArr[resource.getValue()] += rCard.getResources().get(resource);
+            }
+
+            // Add card points
+            currScore += rCard.getPoints();
+
+            // Add card to playArea
+            playArea.put(pos, rCard);
+        }
+        catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | NoAdjacentCardsException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Checks if the playArea already has the key "pos"  -->  throw PositionAlreadyTakenException
+     * getAdjacentCorner:
+     *      Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
+     *      Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
+     * Checks if the player has the required resources to place the card, else  -->  throw MissingResourcesException
+     * Removes resources covered by the placed card from the player's possession
+     * Adds the placed card's resources to the player's possession
+     * Adds either normal points or objective points based on the card
+     * Adds card to play area
+     * @param gCard: Golden card to place in the player's playArea
+     * @param pos: Card's position to add to the player's playArea
+     */
+    public void placeCard(GoldenCard gCard, Position pos){
+        try {
+            if (playArea.containsKey(pos)){
+                throw new PositionAlreadyTakenException();
+            }
+
+            ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
+
+            HashMap<ResourceType, Integer> requiredResources = gCard.getRequiredResources();
 
             // Check if player has required resources
             if (requiredResources != null){
@@ -81,26 +126,22 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : card.getResources().keySet()){
-                numOfResourcesArr[resource.getValue()] += card.getResources().get(resource);
+            for (ResourceType resource : gCard.getResources().keySet()){
+                numOfResourcesArr[resource.getValue()] += gCard.getResources().get(resource);
             }
 
             // Add card points
-            currScore += card.getPoints();
+            currScore += gCard.getPoints();
 
-            if (card.isGolden() && card.getPoints() == 0){
-                GoldenCard gCard = (GoldenCard) card;
-
-                if (gCard.isPointPerResource()){
-                    currScore += numOfResourcesArr[gCard.getPointPerResourceRes().getValue()] * pointsPerResource;
-                }
-                else {
-                    currScore += adjacentCorners.size() * pointsPerCoveredCorner;
-                }
+            if (gCard.isPointPerResource()){
+                currScore += numOfResourcesArr[gCard.getPointPerResourceRes().getValue()] * pointsPerResource;
+            }
+            else {
+                currScore += adjacentCorners.size() * pointsPerCoveredCorner;
             }
 
             // Add card to playArea
-            playArea.put(pos, card);
+            playArea.put(pos, gCard);
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
             System.out.println(e.getMessage());
@@ -148,5 +189,10 @@ public class PlayerModel {
             }
         }
         return adjacentCorners;
+    }
+
+
+    public void calculateObjectivePoints(ObjectiveCard oCard){
+
     }
 }

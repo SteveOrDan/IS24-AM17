@@ -10,4 +10,6 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.card to javafx.fxml;
     exports com.example.pf_soft_ing.card.side;
     opens com.example.pf_soft_ing.card.side to javafx.fxml;
+    exports com.example.pf_soft_ing.card.objectiveCards;
+    opens com.example.pf_soft_ing.card.objectiveCards to javafx.fxml;
 }

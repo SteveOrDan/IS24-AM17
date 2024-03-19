@@ -4,10 +4,9 @@
 classDiagram
 
 class PlaceableCard{
+    - id : int
     - currSide : Side
-    - points : int
     - priority : int
-    - requiredResources : Map <ResourceType, Integer>
 
     + getResources() List ~ ResourceType ~
     + changeCurrSide() void
@@ -19,21 +18,26 @@ class PlaceableCard{
     + getBack() Side
     + getFront() Side
     + getRequiredResources() List ~ ResourceType ~
-    + isGolden() boolean
 }
 
-%% class ResourceCard{
-%%     - cardType : ResourceType
-%% }
+class ResourceCard{
+    - points : int
+
+    + getPoints() int
+}
 
 class GoldenCard{
     - isPointPerResource : boolean
     - pointPerResourceRes : ResourceType
     - isPointPerCoveredCorner : boolean
+    - requiredResources : HashMap ~ ResourceType, Integer ~
+    - points : int
     
     + isPointPerResource() boolean
     + getPointPerResourceRes() ResourceType
     + isPointPerCoveredCorner() boolean
+    + getRequiredResources() HashMap ~ ResourceType, Integer ~
+    + getPoints() int
 }
 
 %% class StarterCard{
@@ -41,8 +45,26 @@ class GoldenCard{
 %% }
 
 class ObjectiveCard{
-    + getPoints() int
+    - id : int
+
+    + calculateObjectivePoints(playArea : HashMap<PlaceableCard, Position>, numOfResourcesArr : int[]) int
+    + getId() int
 }
+
+class ResourcesCountObjectiveCard{
+    - points : int
+    - resourceType : ResourceType
+    - requiredResourceCount : int
+}
+
+class TrinityObjectiveCard{
+    - points : int
+}
+
+ObjectiveCard <|-- DiagonalObjectiveCard
+ObjectiveCard <|-- LShapeObjectiveCard
+ObjectiveCard <|-- ResourcesCountObjectiveCard
+ObjectiveCard <|-- TrinityObjectiveCard
 
 PlaceableCard <|-- ResourceCard
 PlaceableCard <|-- GoldenCard
@@ -154,7 +176,8 @@ class PlayerModel{
     + placeStarterCard() void
     + setObjectiveChoice(list : List) void
     + setObjectiveCard(index : int) void
-    + placeCard(card : PlaceableCard, pos : Position) void
+    + placeCard(card : GoldenCard, pos : Position) void
+    + placeCard(card : ResourceCard, pos : Position) void
     + setAsFirstPlayer() void
     + endTurn() void
     + getId() int

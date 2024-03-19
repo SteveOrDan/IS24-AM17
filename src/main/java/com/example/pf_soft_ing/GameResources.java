@@ -1,12 +1,9 @@
 package com.example.pf_soft_ing;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.example.pf_soft_ing.card.*;
-import com.example.pf_soft_ing.card.side.Back;
-import com.example.pf_soft_ing.card.side.Front;
+import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 
 public class GameResources {
     private List<PlaceableCard> goldenDeck;

@@ -9,19 +9,15 @@ import java.util.List;
 public abstract class PlaceableCard{
     private final int id;
     private Side currSide;
-    private final int points;
     private int priority;
     private final Side front;
     private final Side back;
-    private final HashMap<ResourceType, Integer> requiredResources;
 
-    public PlaceableCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources){
+    public PlaceableCard(int priority, int id, Side front, Side back){
         this.id = id;
-        this.points = points;
         this.priority = priority;
         this.front = front;
         this.back = back;
-        this.requiredResources = requiredResources;
     }
 
     @Override
@@ -34,10 +30,6 @@ public abstract class PlaceableCard{
      */
     public HashMap<ResourceType, Integer> getResources(){
         return null;
-    }
-
-    public int getPoints() {
-        return points;
     }
 
     public int getPriority() {
@@ -56,10 +48,6 @@ public abstract class PlaceableCard{
         return currSide;
     }
 
-    public HashMap<ResourceType, Integer> getRequiredResources(){
-        return requiredResources;
-    }
-
 //    public void exportCard(){
 //        Gson gson = new Gson();
 //
@@ -73,8 +61,6 @@ public abstract class PlaceableCard{
 //            throw new RuntimeException(e);
 //        }
 //    }
-
-    public abstract boolean isGolden();
 
     public int getId() {
         return id;

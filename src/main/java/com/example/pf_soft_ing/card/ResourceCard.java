@@ -6,12 +6,14 @@ import com.example.pf_soft_ing.card.side.Side;
 import java.util.HashMap;
 
 public class ResourceCard extends PlaceableCard{
-    public ResourceCard(int points, int priority, int id, Side front, Side back, HashMap<ResourceType, Integer> requiredResources) {
-        super(points, priority, id, front, back, requiredResources);
+    private final int points;
+    public ResourceCard(int points, int priority, int id, Side front, Side back) {
+        super(priority, id, front, back);
+
+        this.points = points;
     }
 
-    @Override
-    public boolean isGolden(){
-        return false;
+    public int getPoints() {
+        return points;
     }
 }
