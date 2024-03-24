@@ -12,4 +12,9 @@ public class Back extends Side{
         super(BLCorner, BRCorner, TLCorner, TRCorner);
         this.permanentResources = permanentResources;
     }
+
+    @Override
+    public List<ResourceType> getResources() {
+        return permanentResources;
+    }
 }

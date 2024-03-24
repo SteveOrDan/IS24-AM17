@@ -47,6 +47,7 @@ public abstract class LShapeObjectiveCard extends ObjectiveCard {
                         !usedPositions.contains(farPos))
                 {
                     objectivePoints += points;
+                    usedPositions.add(pos);
                     usedPositions.add(diagPos);
                     usedPositions.add(farPos);
                 }

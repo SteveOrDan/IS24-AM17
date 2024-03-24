@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.GoldenCard;
+import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.ResourceCard;
@@ -30,9 +31,13 @@ public class PlayerModel {
     private Token token;
     private Token firstPlayerToken;
 
+    private int currMaxPriority;
+
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
         this.id = id;
+        currMaxPriority = 0;
+        currScore = 0;
     }
 
     public String getNickname() {
@@ -41,6 +46,27 @@ public class PlayerModel {
 
     public int getId() {
         return id;
+    }
+
+    public int getCurrScore(){
+        return currScore;
+    }
+
+    /**
+     * Places the starter card at the position (0, 0)
+     * Adds resources on the card's side
+     * No requirements are needed for positioning this card
+     */
+    public void placeStarterCard(){
+        for (ResourceType resource : starterCard.getResources()){
+            numOfResourcesArr[resource.getValue()]++;
+        }
+
+        starterCard.setPriority(currMaxPriority);
+
+        currMaxPriority++;
+
+        playArea.put(new Position(0,0), starterCard);
     }
 
     /**
@@ -71,12 +97,17 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : rCard.getResources().keySet()){
-                numOfResourcesArr[resource.getValue()] += rCard.getResources().get(resource);
+            for (ResourceType resource : rCard.getResources()){
+                numOfResourcesArr[resource.getValue()]++;
             }
 
             // Add card points
             currScore += rCard.getPoints();
+
+            // Set card priority
+            rCard.setPriority(currMaxPriority);
+
+            currMaxPriority++;
 
             // Add card to playArea
             playArea.put(pos, rCard);
@@ -126,8 +157,8 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : gCard.getResources().keySet()){
-                numOfResourcesArr[resource.getValue()] += gCard.getResources().get(resource);
+            for (ResourceType resource : gCard.getResources()){
+                numOfResourcesArr[resource.getValue()]++;
             }
 
             // Add card points
@@ -139,6 +170,11 @@ public class PlayerModel {
             else {
                 currScore += adjacentCorners.size() * pointsPerCoveredCorner;
             }
+
+            // Set card priority
+            gCard.setPriority(currMaxPriority);
+
+            currMaxPriority++;
 
             // Add card to playArea
             playArea.put(pos, gCard);
@@ -191,8 +227,12 @@ public class PlayerModel {
         return adjacentCorners;
     }
 
-
+    /**
+     * Adds the points given an objective card to the player's score
+     * Objective card could be the player's secret objective or one of the common objectives
+     * @param oCard: Card to use for points calculations
+     */
     public void calculateObjectivePoints(ObjectiveCard oCard){
-
+        currScore += oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
     }
 }

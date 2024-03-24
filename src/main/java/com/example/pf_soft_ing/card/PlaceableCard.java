@@ -1,15 +1,18 @@
 package com.example.pf_soft_ing.card;
 
 import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.side.Back;
+import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
 
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class PlaceableCard{
     private final int id;
     private final CardElementType elementType;
-    private Side currSide;
     private int priority;
+    private Side currSide;
     private final Side front;
     private final Side back;
 
@@ -27,10 +30,13 @@ public abstract class PlaceableCard{
     }
 
     /**
-     * getter of resources
+     * Getter of the resources based on the current side of the card
+     * If card side is front gets the values from the corners
+     * If card side is back gets the values from a list
+     * @return hash map of resources based on the current side of the card
      */
-    public HashMap<ResourceType, Integer> getResources(){
-        return null;
+    public List<ResourceType> getResources(){
+        return currSide.getResources();
     }
 
     public int getPriority() {
@@ -57,8 +63,13 @@ public abstract class PlaceableCard{
         return currSide;
     }
 
-    public void changeCurrSide(){
-
+    public void flipCard(){
+        if (currSide.equals(front)){
+            currSide = back;
+        }
+        else{
+            currSide = front;
+        }
     }
 
 //    public void exportCard(){

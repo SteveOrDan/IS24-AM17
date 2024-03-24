@@ -7,20 +7,18 @@ classDiagram
 class PlaceableCard{
     - id : int
     - elementType : CardElementType
-    - currSide : Side
     - priority : int
+    - currSide : Side
     - front : Side
     - back : Side
 
     + getResources() List ~ ResourceType ~
     + getPriority() int
-    + setPriority() int
+    + setPriority(newPriority : int) void
     + getElementType() CardElementType
     + getBack() Side
     + getFront() Side
     + getCurrSide() Side
-    + changeCurrSide() void
-    + canPlace(availableResources : int[]) bool
     + flipCard() void
     + getId() int
 }
@@ -47,8 +45,8 @@ class ObjectiveCard{
     <<abstract>>
     - id : int
 
-    + calculateObjectivePoints(playArea : HashMap<PlaceableCard, Position>, numOfResourcesArr : int[]) int
     + getId() int
+    + calculateObjectivePoints(playArea : HashMap<PlaceableCard, Position>, numOfResourcesArr : int[]) int
 }
 
 class ResourcesCountObjectiveCard{
@@ -66,7 +64,7 @@ class DiagonalObjectiveCard{
     - points : int
     - elementType: CardElementType
 
-    + calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, direction : int) int
+    # calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, direction : int) int
 }
 
 class TLBRDiagonalObjectiveCard{
@@ -82,8 +80,8 @@ class LShapeObjectiveCard{
     - points : int
     - mainElementType: CardElementType
     - secondaryElementType: CardElementType
-    
-    + calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, xDirection : int, yDirection : int) int
+    %% Protected
+    # calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, xDirection : int, yDirection : int) int
 }
 
 class TLLShapeObjectiveCard{
@@ -122,13 +120,18 @@ LShapeObjectiveCard <|-- BRLShapeObjectiveCard
 PlaceableCard <|-- ResourceCard
 PlaceableCard <|-- GoldenCard
 PlaceableCard <|-- StarterCard
-PlaceableCard *-->"2" Side
+PlaceableCard *-->"3" Side
 
 ResourceCard "cardType"*-->"1" CardElementType
 GoldenCard "cardType"*-->"1" CardElementType
 
 class Side{
     <<abstract>>
+    - BLCorner : CardCorner
+    - BRCorner : CardCorner
+    - TLCorner : CardCorner
+    - TRCorner : CardCorner
+
     + getTRCorner() CardCorner
     + getBRCorner() CardCorner
     + getBLCorner() CardCorner
@@ -158,15 +161,14 @@ class ResourceCorner{
     - resourceType : ResourceType    
 }
 
+class VisibleCorner{
+    <<abstract>>
+}
 
 CardCorner <|-- VisibleCorner
 CardCorner <|-- HiddenCorner
 VisibleCorner <|-- ResourceCorner
 VisibleCorner <|-- EmptyCorner
-
-class VisibleCorner{
-    <<abstract>>
-}
 
 class Position{
     - xPos : int
@@ -208,31 +210,32 @@ class PlayerModel{
     - hand : List ~ PlaceableCard ~
 
     - objectiveToChoose : List ~ ObjectiveCard ~
-
     - secretObjective : ObjectiveCard
     - starterCard : PlaceableCard
 
     - numOfResourcesArr : int[]
-
     - currScore : int
-
     - playArea : Map ~ Position, PlaceableCard ~
 
     - token : Token
     - firstPlayerToken : Token
 
-    + drawCard(card : Card)
-    + flipStarterCard() void
-    + setStarterCard(starterCard : PlaceableCard) void
+    + getID() int
+    + getNickname() String
+    + getCurrScore() int
+
     + placeStarterCard() void
-    + setObjectiveChoice(list : List) void
+    + placeCard(rCard : ResourceCard, pos : Position) void
+    + placeCard(gCard : GoldenCard, pos : Position) void
+    + calculateObjectivePoints(oCard : ObjectiveCard) void 
+
+    %% Not implemented yet
+    + drawCard(card : Card)
+    + setStarterCard(starterCard : PlaceableCard) void
+    + setObjectiveChoice(list : List ~ ObjectiveCard ~) void
     + setObjectiveCard(index : int) void
-    + placeCard(card : GoldenCard, pos : Position) void
-    + placeCard(card : ResourceCard, pos : Position) void
     + setAsFirstPlayer() void
     + endTurn() void
-    + getId() int
-    + getNickname() String
 }
 
 %% class PlayerView{
@@ -244,59 +247,51 @@ class PlayerModel{
 %% }
 
 class GameResources{
-    <<singleton>>
-    - goldenDeck : List
-    - resourcesDeck : List
+    - goldenDeck : List ~ PlaceableCard ~
+    - resourcesDeck : List ~ PlaceableCard ~
 
-    - starterDeck : List
+    - starterDeck : List ~ StarterCard ~
 
-    - objectiveDeck : List
+    - objectiveDeck : List ~ ObjectiveCard ~
 
-    - tokens : List
+    - tokensList : List ~ Token ~
 
-    + copyDeck(deck : List) List
+    + getResourcesDeck() List ~ PlaceableCard ~
+    + getGoldenDeck() List ~ PlaceableCard ~
+    + getStarterDeck() List ~ StarterCard ~
+    + getObjectiveDeck() List ~ ObjectiveCard ~
 }
 
 class GameModel{
-    - board : Map ~ PlayerModel, int ~
+    - gameResources : GameResources
+    - board : Map ~ PlayerModel, Integer ~
 
-    - playersList : List ~ int ~
-    - currentPlayer : int
-    - firstPlayer : int
+    - playersList : List ~ Integer ~
+    - currPlayerID : int
+    - firstPlayerID : int
 
-    %% - visibleResourceCards : List ~ Card ~
-    %% - resourceCardDeck : List ~ Card ~
+    - resourceCardsDeck : UsableCardsDeck
+    - goldenCardsDeck : UsableCardsDeck
+    - starterCardsDeck : StarterCardsDeck
+    - ObjectiveCardsDeck : ObjectiveCardsDeck
 
-    %% - visibleGoldenCards : List ~ Card ~
-    %% - goldenCardDeck : List ~ Card ~
-
-    %% - objectiveCardDeck : List ~ ObjectiveCard ~
-    %% - commonObjectives : List ~ ObjectiveCard ~
-
-    %% - starterCardDeck : List ~ Card ~
-
-    + getPlayerList() List ~ int ~
+    + getPlayerIDList() List ~ Integer ~
+    + getCurrPlayerID() int
+    + getFirstPlayerID() int
 
     + initializeDecks() void
     + shuffleAllDecks() void
     + setVisibleCards() void
-    + drawResourceCards() List ~ PlaceableCard ~
+    + drawResourceCard() PlaceableCard
     + drawGoldenCard() PlaceableCard
     + drawStarterCard() PlaceableCard
-    + drawObjectiveCard() Card
+    + drawObjectiveCard() ObjectiveCard
 
-    %% + flipStarterCard(player: PlayerModel)
-    %% + flipCard(card : Card)
-    %% + placeCard(card : Card, player : PlayerModel)
     + selectToken(token)
-    + setCommonObjectives() void
-    %% + setObjectiveChoice() List
     + endTurn() void
 }
 
 GameModel *-->"2" UsableCardsDeck
-%% UsableCardsDeck -->"1" ResourceCardDeck
-%% UsableCardsDeck -->"1" GoldenCardDeck
 GameModel *-->"1" ObjectiveCardsDeck
 GameModel *-->"1" StarterCardsDeck
 
@@ -305,25 +300,27 @@ class UsableCardsDeck{
     - visibleCards : List ~ PlaceableCard ~
 
     + shuffleDeck() void
-    + drawFromDeck() PlaceableCard
+    + drawCard() PlaceableCard
     + drawVisibleCard(index : int) PlaceableCard
     + restoreVisibleCards() void
 }
 
 class ObjectiveCardsDeck{
-    - deck : List ~ Card ~
-    - commonObjectives : List ~ Card ~
+    - deck : List ~ ObjectiveCard ~
+    - commonObjectives : List ~ ObjectiveCard ~
+
+    + getCommonObjectives() List ~ ObjectiveCard ~
 
     + shuffleDeck() void
-    + drawFromDeck() Card
+    + drawCard() ObjectiveCard
     + setCommonObjectives() void
 }
 
 class StarterCardsDeck{
-    - deck : List ~ PlaceableCard ~
+    - deck : List ~ StarterCard ~
 
     + shuffleDeck() void
-    + drawFromDeck() PlaceableCard
+    + drawCard() StarterCard
 }
 
 %% class GameView{
@@ -334,7 +331,7 @@ class GameController{
     - CardIDMap : Map ~ Integer, Card ~
     - PlayerIDMap : Map ~ Integer, PlayerModel ~
 
-    + intializeGame() void
+    + initializeGame() void
     + flipStarterCard(playerId : int) void
     + setToken(playerId : int, token : Token)
     + placeStarterCard(playerId : int) void

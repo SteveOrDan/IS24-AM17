@@ -1,6 +1,9 @@
 package com.example.pf_soft_ing.card.side;
 
+import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.corner.CardCorner;
+
+import java.util.List;
 
 public abstract class Side {
     private final CardCorner BLCorner;
@@ -30,4 +33,6 @@ public abstract class Side {
     public CardCorner getTRCorner() {
         return TRCorner;
     }
+
+    public abstract List<ResourceType> getResources();
 }
