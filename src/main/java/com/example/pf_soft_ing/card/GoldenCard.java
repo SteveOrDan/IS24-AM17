@@ -22,18 +22,34 @@ public class GoldenCard extends PlaceableCard{
         this.pointPerResourceRes = pointPerResourceRes;
     }
 
+    /**
+     * Getter
+     * @return Boolean that says if the points given by the card are based on the number of resources
+     */
     public boolean isPointPerResource() {
         return isPointPerResource;
     }
 
+    /**
+     * Getter
+     * @return Number of points given for each resource the player has
+     */
     public ResourceType getPointPerResourceRes() {
         return pointPerResourceRes;
     }
 
+    /**
+     * Getter
+     * @return Map of resources needed to place the card
+     */
     public HashMap<ResourceType, Integer> getRequiredResources(){
         return requiredResources;
     }
 
+    /**
+     * Getter
+     * @return Number of points given when the card has no conditions to earn points (either 0, 3 or 5)
+     */
     public int getPoints() {
         return points;
     }

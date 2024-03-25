@@ -13,10 +13,17 @@ public class StarterCardsDeck {
         this.deck = deck;
     }
 
+    /**
+     * Method to shuffle the deck
+     */
     public void shuffleDeck(){
         Collections.shuffle(deck);
     }
 
+    /**
+     * Get the top card in the deck and returns it
+     * @return the top card in the deck
+     */
     public StarterCard drawCard(){
         try{
             if (!deck.isEmpty()){

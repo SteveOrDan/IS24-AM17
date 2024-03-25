@@ -9,10 +9,18 @@ public class Position {
         this.y = y;
     }
 
+    /**
+     * Getter
+     * @return X value of position
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Getter
+     * @return Y value of position
+     */
     public int getY() {
         return y;
     }

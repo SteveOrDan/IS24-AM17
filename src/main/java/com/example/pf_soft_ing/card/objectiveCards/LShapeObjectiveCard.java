@@ -19,6 +19,13 @@ public abstract class LShapeObjectiveCard extends ObjectiveCard {
         this.secondaryElementType = secondaryElementType;
     }
 
+    /**
+     * Function to calculate points given by an L shape type objective card
+     * @param playArea Player's play area to get placed cards from
+     * @param xDirection X direction of the card of the main element type
+     * @param yDirection Y direction of the card of the main element type
+     * @return Number of points given by the objective card
+     */
     protected int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int xDirection, int yDirection) {
         ArrayList<Position> usedPositions = new ArrayList<>();
 

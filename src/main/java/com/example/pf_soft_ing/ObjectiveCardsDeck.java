@@ -16,20 +16,29 @@ public class ObjectiveCardsDeck {
         commonObjectives = new ArrayList<>();
     }
 
+    /**
+     * Getter for commonObjectives
+     * @return commonObjectives List
+     */
     public List<ObjectiveCard> getCommonObjectives(){
         return commonObjectives;
     }
 
+    /**
+     * Method to shuffle the deck
+     */
     public void shuffleDeck(){
         Collections.shuffle(deck);
     }
 
+    /**
+     * Get the top card in the deck and returns it
+     * @return the top card in the deck
+     */
     public ObjectiveCard drawCard(){
         try{
             if (!deck.isEmpty()){
-                int randIndex = (int)(Math.random() * (deck.size() - 1));
-
-                ObjectiveCard retCard = deck.get(randIndex);
+                ObjectiveCard retCard = deck.getFirst();
 
                 deck.remove(retCard);
 
@@ -45,6 +54,10 @@ public class ObjectiveCardsDeck {
         }
     }
 
+    /**
+     * Adds an objective card to the list of common objectives.
+     * No more than 2 cards are allowed in the list
+     */
     public void setCommonObjectives(){
         while (commonObjectives.size() < 2){
             commonObjectives.add(drawCard());

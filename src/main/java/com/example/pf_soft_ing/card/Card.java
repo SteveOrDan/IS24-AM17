@@ -7,6 +7,10 @@ public abstract class Card {
         this.id = id;
     }
 
+    /**
+     * Getter
+     * @return Card's ID
+     */
     public int getId(){
         return id;
     }

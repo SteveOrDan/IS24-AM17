@@ -16,10 +16,17 @@ public class UsableCardsDeck {
         visibleCards = new ArrayList<>();
     }
 
+    /**
+     * Method to shuffle the deck
+     */
     public void shuffleDeck(){
         Collections.shuffle(deck);
     }
 
+    /**
+     * Get the top card in the deck and returns it
+     * @return the top card in the deck
+     */
     public PlaceableCard drawCard(){
         try{
             if (!deck.isEmpty()){
@@ -41,6 +48,11 @@ public class UsableCardsDeck {
         }
     }
 
+    /**
+     * The method returns one of the cards in the visibleCards list based on the index passed as a parameter
+     * @param index Index of visible card in the list (either 0 or 1)
+     * @return the card that has been drawn
+     */
     public PlaceableCard drawVisibleCard(int index){
         try{
             if (!visibleCards.isEmpty()){
@@ -60,6 +72,9 @@ public class UsableCardsDeck {
         }
     }
 
+    /**
+     * Changes the values inside the visibleCards list so that it only contains 2 cards
+     */
     public void restoreVisibleCards(){
         while (visibleCards.size() < 2){
             visibleCards.add(drawCard());

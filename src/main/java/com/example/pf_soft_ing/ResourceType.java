@@ -20,8 +20,8 @@ public enum ResourceType {
 
     /**
      * Constructor for ResourceType enum
-     * @param value initialize value as resource arr index
-     * @param str initialize value as TUI string output
+     * @param value Initialize value as resource arr index
+     * @param str Initialize value as TUI string output
      */
     ResourceType(int value, String str){
         this.value = value;

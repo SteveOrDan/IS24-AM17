@@ -13,6 +13,10 @@ public class ResourceCard extends PlaceableCard{
         this.points = points;
     }
 
+    /**
+     * Getter
+     * @return Points given when placing the card
+     */
     public int getPoints() {
         return points;
     }

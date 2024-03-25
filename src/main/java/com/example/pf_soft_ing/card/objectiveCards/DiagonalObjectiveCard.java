@@ -17,6 +17,12 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
         this.elementType = elementType;
     }
 
+    /**
+     * Function to calculate points given by a diagonal shape type objective card
+     * @param playArea Player's play area to get placed cards from
+     * @param direction Direction of the diagonal
+     * @return Number of points given by the objective card
+     */
     protected int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int direction){
 
         ArrayList<Position> usedPositions = new ArrayList<>();

@@ -25,18 +25,34 @@ public class GameResources {
 //        card.exportCard();
     }
 
+    /**
+     * Getter
+     * @return Gold cards deck list
+     */
     public List<PlaceableCard> getGoldenDeck() {
         return goldenDeck;
     }
 
+    /**
+     * Getter
+     * @return Objective cards deck list
+     */
     public List<ObjectiveCard> getObjectiveDeck() {
         return objectiveDeck;
     }
 
+    /**
+     * Getter
+     * @return Starter cards deck list
+     */
     public List<StarterCard> getStarterDeck() {
         return starterDeck;
     }
 
+    /**
+     * Getter
+     * @return Resource cards deck list
+     */
     public List<PlaceableCard> getResourcesDeck() {
         return resourcesDeck;
     }

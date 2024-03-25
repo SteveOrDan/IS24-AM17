@@ -40,14 +40,26 @@ public class PlayerModel {
         currScore = 0;
     }
 
+    /**
+     * Getter
+     * @return player's nickname as a string
+     */
     public String getNickname() {
         return nickname;
     }
 
+    /**
+     * Getter
+     * @return Player's ID as an int
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Getter
+     * @return Current player's score (int)
+     */
     public int getCurrScore(){
         return currScore;
     }
@@ -78,8 +90,8 @@ public class PlayerModel {
      * Adds the placed card's resources to the player's possession
      * Adds points if needed
      * Adds card to play area
-     * @param rCard: Resource card to place in the player's playArea
-     * @param pos: Card's position to add to the player's playArea
+     * @param rCard Resource card to place in the player's playArea
+     * @param pos Card's position to add to the player's playArea
      */
     public void placeCard(ResourceCard rCard, Position pos){
         try {
@@ -127,8 +139,8 @@ public class PlayerModel {
      * Adds the placed card's resources to the player's possession
      * Adds either normal points or objective points based on the card
      * Adds card to play area
-     * @param gCard: Golden card to place in the player's playArea
-     * @param pos: Card's position to add to the player's playArea
+     * @param gCard Golden card to place in the player's playArea
+     * @param pos Card's position to add to the player's playArea
      */
     public void placeCard(GoldenCard gCard, Position pos){
         try {
@@ -187,10 +199,10 @@ public class PlayerModel {
     /**
      * Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
      * Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
-     * @param pos : position of reference card
-     * @return list of adjacent corners to be covered by card
-     * @throws NoAdjacentCardsException : if there are no adjacent cards to the reference card
-     * @throws PlacingOnInvalidCornerException : if a corner is hidden
+     * @param pos Position of reference card
+     * @return List of adjacent corners to be covered by card
+     * @throws NoAdjacentCardsException If there are no adjacent cards to the reference card
+     * @throws PlacingOnInvalidCornerException If a corner is hidden
      */
     private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
@@ -230,7 +242,7 @@ public class PlayerModel {
     /**
      * Adds the points given an objective card to the player's score
      * Objective card could be the player's secret objective or one of the common objectives
-     * @param oCard: Card to use for points calculations
+     * @param oCard Card to use for points calculations
      */
     public void calculateObjectivePoints(ObjectiveCard oCard){
         currScore += oCard.calculateObjectivePoints(playArea, numOfResourcesArr);

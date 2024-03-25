@@ -80,7 +80,7 @@ class LShapeObjectiveCard{
     - points : int
     - mainElementType: CardElementType
     - secondaryElementType: CardElementType
-    %% Protected
+    
     # calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, xDirection : int, yDirection : int) int
 }
 
