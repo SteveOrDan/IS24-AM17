@@ -22,6 +22,15 @@ public class GoldenCard extends PlaceableCard{
         this.pointPerResourceRes = pointPerResourceRes;
     }
 
+    public GoldenCard(CardElementType elementType, int id, Side front, Side back, int points, HashMap<ResourceType, Integer> requiredResources) {
+        super(elementType, id, front, back);
+
+        this.requiredResources = requiredResources;
+        this.points = points;
+        this.isPointPerResource = false;
+        this.pointPerResourceRes = null;
+    }
+
     /**
      * Getter
      * @return Boolean that says if the points given by the card are based on the number of resources

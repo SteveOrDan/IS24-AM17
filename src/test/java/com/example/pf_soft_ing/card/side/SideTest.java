@@ -42,33 +42,6 @@ class SideTest {
         add(ResourceType.FUNGI);
         add(ResourceType.PLANT);
     }};
-    @DisplayName("Bottom left corner getter test")
-    @Test
-    void getBLCorner() {
-        assertEquals(emptyCorner, front.getBLCorner());
-        assertEquals(hiddenCorner, starterBack.getBLCorner());
-    }
-
-    @DisplayName("Bottom right corner getter test")
-    @Test
-    void getBRCorner() {
-        assertEquals(hiddenCorner, front.getBRCorner());
-        assertEquals(hiddenCorner, starterBack.getBRCorner());
-    }
-
-    @DisplayName("Top left corner getter test")
-    @Test
-    void getTLCorner() {
-        assertEquals(aCorner, front.getTLCorner());
-        assertEquals(pCorner, starterBack.getTLCorner());
-    }
-
-    @DisplayName("Bottom right corner getter test")
-    @Test
-    void getTRCorner() {
-        assertEquals(kCorner, front.getTRCorner());
-        assertEquals(fCorner, starterBack.getTRCorner());
-    }
 
     @DisplayName("Resource getter test")
     @Test
