@@ -1,6 +1,7 @@
-package com.example.pf_soft_ing.card;
+package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.EmptyCorner;
 import com.example.pf_soft_ing.card.corner.HiddenCorner;
@@ -8,15 +9,13 @@ import com.example.pf_soft_ing.card.corner.ResourceCorner;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlaceableCardTest {
+class PlayerModelTest {
     CardCorner emptyCorner = new EmptyCorner();
     CardCorner hiddenCorner = new HiddenCorner();
     CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
@@ -26,23 +25,30 @@ class PlaceableCardTest {
     CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
     CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
     CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
-    Side resourceFront1 = new Front(emptyCorner, hiddenCorner, iCorner, kCorner);
-    Side resourceBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.INSECT);}});
-    PlaceableCard resourceCard1 = new ResourceCard(0, CardElementType.INSECT, 0, resourceFront1, resourceBack1);
-
-    Side goldenFront1 = new Front(emptyCorner, hiddenCorner, qCorner, mCorner);
-    Side goldenBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.ANIMAL);}});
-    PlaceableCard goldenCard1 = new GoldenCard(CardElementType.ANIMAL, 1, goldenFront1, goldenBack1, 3, new HashMap<>(){{put(ResourceType.ANIMAL, 3);}});
-
     Side starterFront1 = new Front(aCorner, pCorner, iCorner, fCorner);
     Side starerBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.FUNGI);}});
     PlaceableCard starterCard1 = new StarterCard(2, starterFront1, starerBack1);
 
-    @DisplayName("Flip card test")
+    PlayerModel playerModel = new PlayerModel("John Smith", 34);
     @Test
-    void flipCard() {
-        assertEquals(resourceFront1, resourceCard1.getCurrSide());
-        resourceCard1.flipCard();
-        assertEquals(resourceBack1, resourceCard1.getCurrSide());
+    void placeStarterCard() {
+        playerModel.setStarterCard(starterCard1);
+        starterCard1.flipCard();
+        starterCard1.flipCard();
+        playerModel.placeStarterCard();
+        assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.ANIMAL.getValue()]);
+        assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.INSECT.getValue()]);
+        assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.PLANT.getValue()]);
+        assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.FUNGI.getValue()]);
+        assertEquals(1, playerModel.getCurrMaxPriority());
+        assertTrue(playerModel.getPlayArea().containsValue(starterCard1) && playerModel.getPlayArea().containsKey(new Position(0,0)));
+    }
+
+    @Test
+    void placeCard() {
+    }
+
+    @Test
+    void testPlaceCard() {
     }
 }

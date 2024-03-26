@@ -56,6 +56,18 @@ public class PlayerModel {
         return id;
     }
 
+    public int[] getNumOfResourcesArr(){
+        return numOfResourcesArr;
+    }
+
+    public int getCurrMaxPriority(){
+        return currMaxPriority;
+    }
+
+    public HashMap<Position, PlaceableCard> getPlayArea() {
+        return playArea;
+    }
+
     /**
      * Getter
      * @return Current player's score (int)
@@ -237,6 +249,10 @@ public class PlayerModel {
             }
         }
         return adjacentCorners;
+    }
+
+    public void setStarterCard(PlaceableCard sCard){
+        starterCard = sCard;
     }
 
     /**

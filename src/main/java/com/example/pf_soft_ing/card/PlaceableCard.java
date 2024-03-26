@@ -20,6 +20,7 @@ public abstract class PlaceableCard{
         this.priority = 0;
         this.elementType = element;
         this.id = id;
+        this.currSide = front;
         this.front = front;
         this.back = back;
     }
