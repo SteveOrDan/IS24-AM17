@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.card.corner;
 
+import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
 
 public abstract class CardCorner {
@@ -15,4 +16,10 @@ public abstract class CardCorner {
      * @return Resource stored in the card's corner
      */
     public abstract ResourceType getResource();
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        return obj != null && getClass() == obj.getClass();
+    }
 }
