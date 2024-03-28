@@ -75,7 +75,7 @@ public class GameModel {
     }
 
     /**
-     * Function to draw the first resource card of the deck
+     * Method to draw the first resource card of the deck
      * @return First resource card of the deck
      */
     public PlaceableCard drawResourceCard(){
@@ -83,7 +83,7 @@ public class GameModel {
     }
 
     /**
-     * Function to draw the first golden card of the deck
+     * Method to draw the first golden card of the deck
      * @return First golden card of the deck
      */
     public PlaceableCard drawGoldenCard(){
@@ -91,7 +91,7 @@ public class GameModel {
     }
 
     /**
-     * Function to draw the first starter card of the deck
+     * Method to draw the first starter card of the deck
      * @return First starter card of the deck
      */
     public PlaceableCard drawStarterCard(){
@@ -99,7 +99,7 @@ public class GameModel {
     }
 
     /**
-     * Function to draw the first objective card of the deck
+     * Method to draw the first objective card of the deck
      * @return First objective card of the deck
      */
     public ObjectiveCard drawObjectiveCard(){
