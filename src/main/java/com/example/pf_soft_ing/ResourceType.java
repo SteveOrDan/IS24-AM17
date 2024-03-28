@@ -42,4 +42,19 @@ public enum ResourceType {
     public String toString() {
         return str;
     }
+
+    public static ResourceType resourceTypeFromString(String str){
+        str = str.toLowerCase();
+
+        return switch (str) {
+            case "a", "animal" -> ANIMAL;
+            case "p", "plant" -> PLANT;
+            case "f", "fungi" -> FUNGI;
+            case "i", "insect" -> INSECT;
+            case "q", "quill" -> QUILL;
+            case "k", "inkwell" -> INKWELL;
+            case "m", "manuscript" -> MANUSCRIPT;
+            default -> throw new IllegalArgumentException("Invalid resource type: " + str);
+        };
+    }
 }

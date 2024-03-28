@@ -1,0 +1,18 @@
+{
+  "sideType": "Back",
+  "permanentResources": [
+    "INSECT"
+  ],
+  "BLCorner": {
+    "cornerType": "EmptyCorner"
+  },
+  "BRCorner": {
+    "cornerType": "EmptyCorner"
+  },
+  "TLCorner": {
+    "cornerType": "EmptyCorner"
+  },
+  "TRCorner": {
+    "cornerType": "EmptyCorner"
+  }
+}

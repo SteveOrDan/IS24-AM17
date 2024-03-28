@@ -3,6 +3,7 @@ module com.example.pf_soft_ing {
     requires javafx.fxml;
 
     requires org.controlsfx.controls;
+    requires com.google.gson;
 
     opens com.example.pf_soft_ing to javafx.fxml;
     exports com.example.pf_soft_ing;
@@ -14,4 +15,6 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.card.objectiveCards to javafx.fxml;
     exports com.example.pf_soft_ing.card.corner;
     opens com.example.pf_soft_ing.card.corner to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers;
+    opens com.example.pf_soft_ing.deserializers to javafx.fxml;
 }

@@ -5,5 +5,19 @@ public enum CardElementType {
     ANIMAL,
     PLANT,
     FUNGI,
-    INSECT
+    INSECT;
+
+    public static CardElementType stringToCardElementType(String cardElementType) {
+
+        cardElementType = cardElementType.toLowerCase();
+
+        return switch (cardElementType) {
+            case "starter" -> CardElementType.STARTER;
+            case "animal" -> CardElementType.ANIMAL;
+            case "plant" -> CardElementType.PLANT;
+            case "fungi" -> CardElementType.FUNGI;
+            case "insect" -> CardElementType.INSECT;
+            default -> null;
+        };
+    }
 }

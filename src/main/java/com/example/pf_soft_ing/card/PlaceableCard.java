@@ -1,20 +1,20 @@
 package com.example.pf_soft_ing.card;
 
 import com.example.pf_soft_ing.ResourceType;
-import com.example.pf_soft_ing.card.side.Back;
-import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
 
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class PlaceableCard{
-    private final int id;
-    private final CardElementType elementType;
-    private int priority;
-    private Side currSide;
-    private final Side front;
-    private final Side back;
+    // Needed for the JSON deserialization
+    public String cardType;
+
+    public final int id;
+    public final CardElementType elementType;
+    public int priority;
+    public Side currSide;
+    public final Side front;
+    public final Side back;
 
     public PlaceableCard(CardElementType element, int id, Side front, Side back){
         this.priority = 0;
@@ -99,20 +99,6 @@ public abstract class PlaceableCard{
             currSide = front;
         }
     }
-
-//    public void exportCard(){
-//        Gson gson = new Gson();
-//
-////        String myJson = gson.toJson(card);
-////        System.out.println(myJson);
-//
-//        try (FileWriter writer = new FileWriter("test.json")){
-//            gson.toJson(this, writer);
-//        }
-//        catch (IOException e){
-//            throw new RuntimeException(e);
-//        }
-//    }
 
     /**
      * Getter

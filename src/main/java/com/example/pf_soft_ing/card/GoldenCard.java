@@ -6,12 +6,12 @@ import com.example.pf_soft_ing.card.side.Side;
 import java.util.HashMap;
 
 public class GoldenCard extends PlaceableCard{
-    private final boolean isPointPerResource;
-    private final ResourceType pointPerResourceRes;
+    public final boolean isPointPerResource;
+    public final ResourceType pointPerResourceRes;
 
-    private final HashMap<ResourceType, Integer> requiredResources;
+    public final HashMap<ResourceType, Integer> requiredResources;
 
-    private final int points;
+    public final int points;
 
     public GoldenCard(CardElementType elementType, int id, Side front, Side back, int points, HashMap<ResourceType, Integer> requiredResources, boolean isPointPerResource, ResourceType pointPerResourceRes) {
         super(elementType, id, front, back);
@@ -20,15 +20,8 @@ public class GoldenCard extends PlaceableCard{
         this.points = points;
         this.isPointPerResource = isPointPerResource;
         this.pointPerResourceRes = pointPerResourceRes;
-    }
 
-    public GoldenCard(CardElementType elementType, int id, Side front, Side back, int points, HashMap<ResourceType, Integer> requiredResources) {
-        super(elementType, id, front, back);
-
-        this.requiredResources = requiredResources;
-        this.points = points;
-        this.isPointPerResource = false;
-        this.pointPerResourceRes = null;
+        this.cardType = "GoldenCard";
     }
 
     /**

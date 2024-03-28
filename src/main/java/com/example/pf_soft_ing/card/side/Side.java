@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Side {
-    private final CardCorner BLCorner;
-    private final CardCorner BRCorner;
-    private final CardCorner TLCorner;
-    private final CardCorner TRCorner;
+    public String sideType;
+    public final CardCorner BLCorner;
+    public final CardCorner BRCorner;
+    public final CardCorner TLCorner;
+    public final CardCorner TRCorner;
 
     public Side(CardCorner BLCorner, CardCorner BRCorner, CardCorner TLCorner, CardCorner TRCorner) {
         this.BLCorner = BLCorner;

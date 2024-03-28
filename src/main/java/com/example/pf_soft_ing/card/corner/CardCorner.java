@@ -4,6 +4,9 @@ import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
 
 public abstract class CardCorner {
+
+    public String cornerType;
+
     /**
      * Function check if on the corner can be placed another card
      * @return Boolean based on the dynamic type

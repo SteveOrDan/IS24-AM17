@@ -13,6 +13,7 @@ public class Back extends Side{
     public Back(CardCorner BLCorner, CardCorner BRCorner, CardCorner TLCorner, CardCorner TRCorner, List<ResourceType> permanentResources) {
         super(BLCorner, BRCorner, TLCorner, TRCorner);
         this.permanentResources = permanentResources;
+        this.sideType = "Back";
     }
 
     @Override

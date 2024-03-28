@@ -9,5 +9,6 @@ import java.util.List;
 public class Front extends Side{
     public Front(CardCorner BLCorner, CardCorner BRCorner, CardCorner TLCorner, CardCorner TRCorner) {
         super(BLCorner, BRCorner, TLCorner, TRCorner);
+        this.sideType = "Front";
     }
 }

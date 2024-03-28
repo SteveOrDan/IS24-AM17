@@ -1,0 +1,41 @@
+{
+  "points": 0,
+  "cardType": "ResourceCard",
+  "id": 0,
+  "elementType": "INSECT",
+  "front": {
+    "sideType": "Front",
+    "BLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "BRCorner": {
+      "cornerType": "HiddenCorner"
+    },
+    "TLCorner": {
+      "resourceType": "INSECT",
+      "cornerType": "ResourceCorner"
+    },
+    "TRCorner": {
+      "resourceType": "INKWELL",
+      "cornerType": "ResourceCorner"
+    }
+  },
+  "back": {
+    "sideType": "Back",
+    "permanentResources": [
+      "INSECT"
+    ],
+    "BLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "BRCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "TLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "TRCorner": {
+      "cornerType": "EmptyCorner"
+    }
+  }
+}

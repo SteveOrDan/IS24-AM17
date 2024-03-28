@@ -1,0 +1,17 @@
+{
+  "sideType": "Front",
+  "BLCorner": {
+    "cornerType": "EmptyCorner"
+  },
+  "BRCorner": {
+    "cornerType": "HiddenCorner"
+  },
+  "TLCorner": {
+    "resourceType": "INSECT",
+    "cornerType": "ResourceCorner"
+  },
+  "TRCorner": {
+    "resourceType": "INKWELL",
+    "cornerType": "ResourceCorner"
+  }
+}
