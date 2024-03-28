@@ -1,0 +1,14 @@
+[
+  {
+    "resourceType": "PLANT",
+    "requiredResourceCount": 3,
+    "id": 3,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "resourceType": "PLANT",
+    "requiredResourceCount": 3,
+    "id": 3,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  }
+]

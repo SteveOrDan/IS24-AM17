@@ -10,6 +10,8 @@ public class TRBLDiagonalObjectiveCard extends DiagonalObjectiveCard{
     private static final int direction = -1;
     public TRBLDiagonalObjectiveCard(int id, CardElementType elementType) {
         super(id, elementType);
+
+        this.objectiveType = "TRBLDiagonalObjectiveCard";
     }
 
     @Override

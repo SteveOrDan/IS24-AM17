@@ -1,48 +1,51 @@
 {
-  "points": 0,
-  "cardType": "ResourceCard",
-  "id": 0,
-  "elementType": "FUNGI",
+  "cardType": "StarterCard",
+  "id": 2,
+  "elementType": "STARTER",
   "priority": 0,
   "currSide": {
     "sideType": "Front",
     "BLCorner": {
-      "cornerType": "EmptyCorner"
+      "resourceType": "ANIMAL",
+      "cornerType": "ResourceCorner"
     },
     "BRCorner": {
-      "cornerType": "HiddenCorner"
+      "resourceType": "PLANT",
+      "cornerType": "ResourceCorner"
     },
     "TLCorner": {
       "resourceType": "INSECT",
       "cornerType": "ResourceCorner"
     },
     "TRCorner": {
-      "resourceType": "INKWELL",
+      "resourceType": "FUNGI",
       "cornerType": "ResourceCorner"
     }
   },
   "front": {
     "sideType": "Front",
     "BLCorner": {
-      "cornerType": "EmptyCorner"
+      "resourceType": "ANIMAL",
+      "cornerType": "ResourceCorner"
     },
     "BRCorner": {
-      "cornerType": "HiddenCorner"
+      "resourceType": "PLANT",
+      "cornerType": "ResourceCorner"
     },
     "TLCorner": {
       "resourceType": "INSECT",
       "cornerType": "ResourceCorner"
     },
     "TRCorner": {
-      "resourceType": "INKWELL",
+      "resourceType": "FUNGI",
       "cornerType": "ResourceCorner"
     }
   },
   "back": {
-    "sideType": "Back",
     "permanentResources": [
-      "INSECT"
+      "FUNGI"
     ],
+    "sideType": "Back",
     "BLCorner": {
       "cornerType": "EmptyCorner"
     },

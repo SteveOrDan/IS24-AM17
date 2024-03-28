@@ -1,20 +1,26 @@
-package com.example.pf_soft_ing.deserializers;
+package com.example.pf_soft_ing.deserializers.side;
 
+import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.card.side.Front;
+import com.example.pf_soft_ing.card.side.Back;
+import com.example.pf_soft_ing.deserializers.corner.CornerDeserializer;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FrontDeserializer implements JsonDeserializer<Front> {
+public class BackDeserializer implements JsonDeserializer<Back> {
     @Override
-    public Front deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+    public Back deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
 
         JsonElement BLCornerElement = jsonObject.get("BLCorner");
         JsonElement BRCornerElement = jsonObject.get("BRCorner");
         JsonElement TLCornerElement = jsonObject.get("TLCorner");
         JsonElement TRCornerElement = jsonObject.get("TRCorner");
+
+        JsonElement permanentResourcesElement = jsonObject.get("permanentResources");
 
         CornerDeserializer cornerDeserializer = new CornerDeserializer();
 
@@ -27,6 +33,12 @@ public class FrontDeserializer implements JsonDeserializer<Front> {
         CardCorner TLCorner = gson.fromJson(TLCornerElement, CardCorner.class);
         CardCorner TRCorner = gson.fromJson(TRCornerElement, CardCorner.class);
 
-        return new Front(BLCorner, BRCorner, TLCorner, TRCorner);
+        List<ResourceType> permanentResources = new ArrayList<>();
+
+        permanentResourcesElement.getAsJsonArray().forEach(jsonArrayElement -> {
+            permanentResources.add(ResourceType.resourceTypeFromString(jsonArrayElement.getAsString()));
+        });
+
+        return new Back(BLCorner, BRCorner, TLCorner, TRCorner, permanentResources);
     }
 }

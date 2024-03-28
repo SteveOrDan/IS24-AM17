@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public abstract class DiagonalObjectiveCard extends ObjectiveCard {
     private static final int points = 2;
-    private final CardElementType elementType;
+    public final CardElementType elementType;
 
     public DiagonalObjectiveCard(int id, CardElementType elementType) {
         super(id);

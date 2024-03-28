@@ -1,13 +1,16 @@
-package com.example.pf_soft_ing.deserializers;
+package com.example.pf_soft_ing.deserializers.placeable_card;
 
 import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.CardElementType;
 import com.example.pf_soft_ing.card.GoldenCard;
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.deserializers.side.SideDeserializer;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Map;
 
 public class GoldenCardDeserializer implements JsonDeserializer<GoldenCard> {
     @Override
@@ -16,12 +19,21 @@ public class GoldenCardDeserializer implements JsonDeserializer<GoldenCard> {
 
         int points = jsonObject.get("points").getAsInt();
         int id = jsonObject.get("id").getAsInt();
-        CardElementType elementType = CardElementType.stringToCardElementType(jsonObject.get("elementType").getAsString());
+        CardElementType elementType = CardElementType.cardElementTypeFromString(jsonObject.get("elementType").getAsString());
         boolean isPointPerResource = jsonObject.get("isPointPerResource").getAsBoolean();
-        ResourceType pointPerResourceRes = ResourceType.resourceTypeFromString(jsonObject.get("pointPerResourceRes").getAsString());
 
-        HashMap<ResourceType, Integer> requiredResources = jsonObject.get("requiredResources").getAsJsonObject().entrySet().stream()
-                .collect(HashMap::new, (map, entry) -> map.put(ResourceType.resourceTypeFromString(entry.getKey()), entry.getValue().getAsInt()), HashMap::putAll);
+        ResourceType pointPerResourceRes = null;
+
+        if (isPointPerResource) {
+            pointPerResourceRes = ResourceType.resourceTypeFromString(jsonObject.get("pointPerResourceRes").getAsString());
+        }
+
+        JsonElement requiredResourcesElement = jsonObject.get("requiredResources");
+
+        Gson mapGson = new Gson();
+
+        Type mapType = new TypeToken<Map<ResourceType, Integer>>() {}.getType();
+        HashMap<ResourceType, Integer> requiredResources = mapGson.fromJson(requiredResourcesElement, mapType);
 
         JsonElement frontElement = jsonObject.get("front");
         JsonElement backElement = jsonObject.get("back");

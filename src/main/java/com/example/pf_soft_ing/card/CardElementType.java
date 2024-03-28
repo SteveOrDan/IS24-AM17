@@ -7,7 +7,7 @@ public enum CardElementType {
     FUNGI,
     INSECT;
 
-    public static CardElementType stringToCardElementType(String cardElementType) {
+    public static CardElementType cardElementTypeFromString(String cardElementType) {
 
         cardElementType = cardElementType.toLowerCase();
 

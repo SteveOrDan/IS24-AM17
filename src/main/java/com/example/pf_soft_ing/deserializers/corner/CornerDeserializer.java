@@ -1,15 +1,12 @@
-package com.example.pf_soft_ing.deserializers;
+package com.example.pf_soft_ing.deserializers.corner;
 
-import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.EmptyCorner;
 import com.example.pf_soft_ing.card.corner.HiddenCorner;
 import com.example.pf_soft_ing.card.corner.ResourceCorner;
 import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 
 public class CornerDeserializer implements JsonDeserializer<CardCorner> {
     @Override

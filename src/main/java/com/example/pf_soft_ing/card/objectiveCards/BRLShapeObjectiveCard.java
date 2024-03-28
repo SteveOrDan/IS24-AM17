@@ -12,6 +12,8 @@ public class BRLShapeObjectiveCard extends LShapeObjectiveCard {
 
     public BRLShapeObjectiveCard(int id, CardElementType mainElementType, CardElementType secondaryElementType) {
         super(id, mainElementType, secondaryElementType);
+
+        this.objectiveType = "BRLShapeObjectiveCard";
     }
 
     @Override

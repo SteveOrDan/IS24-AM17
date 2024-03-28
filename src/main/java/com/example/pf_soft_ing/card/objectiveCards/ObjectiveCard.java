@@ -6,7 +6,8 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public abstract class ObjectiveCard {
-    private final int id;
+    public final int id;
+    public String objectiveType;
 
     public ObjectiveCard(int id) {
         this.id = id;

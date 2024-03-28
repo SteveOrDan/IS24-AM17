@@ -1,0 +1,64 @@
+{
+  "isPointPerResource": false,
+  "requiredResources": {
+    "A": 2,
+    "I": 1
+  },
+  "points": 3,
+  "cardType": "GoldenCard",
+  "id": 1,
+  "elementType": "ANIMAL",
+  "priority": 0,
+  "currSide": {
+    "sideType": "Front",
+    "BLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "BRCorner": {
+      "cornerType": "HiddenCorner"
+    },
+    "TLCorner": {
+      "resourceType": "QUILL",
+      "cornerType": "ResourceCorner"
+    },
+    "TRCorner": {
+      "resourceType": "MANUSCRIPT",
+      "cornerType": "ResourceCorner"
+    }
+  },
+  "front": {
+    "sideType": "Front",
+    "BLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "BRCorner": {
+      "cornerType": "HiddenCorner"
+    },
+    "TLCorner": {
+      "resourceType": "QUILL",
+      "cornerType": "ResourceCorner"
+    },
+    "TRCorner": {
+      "resourceType": "MANUSCRIPT",
+      "cornerType": "ResourceCorner"
+    }
+  },
+  "back": {
+    "permanentResources": [
+      "ANIMAL"
+    ],
+    "sideType": "Back",
+    "BLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "BRCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "TLCorner": {
+      "cornerType": "EmptyCorner"
+    },
+    "TRCorner": {
+      "cornerType": "EmptyCorner"
+    }
+  }
+}

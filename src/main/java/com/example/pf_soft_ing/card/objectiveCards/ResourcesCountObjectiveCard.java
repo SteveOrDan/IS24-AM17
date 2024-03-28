@@ -8,14 +8,16 @@ import java.util.HashMap;
 
 public class ResourcesCountObjectiveCard extends ObjectiveCard {
     private static final int points = 2;
-    private final ResourceType resourceType;
-    private final int requiredResourceCount;
+    public final ResourceType resourceType;
+    public final int requiredResourceCount;
 
     public ResourcesCountObjectiveCard(int id, ResourceType resourceType, int requiredResourceCount) {
         super(id);
 
         this.resourceType = resourceType;
         this.requiredResourceCount = requiredResourceCount;
+
+        this.objectiveType = "ResourcesCountObjectiveCard";
     }
 
     @Override

@@ -15,6 +15,12 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.card.objectiveCards to javafx.fxml;
     exports com.example.pf_soft_ing.card.corner;
     opens com.example.pf_soft_ing.card.corner to javafx.fxml;
-    exports com.example.pf_soft_ing.deserializers;
-    opens com.example.pf_soft_ing.deserializers to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers.side;
+    opens com.example.pf_soft_ing.deserializers.side to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers.objective_card;
+    opens com.example.pf_soft_ing.deserializers.objective_card to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers.placeable_card;
+    opens com.example.pf_soft_ing.deserializers.placeable_card to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers.corner;
+    opens com.example.pf_soft_ing.deserializers.corner to javafx.fxml;
 }

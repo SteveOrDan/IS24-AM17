@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
@@ -7,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class StarterCardsDeck {
-    private final List<StarterCard> deck;
+    private final List<PlaceableCard> deck;
 
-    public StarterCardsDeck(List<StarterCard> deck) {
+    public StarterCardsDeck(List<PlaceableCard> deck) {
         this.deck = deck;
     }
 
@@ -24,12 +25,12 @@ public class StarterCardsDeck {
      * Get the top card in the deck and returns it
      * @return the top card in the deck
      */
-    public StarterCard drawCard(){
+    public PlaceableCard drawCard(){
         try{
             if (!deck.isEmpty()){
                 int randIndex = (int)(Math.random() * (deck.size() - 1));
 
-                StarterCard retCard = deck.get(randIndex);
+                PlaceableCard retCard = deck.get(randIndex);
 
                 deck.remove(retCard);
 

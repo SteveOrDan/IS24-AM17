@@ -1,12 +1,9 @@
-package com.example.pf_soft_ing.deserializers;
+package com.example.pf_soft_ing.deserializers.placeable_card;
 
 import com.example.pf_soft_ing.card.ResourceCard;
-import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.card.corner.EmptyCorner;
 import com.example.pf_soft_ing.card.CardElementType;
-import com.example.pf_soft_ing.card.side.Back;
-import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.deserializers.side.SideDeserializer;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
@@ -19,7 +16,7 @@ public class ResourceCardDeserializer implements JsonDeserializer<ResourceCard> 
 
         int points = jsonObject.get("points").getAsInt();
         int id = jsonObject.get("id").getAsInt();
-        CardElementType elementType = CardElementType.stringToCardElementType(jsonObject.get("elementType").getAsString());
+        CardElementType elementType = CardElementType.cardElementTypeFromString(jsonObject.get("elementType").getAsString());
 
         JsonElement frontElement = jsonObject.get("front");
         JsonElement backElement = jsonObject.get("back");
