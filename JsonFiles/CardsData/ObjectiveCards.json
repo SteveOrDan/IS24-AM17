@@ -1,14 +1,92 @@
 [
   {
-    "resourceType": "PLANT",
+    "elementType": "FUNGI",
+    "id": 86,
+    "objectiveType": "TRBLDiagonalObjectiveCard"
+  },
+  {
+    "elementType": "PLANT",
+    "id": 87,
+    "objectiveType": "TLBRDiagonalObjectiveCard"
+  },
+  {
+    "elementType": "ANIMAL",
+    "id": 88,
+    "objectiveType": "TRBLDiagonalObjectiveCard"
+  },
+  {
+    "elementType": "INSECT",
+    "id": 89,
+    "objectiveType": "TLBRDiagonalObjectiveCard"
+  },
+  {
+    "mainElementType": "PLANT",
+    "secondaryElementType": "FUNGI",
+    "id": 90,
+    "objectiveType": "BRLShapeObjectiveCard"
+  },
+  {
+    "mainElementType": "INSECT",
+    "secondaryElementType": "PLANT",
+    "id": 91,
+    "objectiveType": "BLLShapeObjectiveCard"
+  },
+  {
+    "mainElementType": "FUNGI",
+    "secondaryElementType": "ANIMAL",
+    "id": 92,
+    "objectiveType": "TRLShapeObjectiveCard"
+  },
+  {
+    "mainElementType": "ANIMAL",
+    "secondaryElementType": "INSECT",
+    "id": 93,
+    "objectiveType": "TLLShapeObjectiveCard"
+  },
+  {
     "requiredResourceCount": 3,
-    "id": 3,
+    "resourceType": "FUNGI",
+    "id": 94,
     "objectiveType": "ResourcesCountObjectiveCard"
   },
   {
-    "resourceType": "PLANT",
     "requiredResourceCount": 3,
-    "id": 3,
+    "resourceType": "PLANT",
+    "id": 95,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "requiredResourceCount": 3,
+    "resourceType": "ANIMAL",
+    "id": 96,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "requiredResourceCount": 3,
+    "resourceType": "INSECT",
+    "id": 97,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "id": 98,
+    "objectiveType": "TrinityObjectiveCard"
+  },
+  {
+    "requiredResourceCount": 2,
+    "resourceType": "MANUSCRIPT",
+    "id": 99,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "requiredResourceCount": 2,
+    "resourceType": "INKWELL",
+    "id": 100,
+    "objectiveType": "ResourcesCountObjectiveCard"
+  },
+  {
+    "requiredResourceCount": 2,
+    "resourceType": "QUILL",
+    "id": 101,
     "objectiveType": "ResourcesCountObjectiveCard"
   }
 ]

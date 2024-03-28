@@ -37,29 +37,9 @@ public class GameResources {
     private static List<PlaceableCard> starterDeck;
     private static List<ObjectiveCard> objectiveDeck;
 
-    public static CardCorner testCorner;
-    public static Side testFront;
-    public static Side testBack;
-    public static PlaceableCard testResourceCard;
-    public static PlaceableCard testGoldenCard;
-    public static PlaceableCard testStarterCard;
-    public static ObjectiveCard testObjectiveCard;
-
     private List<Token> tokensList;
 
-    public static void main(String[] args) {
-//        deserializeCorner();
-//        deserializeFront();
-//        deserializeBack();
-//        deserializeSide();
-//        deserializeResourceCard();
-//        initializeResourceDeck();
-//        deserializeGoldenCard();
-//        deserializeObjectiveCard();
-//        deserializeStarterCard();
-    }
-
-    public static void deserializeCorner() {
+    public static CardCorner deserializeCorner() {
         try {
             JsonReader cornerReader = new JsonReader(new FileReader("JsonFiles/Exports/Corner.json"));
             CornerDeserializer cornerDeserializer = new CornerDeserializer();
@@ -67,14 +47,14 @@ public class GameResources {
                     .registerTypeAdapter(CardCorner.class, cornerDeserializer)
                     .create();
 
-            testCorner = gson.fromJson(cornerReader, CardCorner.class);
+            return gson.fromJson(cornerReader, CardCorner.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeFront() {
+    public static Side deserializeFront() {
         try {
             JsonReader frontReader = new JsonReader(new FileReader("JsonFiles/Exports/Front.json"));
             FrontDeserializer frontDeserializer = new FrontDeserializer();
@@ -82,14 +62,14 @@ public class GameResources {
                     .registerTypeAdapter(Front.class, frontDeserializer)
                     .create();
 
-            testFront = gson.fromJson(frontReader, Front.class);
+            return gson.fromJson(frontReader, Front.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeBack() {
+    public static Side deserializeBack() {
         try {
             JsonReader backReader = new JsonReader(new FileReader("JsonFiles/Exports/Back.json"));
             BackDeserializer backDeserializer = new BackDeserializer();
@@ -97,29 +77,14 @@ public class GameResources {
                     .registerTypeAdapter(Back.class, backDeserializer)
                     .create();
 
-            testBack = gson.fromJson(backReader, Back.class);
+            return gson.fromJson(backReader, Back.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeSide(){
-        try {
-            JsonReader sideReader = new JsonReader(new FileReader("JsonFiles/Exports/Back.json"));
-            SideDeserializer sideDeserializer = new SideDeserializer();
-            Gson gson = new GsonBuilder()
-                    .registerTypeAdapter(Side.class, sideDeserializer)
-                    .create();
-
-            testBack = gson.fromJson(sideReader, Side.class);
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static void deserializeResourceCard() {
+    public static PlaceableCard deserializeResourceCard() {
         try {
             JsonReader resourceCardReader = new JsonReader(new FileReader("JsonFiles/Exports/ResourceCard.json"));
             ResourceCardDeserializer resourceCardDeserializer = new ResourceCardDeserializer();
@@ -127,14 +92,14 @@ public class GameResources {
                     .registerTypeAdapter(PlaceableCard.class, resourceCardDeserializer)
                     .create();
 
-            testResourceCard = gson.fromJson(resourceCardReader, PlaceableCard.class);
+            return gson.fromJson(resourceCardReader, PlaceableCard.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeGoldenCard() {
+    public static PlaceableCard deserializeGoldenCard() {
         try {
             JsonReader goldenCardReader = new JsonReader(new FileReader("JsonFiles/Exports/GoldenCard.json"));
             GoldenCardDeserializer goldenCardDeserializer = new GoldenCardDeserializer();
@@ -142,14 +107,14 @@ public class GameResources {
                     .registerTypeAdapter(PlaceableCard.class, goldenCardDeserializer)
                     .create();
 
-            testGoldenCard = gson.fromJson(goldenCardReader, PlaceableCard.class);
+            return gson.fromJson(goldenCardReader, PlaceableCard.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeStarterCard() {
+    public static PlaceableCard deserializeStarterCard() {
         try {
             JsonReader starterCardReader = new JsonReader(new FileReader("JsonFiles/Exports/StarterCard.json"));
             StarterCardDeserializer starterCardDeserializer = new StarterCardDeserializer();
@@ -157,14 +122,14 @@ public class GameResources {
                     .registerTypeAdapter(PlaceableCard.class, starterCardDeserializer)
                     .create();
 
-            testStarterCard = gson.fromJson(starterCardReader, PlaceableCard.class);
+            return gson.fromJson(starterCardReader, PlaceableCard.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    public static void deserializeObjectiveCard() {
+    public static ObjectiveCard deserializeObjectiveCard() {
         try {
             JsonReader objectiveCardReader = new JsonReader(new FileReader("JsonFiles/Exports/ObjectiveCard.json"));
             ObjectiveCardDeserializer objectiveCardDeserializer = new ObjectiveCardDeserializer();
@@ -172,10 +137,10 @@ public class GameResources {
                     .registerTypeAdapter(ObjectiveCard.class, objectiveCardDeserializer)
                     .create();
 
-            testObjectiveCard = gson.fromJson(objectiveCardReader, ObjectiveCard.class);
+            return gson.fromJson(objectiveCardReader, ObjectiveCard.class);
         }
         catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
@@ -253,6 +218,13 @@ public class GameResources {
         catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void initializeAllDecks() {
+        initializeResourceDeck();
+        initializeGoldenDeck();
+        initializeStarterDeck();
+        initializeObjectiveDeck();
     }
 
     /**

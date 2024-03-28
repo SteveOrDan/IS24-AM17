@@ -7,33 +7,15 @@
     "front": {
       "sideType": "Front",
       "BLCorner": {
-        "cornerType": "EmptyCorner"
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
       },
       "BRCorner": {
         "cornerType": "HiddenCorner"
       },
       "TLCorner": {
-        "resourceType": "INSECT",
+        "resourceType": "FUNGI",
         "cornerType": "ResourceCorner"
-      },
-      "TRCorner": {
-        "resourceType": "INKWELL",
-        "cornerType": "ResourceCorner"
-      }
-    },
-    "back": {
-      "sideType": "Back",
-      "permanentResources": [
-        "INSECT"
-      ],
-      "BLCorner": {
-        "cornerType": "EmptyCorner"
-      },
-      "BRCorner": {
-        "cornerType": "EmptyCorner"
-      },
-      "TLCorner": {
-        "cornerType": "EmptyCorner"
       },
       "TRCorner": {
         "cornerType": "EmptyCorner"
@@ -48,6 +30,673 @@
     "front": {
       "sideType": "Front",
       "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 2,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 3,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 4,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "QUILL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 5,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "INKWELL",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 6,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "MANUSCRIPT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 7,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 8,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 9,
+    "elementType": "FUNGI",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 10,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 11,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 12,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 13,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 14,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "QUILL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 15,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "INKWELL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 16,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "MANUSCRIPT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 17,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 18,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 19,
+    "elementType": "PLANT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 20,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 21,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 22,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 23,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 24,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "INKWELL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 25,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "MANUSCRIPT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 26,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "QUILL",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 27,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 28,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 29,
+    "elementType": "ANIMAL",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 30,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
         "cornerType": "EmptyCorner"
       },
       "BRCorner": {
@@ -58,15 +707,159 @@
         "cornerType": "ResourceCorner"
       },
       "TRCorner": {
-        "resourceType": "INKWELL",
+        "resourceType": "INSECT",
         "cornerType": "ResourceCorner"
       }
-    },
-    "back": {
-      "sideType": "Back",
-      "permanentResources": [
-        "INSECT"
-      ],
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 31,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 32,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 33,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 34,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "QUILL",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 35,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "FUNGI",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
+        "resourceType": "MANUSCRIPT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 0,
+    "cardType": "ResourceCard",
+    "id": 36,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "resourceType": "INKWELL",
+        "cornerType": "ResourceCorner"
+      },
+      "BRCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TLCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "resourceType": "PLANT",
+        "cornerType": "ResourceCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 37,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
       "BLCorner": {
         "cornerType": "EmptyCorner"
       },
@@ -74,10 +867,55 @@
         "cornerType": "EmptyCorner"
       },
       "TLCorner": {
+        "resourceType": "INSECT",
+        "cornerType": "ResourceCorner"
+      },
+      "TRCorner": {
+        "cornerType": "HiddenCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 38,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "BRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
+      },
+      "TLCorner": {
         "cornerType": "EmptyCorner"
       },
       "TRCorner": {
         "cornerType": "EmptyCorner"
+      }
+    }
+  },
+  {
+    "points": 1,
+    "cardType": "ResourceCard",
+    "id": 39,
+    "elementType": "INSECT",
+    "front": {
+      "sideType": "Front",
+      "BLCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "BRCorner": {
+        "cornerType": "EmptyCorner"
+      },
+      "TLCorner": {
+        "cornerType": "HiddenCorner"
+      },
+      "TRCorner": {
+        "resourceType": "ANIMAL",
+        "cornerType": "ResourceCorner"
       }
     }
   }

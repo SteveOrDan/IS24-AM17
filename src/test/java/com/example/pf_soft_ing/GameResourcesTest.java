@@ -3,85 +3,66 @@ package com.example.pf_soft_ing;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.pf_soft_ing.card.GoldenCard;
+import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.StarterCard;
+import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.ResourceCorner;
+import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.objectiveCards.ResourcesCountObjectiveCard;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
+import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.Test;
 
 class GameResourcesTest {
     @Test
     void cornerDeserialization() {
-        GameResources gameResources = new GameResources();
+        CardCorner testCorner = GameResources.deserializeCorner();
 
-        GameResources.deserializeCorner();
-
-        assertInstanceOf(ResourceCorner.class, GameResources.testCorner);
+        assertInstanceOf(ResourceCorner.class, testCorner);
     }
 
     @Test
     void FrontDeserialization() {
-        GameResources gameResources = new GameResources();
+        Side testFront = GameResources.deserializeFront();
 
-        GameResources.deserializeFront();
-
-        assertInstanceOf(Front.class, GameResources.testFront);
+        assertInstanceOf(Front.class, testFront);
     }
 
     @Test
     void BackDeserialization() {
-        GameResources gameResources = new GameResources();
+        Side testBack = GameResources.deserializeBack();
 
-        GameResources.deserializeBack();
-
-        assertInstanceOf(Back.class, GameResources.testBack);
-    }
-
-    @Test
-    void SideDeserialization() {
-        GameResources gameResources = new GameResources();
-
-        GameResources.deserializeSide();
-
-        assertInstanceOf(Back.class, GameResources.testBack);
+        assertInstanceOf(Back.class, testBack);
     }
 
     @Test
     void ResourceCardDeserialization() {
-        GameResources gameResources = new GameResources();
+        PlaceableCard testResourceCard = GameResources.deserializeResourceCard();
 
-        GameResources.deserializeResourceCard();
-
-        assertInstanceOf(ResourceCard.class, GameResources.testResourceCard);
+        assertInstanceOf(ResourceCard.class, testResourceCard);
     }
 
     @Test
     void GoldenCardDeserialization() {
-        GameResources gameResources = new GameResources();
+        PlaceableCard testGoldenCard = GameResources.deserializeGoldenCard();
 
-        GameResources.deserializeGoldenCard();
-
-        assertInstanceOf(GoldenCard.class, GameResources.testGoldenCard);
+        assertInstanceOf(GoldenCard.class, testGoldenCard);
     }
 
     @Test
     void StarterCardDeserialization() {
-        GameResources gameResources = new GameResources();
+        PlaceableCard testStarterCard = GameResources.deserializeStarterCard();
 
-        GameResources.deserializeStarterCard();
-
-        assertInstanceOf(StarterCard.class, GameResources.testStarterCard);
+        assertInstanceOf(StarterCard.class, testStarterCard);
     }
 
     @Test
     void ObjectiveCardDeserialization() {
-        GameResources gameResources = new GameResources();
+        ObjectiveCard testObjectiveCard = GameResources.deserializeObjectiveCard();
 
-        GameResources.deserializeObjectiveCard();
-
-        assertInstanceOf(ResourcesCountObjectiveCard.class, GameResources.testObjectiveCard);
+        assertInstanceOf(ResourcesCountObjectiveCard.class, testObjectiveCard);
     }
 
     @Test
@@ -91,7 +72,7 @@ class GameResourcesTest {
         GameResources.initializeResourceDeck();
 
         assertNotNull(gameResources.getResourcesDeck());
-        assertEquals(2, gameResources.getResourcesDeck().size());
+        assertEquals(40, gameResources.getResourcesDeck().size());
     }
 
     @Test
@@ -101,7 +82,7 @@ class GameResourcesTest {
         GameResources.initializeGoldenDeck();
 
         assertNotNull(gameResources.getGoldenDeck());
-        assertEquals(2, gameResources.getGoldenDeck().size());
+        assertEquals(40, gameResources.getGoldenDeck().size());
     }
 
     @Test
@@ -111,7 +92,7 @@ class GameResourcesTest {
         GameResources.initializeStarterDeck();
 
         assertNotNull(gameResources.getStarterDeck());
-        assertEquals(2, gameResources.getStarterDeck().size());
+        assertEquals(6, gameResources.getStarterDeck().size());
     }
 
     @Test
@@ -121,6 +102,6 @@ class GameResourcesTest {
         GameResources.initializeObjectiveDeck();
 
         assertNotNull(gameResources.getObjectiveDeck());
-        assertEquals(2, gameResources.getObjectiveDeck().size());
+        assertEquals(16, gameResources.getObjectiveDeck().size());
     }
 }

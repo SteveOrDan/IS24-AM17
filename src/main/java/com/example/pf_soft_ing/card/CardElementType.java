@@ -12,11 +12,11 @@ public enum CardElementType {
         cardElementType = cardElementType.toLowerCase();
 
         return switch (cardElementType) {
-            case "starter" -> CardElementType.STARTER;
-            case "animal" -> CardElementType.ANIMAL;
-            case "plant" -> CardElementType.PLANT;
-            case "fungi" -> CardElementType.FUNGI;
-            case "insect" -> CardElementType.INSECT;
+            case "s", "starter" -> CardElementType.STARTER;
+            case "a", "animal" -> CardElementType.ANIMAL;
+            case "p", "plant" -> CardElementType.PLANT;
+            case "f", "fungi" -> CardElementType.FUNGI;
+            case "i", "insect" -> CardElementType.INSECT;
             default -> null;
         };
     }
