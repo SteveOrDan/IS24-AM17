@@ -46,6 +46,7 @@ class PlayerModelTest {
         starterCard1.flipCard();
         starterCard1.flipCard();
         playerModel.placeStarterCard();
+
         assertEquals(0, playerModel.getCurrScore());
         assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.INSECT.getValue()]);
         assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.PLANT.getValue()]);
@@ -61,13 +62,14 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard();
         assertEquals(0, playerModel.getCurrScore());
+
         //Now place a card in a valid position
         Position pos = new Position(1,1);
         playerModel.placeCard(normalCard, pos);
-        assertTrue(playerModel.getPlayArea().containsValue(normalCard) &&
-                playerModel.getPlayArea().containsKey(pos) &&
-                playerModel.getCurrScore() == resourceCardPoints
-                );
+
+        assertTrue(playerModel.getPlayArea().containsKey(pos));
+        assertEquals(playerModel.getPlayArea().get(pos), normalCard);
+        assertEquals(playerModel.getCurrScore(), resourceCardPoints);
     }
 
     @DisplayName("Test for placing a card in an invalid position")
@@ -77,12 +79,28 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard();
         assertEquals(0, playerModel.getCurrScore());
+
         //Now place a card in a valid position
         Position pos1 = new Position(0,0);
         Position pos2 = new Position(1,0);
         Position pos3 = new Position(-1,-1);
-        assertDoesNotThrow(() -> playerModel.placeCard(normalCard, pos1));
-        assertDoesNotThrow(() -> playerModel.placeCard(normalCard, pos2));
-        assertDoesNotThrow(() -> playerModel.placeCard(normalCard, pos3));
+
+        playerModel.placeCard(normalCard, pos1);
+        playerModel.placeCard(normalCard, pos2);
+        playerModel.placeCard(normalCard, pos3);
+
+        assertFalse(playerModel.getPlayArea().containsValue(normalCard));
+
+        assertFalse(playerModel.getPlayArea().containsKey(pos2));
+        assertFalse(playerModel.getPlayArea().containsKey(pos3));
+
+        assertEquals(0, playerModel.getCurrScore());
+    }
+
+    @Test
+    void checkPlaceCardFromJSON(){
+        GameResources.initializeAllDecks();
+
+
     }
 }

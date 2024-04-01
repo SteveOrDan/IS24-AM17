@@ -37,7 +37,7 @@ public class GameResources {
     private static List<PlaceableCard> starterDeck;
     private static List<ObjectiveCard> objectiveDeck;
 
-    private List<Token> tokensList;
+    private static List<Token> tokensList;
 
     public static CardCorner deserializeCorner() {
         try {
@@ -231,7 +231,7 @@ public class GameResources {
      * Getter
      * @return Gold cards deck list
      */
-    public List<PlaceableCard> getGoldenDeck() {
+    public static List<PlaceableCard> getGoldenDeck() {
         return goldenDeck;
     }
 
@@ -239,7 +239,7 @@ public class GameResources {
      * Getter
      * @return Objective cards deck list
      */
-    public List<ObjectiveCard> getObjectiveDeck() {
+    public static List<ObjectiveCard> getObjectiveDeck() {
         return objectiveDeck;
     }
 
@@ -247,7 +247,7 @@ public class GameResources {
      * Getter
      * @return Starter cards deck list
      */
-    public List<PlaceableCard> getStarterDeck() {
+    public static List<PlaceableCard> getStarterDeck() {
         return starterDeck;
     }
 
@@ -255,7 +255,7 @@ public class GameResources {
      * Getter
      * @return Resource cards deck list
      */
-    public List<PlaceableCard> getResourcesDeck() {
+    public static List<PlaceableCard> getResourcesDeck() {
         return resourcesDeck;
     }
 }
