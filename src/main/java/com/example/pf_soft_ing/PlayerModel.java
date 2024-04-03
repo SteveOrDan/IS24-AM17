@@ -6,23 +6,18 @@ import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.exceptions.MissingResourcesException;
-import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
-import com.example.pf_soft_ing.exceptions.PlacingOnInvalidCornerException;
-import com.example.pf_soft_ing.exceptions.PositionAlreadyTakenException;
+import com.example.pf_soft_ing.exceptions.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class PlayerModel {
-    private static final int pointsPerResource = 1;
-    private static final int pointsPerCoveredCorner = 2;
-
     private final String nickname;
     private final int id;
 
-    private ArrayList<PlaceableCard> hand;
-    private ArrayList<ObjectiveCard> objectivesToChoose;
+    private List<PlaceableCard> hand;
+    private List<ObjectiveCard> objectivesToChoose;
     private ObjectiveCard secretObjective;
     private PlaceableCard starterCard;
     private final int[] numOfResourcesArr = new int[7];
@@ -98,80 +93,25 @@ public class PlayerModel {
      * getAdjacentCorner:
      *      Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
      *      Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
-     * Removes resources covered by the placed card from the player's possession
-     * Adds the placed card's resources to the player's possession
-     * Adds points if needed
-     * Adds card to play area
-     * @param rCard Resource card to place in the player's playArea
-     * @param pos Card's position to add to the player's playArea
-     */
-    public void placeCard(ResourceCard rCard, Position pos){
-        try {
-            if (playArea.containsKey(pos)){
-                throw new PositionAlreadyTakenException();
-            }
-
-            ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
-
-            // Remove resources of covered corners
-            for (CardCorner corner : adjacentCorners){
-                if (corner.getResource() != null){
-                    numOfResourcesArr[corner.getResource().getValue()]--;
-                }
-            }
-
-            // Add resources on placed card's corners
-            for (ResourceType resource : rCard.getResources()){
-                numOfResourcesArr[resource.getValue()]++;
-            }
-
-            // Add card points
-            currScore += rCard.getPoints();
-
-            // Set card priority
-            rCard.setPriority(currMaxPriority);
-
-            currMaxPriority++;
-
-            // Add card to playArea
-            playArea.put(pos, rCard);
-        }
-        catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | NoAdjacentCardsException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Checks if the playArea already has the key "pos"  -->  throw PositionAlreadyTakenException
-     * getAdjacentCorner:
-     *      Checks if all adjacent corners are available or null, else  -->  throw PlacingOnInvalidCornerException
-     *      Checks if at least one corner is not null (there is at least an adjacent valid corner), else  -->  throw NoAdjacentCardsException
      * Checks if the player has the required resources to place the card, else  -->  throw MissingResourcesException
      * Removes resources covered by the placed card from the player's possession
      * Adds the placed card's resources to the player's possession
      * Adds either normal points or objective points based on the card
      * Adds card to play area
-     * @param gCard Golden card to place in the player's playArea
+     * @param card Golden card to place in the player's playArea
      * @param pos Card's position to add to the player's playArea
      */
-    public void placeCard(GoldenCard gCard, Position pos){
+    public void placeCard(PlaceableCard card, Position pos){
         try {
             if (playArea.containsKey(pos)){
                 throw new PositionAlreadyTakenException();
             }
 
-            ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
-
-            HashMap<ResourceType, Integer> requiredResources = gCard.getRequiredResources();
-
-            // Check if player has required resources
-            if (requiredResources != null){
-                for (ResourceType resource : requiredResources.keySet()){
-                    if (numOfResourcesArr[resource.getValue()] < requiredResources.get(resource)){
-                        throw new MissingResourcesException();
-                    }
-                }
+            if(!card.hasEnoughRequiredResources(numOfResourcesArr)){
+                throw new MissingResourcesException();
             }
+
+            ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
 
             // Remove resources of covered corners
             for (CardCorner corner : adjacentCorners){
@@ -181,27 +121,22 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : gCard.getResources()){
+            for (ResourceType resource : card.getResources()){
                 numOfResourcesArr[resource.getValue()]++;
             }
 
             // Add card points
-            currScore += gCard.getPoints();
+            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr);
 
-            if (gCard.isPointPerResource()){
-                currScore += numOfResourcesArr[gCard.getPointPerResourceRes().getValue()] * pointsPerResource;
-            }
-            else {
-                currScore += adjacentCorners.size() * pointsPerCoveredCorner;
-            }
+
 
             // Set card priority
-            gCard.setPriority(currMaxPriority);
+            card.setPriority(currMaxPriority);
 
             currMaxPriority++;
 
             // Add card to playArea
-            playArea.put(pos, gCard);
+            playArea.put(pos, card);
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
             System.out.println(e.getMessage());
@@ -256,11 +191,59 @@ public class PlayerModel {
     }
 
     /**
+     * Sets the player's secret objective card choices
+     * @param objectives List of 2 objective cards to choose from
+     */
+    public void setObjectivesToChoose(List<ObjectiveCard> objectives){
+        objectivesToChoose = objectives;
+    }
+
+    /**
+     * Sets the player's secret objective card
+     * @param index Index of the objective card in the list of objectives to choose from
+     */
+    public void setSecretObjective(int index) {
+        try{
+            if (index < 0 || index >= objectivesToChoose.size()){
+                throw new InvalidIndexException();
+            }
+            secretObjective = objectivesToChoose.get(index);
+        }
+        catch (InvalidIndexException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Adds the points given by the secret objective card to the player's score
+     */
+    public void calculateSecretObjectivePoints() {
+        try {
+            if (secretObjective == null){
+                throw new SecretObjectiveNotSetException();
+            }
+            currScore += secretObjective.calculateObjectivePoints(playArea, numOfResourcesArr);
+        }
+        catch (SecretObjectiveNotSetException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
      * Adds the points given an objective card to the player's score
      * Objective card could be the player's secret objective or one of the common objectives
      * @param oCard Card to use for points calculations
      */
-    public void calculateObjectivePoints(ObjectiveCard oCard){
+    public void calculateObjectivePoints(ObjectiveCard oCard) {
         currScore += oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
+    }
+
+    /**
+     * Flips the starter card
+     */
+    public void flipStarterCard() {
+        if (starterCard != null){
+            starterCard.flipCard();
+        }
     }
 }

@@ -1,11 +1,14 @@
 package com.example.pf_soft_ing.card;
 
 import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
 
 import java.util.HashMap;
 
 public class GoldenCard extends PlaceableCard{
+    private static final int pointsPerResource = 1;
+    private static final int pointsPerCoveredCorner = 2;
     public final boolean isPointPerResource;
     public final ResourceType pointPerResourceRes;
 
@@ -54,5 +57,44 @@ public class GoldenCard extends PlaceableCard{
      */
     public int getPoints() {
         return points;
+    }
+
+    /**
+     * Checks if the player has enough resources to place the card
+     * @param numOfResourcesArr Array containing the number of resources of the player per type
+     * @return True if the player has enough resources to place the card
+     */
+    @Override
+    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr){
+        if (currSide.equals(front)) {
+            for (ResourceType res : requiredResources.keySet()) {
+                if (numOfResourcesArr[res.getValue()] < requiredResources.get(res)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Calculates the points given by the card when placed
+     * @param numOfCoveredCorners Number of corners covered by the card
+     * @param numOfResourcesArr Array containing the number of resources of the player per type
+     * @return Points given by the card placement
+     */
+    @Override
+    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr) {
+
+        if (currSide.equals(front)) {
+            if (points == 0) {
+                if (isPointPerResource) {
+                    return numOfResourcesArr[pointPerResourceRes.getValue()] * pointsPerResource;
+                } else {
+                    return numOfCoveredCorners * pointsPerCoveredCorner;
+                }
+            }
+            return points;
+        }
+        return 0;
     }
 }

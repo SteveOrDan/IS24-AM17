@@ -1,8 +1,16 @@
 package com.example.pf_soft_ing.card;
 
+import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.exceptions.MissingResourcesException;
+import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
+import com.example.pf_soft_ing.exceptions.PlacingOnInvalidCornerException;
+import com.example.pf_soft_ing.exceptions.PositionAlreadyTakenException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class PlaceableCard{
@@ -89,7 +97,7 @@ public abstract class PlaceableCard{
     }
 
     /**
-     * Switches the card's current side from front and back and viceversa
+     * Switches the card's current side from front and back and vice versa
      */
     public void flipCard(){
         if (currSide.equals(front)){
@@ -107,4 +115,8 @@ public abstract class PlaceableCard{
     public int getId() {
         return id;
     }
+
+    public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr);
+
+    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr);
 }

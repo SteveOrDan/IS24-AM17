@@ -1,13 +1,11 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.card.CardElementType;
-import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.ResourceCard;
-import com.example.pf_soft_ing.card.StarterCard;
+import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.EmptyCorner;
 import com.example.pf_soft_ing.card.corner.HiddenCorner;
 import com.example.pf_soft_ing.card.corner.ResourceCorner;
+import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
@@ -17,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,10 +96,114 @@ class PlayerModelTest {
         assertEquals(0, playerModel.getCurrScore());
     }
 
+
+    @DisplayName("Test for the top right to bottom left diagonal objective card")
     @Test
-    void checkPlaceCardFromJSON(){
+    void checkTRBLDiagonalObjective(){
         GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
 
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 3 fungi resource cards and flip them
+        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
+        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(1);
+        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
+        resourceCard1.flipCard();
+        resourceCard2.flipCard();
+        resourceCard3.flipCard();
+
+        //Place the resource cards
+        playerModel.placeCard(resourceCard1, new Position(-1, 1));
+        playerModel.placeCard(resourceCard2, new Position(0, 2));
+        playerModel.placeCard(resourceCard3, new Position(-2, 0));
+
+        //Same thing with 3 animal golden cards
+        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
+        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
+        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
+        goldenCard1.flipCard();
+        goldenCard2.flipCard();
+        goldenCard3.flipCard();
+
+        playerModel.placeCard(goldenCard1, new Position(1, -1));
+        playerModel.placeCard(goldenCard2, new Position(2, 0));
+        playerModel.placeCard(goldenCard3, new Position(0, -2));
+
+        //Select 2 objective cards
+        ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
+        ObjectiveCard objectiveCard2 = objectiveDeck.get(2);
+
+        //Check if the calculated score of the objective cards is correct
+        playerModel.calculateObjectivePoints(objectiveCard1);
+        assertEquals(2, playerModel.getCurrScore());
+        playerModel.calculateObjectivePoints(objectiveCard2);
+        assertEquals(4, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Test for the top left to bottom right diagonal objective card")
+    @Test
+    void checkTLBRDiagonalObjective(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 3 fungi resource cards and flip them
+        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
+        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
+        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
+        resourceCard1.flipCard();
+        resourceCard2.flipCard();
+        resourceCard3.flipCard();
+
+        //Place the resource cards
+        playerModel.placeCard(resourceCard1, new Position(1, 1));
+        playerModel.placeCard(resourceCard2, new Position(0, 2));
+        playerModel.placeCard(resourceCard3, new Position(2, 0));
+
+        //Same thing with 3 animal golden cards
+        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
+        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
+        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
+        goldenCard1.flipCard();
+        goldenCard2.flipCard();
+        goldenCard3.flipCard();
+
+        playerModel.placeCard(goldenCard1, new Position(-1, -1));
+        playerModel.placeCard(goldenCard2, new Position(-2, 0));
+        playerModel.placeCard(goldenCard3, new Position(0, -2));
+
+        //Select 2 objective cards
+        ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
+        ObjectiveCard objectiveCard2 = objectiveDeck.get(3);
+
+        //Check if the calculated score of the objective cards is correct
+        playerModel.calculateObjectivePoints(objectiveCard1);
+        assertEquals(2, playerModel.getCurrScore());
+        playerModel.calculateObjectivePoints(objectiveCard2);
+        assertEquals(4, playerModel.getCurrScore());
     }
 }

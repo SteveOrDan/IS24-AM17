@@ -1,6 +1,8 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.card.GoldenCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -229,18 +231,18 @@ public class GameResources {
 
     /**
      * Getter
-     * @return Gold cards deck list
+     * @return Resource cards deck list
      */
-    public static List<PlaceableCard> getGoldenDeck() {
-        return goldenDeck;
+    public static List<PlaceableCard> getResourcesDeck() {
+        return resourcesDeck;
     }
 
     /**
      * Getter
-     * @return Objective cards deck list
+     * @return Gold cards deck list
      */
-    public static List<ObjectiveCard> getObjectiveDeck() {
-        return objectiveDeck;
+    public static List<PlaceableCard> getGoldenDeck() {
+        return goldenDeck;
     }
 
     /**
@@ -253,9 +255,9 @@ public class GameResources {
 
     /**
      * Getter
-     * @return Resource cards deck list
+     * @return Objective cards deck list
      */
-    public static List<PlaceableCard> getResourcesDeck() {
-        return resourcesDeck;
+    public static List<ObjectiveCard> getObjectiveDeck() {
+        return objectiveDeck;
     }
 }
