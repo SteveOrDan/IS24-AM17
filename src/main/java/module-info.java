@@ -4,7 +4,9 @@ module com.example.pf_soft_ing {
 
     requires org.controlsfx.controls;
     requires com.google.gson;
+    requires java.rmi;
 
+    exports com.example.pf_soft_ing.RMI to java.rmi;
     opens com.example.pf_soft_ing to javafx.fxml;
     exports com.example.pf_soft_ing;
     exports com.example.pf_soft_ing.card;

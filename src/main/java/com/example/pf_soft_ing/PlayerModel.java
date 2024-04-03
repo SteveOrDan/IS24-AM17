@@ -190,6 +190,8 @@ public class PlayerModel {
         starterCard = sCard;
     }
 
+    public void setToken(Token choosentoken) {token = choosentoken;}
+
     /**
      * Sets the player's secret objective card choices
      * @param objectives List of 2 objective cards to choose from

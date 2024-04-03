@@ -67,7 +67,6 @@ public class RMIConnection {
 
         System.out.println("Client connected!");
 
-
         return in;
     }
 
