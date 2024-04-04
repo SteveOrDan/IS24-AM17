@@ -72,6 +72,14 @@ public class PlayerModel {
     }
 
     /**
+     * Setter
+     * @param score New score to set for the player
+     */
+    public void setCurrScore(int score){
+        currScore = score;
+    }
+
+    /**
      * Places the starter card at the position (0, 0)
      * Adds resources on the card's side
      * No requirements are needed for positioning this card
