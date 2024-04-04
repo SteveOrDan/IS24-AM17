@@ -33,6 +33,7 @@ public class PlayerModel {
         this.id = id;
         currMaxPriority = 0;
         currScore = 0;
+        hand = new ArrayList<>();
     }
 
     /**
@@ -49,6 +50,18 @@ public class PlayerModel {
      */
     public int getId() {
         return id;
+    }
+
+    public List<PlaceableCard> getHand() {
+        return hand;
+    }
+
+    public ObjectiveCard getSecretObjective() {
+        return secretObjective;
+    }
+
+    public PlaceableCard getStarterCard() {
+        return starterCard;
     }
 
     public int[] getNumOfResourcesArr(){
@@ -244,6 +257,12 @@ public class PlayerModel {
     public void flipStarterCard() {
         if (starterCard != null){
             starterCard.flipCard();
+        }
+    }
+
+    public void drawCard(PlaceableCard card){
+        if (card != null && hand.size() < 3){
+            hand.add(card);
         }
     }
 }

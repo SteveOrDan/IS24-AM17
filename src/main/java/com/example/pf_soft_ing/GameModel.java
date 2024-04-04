@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GameModel {
-    private final GameResources gameResources;
+    private HashMap<Integer, PlayerModel> IDToPlayerMap;
     private HashMap<Integer, Integer> board;
     private UsableCardsDeck resourceCardsDeck;
     private UsableCardsDeck goldenCardsDeck;
@@ -17,9 +17,38 @@ public class GameModel {
     private int currPlayerID;
     private int firstPlayerID;
 
-    public GameModel(GameResources gameResources, List<Integer> playerIDList) {
-        this.gameResources = gameResources;
+    public GameModel(List<Integer> playerIDList) {
         this.playerIDList = playerIDList;
+
+        IDToPlayerMap = new HashMap<>();
+
+        for (Integer i : playerIDList){
+            IDToPlayerMap.put(i, new PlayerModel(STR."Player\{i.toString()}", i));
+        }
+    }
+
+    public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
+        return IDToPlayerMap;
+    }
+
+    public HashMap<Integer, Integer> getBoard() {
+        return board;
+    }
+
+    public UsableCardsDeck getResourceCardsDeck() {
+        return resourceCardsDeck;
+    }
+
+    public UsableCardsDeck getGoldenCardsDeck() {
+        return goldenCardsDeck;
+    }
+
+    public ObjectiveCardsDeck getObjectiveCardsDeck() {
+        return objectiveCardsDeck;
+    }
+
+    public StarterCardsDeck getStarterCardsDeck() {
+        return starterCardsDeck;
     }
 
     /**
@@ -50,10 +79,12 @@ public class GameModel {
      * Copies the deck from the game resources
      */
     public void initializeDecks(){
-        resourceCardsDeck = new UsableCardsDeck(gameResources.getResourcesDeck());
-        goldenCardsDeck = new UsableCardsDeck(gameResources.getGoldenDeck());
-        objectiveCardsDeck = new ObjectiveCardsDeck(gameResources.getObjectiveDeck());
-        starterCardsDeck = new StarterCardsDeck(gameResources.getStarterDeck());
+        GameResources.initializeAllDecks();
+
+        resourceCardsDeck = new UsableCardsDeck(GameResources.getResourcesDeck());
+        goldenCardsDeck = new UsableCardsDeck(GameResources.getGoldenDeck());
+        objectiveCardsDeck = new ObjectiveCardsDeck(GameResources.getObjectiveDeck());
+        starterCardsDeck = new StarterCardsDeck(GameResources.getStarterDeck());
     }
 
     /**
@@ -104,5 +135,28 @@ public class GameModel {
      */
     public ObjectiveCard drawObjectiveCard(){
         return objectiveCardsDeck.drawCard();
+    }
+
+    public PlaceableCard drawVisibleResourceCard(int index){
+        if (0 <= index && index <= 1){
+            return resourceCardsDeck.drawVisibleCard(index);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public PlaceableCard drawVisibleGoldenCard(int index){
+        if (0 <= index && index <= 1){
+            return goldenCardsDeck.drawVisibleCard(index);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public void setRandomFirstPlayer(){
+        firstPlayerID = playerIDList.get((int) Math.round(Math.random() * (playerIDList.size() - 1)));
+        currPlayerID = firstPlayerID;
     }
 }

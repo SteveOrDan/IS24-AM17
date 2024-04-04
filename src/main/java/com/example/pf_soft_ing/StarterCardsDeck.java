@@ -14,6 +14,10 @@ public class StarterCardsDeck {
         this.deck = deck;
     }
 
+    public List<PlaceableCard> getDeck() {
+        return deck;
+    }
+
     /**
      * Method to shuffle the deck
      */

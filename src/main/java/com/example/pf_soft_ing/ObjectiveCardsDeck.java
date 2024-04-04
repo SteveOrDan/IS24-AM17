@@ -16,6 +16,10 @@ public class ObjectiveCardsDeck {
         commonObjectives = new ArrayList<>();
     }
 
+    public List<ObjectiveCard> getDeck() {
+        return deck;
+    }
+
     /**
      * Getter for commonObjectives
      * @return commonObjectives List

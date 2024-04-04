@@ -16,6 +16,14 @@ public class UsableCardsDeck {
         visibleCards = new ArrayList<>();
     }
 
+    public List<PlaceableCard> getDeck() {
+        return deck;
+    }
+
+    public List<PlaceableCard> getVisibleCards() {
+        return visibleCards;
+    }
+
     /**
      * Method to shuffle the deck
      */
