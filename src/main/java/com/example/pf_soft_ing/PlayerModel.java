@@ -1,10 +1,7 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.card.GoldenCard;
-import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.exceptions.*;
 
@@ -16,7 +13,7 @@ public class PlayerModel {
     private final String nickname;
     private final int id;
 
-    private List<PlaceableCard> hand;
+    private final List<PlaceableCard> hand;
     private List<ObjectiveCard> objectivesToChoose;
     private ObjectiveCard secretObjective;
     private PlaceableCard starterCard;
@@ -52,26 +49,50 @@ public class PlayerModel {
         return id;
     }
 
+    /**
+     * Getter
+     * @return List of cards in the player's hand
+     */
     public List<PlaceableCard> getHand() {
         return hand;
     }
 
+    /**
+     * Getter
+     * @return List of objective cards to choose from
+     */
     public ObjectiveCard getSecretObjective() {
         return secretObjective;
     }
 
+    /**
+     * Getter
+     * @return Player's starter card
+     */
     public PlaceableCard getStarterCard() {
         return starterCard;
     }
 
+    /**
+     * Getter
+     * @return Player's resources array
+     */
     public int[] getNumOfResourcesArr(){
         return numOfResourcesArr;
     }
 
+    /**
+     * Getter
+     * @return Player's current max priority for card placement
+     */
     public int getCurrMaxPriority(){
         return currMaxPriority;
     }
 
+    /**
+     * Getter
+     * @return Player's play area
+     */
     public HashMap<Position, PlaceableCard> getPlayArea() {
         return playArea;
     }
@@ -82,6 +103,44 @@ public class PlayerModel {
      */
     public int getCurrScore(){
         return currScore;
+    }
+
+    /**
+     * Getter
+     * @return Token of the player
+     */
+    public Token getToken(){
+        return token;
+    }
+
+    /**
+     * Setter
+     * @param token Player's new token
+     */
+    public void setToken(Token token){
+        this.token = token;
+    }
+
+    /**
+     * Setter
+     * @param isFirstPlayer Boolean to check if the player is the first player
+     */
+    public void setAsFirstPlayer(boolean isFirstPlayer){
+        if (isFirstPlayer){
+            firstPlayerToken = new Token(TokenColors.BLACK);
+        }
+        else{
+            firstPlayerToken = null;
+        }
+
+    }
+
+    /**
+     * Getter
+     * @return If the player is the first player
+     */
+    public boolean isFirstPlayer(){
+        return firstPlayerToken != null;
     }
 
     /**
@@ -260,9 +319,22 @@ public class PlayerModel {
         }
     }
 
+    /**
+     * Adds a card to the player's hand
+     * @param card Card to add to the player's hand
+     */
     public void drawCard(PlaceableCard card){
         if (card != null && hand.size() < 3){
             hand.add(card);
         }
+    }
+
+    public PlaceableCard getCardFromHandByID(int cardID){
+        for (PlaceableCard card : hand){
+            if (card.getId() == cardID){
+                return card;
+            }
+        }
+        return null;
     }
 }

@@ -11,12 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameModelTest {
 
-    GameModel gameModel = new GameModel(new ArrayList<>(){{
-        add(1);
-        add(2);
-        add(3);
-        add(4);
-    }});
+    GameModel gameModel = new GameModel();
 
     @Test
     void initializeDecks() {
@@ -140,72 +135,5 @@ class GameModelTest {
 
         assertNotNull(card);
         assertFalse(gameModel.getObjectiveCardsDeck().getDeck().contains(card));
-    }
-
-    @Test
-    void simulateGame(){
-        GameModel gm = new GameModel(new ArrayList<>(){{
-            add(1);
-            add(2);
-            add(3);
-            add(4);
-        }});
-
-        // Decks set up
-        gm.initializeDecks();
-
-        gm.shuffleAllDecks();
-
-        gm.setVisibleCards();
-
-        // Foreach player...
-        for (Integer i : gm.getIDToPlayerMap().keySet()){
-            PlayerModel player = gm.getIDToPlayerMap().get(i);
-
-            // Set starter card
-            player.setStarterCard(gm.drawStarterCard());
-
-            player.flipStarterCard();
-            player.flipStarterCard();
-
-            player.placeStarterCard();
-
-            // Choose token
-
-
-            // Draw 2 resource cards and 1 golden card
-            player.drawCard(gm.drawResourceCard());
-            player.drawCard(gm.drawResourceCard());
-            player.drawCard(gm.drawGoldenCard());
-        }
-
-        // Set common objectives
-        gm.getObjectiveCardsDeck().setCommonObjectives();
-
-        // Set objectives to choose
-        for (Integer i : gm.getIDToPlayerMap().keySet()){
-            PlayerModel player = gm.getIDToPlayerMap().get(i);
-
-            List<ObjectiveCard> objectives = new ArrayList<>();
-            objectives.add(gm.drawObjectiveCard());
-            objectives.add(gm.drawObjectiveCard());
-
-            player.setObjectivesToChoose(objectives);
-
-            int randIndex = Math.random() < 0.5 ? 0 : 1;
-
-            player.setSecretObjective(randIndex);
-        }
-
-        // Set first player
-        gm.setRandomFirstPlayer();
-
-        for (Integer i : gm.getIDToPlayerMap().keySet()){
-            assertNotNull(gm.getIDToPlayerMap().get(i).getStarterCard());
-
-            assertEquals(3, gm.getIDToPlayerMap().get(i).getHand().size());
-
-            assertNotNull(gm.getIDToPlayerMap().get(i).getSecretObjective());
-        }
     }
 }

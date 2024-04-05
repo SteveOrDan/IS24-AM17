@@ -1,7 +1,6 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
 import java.util.Collections;
@@ -48,5 +47,43 @@ public class StarterCardsDeck {
             System.out.println(e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * Method to draw a specific card from the deck
+     * @param cardID ID of the card to draw
+     * @return The card that has been drawn
+     */
+    public PlaceableCard drawCard(int cardID){
+        try{
+            if (!deck.isEmpty()){
+                PlaceableCard retCard = getCardByID(cardID);
+
+                deck.remove(retCard);
+
+                return retCard;
+            }
+            else{
+                throw new NotEnoughCardsException();
+            }
+        }
+        catch (NotEnoughCardsException e){
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Method to get a card by its ID
+     * @param cardID ID of the card to get
+     * @return The card with the given ID
+     */
+    public PlaceableCard getCardByID(int cardID){
+        for (PlaceableCard card : deck){
+            if (card.getId() == cardID){
+                return card;
+            }
+        }
+        return null;
     }
 }
