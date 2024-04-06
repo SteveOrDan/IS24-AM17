@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.exceptions.InvalidCardIDException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
 import java.util.ArrayList;
@@ -57,24 +58,28 @@ public class UsableCardsDeck {
     }
 
     /**
-     * The method returns one of the cards in the visibleCards list based on the index passed as a parameter
-     * @param index Index of visible card in the list (either 0 or 1)
+     * The method returns one of the cards in the visibleCards list based on the ID passed as a parameter
+     * @param cardID ID of visible card in the list
      * @return the card that has been drawn
      */
-    public PlaceableCard drawVisibleCard(int index){
+    public PlaceableCard drawVisibleCard(int cardID){
         try{
             if (!visibleCards.isEmpty()){
-                PlaceableCard retCard = visibleCards.get(index);
+                for (PlaceableCard card : visibleCards){
+                    if (card.getId() == cardID){
+                        visibleCards.remove(card);
 
-                visibleCards.remove(retCard);
+                        return card;
+                    }
+                }
 
-                return retCard;
+                throw new InvalidCardIDException();
             }
             else{
                 throw new NotEnoughCardsException();
             }
         }
-        catch (NotEnoughCardsException e){
+        catch (Exception e){
             System.out.println(e.getMessage());
             return null;
         }
@@ -130,6 +135,20 @@ public class UsableCardsDeck {
      */
     public PlaceableCard getCardByID(int cardID){
         for (PlaceableCard card : deck){
+            if (card.getId() == cardID){
+                return card;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Method to get a visible card by its ID
+     * @param cardID ID of the card to get
+     * @return The card with the given ID
+     */
+    public PlaceableCard getVisibleCardByID(int cardID){
+        for (PlaceableCard card : visibleCards){
             if (card.getId() == cardID){
                 return card;
             }

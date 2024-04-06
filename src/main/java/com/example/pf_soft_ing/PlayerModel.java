@@ -22,6 +22,7 @@ public class PlayerModel {
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
     private Token token;
     private Token firstPlayerToken;
+    private PlayerState state;
 
     private int currMaxPriority;
 
@@ -31,6 +32,23 @@ public class PlayerModel {
         currMaxPriority = 0;
         currScore = 0;
         hand = new ArrayList<>();
+        state = PlayerState.PRE_GAME;
+    }
+
+    /**
+     * Getter
+     * @return Player's current state
+     */
+    public PlayerState getState() {
+        return state;
+    }
+
+    /**
+     * Setter
+     * @param state New state of the player
+     */
+    public void setState(PlayerState state){
+        this.state = state;
     }
 
     /**
@@ -200,8 +218,6 @@ public class PlayerModel {
             // Add card points
             currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr);
 
-
-
             // Set card priority
             card.setPriority(currMaxPriority);
 
@@ -209,6 +225,11 @@ public class PlayerModel {
 
             // Add card to playArea
             playArea.put(pos, card);
+
+            // Remove card from hand
+            hand.remove(card);
+
+            state = PlayerState.DRAWING;
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
             System.out.println(e.getMessage());

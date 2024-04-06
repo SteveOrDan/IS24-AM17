@@ -18,12 +18,30 @@ public class GameModel {
     private int currPlayerID;
     private int firstPlayerID;
     private int[] orderOfPlayersIDs;
+    private GameState gameState;
 
     public GameModel() {
         this.playerIDList = new ArrayList<>();
         this.board = new HashMap<>();
 
         IDToPlayerMap = new HashMap<>();
+        gameState = GameState.PREGAME;
+    }
+
+    /**
+     * Getter
+     * @return Current game state
+     */
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    /**
+     * Setter
+     * @param gameState New game state
+     */
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     /**
@@ -249,13 +267,13 @@ public class GameModel {
     }
 
     /**
-     * Method to draw the first visible resource card of the deck
-     * @param index Index of the card to draw
-     * @return Visible resource card of the deck at the given index
+     * Method to draw the visible resource card of the deck with the given ID
+     * @param cardID ID of the card to draw
+     * @return Visible resource card of the deck with the given ID
      */
-    public PlaceableCard drawVisibleResourceCard(int index){
-        if (0 <= index && index <= 1){
-            return resourceCardsDeck.drawVisibleCard(index);
+    public PlaceableCard drawVisibleResourceCard(int cardID){
+        if (resourceCardsDeck.getVisibleCards().contains(resourceCardsDeck.getVisibleCardByID(cardID))){
+            return resourceCardsDeck.drawVisibleCard(cardID);
         }
         else {
             return null;
@@ -263,13 +281,13 @@ public class GameModel {
     }
 
     /**
-     * Method to draw the first visible golden card of the deck
-     * @param index Index of the card to draw
-     * @return Visible golden card of the deck at the given index
+     * Method to draw the visible golden card of the deck with the given ID
+     * @param cardID ID of the card to draw
+     * @return Visible golden card of the deck with the given ID
      */
-    public PlaceableCard drawVisibleGoldenCard(int index){
-        if (0 <= index && index <= 1){
-            return goldenCardsDeck.drawVisibleCard(index);
+    public PlaceableCard drawVisibleGoldenCard(int cardID){
+        if (goldenCardsDeck.getVisibleCards().contains(goldenCardsDeck.getVisibleCardByID(cardID))){
+            return goldenCardsDeck.drawVisibleCard(cardID);
         }
         else {
             return null;
@@ -282,6 +300,7 @@ public class GameModel {
     public void setRandomFirstPlayer(){
         for (Integer i : playerIDList){
             IDToPlayerMap.get(i).setAsFirstPlayer(false);
+            IDToPlayerMap.get(i).setState(PlayerState.WAITING);
         }
 
         firstPlayerID = playerIDList.get((int) Math.round(Math.random() * (playerIDList.size() - 1)));
@@ -289,6 +308,7 @@ public class GameModel {
 
         PlayerModel firstPlayer = IDToPlayerMap.get(firstPlayerID);
         firstPlayer.setAsFirstPlayer(true);
+        firstPlayer.setState(PlayerState.PLACING);
     }
 
     /**
@@ -302,6 +322,7 @@ public class GameModel {
 
         for (Integer i : playerIDList){
             IDToPlayerMap.get(i).setAsFirstPlayer(false);
+            IDToPlayerMap.get(i).setState(PlayerState.WAITING);
         }
 
         firstPlayerID = playerID;
@@ -309,12 +330,13 @@ public class GameModel {
 
         PlayerModel firstPlayer = IDToPlayerMap.get(firstPlayerID);
         firstPlayer.setAsFirstPlayer(true);
+        firstPlayer.setState(PlayerState.PLACING);
     }
 
     /**
-     * Method to set the order of the players based on the first player
+     * Method to calculate the order of the players based on the first player
      */
-    public void setOrderOfPlayers() {
+    public void calculateOrderOfPlayers() {
         orderOfPlayersIDs = new int[playerIDList.size()];
 
         orderOfPlayersIDs[0] = firstPlayerID;
@@ -337,6 +359,8 @@ public class GameModel {
     }
 
     public void endTurn(){
+        IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
+
         int currPlayerIndex = 0;
         for (int i = 0; i < orderOfPlayersIDs.length; i++){
             if (orderOfPlayersIDs[i] == currPlayerID){
@@ -351,5 +375,7 @@ public class GameModel {
         else {
             currPlayerID = orderOfPlayersIDs[currPlayerIndex + 1];
         }
+
+        IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
     }
 }
