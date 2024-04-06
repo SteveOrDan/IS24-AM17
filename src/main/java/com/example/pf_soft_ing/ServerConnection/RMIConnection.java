@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import static java.lang.System.exit;
@@ -84,6 +85,6 @@ public class RMIConnection {
 
 
     public static void StartClientConnection( String[] args ) {
-        System.out.println( "Hello World!");
+
     }
 }
