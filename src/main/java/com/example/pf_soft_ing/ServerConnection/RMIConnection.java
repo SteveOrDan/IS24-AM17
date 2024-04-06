@@ -84,6 +84,6 @@ public class RMIConnection {
 
 
     public static void StartClientConnection( String[] args ) {
-            System.out.println( "Hello World!");
+        System.out.println( "Hello World!");
     }
 }
