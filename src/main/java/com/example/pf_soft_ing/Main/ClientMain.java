@@ -24,10 +24,20 @@ public class ClientMain {
                         new BufferedReader(
                                 new InputStreamReader(System.in))
         ) {
-            String userInput;
-            while ((userInput = stdIn.readLine()) != null) {
-                out.println(userInput);
-                System.out.println("echo: " + in.readLine());
+            String s = "";
+            while (true) {
+                s = in.readLine();
+                System.out.println(s);
+                System.out.println("Enter new command here : ");
+                String input = null;
+                try {
+                    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+                    input = bufferRead.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                out.println(input + "_");
+                System.out.println("echo: " + input);
             }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);

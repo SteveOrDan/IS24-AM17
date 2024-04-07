@@ -14,11 +14,8 @@ import static java.lang.System.exit;
 
 
 public class RMIConnection {
-
-    private static ServerSocket serverSocket;
-    private static BufferedReader in;
-
     public static ServerSocket StartServerConnection(String[] args) {
+        ServerSocket serverSocket = null;
         if (args.length != 1) {
             System.out.println("Cannot start port:" + Arrays.toString(args));
             exit(1);
@@ -39,29 +36,40 @@ public class RMIConnection {
                 portNumber++;
             }
         }
-
         System.out.println(STR."Server started! Port:\{portNumber}");
 
         return serverSocket;
     }
 
-    public static BufferedReader WaitClientConnection(){
-        Socket clientSocket = null;
-        try{
-            clientSocket = serverSocket.accept();
-        } catch(IOException e) {
+    public static Socket ConnectClient(ServerSocket serverSocket) {
+        Socket connectionSocket = null;
+        try {
+            connectionSocket = serverSocket.accept();
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return connectionSocket;
+    }
+
+    public static PrintWriter CreateClientConnectionOUT(Socket connectionSocket) {
+
 
         PrintWriter out = null;
         try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-        } catch(IOException e) {
+            out = new PrintWriter(connectionSocket.getOutputStream(), true);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return out;
+    }
+
+    public static BufferedReader WaitClientConnectionIN(Socket connectionSocket){
+
+        BufferedReader in =null;
         try {
             in = new BufferedReader(
-                    new InputStreamReader(clientSocket.getInputStream()));
+                    new InputStreamReader(connectionSocket.getInputStream()));
         } catch(IOException e) {
             throw new RuntimeException(e);
         }
@@ -72,11 +80,26 @@ public class RMIConnection {
         return in;
     }
 
-    public static void InputReader(BufferedReader bufferedReader){
+    public static void InputReader(BufferedReader in, PrintWriter out){
+        BufferedReader stdIn =
+                new BufferedReader(
+                        new InputStreamReader(System.in));
         String s = "";
+        out.println("userInput_");
         try {
-            while ((s = bufferedReader.readLine()) != null){
+            while (true) {
+                s = in.readLine();
                 System.out.println(s);
+                System.out.println("Enter new command here : ");
+                String input = null;
+                try {
+                    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+                    input = bufferRead.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                out.println(input);
+                System.out.println("echo: " + input);
             }
         } catch (IOException e) {
             e.printStackTrace();
