@@ -50,10 +50,10 @@ public class GameModel {
      * Copies the deck from the game resources
      */
     public void initializeDecks(){
-        resourceCardsDeck = new UsableCardsDeck(gameResources.getResourcesDeck());
-        goldenCardsDeck = new UsableCardsDeck(gameResources.getGoldenDeck());
-        objectiveCardsDeck = new ObjectiveCardsDeck(gameResources.getObjectiveDeck());
-        starterCardsDeck = new StarterCardsDeck(gameResources.getStarterDeck());
+        resourceCardsDeck = new UsableCardsDeck(GameResources.getResourcesDeck());
+        goldenCardsDeck = new UsableCardsDeck(GameResources.getGoldenDeck());
+        objectiveCardsDeck = new ObjectiveCardsDeck(GameResources.getObjectiveDeck());
+        starterCardsDeck = new StarterCardsDeck(GameResources.getStarterDeck());
     }
 
     /**

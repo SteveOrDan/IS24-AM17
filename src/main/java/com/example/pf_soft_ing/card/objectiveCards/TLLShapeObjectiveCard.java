@@ -7,8 +7,8 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class TLLShapeObjectiveCard extends LShapeObjectiveCard {
-    private static final int yDirection = 1;
-    private static final int xDirection = -1;
+    private static final int xDirection = 1;
+    private static final int yDirection = -1;
     public TLLShapeObjectiveCard(int id, CardElementType mainElementType, CardElementType secondaryElementType) {
         super(id, mainElementType, secondaryElementType);
 

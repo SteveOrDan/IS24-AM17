@@ -171,7 +171,7 @@ class PlayerModelTest {
         //Place the starter card
         playerModel.placeStarterCard();
 
-        //Use 3 fungi resource cards and flip them
+        //Use 3 plant resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
         ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
@@ -184,7 +184,7 @@ class PlayerModelTest {
         playerModel.placeCard(resourceCard2, new Position(0, 2));
         playerModel.placeCard(resourceCard3, new Position(2, 0));
 
-        //Same thing with 3 animal golden cards
+        //Same thing with 3 insect golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
@@ -207,9 +207,9 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
     }
 
-
+    @DisplayName("Different diagonal cases from top right to bottom left")
     @Test
-    void checkDiagonalCases(){
+    void checkTRBLDiagonalCases(){
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -226,7 +226,7 @@ class PlayerModelTest {
         //Place the starter card
         playerModel.placeStarterCard();
 
-        //Use 3 fungi resource cards and flip them
+        //Use 6 fungi resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
         ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(1);
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
@@ -246,7 +246,7 @@ class PlayerModelTest {
         playerModel.placeCard(resourceCard3, new Position(-2, 0));
         playerModel.placeCard(resourceCard4, new Position(1, 3));
 
-        //Same thing with 3 animal golden cards
+        //Same thing with 6 animal golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
@@ -300,5 +300,260 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(8, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Different diagonal cases from top left to bottom right")
+    @Test
+    void checkTLBRDiagonal(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 6 plant resource cards and flip them
+        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
+        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
+        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
+        ResourceCard resourceCard4 = (ResourceCard) resourceDeck.get(13);
+        ResourceCard resourceCard5 = (ResourceCard) resourceDeck.get(14);
+        ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(15);
+        resourceCard1.flipCard();
+        resourceCard2.flipCard();
+        resourceCard3.flipCard();
+        resourceCard4.flipCard();
+        resourceCard5.flipCard();
+        resourceCard6.flipCard();
+
+        //Place the resource cards
+        playerModel.placeCard(resourceCard1, new Position(1, 1));
+        playerModel.placeCard(resourceCard2, new Position(2, 0));
+        playerModel.placeCard(resourceCard3, new Position(3, -1));
+        playerModel.placeCard(resourceCard4, new Position(4, -2));
+
+        //Same thing with 6 insect golden cards
+        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
+        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
+        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
+        GoldenCard goldenCard4 = (GoldenCard) goldenDeck.get(33);
+        GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(34);
+        GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(35);
+        goldenCard1.flipCard();
+        goldenCard2.flipCard();
+        goldenCard3.flipCard();
+        goldenCard4.flipCard();
+        goldenCard5.flipCard();
+        goldenCard6.flipCard();
+
+        playerModel.placeCard(goldenCard1, new Position(-1, -1));
+        playerModel.placeCard(goldenCard2, new Position(0, -2));
+        playerModel.placeCard(goldenCard3, new Position(1, -3));
+        playerModel.placeCard(goldenCard4, new Position(2, -4));
+
+        //Select 2 objective cards
+        ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
+        ObjectiveCard objectiveCard2 = objectiveDeck.get(3);
+
+        //Check if the calculated score of the objective cards is correct
+        playerModel.calculateObjectivePoints(objectiveCard1);
+        assertEquals(2, playerModel.getCurrScore());
+        playerModel.calculateObjectivePoints(objectiveCard2);
+        assertEquals(4, playerModel.getCurrScore());
+
+        //Place a fifth card in the diagonal
+        playerModel.placeCard(resourceCard5, new Position(5, -3));
+        playerModel.placeCard(goldenCard5, new Position(3,-5));
+
+        //Reset the player's score
+        playerModel.setCurrScore(0);
+
+        //Check if the calculated score of the objective cards is correct
+        playerModel.calculateObjectivePoints(objectiveCard1);
+        assertEquals(2, playerModel.getCurrScore());
+        playerModel.calculateObjectivePoints(objectiveCard2);
+        assertEquals(4, playerModel.getCurrScore());
+
+        //Place a sixth card in the diagonal
+        playerModel.placeCard(resourceCard6, new Position(6, -4));
+        playerModel.placeCard(goldenCard6, new Position(4,-6));
+
+        //Reset the player's score
+        playerModel.setCurrScore(0);
+
+        //Check if the calculated score of the objective cards is correct
+        playerModel.calculateObjectivePoints(objectiveCard1);
+        assertEquals(4, playerModel.getCurrScore());
+        playerModel.calculateObjectivePoints(objectiveCard2);
+        assertEquals(8, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Test for the top right L shape objective card")
+    @Test
+    void checkTRLShapeObjective(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 1 fungi golden card and 2 animal resource cards and flip them
+        PlaceableCard mainCard = goldenDeck.getFirst();
+        PlaceableCard card1 = resourceDeck.get(20);
+        PlaceableCard card2 = resourceDeck.get(21);
+        mainCard.flipCard();
+        card1.flipCard();
+        card2.flipCard();
+
+        //Place the cards
+        playerModel.placeCard(card1, new Position(1, 1));
+        playerModel.placeCard(mainCard, new Position(2,2));
+        playerModel.placeCard(card2, new Position(1,-1));
+
+        //Select an objective card
+        ObjectiveCard objectiveCard = objectiveDeck.get(6);
+
+        //Check if the calculated score of the objective card is correct
+        playerModel.calculateObjectivePoints(objectiveCard);
+        assertEquals(3, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Test for the top left L shape objective card")
+    @Test
+    void checkTLLShapeObjective(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 1 animal golden card and 2 insect resource cards and flip them
+        PlaceableCard mainCard = goldenDeck.get(20);
+        PlaceableCard card1 = resourceDeck.get(30);
+        PlaceableCard card2 = resourceDeck.get(31);
+        mainCard.flipCard();
+        card1.flipCard();
+        card2.flipCard();
+
+        //Place the cards
+        playerModel.placeCard(card1, new Position(-1, 1));
+        playerModel.placeCard(mainCard, new Position(-2,2));
+        playerModel.placeCard(card2, new Position(-1,-1));
+
+        //Select an objective card
+        ObjectiveCard objectiveCard = objectiveDeck.get(7);
+
+        //Check if the calculated score of the objective card is correct
+        playerModel.calculateObjectivePoints(objectiveCard);
+        assertEquals(3, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Test for the bottom right L shape objective card")
+    @Test
+    void checkBRLShapeObjective(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 1 plant golden card and 2 fungi resource cards and flip them
+        PlaceableCard mainCard = goldenDeck.get(10);
+        PlaceableCard card1 = resourceDeck.get(0);
+        PlaceableCard card2 = resourceDeck.get(1);
+        mainCard.flipCard();
+        card1.flipCard();
+        card2.flipCard();
+
+        //Place the cards
+        playerModel.placeCard(card1, new Position(1, -1));
+        playerModel.placeCard(mainCard, new Position(2,-2));
+        playerModel.placeCard(card2, new Position(1,1));
+
+        //Select an objective card
+        ObjectiveCard objectiveCard = objectiveDeck.get(4);
+
+        //Check if the calculated score of the objective card is correct
+        playerModel.calculateObjectivePoints(objectiveCard);
+        assertEquals(3, playerModel.getCurrScore());
+    }
+
+    @DisplayName("Test for the bottom left L shape objective card")
+    @Test
+    void checkBLLShapeObjective(){
+        GameResources.initializeAllDecks();
+        //Initialize the decks
+        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
+        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
+        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
+        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+
+        //Initialize the player
+        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterDeck.getFirst());
+
+        //Place the starter card
+        playerModel.placeStarterCard();
+
+        //Use 1 fungus golden card and 2 animal resource cards and flip them
+        PlaceableCard mainCard = goldenDeck.get(30);
+        PlaceableCard card1 = resourceDeck.get(10);
+        PlaceableCard card2 = resourceDeck.get(11);
+        mainCard.flipCard();
+        card1.flipCard();
+        card2.flipCard();
+
+        //Place the cards
+        playerModel.placeCard(card1, new Position(-1, -1));
+        playerModel.placeCard(mainCard, new Position(-2,-2));
+        playerModel.placeCard(card2, new Position(-1,1));
+
+        //Select an objective card
+        ObjectiveCard objectiveCard = objectiveDeck.get(5);
+
+        //Check if the calculated score of the objective card is correct
+        playerModel.calculateObjectivePoints(objectiveCard);
+        assertEquals(3, playerModel.getCurrScore());
     }
 }
