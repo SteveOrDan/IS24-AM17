@@ -95,21 +95,6 @@ public class GameController {
     }
 
     /**
-     * Initialize decks, shuffle them and set specified visible cards
-     * @param resourceCard1 ID of the first resource card
-     * @param resourceCard2 ID of the second resource card
-     * @param goldenCard1 ID of the first golden card
-     * @param goldenCard2 ID of the second golden card
-     */
-    public void setUpGame(int resourceCard1, int resourceCard2, int goldenCard1, int goldenCard2){
-        gameModel.setGameState(GameState.SET_UP);
-
-        initializeDecks();
-        shuffleAllDecks();
-        setVisibleCards(resourceCard1, resourceCard2, goldenCard1, goldenCard2);
-    }
-
-    /**
      * Initialize all decks
      */
     public void initializeDecks(){
@@ -147,47 +132,10 @@ public class GameController {
     }
 
     /**
-     * Set visible cards for the game
-     * @param resourceCard1 ID of the first resource card
-     * @param resourceCard2 ID of the second resource card
-     * @param goldenCard1 ID of the first golden card
-     * @param goldenCard2 ID of the second golden card
-     */
-    public void setVisibleCards(int resourceCard1, int resourceCard2, int goldenCard1, int goldenCard2){
-        gameModel.setVisibleCards(resourceCard1, resourceCard2, goldenCard1, goldenCard2);
-    }
-
-    /**
-     * Set visible cards for the game
-     * @param resourceCardID ID of the resource card
-     */
-    public void setResourceVisibleCard(int resourceCardID){
-        gameModel.setResourceVisibleCard(resourceCardID);
-    }
-
-    /**
-     * Set visible cards for the game
-     * @param goldenCardID ID of the golden card
-     */
-    public void setGoldenVisibleCard(int goldenCardID){
-        gameModel.setGoldenVisibleCard(goldenCardID);
-    }
-
-    /**
      * Set the visible cards for the game
      */
     public void setCommonObjectives(){
         gameModel.getObjectiveCardsDeck().setCommonObjectives();
-    }
-
-    /**
-     * Set the objectives to choose for the player
-     * @param objective1 ID of the first objective
-     * @param objective2 ID of the second objective
-     */
-    public void setCommonObjectives(int objective1, int objective2){
-        gameModel.getObjectiveCardsDeck().setCommonObjective(objective1);
-        gameModel.getObjectiveCardsDeck().setCommonObjective(objective2);
     }
 
     /**
@@ -209,38 +157,10 @@ public class GameController {
     }
 
     /**
-     * Set the objectives to choose for the player
-     * @param playerID ID of the player
-     * @param objective1 ID of the first objective
-     * @param objective2 ID of the second objective
-     */
-    public void setObjectivesToChoose(int playerID, int objective1, int objective2){
-        if (!IDPlayerMap.containsKey(playerID)){
-            return;
-        }
-
-        PlayerModel player = IDPlayerMap.get(playerID);
-
-        ArrayList<ObjectiveCard> objectives = new ArrayList<>();
-        objectives.add(gameModel.drawObjectiveCard(objective1));
-        objectives.add(gameModel.drawObjectiveCard(objective2));
-
-        player.setObjectivesToChoose(objectives);
-    }
-
-    /**
      * Set the first player randomly
      */
     public void setRandomFirstPlayer(){
         gameModel.setRandomFirstPlayer();
-    }
-
-    /**
-     * Set the first player
-     * @param playerID ID of the player
-     */
-    public void setFirstPlayer(int playerID){
-        gameModel.setFirstPlayer(playerID);
     }
 
     /**
@@ -284,6 +204,10 @@ public class GameController {
             player.placeCard(IDPlaceableCardMap.get(cardID), pos);
 
             player.setState(PlayerState.DRAWING);
+
+            if (gameModel.getGameState() != GameState.END_GAME){
+                checkForEndGame();
+            }
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -318,43 +242,6 @@ public class GameController {
     }
 
     /**
-     * Fill player's hand with 2 resource cards and 1 golden card
-     * Handles exceptions for invalid game state, invalid player ID, invalid cards ID
-     * @param playerID ID of the player
-     * @param resourceCard1 ID of the first resource card
-     * @param resourceCard2 ID of the second resource card
-     * @param goldenCard ID of the golden card
-     */
-    public void fillPlayerHand(int playerID, int resourceCard1, int resourceCard2, int goldenCard){
-        try {
-            if (gameModel.getGameState() != GameState.SET_UP){
-                // Not in game set up
-                throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.SET_UP.toString());
-            }
-
-            if (!IDPlayerMap.containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            if (!IDPlaceableCardMap.containsKey(resourceCard1) ||
-                    !IDPlaceableCardMap.containsKey(resourceCard2) ||
-                    !IDPlaceableCardMap.containsKey(goldenCard)){
-                // Invalid card ID
-                throw new InvalidCardIDException();
-            }
-
-            PlayerModel player = IDPlayerMap.get(playerID);
-
-            player.drawCard(gameModel.drawResourceCard(resourceCard1));
-            player.drawCard(gameModel.drawResourceCard(resourceCard2));
-            player.drawCard(gameModel.drawGoldenCard(goldenCard));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
      * Draw a resource card from the deck and add to the player's hand
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
@@ -375,50 +262,23 @@ public class GameController {
     }
 
     /**
-     * Draw a resource card from the deck and add to the player's hand
-     * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, invalid card ID
-     * @param playerID ID of the player
-     * @param cardID ID of the card
-     */
-    public void drawResourceCard(int playerID, int cardID){
-        try {
-            checkPlayerDrawExceptions(playerID, cardID);
-
-            IDPlayerMap.get(playerID).drawCard(gameModel.drawResourceCard(cardID));
-
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-            endTurn();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
      * Draw a visible resource card
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, card not visible
      * @param playerID ID of the player
-     * @param cardID ID of the visible resource card
+     * @param index index of the visible resource card (either 0 or 1)
      */
-    public void drawVisibleResourceCard(int playerID, int cardID){
+    public void drawVisibleResourceCard(int playerID, int index){
         try {
-            checkPlayerDrawExceptions(playerID, cardID);
-
-            if (!gameModel.getResourceCardsDeck().getVisibleCards().contains(IDPlaceableCardMap.get(cardID))){
-                // Card not visible
-                throw new CardNotVisibleException();
-            }
-
-            IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleResourceCard(cardID));
-
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-            endTurn();
+            IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleResourceCard(index));
+            gameModel.restoreVisibleResourceCard();
         }
-        catch (Exception e) {
+        catch (InvalidVisibleCardIndexException e) {
             System.out.println(e.getMessage());
         }
+
+        IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+
+        endTurn();
     }
 
     /**
@@ -442,50 +302,23 @@ public class GameController {
     }
 
     /**
-     * Draw a golden card from the deck and add to the player's hand
-     * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, invalid card ID
-     * @param playerID ID of the player
-     * @param cardID ID of the card
-     */
-    public void drawGoldenCard(int playerID, int cardID){
-        try {
-            checkPlayerDrawExceptions(playerID, cardID);
-
-            IDPlayerMap.get(playerID).drawCard(gameModel.drawGoldenCard(cardID));
-
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-            endTurn();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Draw a visible golden card
+     * Draw a visible resource card
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, card not visible
      * @param playerID ID of the player
-     * @param cardID ID of the card
+     * @param index index of the visible resource card (either 0 or 1)
      */
-    public void drawVisibleGoldenCard(int playerID, int cardID){
+    public void drawVisibleGoldenCard(int playerID, int index){
         try {
-            checkPlayerDrawExceptions(playerID, cardID);
-
-            if (!gameModel.getGoldenCardsDeck().getVisibleCards().contains(IDPlaceableCardMap.get(cardID))){
-                // Card not visible
-                throw new CardNotVisibleException();
-            }
-
-            IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleGoldenCard(cardID));
-
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-            endTurn();
+            IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleGoldenCard(index));
+            gameModel.restoreVisibleGoldenCard();
         }
-        catch (Exception e) {
+        catch (InvalidVisibleCardIndexException e) {
             System.out.println(e.getMessage());
         }
+
+        IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+
+        endTurn();
     }
 
     /**
@@ -506,36 +339,6 @@ public class GameController {
             }
 
             IDPlayerMap.get(playerID).setStarterCard(gameModel.drawStarterCard());
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
-     * Draw a starter card from the deck and set it as the player's starter card
-     * Handles exceptions for invalid game state, invalid player ID, invalid card ID
-     * @param playerID ID of the player
-     * @param cardID ID of the card
-     */
-    public void drawStarterCard(int playerID, int cardID){
-        try {
-            if (gameModel.getGameState() != GameState.SET_UP){
-                // Not in game set up
-                throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.SET_UP.toString());
-            }
-
-            if (!IDPlayerMap.containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            if (!IDPlaceableCardMap.containsKey(cardID)){
-                // Invalid card ID
-                throw new InvalidCardIDException();
-            }
-
-            IDPlayerMap.get(playerID).setStarterCard(gameModel.drawStarterCard(cardID));
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -582,7 +385,7 @@ public class GameController {
         gameModel.endTurn();
     }
 
-    public void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
+    protected void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
         if (gameModel.getGameState() != GameState.PLAYING){
             // Not playing game state
             throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING.toString());
@@ -604,12 +407,27 @@ public class GameController {
         }
     }
 
-    public void checkPlayerDrawExceptions(int playerID, int cardID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException, InvalidCardIDException{
+    protected void checkPlayerDrawExceptions(int playerID, int cardID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException, InvalidCardIDException{
         checkPlayerDrawExceptions(playerID);
 
         if (!IDPlaceableCardMap.containsKey(cardID)){
             // Invalid card ID
             throw new InvalidCardIDException();
+        }
+    }
+
+    public void checkForEndGame(){
+        if (IDPlayerMap.get(gameModel.getCurrPlayerID()).getCurrScore() >= 20){
+            gameModel.setGameState(GameState.FINAL_ROUND);
+        }
+
+        if (gameModel.getGameState() == GameState.FINAL_ROUND &&
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length] == (gameModel.getCurrPlayerID())){
+            gameModel.setGameState(GameState.EXTRA_ROUND);
+        }
+        else if (gameModel.getGameState().equals(GameState.EXTRA_ROUND) &&
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length] == (gameModel.getCurrPlayerID())){
+            gameModel.setGameState(GameState.END_GAME);
         }
     }
 }

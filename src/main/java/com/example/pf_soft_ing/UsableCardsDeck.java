@@ -2,6 +2,7 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.exceptions.InvalidCardIDException;
+import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
 import java.util.ArrayList;
@@ -32,76 +33,60 @@ public class UsableCardsDeck {
         Collections.shuffle(deck);
     }
 
+    public void restoreInitialVisibleCards () {
+        PlaceableCard card1 = deck.getFirst();
+        deck.remove(card1);
+        PlaceableCard card2 = deck.getFirst();
+        deck.remove(card2);
+
+        visibleCards.add(card1);
+        visibleCards.add(card2);
+    }
+
     /**
      * Get the top card in the deck and returns it
      * @return the top card in the deck
      */
-    public PlaceableCard drawCard(){
-        try{
-            if (!deck.isEmpty()){
-                int randIndex = (int)(Math.random() * (deck.size() - 1));
+    public PlaceableCard drawCard() throws NotEnoughCardsException {
+        if (!deck.isEmpty()){
+            PlaceableCard retCard = deck.getFirst();
 
-                PlaceableCard retCard = deck.get(randIndex);
+            deck.remove(retCard);
 
-                deck.remove(retCard);
-
-                return retCard;
-            }
-            else{
-                throw new NotEnoughCardsException();
-            }
+            return retCard;
         }
-        catch (NotEnoughCardsException e){
-            System.out.println(e.getMessage());
-            return null;
+        else{
+            throw new NotEnoughCardsException();
         }
     }
 
     /**
      * The method returns one of the cards in the visibleCards list based on the ID passed as a parameter
-     * @param cardID ID of visible card in the list
+     * @param index index of visible card in the array (either 0 or 1)
      * @return the card that has been drawn
      */
-    public PlaceableCard drawVisibleCard(int cardID){
-        try{
-            if (!visibleCards.isEmpty()){
-                for (PlaceableCard card : visibleCards){
-                    if (card.getId() == cardID){
-                        visibleCards.remove(card);
-
-                        return card;
-                    }
-                }
-
-                throw new InvalidCardIDException();
-            }
-            else{
-                throw new NotEnoughCardsException();
-            }
+    public PlaceableCard drawVisibleCard(int index) throws InvalidVisibleCardIndexException{
+        if (!visibleCards.isEmpty() && index >= 0 && index < visibleCards.size()) {
+            PlaceableCard retCard = visibleCards.get(index);
+            visibleCards.remove(index);
+            return retCard;
         }
-        catch (Exception e){
-            System.out.println(e.getMessage());
-            return null;
-        }
+        throw new InvalidVisibleCardIndexException(index);
     }
 
     /**
      * Changes the values inside the visibleCards list so that it only contains 2 cards
      */
-    public void restoreVisibleCards(){
-        while (visibleCards.size() < 2){
-            visibleCards.add(drawCard());
-        }
+    public void restoreVisibleCard() throws NotEnoughCardsException {
+        visibleCards.add(drawCard());
     }
+
 
     /**
      * Changes the values inside the visibleCards list so that it only contains 2 cards
-     * @param cardID ID of the card to set visible
      */
-    public void restoreVisibleCard(int cardID){
-        if (visibleCards.size() < 2){
-            visibleCards.add(drawCard(cardID));
-        }
+    public void restoreVisibleCardWithOtherDeck(PlaceableCard card) throws NotEnoughCardsException {
+        visibleCards.add(card);
     }
 
     /**

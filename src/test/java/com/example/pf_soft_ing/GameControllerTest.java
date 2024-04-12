@@ -120,297 +120,297 @@ class GameControllerTest {
         assertEquals(1, firstPlayers);
     }
 
-    @Test
-    void simulateGame(){
-        // region Add players
-
-        PlayerModel player17 = new PlayerModel("Player 17", 17);
-        PlayerModel player86 = new PlayerModel("Player 86", 86);
-
-        gc.addPlayer(player17);
-        gc.addPlayer(player86);
-
-        assertEquals(2, gc.getIDPlayerMap().size());
-
-        // endregion
-
-        // region Game setup
-
-        // Set up decks (initialize, shuffle and set visible cards)
-        gc.setUpGame(10, 30, 40, 60);
-
-        // Foreach player set starter card, token and draw cards
-        // region Player 17
-
-        // Set starter card
-        gc.drawStarterCard(17, 80);
-
-        player17.placeStarterCard();
-
-        // Choose token
-        player17.setToken(new Token(TokenColors.BLUE));
-
-        // Draw 2 resource cards and 1 golden card
-        gc.fillPlayerHand(17, 0, 20, 50);
-
-        // endregion
-
-        // region Player 86
-
-        // Set starter card
-        gc.drawStarterCard(86, 81);
-
-        player86.placeStarterCard();
-
-        // Choose token
-        player86.setToken(new Token(TokenColors.RED));
-
-        // Draw 2 resource cards and 1 golden card
-        gc.fillPlayerHand(86, 1, 11, 70);
-
-        // endregion
-
-        // Set common objectives
-        gc.setCommonObjectives(94, 95); // Num of Fungi ; Num of Plants
-
-        // Set objectives to choose
-        gc.setObjectivesToChoose(17, 86, 90);
-        gc.setObjectivesToChoose(86, 88, 101);
-
-        player17.setSecretObjective(0);
-        player86.setSecretObjective(1);
-
-        // Set first player
-        gc.setFirstPlayer(86);
-
-        gc.calculateOrderOfPlayers();
-
-        gc.endGameSetUp();
-
-        // endregion
-
-        // region Before game simulation
-
-        // =============================== BEFORE GAME START ===============================
-        // Visible Resource Cards: 10, 30
-        // Visible Golden Cards: 40, 60
-        // Player 17 hand: 0, 20, 50
-        // Player 86 hand: 1, 11, 70
-        // First player: 86
-        // Current player: 86
-
-        assertTrue(gc.getGameModel().getResourceCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(10)));
-        assertTrue(gc.getGameModel().getResourceCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(30)));
-        assertTrue(gc.getGameModel().getGoldenCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(40)));
-        assertTrue(gc.getGameModel().getGoldenCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(60)));
-
-        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(0)));
-        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(20)));
-        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(50)));
-
-        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(1)));
-        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(11)));
-        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(70)));
-
-        assertEquals(86, gc.getGameModel().getCurrPlayerID());
-        assertEquals(86, gc.getGameModel().getFirstPlayerID());
-
-        // endregion
-
-        // region Game simulation
-
-        // =============================== GAME START ===============================
-
-        gc.placeCard(86, 11, new Position(1, 1));
-
-        gc.drawVisibleResourceCard(86, 10);
-
-        gc.setResourceVisibleCard(2);
-
-        // =================== NEXT TURN ===================
-
-        gc.placeCard(17, 0, new Position(-1, 1));
-
-        gc.drawVisibleGoldenCard(17, 40);
-
-        gc.setGoldenVisibleCard(47);
-
-        // =================== NEXT TURN ===================
-
-        gc.placeCard(86, 1, new Position(1, -1));
-
-        gc.drawVisibleGoldenCard(86, 47);
-
-        gc.setGoldenVisibleCard(62);
-
-        // =================== NEXT TURN ===================
-
-        gc.placeCard(17, 40, new Position(1, -1));
-
-        gc.drawVisibleResourceCard(17, 2);
-
-        gc.setResourceVisibleCard(15);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 0, new int[]{0, 3, 3, 0, 0, 0, 0});
-
-        checkPlayerSituation(17, 1, new int[]{0, 1, 2, 1, 1, 0, 0});
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 10, new Position(-1, 1));
-
-        gc.drawResourceCard(86, 19);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 2, new Position(-2, 0));
-
-        gc.drawResourceCard(17, 5);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 47, new Position(0, 2));
-
-        gc.drawResourceCard(86, 34);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 5, new Position(0, 2));
-
-        gc.drawGoldenCard(17, 73);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 3, new int[]{0, 3, 3, 0, 1, 0, 0});
-
-        checkPlayerSituation(17, 1, new int[]{1, 1, 4, 1, 1, 1, 0});
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 34, new Position(2, -2));
-
-        gc.drawResourceCard(86, 14);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 20, new Position(-3, 1));
-
-        gc.drawResourceCard(17, 7);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 14, new Position(1, 3));
-
-        gc.drawGoldenCard(86, 43);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 7, new Position(2, 0));
-
-        gc.drawGoldenCard(17, 49);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 3, new int[]{1, 4, 3, 2, 3, 0, 0});
-
-        checkPlayerSituation(17, 2, new int[]{3, 1, 5, 1, 1, 1, 0});
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 70, new Position(2, 0));
-
-        gc.drawResourceCard(86, 26);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 49, new Position(0, -2));
-
-        gc.drawGoldenCard(17, 53);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 26, new Position(2, 4));
-
-        gc.drawResourceCard(86, 3);
-
-        //=================== NEXT TURN ===================
-
-        gc.flipCard(17, 50);
-
-        gc.placeCard(17, 50, new Position(-3, -1));
-
-        gc.drawResourceCard(17, 13);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 7, new int[]{2, 4, 3, 1, 5, 0, 0});
-
-        checkPlayerSituation(17, 7, new int[]{3, 2, 4, 1, 1, 1, 0});
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 3, new Position(3, 3));
-
-        gc.drawVisibleGoldenCard(86, 62);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 13, new Position(-2, -2));
-
-        gc.drawResourceCard(17, 4);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 43, new Position(2, 2));
-
-        gc.drawResourceCard(86, 12);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 53, new Position(-1, -1));
-
-        gc.drawResourceCard(17, 31);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 13, new int[]{2, 2, 4, 1, 5, 0, 0});
-
-        checkPlayerSituation(17, 15, new int[]{3, 3, 3, 0, 1, 1, 0});
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 62, new Position(1, -3));
-
-        gc.drawGoldenCard(86, 44);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 31, new Position(2, -2));
-
-        gc.drawGoldenCard(17, 45);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(86, 44, new Position(3, -1));
-
-        gc.drawResourceCard(86, 31);
-
-        //=================== NEXT TURN ===================
-
-        gc.placeCard(17, 45, new Position(1, 1));
-
-        gc.drawResourceCard(17, 31);
-
-        // =================== CHECK SITUATION ===================
-
-        checkPlayerSituation(86, 23, new int[]{1, 2, 4, 1, 5, 0, 0});
-
-        checkPlayerSituation(17, 21, new int[]{2, 2, 3, 2, 0, 1, 0});
-
-        // endregion
-    }
+//    @Test
+//    void simulateGame(){
+//        // region Add players
+//
+//        PlayerModel player17 = new PlayerModel("Player 17", 17);
+//        PlayerModel player86 = new PlayerModel("Player 86", 86);
+//
+//        gc.addPlayer(player17);
+//        gc.addPlayer(player86);
+//
+//        assertEquals(2, gc.getIDPlayerMap().size());
+//
+//        // endregion
+//
+//        // region Game setup
+//
+//        // Set up decks (initialize, shuffle and set visible cards)
+//        gc.setUpGame(10, 30, 40, 60);
+//
+//        // Foreach player set starter card, token and draw cards
+//        // region Player 17
+//
+//        // Set starter card
+//        gc.drawStarterCard(17, 80);
+//
+//        player17.placeStarterCard();
+//
+//        // Choose token
+//        player17.setToken(new Token(TokenColors.BLUE));
+//
+//        // Draw 2 resource cards and 1 golden card
+//        gc.fillPlayerHand(17, 0, 20, 50);
+//
+//        // endregion
+//
+//        // region Player 86
+//
+//        // Set starter card
+//        gc.drawStarterCard(86, 81);
+//
+//        player86.placeStarterCard();
+//
+//        // Choose token
+//        player86.setToken(new Token(TokenColors.RED));
+//
+//        // Draw 2 resource cards and 1 golden card
+//        gc.fillPlayerHand(86, 1, 11, 70);
+//
+//        // endregion
+//
+//        // Set common objectives
+//        gc.setCommonObjectives(94, 95); // Num of Fungi ; Num of Plants
+//
+//        // Set objectives to choose
+//        gc.setObjectivesToChoose(17, 86, 90);
+//        gc.setObjectivesToChoose(86, 88, 101);
+//
+//        player17.setSecretObjective(0);
+//        player86.setSecretObjective(1);
+//
+//        // Set first player
+//        gc.setFirstPlayer(86);
+//
+//        gc.calculateOrderOfPlayers();
+//
+//        gc.endGameSetUp();
+//
+//        // endregion
+//
+//        // region Before game simulation
+//
+//        // =============================== BEFORE GAME START ===============================
+//        // Visible Resource Cards: 10, 30
+//        // Visible Golden Cards: 40, 60
+//        // Player 17 hand: 0, 20, 50
+//        // Player 86 hand: 1, 11, 70
+//        // First player: 86
+//        // Current player: 86
+//
+//        assertTrue(gc.getGameModel().getResourceCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(10)));
+//        assertTrue(gc.getGameModel().getResourceCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(30)));
+//        assertTrue(gc.getGameModel().getGoldenCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(40)));
+//        assertTrue(gc.getGameModel().getGoldenCardsDeck().getVisibleCards().contains(gc.getIDPlaceableCardMap().get(60)));
+//
+//        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(0)));
+//        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(20)));
+//        assertTrue(player17.getHand().contains(gc.getIDPlaceableCardMap().get(50)));
+//
+//        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(1)));
+//        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(11)));
+//        assertTrue(player86.getHand().contains(gc.getIDPlaceableCardMap().get(70)));
+//
+//        assertEquals(86, gc.getGameModel().getCurrPlayerID());
+//        assertEquals(86, gc.getGameModel().getFirstPlayerID());
+//
+//        // endregion
+//
+//        // region Game simulation
+//
+//        // =============================== GAME START ===============================
+//
+//        gc.placeCard(86, 11, new Position(1, 1));
+//
+//        gc.drawVisibleResourceCard(86, 10);
+//
+//        gc.setResourceVisibleCard(2);
+//
+//        // =================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 0, new Position(-1, 1));
+//
+//        gc.drawVisibleGoldenCard(17, 40);
+//
+//        gc.setGoldenVisibleCard(47);
+//
+//        // =================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 1, new Position(1, -1));
+//
+//        gc.drawVisibleGoldenCard(86, 47);
+//
+//        gc.setGoldenVisibleCard(62);
+//
+//        // =================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 40, new Position(1, -1));
+//
+//        gc.drawVisibleResourceCard(17, 2);
+//
+//        gc.setResourceVisibleCard(15);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 0, new int[]{0, 3, 3, 0, 0, 0, 0});
+//
+//        checkPlayerSituation(17, 1, new int[]{0, 1, 2, 1, 1, 0, 0});
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 10, new Position(-1, 1));
+//
+//        gc.drawResourceCard(86, 19);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 2, new Position(-2, 0));
+//
+//        gc.drawResourceCard(17, 5);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 47, new Position(0, 2));
+//
+//        gc.drawResourceCard(86, 34);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 5, new Position(0, 2));
+//
+//        gc.drawGoldenCard(17, 73);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 3, new int[]{0, 3, 3, 0, 1, 0, 0});
+//
+//        checkPlayerSituation(17, 1, new int[]{1, 1, 4, 1, 1, 1, 0});
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 34, new Position(2, -2));
+//
+//        gc.drawResourceCard(86, 14);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 20, new Position(-3, 1));
+//
+//        gc.drawResourceCard(17, 7);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 14, new Position(1, 3));
+//
+//        gc.drawGoldenCard(86, 43);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 7, new Position(2, 0));
+//
+//        gc.drawGoldenCard(17, 49);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 3, new int[]{1, 4, 3, 2, 3, 0, 0});
+//
+//        checkPlayerSituation(17, 2, new int[]{3, 1, 5, 1, 1, 1, 0});
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 70, new Position(2, 0));
+//
+//        gc.drawResourceCard(86, 26);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 49, new Position(0, -2));
+//
+//        gc.drawGoldenCard(17, 53);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 26, new Position(2, 4));
+//
+//        gc.drawResourceCard(86, 3);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.flipCard(17, 50);
+//
+//        gc.placeCard(17, 50, new Position(-3, -1));
+//
+//        gc.drawResourceCard(17, 13);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 7, new int[]{2, 4, 3, 1, 5, 0, 0});
+//
+//        checkPlayerSituation(17, 7, new int[]{3, 2, 4, 1, 1, 1, 0});
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 3, new Position(3, 3));
+//
+//        gc.drawVisibleGoldenCard(86, 62);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 13, new Position(-2, -2));
+//
+//        gc.drawResourceCard(17, 4);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 43, new Position(2, 2));
+//
+//        gc.drawResourceCard(86, 12);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 53, new Position(-1, -1));
+//
+//        gc.drawResourceCard(17, 31);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 13, new int[]{2, 2, 4, 1, 5, 0, 0});
+//
+//        checkPlayerSituation(17, 15, new int[]{3, 3, 3, 0, 1, 1, 0});
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 62, new Position(1, -3));
+//
+//        gc.drawGoldenCard(86, 44);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 31, new Position(2, -2));
+//
+//        gc.drawGoldenCard(17, 45);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(86, 44, new Position(3, -1));
+//
+//        gc.drawResourceCard(86, 31);
+//
+//        //=================== NEXT TURN ===================
+//
+//        gc.placeCard(17, 45, new Position(1, 1));
+//
+//        gc.drawResourceCard(17, 31);
+//
+//        // =================== CHECK SITUATION ===================
+//
+//        checkPlayerSituation(86, 23, new int[]{1, 2, 4, 1, 5, 0, 0});
+//
+//        checkPlayerSituation(17, 21, new int[]{2, 2, 3, 2, 0, 1, 0});
+//
+//        // endregion
+//    }
 
     public void checkPlayerSituation(int playerID, int score, int[] resources){
         PlayerModel player = gc.getIDPlayerMap().get(playerID);

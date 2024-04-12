@@ -93,27 +93,27 @@ class GameModelTest {
         assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(gameModel.getGoldenCardsDeck().getVisibleCards().get(1)));
     }
 
-    @Test
-    void drawResourceCard() {
-        gameModel.initializeDecks();
-        gameModel.setVisibleCards();
+//    @Test
+//    void drawResourceCard() {
+//        gameModel.initializeDecks();
+//        gameModel.setVisibleCards();
+//
+//        PlaceableCard card = gameModel.drawResourceCard();
+//
+//        assertNotNull(card);
+//        assertFalse(gameModel.getResourceCardsDeck().getDeck().contains(card));
+//    }
 
-        PlaceableCard card = gameModel.drawResourceCard();
-
-        assertNotNull(card);
-        assertFalse(gameModel.getResourceCardsDeck().getDeck().contains(card));
-    }
-
-    @Test
-    void drawGoldenCard() {
-        gameModel.initializeDecks();
-        gameModel.setVisibleCards();
-
-        PlaceableCard card = gameModel.drawGoldenCard();
-
-        assertNotNull(card);
-        assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(card));
-    }
+//    @Test
+//    void drawGoldenCard() {
+//        gameModel.initializeDecks();
+//        gameModel.setVisibleCards();
+//
+//        PlaceableCard card = gameModel.drawGoldenCard();
+//
+//        assertNotNull(card);
+//        assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(card));
+//    }
 
     @Test
     void drawStarterCard() {

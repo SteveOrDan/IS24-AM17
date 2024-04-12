@@ -2,6 +2,8 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
+import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -160,76 +162,25 @@ public class GameModel {
         starterCardsDeck.shuffleDeck();
     }
 
-    /**
-     * Sets the visible cards list in the golden and resource card decks
-     */
-    public void setVisibleCards(){
-        resourceCardsDeck.restoreVisibleCards();
-        goldenCardsDeck.restoreVisibleCards();
-    }
-
-    /**
-     * Sets the visible cards list in the golden and resource card decks
-     * @param resourceCardID1 ID of the first resource card to set visible
-     * @param resourceCardID2 ID of the second resource card to set visible
-     * @param goldenCardID1 ID of the first golden card to set visible
-     * @param goldenCardID2 ID of the second golden card to set visible
-     */
-    public void setVisibleCards(int resourceCardID1, int resourceCardID2, int goldenCardID1, int goldenCardID2){
-        resourceCardsDeck.restoreVisibleCard(resourceCardID1);
-        resourceCardsDeck.restoreVisibleCard(resourceCardID2);
-        goldenCardsDeck.restoreVisibleCard(goldenCardID1);
-        goldenCardsDeck.restoreVisibleCard(goldenCardID2);
-    }
-
-    /**
-     * Sets the visible resource card in the resource card deck
-     * @param resourceCardID ID of the resource card to set visible
-     */
-    public void setResourceVisibleCard(int resourceCardID){
-        resourceCardsDeck.restoreVisibleCard(resourceCardID);
-    }
-
-    /**
-     * Sets the visible golden card in the golden card deck
-     * @param goldenCardID ID of the golden card to set visible
-     */
-    public void setGoldenVisibleCard(int goldenCardID){
-        goldenCardsDeck.restoreVisibleCard(goldenCardID);
+    public void setVisibleCards () {
+        resourceCardsDeck.restoreInitialVisibleCards();
+        goldenCardsDeck.restoreInitialVisibleCards();
     }
 
     /**
      * Method to draw the first resource card of the deck
      * @return First resource card of the deck
      */
-    public PlaceableCard drawResourceCard(){
+    public PlaceableCard drawResourceCard() throws NotEnoughCardsException {
         return resourceCardsDeck.drawCard();
-    }
-
-    /**
-     * Method to draw a specific resource card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public PlaceableCard drawResourceCard(int cardID){
-        return resourceCardsDeck.drawCard(cardID);
     }
 
     /**
      * Method to draw the first golden card of the deck
      * @return First golden card of the deck
      */
-    public PlaceableCard drawGoldenCard(){
+    public PlaceableCard drawGoldenCard() throws NotEnoughCardsException {
         return goldenCardsDeck.drawCard();
-    }
-
-    /**
-     * Method to draw a specific golden card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public PlaceableCard drawGoldenCard(int cardID){
-        return goldenCardsDeck.drawCard(cardID);
     }
 
     /**
@@ -241,15 +192,6 @@ public class GameModel {
     }
 
     /**
-     * Method to draw a specific starter card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public PlaceableCard drawStarterCard(int cardID){
-        return starterCardsDeck.drawCard(cardID);
-    }
-
-    /**
      * Method to draw the first objective card of the deck
      * @return First objective card of the deck
      */
@@ -258,39 +200,44 @@ public class GameModel {
     }
 
     /**
-     * Method to draw a specific objective card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public ObjectiveCard drawObjectiveCard(int cardID){
-        return objectiveCardsDeck.drawCard(cardID);
-    }
-
-    /**
      * Method to draw the visible resource card of the deck with the given ID
-     * @param cardID ID of the card to draw
+     * @param index index of the card to draw (either 0 or 1)
      * @return Visible resource card of the deck with the given ID
      */
-    public PlaceableCard drawVisibleResourceCard(int cardID){
-        if (resourceCardsDeck.getVisibleCards().contains(resourceCardsDeck.getVisibleCardByID(cardID))){
-            return resourceCardsDeck.drawVisibleCard(cardID);
-        }
-        else {
-            return null;
-        }
+    public PlaceableCard drawVisibleResourceCard(int index) throws InvalidVisibleCardIndexException {
+        return resourceCardsDeck.drawVisibleCard(index);
     }
 
     /**
      * Method to draw the visible golden card of the deck with the given ID
-     * @param cardID ID of the card to draw
+     * @param index index of the card to draw (either 0 or 1)
      * @return Visible golden card of the deck with the given ID
      */
-    public PlaceableCard drawVisibleGoldenCard(int cardID){
-        if (goldenCardsDeck.getVisibleCards().contains(goldenCardsDeck.getVisibleCardByID(cardID))){
-            return goldenCardsDeck.drawVisibleCard(cardID);
+    public PlaceableCard drawVisibleGoldenCard(int index) throws InvalidVisibleCardIndexException {
+        return goldenCardsDeck.drawVisibleCard(index);
+    }
+
+    public void restoreVisibleResourceCard (){
+        try {
+            resourceCardsDeck.restoreVisibleCard();
+        } catch (NotEnoughCardsException e) {
+            try {
+                resourceCardsDeck.restoreVisibleCardWithOtherDeck(goldenCardsDeck.drawCard());
+            } catch (NotEnoughCardsException ex) {
+                System.out.println("Endgame?");
+            }
         }
-        else {
-            return null;
+    }
+
+    public void restoreVisibleGoldenCard (){
+        try {
+            goldenCardsDeck.restoreVisibleCard();
+        } catch (NotEnoughCardsException e) {
+            try {
+                goldenCardsDeck.restoreVisibleCardWithOtherDeck(resourceCardsDeck.drawCard());
+            } catch (NotEnoughCardsException ex) {
+                System.out.println("Endgame?");
+            }
         }
     }
 
@@ -304,28 +251,6 @@ public class GameModel {
         }
 
         firstPlayerID = playerIDList.get((int) Math.round(Math.random() * (playerIDList.size() - 1)));
-        currPlayerID = firstPlayerID;
-
-        PlayerModel firstPlayer = IDToPlayerMap.get(firstPlayerID);
-        firstPlayer.setAsFirstPlayer(true);
-        firstPlayer.setState(PlayerState.PLACING);
-    }
-
-    /**
-     * Method to set the first player
-     * @param playerID ID of the first player
-     */
-    public void setFirstPlayer(int playerID){
-        if (!playerIDList.contains(playerID)){
-            return;
-        }
-
-        for (Integer i : playerIDList){
-            IDToPlayerMap.get(i).setAsFirstPlayer(false);
-            IDToPlayerMap.get(i).setState(PlayerState.WAITING);
-        }
-
-        firstPlayerID = playerID;
         currPlayerID = firstPlayerID;
 
         PlayerModel firstPlayer = IDToPlayerMap.get(firstPlayerID);
