@@ -177,7 +177,7 @@ public class GameController {
      * @param cardID ID of the card
      * @param pos Position to place the card
      */
-    public void placeCard(int playerID, int cardID, Position pos){
+    public void placeCard(int playerID, int cardID, Position pos) {
         try {
             if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
@@ -203,11 +203,7 @@ public class GameController {
 
             player.placeCard(IDPlaceableCardMap.get(cardID), pos);
 
-            player.setState(PlayerState.DRAWING);
-
-            if (gameModel.getGameState() != GameState.END_GAME){
-                checkForEndGame();
-            }
+            checkForEndGamePlace();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -254,6 +250,8 @@ public class GameController {
 
             IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
 
+            checkForEndGameDraw();
+
             endTurn();
         }
         catch (Exception e) {
@@ -269,16 +267,21 @@ public class GameController {
      */
     public void drawVisibleResourceCard(int playerID, int index){
         try {
+            checkPlayerDrawExceptions(playerID);
+
             IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleResourceCard(index));
+
             gameModel.restoreVisibleResourceCard();
+
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+
+            checkForEndGameDraw();
+
+            endTurn();
         }
-        catch (InvalidVisibleCardIndexException e) {
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-        endTurn();
     }
 
     /**
@@ -293,6 +296,8 @@ public class GameController {
             IDPlayerMap.get(playerID).drawCard(gameModel.drawGoldenCard());
 
             IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+
+            checkForEndGameDraw();
 
             endTurn();
         }
@@ -309,16 +314,21 @@ public class GameController {
      */
     public void drawVisibleGoldenCard(int playerID, int index){
         try {
+            checkPlayerDrawExceptions(playerID);
+
             IDPlayerMap.get(playerID).drawCard(gameModel.drawVisibleGoldenCard(index));
+
             gameModel.restoreVisibleGoldenCard();
+
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+
+            checkForEndGameDraw();
+
+            endTurn();
         }
-        catch (InvalidVisibleCardIndexException e) {
+        catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
-
-        endTurn();
     }
 
     /**
@@ -386,7 +396,9 @@ public class GameController {
     }
 
     protected void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
-        if (gameModel.getGameState() != GameState.PLAYING){
+        if (gameModel.getGameState() != GameState.PLAYING &&
+                gameModel.getGameState() != GameState.FINAL_ROUND &&
+                gameModel.getGameState() != GameState.EXTRA_ROUND){
             // Not playing game state
             throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING.toString());
         }
@@ -407,26 +419,32 @@ public class GameController {
         }
     }
 
-    protected void checkPlayerDrawExceptions(int playerID, int cardID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException, InvalidCardIDException{
-        checkPlayerDrawExceptions(playerID);
-
-        if (!IDPlaceableCardMap.containsKey(cardID)){
-            // Invalid card ID
-            throw new InvalidCardIDException();
-        }
-    }
-
-    public void checkForEndGame(){
+    public void checkForEndGamePlace(){
         if (IDPlayerMap.get(gameModel.getCurrPlayerID()).getCurrScore() >= 20){
             gameModel.setGameState(GameState.FINAL_ROUND);
         }
 
         if (gameModel.getGameState() == GameState.FINAL_ROUND &&
-                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length] == (gameModel.getCurrPlayerID())){
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length - 1] == (gameModel.getCurrPlayerID())){
             gameModel.setGameState(GameState.EXTRA_ROUND);
         }
-        else if (gameModel.getGameState().equals(GameState.EXTRA_ROUND) &&
-                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length] == (gameModel.getCurrPlayerID())){
+        else if (gameModel.getGameState() == GameState.EXTRA_ROUND &&
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length - 1] == (gameModel.getCurrPlayerID())){
+            gameModel.setGameState(GameState.END_GAME);
+        }
+    }
+
+    public void checkForEndGameDraw(){
+        if (getGameModel().getResourceCardsDeck().isDeckEmpty() && getGameModel().getGoldenCardsDeck().isDeckEmpty()){
+            gameModel.setGameState(GameState.FINAL_ROUND);
+        }
+
+        if (gameModel.getGameState() == GameState.FINAL_ROUND &&
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length - 1] == (gameModel.getCurrPlayerID())){
+            gameModel.setGameState(GameState.EXTRA_ROUND);
+        }
+        else if (gameModel.getGameState() == GameState.EXTRA_ROUND &&
+                gameModel.getOrderOfPlayersIDs()[gameModel.getOrderOfPlayersIDs().length - 1] == (gameModel.getCurrPlayerID())){
             gameModel.setGameState(GameState.END_GAME);
         }
     }

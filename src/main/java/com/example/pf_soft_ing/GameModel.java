@@ -218,25 +218,27 @@ public class GameModel {
     }
 
     public void restoreVisibleResourceCard (){
-        try {
+        if (!resourceCardsDeck.isDeckEmpty()){
             resourceCardsDeck.restoreVisibleCard();
-        } catch (NotEnoughCardsException e) {
+        }
+        else if (!goldenCardsDeck.isDeckEmpty()){
             try {
                 resourceCardsDeck.restoreVisibleCardWithOtherDeck(goldenCardsDeck.drawCard());
-            } catch (NotEnoughCardsException ex) {
-                System.out.println("Endgame?");
+            } catch (NotEnoughCardsException e) {
+                System.out.println(e.getMessage());
             }
         }
     }
 
     public void restoreVisibleGoldenCard (){
-        try {
+        if (!goldenCardsDeck.isDeckEmpty()){
             goldenCardsDeck.restoreVisibleCard();
-        } catch (NotEnoughCardsException e) {
+        }
+        else if (!resourceCardsDeck.isDeckEmpty()){
             try {
                 goldenCardsDeck.restoreVisibleCardWithOtherDeck(resourceCardsDeck.drawCard());
-            } catch (NotEnoughCardsException ex) {
-                System.out.println("Endgame?");
+            } catch (NotEnoughCardsException e) {
+                System.out.println(e.getMessage());
             }
         }
     }

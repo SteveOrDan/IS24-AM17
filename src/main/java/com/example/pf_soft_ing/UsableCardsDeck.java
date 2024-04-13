@@ -1,7 +1,6 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.exceptions.InvalidCardIDException;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
@@ -77,67 +76,22 @@ public class UsableCardsDeck {
     /**
      * Changes the values inside the visibleCards list so that it only contains 2 cards
      */
-    public void restoreVisibleCard() throws NotEnoughCardsException {
-        visibleCards.add(drawCard());
-    }
+    public void restoreVisibleCard() {
+        visibleCards.add(deck.getFirst());
 
+        deck.remove(deck.getFirst());
+    }
 
     /**
      * Changes the values inside the visibleCards list so that it only contains 2 cards
      */
-    public void restoreVisibleCardWithOtherDeck(PlaceableCard card) throws NotEnoughCardsException {
+    public void restoreVisibleCardWithOtherDeck(PlaceableCard card) {
         visibleCards.add(card);
+
+        deck.remove(card);
     }
 
-    /**
-     * Method to draw a specific card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public PlaceableCard drawCard(int cardID){
-        try{
-            if (!deck.isEmpty()){
-                PlaceableCard retCard = getCardByID(cardID);
-
-                deck.remove(retCard);
-
-                return retCard;
-            }
-            else{
-                throw new NotEnoughCardsException();
-            }
-        }
-        catch (NotEnoughCardsException e){
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Method to get a card by its ID
-     * @param cardID ID of the card to get
-     * @return The card with the given ID
-     */
-    public PlaceableCard getCardByID(int cardID){
-        for (PlaceableCard card : deck){
-            if (card.getId() == cardID){
-                return card;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Method to get a visible card by its ID
-     * @param cardID ID of the card to get
-     * @return The card with the given ID
-     */
-    public PlaceableCard getVisibleCardByID(int cardID){
-        for (PlaceableCard card : visibleCards){
-            if (card.getId() == cardID){
-                return card;
-            }
-        }
-        return null;
+    public boolean isDeckEmpty(){
+        return deck.isEmpty();
     }
 }
