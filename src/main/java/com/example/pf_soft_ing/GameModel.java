@@ -11,16 +11,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GameModel {
+
     private final HashMap<Integer, PlayerModel> IDToPlayerMap;
     private final HashMap<Integer, Integer> board;
+
     private UsableCardsDeck resourceCardsDeck;
     private UsableCardsDeck goldenCardsDeck;
     private ObjectiveCardsDeck objectiveCardsDeck;
     private StarterCardsDeck starterCardsDeck;
+
     private final List<Integer> playerIDList;
+
     private int currPlayerID;
     private int firstPlayerID;
     private int[] orderOfPlayersIDs;
+
     private GameState gameState;
 
     public GameModel() {
@@ -29,38 +34,6 @@ public class GameModel {
 
         IDToPlayerMap = new HashMap<>();
         gameState = GameState.PREGAME;
-    }
-
-    /**
-     * Getter
-     * @return Current game state
-     */
-    public GameState getGameState() {
-        return gameState;
-    }
-
-    /**
-     * Setter
-     * @param gameState New game state
-     */
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
-    }
-
-    /**
-     * Getter
-     * @return IDToPlayerMap with keys as player IDs and values as PlayerModel objects
-     */
-    public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
-        return IDToPlayerMap;
-    }
-
-    /**
-     * Getter
-     * @return Board map with keys as player IDs and values as player score
-     */
-    public HashMap<Integer, Integer> getBoard() {
-        return board;
     }
 
     /**
@@ -97,14 +70,6 @@ public class GameModel {
 
     /**
      * Getter
-     * @return List of players' IDs
-     */
-    public List<Integer> getPlayerIDList() {
-        return playerIDList;
-    }
-
-    /**
-     * Getter
      * @return ID of the player that is currently playing his turn
      */
     public int getCurrPlayerID() {
@@ -112,27 +77,19 @@ public class GameModel {
     }
 
     /**
-     * Setter
-     * @param currPlayerID ID of the player that is currently playing his turn
-     */
-    public void setCurrPlayerID(int currPlayerID) {
-        this.currPlayerID = currPlayerID;
-    }
-
-    /**
      * Getter
-     * @return ID of the first player to play his turn
+     * @return Current game state
      */
-    public int getFirstPlayerID() {
-        return firstPlayerID;
+    public GameState getGameState() {
+        return gameState;
     }
 
     /**
      * Setter
-     * @param firstPlayerID ID of the first player to play his turn
+     * @param gameState New game state
      */
-    public void setFirstPlayerID(int firstPlayerID) {
-        this.firstPlayerID = firstPlayerID;
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
     }
 
     public void addPlayer(PlayerModel player){
@@ -282,14 +239,6 @@ public class GameModel {
     }
 
     /**
-     * Getter
-     * @return Order of the players' IDs
-     */
-    public int[] getOrderOfPlayersIDs(){
-        return orderOfPlayersIDs;
-    }
-
-    /**
      * Method to end the turn of the current player and pass the turn to
      * the next player in the order
      */
@@ -315,7 +264,9 @@ public class GameModel {
             currPlayerID = orderOfPlayersIDs[currPlayerIndex + 1];
         }
 
-        IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
+        if (gameState != GameState.END_GAME){
+            IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
+        }
     }
 
     /**

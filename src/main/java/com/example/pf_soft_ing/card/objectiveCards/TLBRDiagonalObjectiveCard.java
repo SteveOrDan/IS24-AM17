@@ -7,6 +7,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class TLBRDiagonalObjectiveCard extends DiagonalObjectiveCard {
+
     private static final int direction = -1;
 
     public TLBRDiagonalObjectiveCard(int id, CardElementType elementType) {
@@ -19,6 +20,4 @@ public class TLBRDiagonalObjectiveCard extends DiagonalObjectiveCard {
     public int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int[] numOfResourcesArr) {
         return super.calculateObjectivePoints(playArea, direction);
     }
-
-
 }

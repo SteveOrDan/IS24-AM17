@@ -13,6 +13,7 @@ public enum ResourceType {
      * index for playerModel resource array
      */
     private final int value;
+
     /**
      * string value for TUI output
      */
@@ -29,20 +30,24 @@ public enum ResourceType {
     }
 
     /**
-     * @return index value
+     * @return Index value
      */
     public int getValue(){
         return value;
     }
 
     /**
-     * @return string value to display in TUI
+     * @return String value to display in TUI
      */
     @Override
     public String toString() {
         return str;
     }
 
+    /**
+     * @param str String to convert to ResourceType
+     * @return ResourceType enum corresponding to input string
+     */
     public static ResourceType resourceTypeFromString(String str){
         str = str.toLowerCase();
 

@@ -1,25 +1,20 @@
 package com.example.pf_soft_ing.card;
 
-import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
-import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.side.Side;
-import com.example.pf_soft_ing.exceptions.MissingResourcesException;
-import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
-import com.example.pf_soft_ing.exceptions.PlacingOnInvalidCornerException;
-import com.example.pf_soft_ing.exceptions.PositionAlreadyTakenException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public abstract class PlaceableCard{
-    // Needed for the JSON deserialization
+
     public String cardType;
 
     public final int id;
+
     public final CardElementType elementType;
+
     public int priority;
+
     public Side currSide;
     public final Side front;
     public final Side back;
@@ -39,21 +34,19 @@ public abstract class PlaceableCard{
     }
 
     /**
-     * Getter of the resources based on the current side of the card
-     * If card side is front gets the values from the corners
-     * If card side is back gets the values from a list
-     * @return Hash map of resources based on the current side of the card
+     * Getter
+     * @return Card's ID
      */
-    public List<ResourceType> getResources(){
-        return currSide.getResources();
+    public int getId() {
+        return id;
     }
 
     /**
      * Getter
-     * @return Card's priority
+     * @return Card's element type
      */
-    public int getPriority() {
-        return priority;
+    public CardElementType getElementType(){
+        return elementType;
     }
 
     /**
@@ -66,18 +59,10 @@ public abstract class PlaceableCard{
 
     /**
      * Getter
-     * @return Card's element type
+     * @return Card's current side
      */
-    public CardElementType getElementType(){
-        return elementType;
-    }
-
-    /**
-     * Getter
-     * @return Card's back side
-     */
-    public Side getBack() {
-        return back;
+    public Side getCurrSide() {
+        return currSide;
     }
 
     /**
@@ -90,10 +75,20 @@ public abstract class PlaceableCard{
 
     /**
      * Getter
-     * @return Card's current side
+     * @return Card's back side
      */
-    public Side getCurrSide() {
-        return currSide;
+    public Side getBack() {
+        return back;
+    }
+
+    /**
+     * Getter of the resources based on the current side of the card
+     * If card side is front gets the values from the corners
+     * If card side is back gets the values from a list
+     * @return Hash map of resources based on the current side of the card
+     */
+    public List<ResourceType> getResources(){
+        return currSide.getResources();
     }
 
     /**
@@ -106,14 +101,6 @@ public abstract class PlaceableCard{
         else{
             currSide = front;
         }
-    }
-
-    /**
-     * Getter
-     * @return Card's ID
-     */
-    public int getId() {
-        return id;
     }
 
     public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr);

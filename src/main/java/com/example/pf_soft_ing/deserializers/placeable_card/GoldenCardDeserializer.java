@@ -22,7 +22,9 @@ public class GoldenCardDeserializer implements JsonDeserializer<GoldenCard> {
 
         int points = jsonObject.get("points").getAsInt();
         int id = jsonObject.get("id").getAsInt();
+
         CardElementType elementType = CardElementType.cardElementTypeFromString(jsonObject.get("elementType").getAsString());
+
         boolean isPointPerResource = jsonObject.get("isPointPerResource").getAsBoolean();
 
         ResourceType pointPerResourceRes = null;
@@ -39,7 +41,6 @@ public class GoldenCardDeserializer implements JsonDeserializer<GoldenCard> {
         HashMap<ResourceType, Integer> requiredResources = mapGson.fromJson(requiredResourcesElement, mapType);
 
         JsonElement frontElement = jsonObject.get("front");
-        // JsonElement backElement = jsonObject.get("back");
 
         SideDeserializer sideDeserializer = new SideDeserializer();
 
@@ -48,7 +49,6 @@ public class GoldenCardDeserializer implements JsonDeserializer<GoldenCard> {
                 .create();
 
         Side front = gson.fromJson(frontElement, Side.class);
-        // Side back = gson.fromJson(backElement, Side.class);
 
         ResourceType resourceType = ResourceType.resourceTypeFromString(jsonObject.get("elementType").getAsString());
         Side back = new Back(new EmptyCorner(), new EmptyCorner(), new EmptyCorner(), new EmptyCorner(), new ArrayList<>(){{add(resourceType);}});

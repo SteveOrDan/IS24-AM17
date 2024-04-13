@@ -67,41 +67,33 @@ class GameResourcesTest {
 
     @Test
     void resourceCardDeckDeserialization() {
-        GameResources gameResources = new GameResources();
-
         GameResources.initializeResourceDeck();
 
-        assertNotNull(gameResources.getResourcesDeck());
-        assertEquals(40, gameResources.getResourcesDeck().size());
+        assertNotNull(GameResources.getResourcesDeck());
+        assertEquals(40, GameResources.getResourcesDeck().size());
     }
 
     @Test
     void goldenCardDeckDeserialization() {
-        GameResources gameResources = new GameResources();
-
         GameResources.initializeGoldenDeck();
 
-        assertNotNull(gameResources.getGoldenDeck());
-        assertEquals(40, gameResources.getGoldenDeck().size());
+        assertNotNull(GameResources.getGoldenDeck());
+        assertEquals(40, GameResources.getGoldenDeck().size());
     }
 
     @Test
     void starterCardDeckDeserialization() {
-        GameResources gameResources = new GameResources();
-
         GameResources.initializeStarterDeck();
 
-        assertNotNull(gameResources.getStarterDeck());
-        assertEquals(6, gameResources.getStarterDeck().size());
+        assertNotNull(GameResources.getStarterDeck());
+        assertEquals(6, GameResources.getStarterDeck().size());
     }
 
     @Test
     void objectiveCardDeckDeserialization() {
-        GameResources gameResources = new GameResources();
-
         GameResources.initializeObjectiveDeck();
 
-        assertNotNull(gameResources.getObjectiveDeck());
-        assertEquals(16, gameResources.getObjectiveDeck().size());
+        assertNotNull(GameResources.getObjectiveDeck());
+        assertEquals(16, GameResources.getObjectiveDeck().size());
     }
 }

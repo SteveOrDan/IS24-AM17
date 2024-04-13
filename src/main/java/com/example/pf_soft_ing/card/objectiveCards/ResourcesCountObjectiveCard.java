@@ -7,8 +7,11 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class ResourcesCountObjectiveCard extends ObjectiveCard {
+
     private static final int points = 2;
+
     public final ResourceType resourceType;
+
     public final int requiredResourceCount;
 
     public ResourcesCountObjectiveCard(int id, ResourceType resourceType, int requiredResourceCount) {

@@ -20,8 +20,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
+
     CardCorner emptyCorner = new EmptyCorner();
     CardCorner hiddenCorner = new HiddenCorner();
+
     CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
     CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
     CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
@@ -29,13 +31,19 @@ class PlayerModelTest {
     CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
     CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
     CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
+
     Side starterFront1 = new Front(hiddenCorner, pCorner, iCorner, fCorner);
     Side starerBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.FUNGI);}});
+
     PlaceableCard starterCard1 = new StarterCard(2, starterFront1, starerBack1);
+
     int resourceCardPoints = 2;
+
     Side normalFront = new Front(aCorner, kCorner, mCorner, qCorner);
     Side normalBack = new Back(emptyCorner, emptyCorner, emptyCorner,emptyCorner, new ArrayList<>(){{add(ResourceType.ANIMAL);}});
+
     ResourceCard normalCard = new ResourceCard(resourceCardPoints, CardElementType.ANIMAL, 3, normalFront, normalBack);
+
     PlayerModel playerModel = new PlayerModel("John Smith", 34);
 
     @DisplayName("Test for placing a starter card in the player area")

@@ -10,23 +10,29 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlayerModel {
+
     private final String nickname;
     private final int id;
 
     private final List<PlaceableCard> hand;
+
     private List<ObjectiveCard> objectivesToChoose;
     private ObjectiveCard secretObjective;
+
     private PlaceableCard starterCard;
-    private final int[] numOfResourcesArr = new int[7];
-    private int currScore;
+
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
+    private final int[] numOfResourcesArr = new int[7];
+
+    private int currScore;
+    private int numOfCompletedObjectives;
+
     private Token token;
     private Token firstPlayerToken;
+
     private PlayerState state;
 
     private int currMaxPriority;
-
-    private int numOfCompletedObjectives;
 
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
@@ -35,30 +41,6 @@ public class PlayerModel {
         currScore = 0;
         hand = new ArrayList<>();
         state = PlayerState.PRE_GAME;
-    }
-
-    /**
-     * Getter
-     * @return Number of completed objectives
-     */
-    public int getNumOfCompletedObjectives() {
-        return numOfCompletedObjectives;
-    }
-
-    /**
-     * Getter
-     * @return Player's current state
-     */
-    public PlayerState getState() {
-        return state;
-    }
-
-    /**
-     * Setter
-     * @param state New state of the player
-     */
-    public void setState(PlayerState state){
-        this.state = state;
     }
 
     /**
@@ -86,11 +68,35 @@ public class PlayerModel {
     }
 
     /**
+     * Setter
+     * @param objectives List of 2 objective cards to choose from
+     */
+    public void setObjectivesToChoose(List<ObjectiveCard> objectives){
+        objectivesToChoose = objectives;
+    }
+
+    /**
      * Getter
      * @return List of objective cards to choose from
      */
     public ObjectiveCard getSecretObjective() {
         return secretObjective;
+    }
+
+    /**
+     * Sets the player's secret objective card
+     * @param index Index of the objective card in the list of objectives to choose from
+     */
+    public void setSecretObjective(int index) {
+        try{
+            if (index < 0 || index >= objectivesToChoose.size()){
+                throw new InvalidIndexException();
+            }
+            secretObjective = objectivesToChoose.get(index);
+        }
+        catch (InvalidIndexException e){
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -101,20 +107,8 @@ public class PlayerModel {
         return starterCard;
     }
 
-    /**
-     * Getter
-     * @return Player's resources array
-     */
-    public int[] getNumOfResourcesArr(){
-        return numOfResourcesArr;
-    }
-
-    /**
-     * Getter
-     * @return Player's current max priority for card placement
-     */
-    public int getCurrMaxPriority(){
-        return currMaxPriority;
+    public void setStarterCard(PlaceableCard sCard){
+        starterCard = sCard;
     }
 
     /**
@@ -127,10 +121,34 @@ public class PlayerModel {
 
     /**
      * Getter
+     * @return Player's resources array
+     */
+    public int[] getNumOfResourcesArr(){
+        return numOfResourcesArr;
+    }
+
+    /**
+     * Getter
      * @return Current player's score (int)
      */
     public int getCurrScore(){
         return currScore;
+    }
+
+    /**
+     * Setter
+     * @param score New score to set for the player
+     */
+    public void setCurrScore(int score){
+        currScore = score;
+    }
+
+    /**
+     * Getter
+     * @return Number of completed objectives
+     */
+    public int getNumOfCompletedObjectives() {
+        return numOfCompletedObjectives;
     }
 
     /**
@@ -150,6 +168,14 @@ public class PlayerModel {
     }
 
     /**
+     * Getter
+     * @return If the player is the first player
+     */
+    public boolean isFirstPlayer(){
+        return firstPlayerToken != null;
+    }
+
+    /**
      * Setter
      * @param isFirstPlayer Boolean to check if the player is the first player
      */
@@ -165,18 +191,26 @@ public class PlayerModel {
 
     /**
      * Getter
-     * @return If the player is the first player
+     * @return Player's current state
      */
-    public boolean isFirstPlayer(){
-        return firstPlayerToken != null;
+    public PlayerState getState() {
+        return state;
     }
 
     /**
      * Setter
-     * @param score New score to set for the player
+     * @param state New state of the player
      */
-    public void setCurrScore(int score){
-        currScore = score;
+    public void setState(PlayerState state){
+        this.state = state;
+    }
+
+    /**
+     * Getter
+     * @return Player's current max priority for card placement
+     */
+    public int getCurrMaxPriority(){
+        return currMaxPriority;
     }
 
     /**
@@ -297,37 +331,10 @@ public class PlayerModel {
         return adjacentCorners;
     }
 
-    public void setStarterCard(PlaceableCard sCard){
-        starterCard = sCard;
-    }
-
-    /**
-     * Sets the player's secret objective card choices
-     * @param objectives List of 2 objective cards to choose from
-     */
-    public void setObjectivesToChoose(List<ObjectiveCard> objectives){
-        objectivesToChoose = objectives;
-    }
-
-    /**
-     * Sets the player's secret objective card
-     * @param index Index of the objective card in the list of objectives to choose from
-     */
-    public void setSecretObjective(int index) {
-        try{
-            if (index < 0 || index >= objectivesToChoose.size()){
-                throw new InvalidIndexException();
-            }
-            secretObjective = objectivesToChoose.get(index);
-        }
-        catch (InvalidIndexException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
     /**
      * Adds the points given an objective card to the player's score
      * Objective card could be the player's secret objective or one of the common objectives
+     * The score is capped to a maximum of 29
      * @param oCard Card to use for points calculations
      */
     public void calculateObjectivePoints(ObjectiveCard oCard) {
@@ -356,14 +363,5 @@ public class PlayerModel {
         if (card != null && hand.size() < 3){
             hand.add(card);
         }
-    }
-
-    public PlaceableCard getCardFromHandByID(int cardID){
-        for (PlaceableCard card : hand){
-            if (card.getId() == cardID){
-                return card;
-            }
-        }
-        return null;
     }
 }

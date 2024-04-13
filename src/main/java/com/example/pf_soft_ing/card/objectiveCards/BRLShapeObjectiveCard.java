@@ -7,6 +7,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class BRLShapeObjectiveCard extends LShapeObjectiveCard {
+
     private static final int xDirection = -1;
     private static final int yDirection = 1;
 

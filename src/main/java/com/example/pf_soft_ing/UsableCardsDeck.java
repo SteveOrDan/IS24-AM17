@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class UsableCardsDeck {
+
     private final List<PlaceableCard> deck;
     private final List<PlaceableCard> visibleCards;
 
@@ -17,10 +18,18 @@ public class UsableCardsDeck {
         visibleCards = new ArrayList<>();
     }
 
+    /**
+     * Getter
+     * @return List of PlaceableCards in the deck
+     */
     public List<PlaceableCard> getDeck() {
         return deck;
     }
 
+    /**
+     * Getter
+     * @return List of visible PlaceableCards
+     */
     public List<PlaceableCard> getVisibleCards() {
         return visibleCards;
     }
@@ -32,6 +41,9 @@ public class UsableCardsDeck {
         Collections.shuffle(deck);
     }
 
+    /**
+     * Method to show the first two cards in the deck at the start of the game
+     */
     public void restoreInitialVisibleCards () {
         PlaceableCard card1 = deck.getFirst();
         deck.remove(card1);
@@ -91,6 +103,10 @@ public class UsableCardsDeck {
         deck.remove(card);
     }
 
+    /**
+     * Getter
+     * @return True if the deck is empty, false otherwise
+     */
     public boolean isDeckEmpty(){
         return deck.isEmpty();
     }

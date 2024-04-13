@@ -6,6 +6,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public abstract class ObjectiveCard {
+
     public final int id;
     public final int points;
     public String objectiveType;

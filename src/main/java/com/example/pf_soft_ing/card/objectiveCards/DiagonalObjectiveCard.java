@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class DiagonalObjectiveCard extends ObjectiveCard {
+
     private static final int points = 2;
     public final CardElementType elementType;
 
@@ -24,7 +25,6 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
      * @return Number of points given by the objective card
      */
     protected int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int direction){
-
         ArrayList<Position> usedPositions = new ArrayList<>();
 
         int objectivePoints = 0;

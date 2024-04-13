@@ -7,7 +7,9 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class TrinityObjectiveCard extends ObjectiveCard{
+
     private static final int points = 3;
+
     public TrinityObjectiveCard(int id) {
         super(id, points);
 

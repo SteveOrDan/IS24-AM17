@@ -20,6 +20,7 @@ public class SideDeserializer implements JsonDeserializer<Side> {
                         .create();
 
                 return fGson.fromJson(jsonObject, Side.class);
+
             case "Back":
                 BackDeserializer backDeserializer = new BackDeserializer();
 
@@ -28,6 +29,7 @@ public class SideDeserializer implements JsonDeserializer<Side> {
                         .create();
 
                 return bGson.fromJson(jsonObject, Side.class);
+
             default:
                 return null;
         }

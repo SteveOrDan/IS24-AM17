@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class GameController {
+
     private final HashMap<Integer, PlaceableCard> IDPlaceableCardMap;
     private final HashMap<Integer, ObjectiveCard> IDObjectiveCardMap;
     private final HashMap<Integer, PlayerModel> IDPlayerMap;
@@ -21,10 +22,6 @@ public class GameController {
         IDPlayerMap = new HashMap<>();
 
         gameModel = new GameModel();
-    }
-
-    public GameModel getGameModel() {
-        return gameModel;
     }
 
     /**
@@ -49,6 +46,14 @@ public class GameController {
      */
     public HashMap<Integer, PlayerModel> getIDPlayerMap() {
         return IDPlayerMap;
+    }
+
+    /**
+     * Getter
+     * @return GameModel object
+     */
+    public GameModel getGameModel() {
+        return gameModel;
     }
 
     /**
@@ -389,14 +394,23 @@ public class GameController {
         }
     }
 
+    /**
+     * End the game set up and set the game state to "playing"
+     */
     public void endGameSetUp(){
         gameModel.setGameState(GameState.PLAYING);
     }
 
+    /**
+     * End the current player's turn
+     */
     public void endTurn(){
         gameModel.endTurn();
     }
 
+    /**
+     * Checks for any exceptions when a player is drawing a card
+     */
     protected void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
         if (gameModel.getGameState() != GameState.PLAYING &&
                 gameModel.getGameState() != GameState.FINAL_ROUND){

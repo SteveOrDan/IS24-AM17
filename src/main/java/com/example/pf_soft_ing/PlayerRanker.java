@@ -7,9 +7,11 @@ public class PlayerRanker implements Comparator<PlayerModel> {
     public int compare(PlayerModel p1, PlayerModel p2) {
         if (p1.getCurrScore() > p2.getCurrScore()) {
             return -1;
-        } else if (p1.getCurrScore() < p2.getCurrScore()) {
+        }
+        else if (p1.getCurrScore() < p2.getCurrScore()) {
             return 1;
-        } else {
+        }
+        else {
             return -Integer.compare(p1.getNumOfCompletedObjectives(), p2.getNumOfCompletedObjectives());
         }
     }

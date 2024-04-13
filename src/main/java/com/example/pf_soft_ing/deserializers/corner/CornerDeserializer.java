@@ -23,6 +23,7 @@ public class CornerDeserializer implements JsonDeserializer<CardCorner> {
                         .create();
 
                 return rGson.fromJson(jsonObject, ResourceCorner.class);
+
             case "EmptyCorner":
                 EmptyCornerDeserializer emptyCornerDeserializer = new EmptyCornerDeserializer();
 
@@ -31,6 +32,7 @@ public class CornerDeserializer implements JsonDeserializer<CardCorner> {
                         .create();
 
                 return eGson.fromJson(jsonObject, EmptyCorner.class);
+
             case "HiddenCorner":
                 HiddenCornerDeserializer hiddenCornerDeserializer = new HiddenCornerDeserializer();
 
@@ -39,6 +41,7 @@ public class CornerDeserializer implements JsonDeserializer<CardCorner> {
                         .create();
 
                 return hGson.fromJson(jsonObject, HiddenCorner.class);
+
             default:
                 return null;
         }

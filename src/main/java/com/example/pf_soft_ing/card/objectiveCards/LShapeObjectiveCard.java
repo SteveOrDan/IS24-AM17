@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public abstract class LShapeObjectiveCard extends ObjectiveCard {
+
     private static final int points = 3;
+
     public final CardElementType mainElementType;
     public final CardElementType secondaryElementType;
 

@@ -23,7 +23,6 @@ public class ResourceCardDeserializer implements JsonDeserializer<ResourceCard> 
         CardElementType elementType = CardElementType.cardElementTypeFromString(jsonObject.get("elementType").getAsString());
 
         JsonElement frontElement = jsonObject.get("front");
-        // JsonElement backElement = jsonObject.get("back");
 
         SideDeserializer sideDeserializer = new SideDeserializer();
 
@@ -32,7 +31,6 @@ public class ResourceCardDeserializer implements JsonDeserializer<ResourceCard> 
                 .create();
 
         Side front = gson.fromJson(frontElement, Side.class);
-        // Side back = gson.fromJson(backElement, Side.class);
 
         ResourceType resourceType = ResourceType.resourceTypeFromString(jsonObject.get("elementType").getAsString());
         Side back = new Back(new EmptyCorner(), new EmptyCorner(), new EmptyCorner(), new EmptyCorner(), new ArrayList<>(){{add(resourceType);}});

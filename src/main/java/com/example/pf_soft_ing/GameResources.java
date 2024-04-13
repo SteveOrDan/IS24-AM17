@@ -1,20 +1,19 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.card.GoldenCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.ResourceCard;
-import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
+
 import com.example.pf_soft_ing.deserializers.corner.CornerDeserializer;
 import com.example.pf_soft_ing.deserializers.objective_card.ObjectiveCardDeserializer;
 import com.example.pf_soft_ing.deserializers.placeable_card.GoldenCardDeserializer;
 import com.example.pf_soft_ing.deserializers.placeable_card.ResourceCardDeserializer;
 import com.example.pf_soft_ing.deserializers.placeable_card.StarterCardDeserializer;
 import com.example.pf_soft_ing.deserializers.side.*;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
@@ -29,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GameResources {
+
     private final static String resourceCardsFilename = "JsonFiles/CardsData/ResourceCards.json";
     private final static String goldenCardsFilename = "JsonFiles/CardsData/GoldenCards.json";
     private final static String starterCardsFilename = "JsonFiles/CardsData/StarterCards.json";
@@ -38,8 +38,6 @@ public class GameResources {
     private static List<PlaceableCard> goldenDeck;
     private static List<PlaceableCard> starterDeck;
     private static List<ObjectiveCard> objectiveDeck;
-
-    private static List<Token> tokensList;
 
     public static CardCorner deserializeCorner() {
         try {

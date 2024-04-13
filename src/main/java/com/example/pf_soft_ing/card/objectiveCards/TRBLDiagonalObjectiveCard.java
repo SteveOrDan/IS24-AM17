@@ -7,7 +7,9 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import java.util.HashMap;
 
 public class TRBLDiagonalObjectiveCard extends DiagonalObjectiveCard{
+
     private static final int direction = 1;
+
     public TRBLDiagonalObjectiveCard(int id, CardElementType elementType) {
         super(id, elementType);
 

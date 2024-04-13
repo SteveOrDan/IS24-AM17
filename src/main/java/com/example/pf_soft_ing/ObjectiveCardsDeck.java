@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ObjectiveCardsDeck {
+
     private final List<ObjectiveCard> deck;
     private final List<ObjectiveCard> commonObjectives;
 
@@ -16,13 +17,17 @@ public class ObjectiveCardsDeck {
         commonObjectives = new ArrayList<>();
     }
 
+    /**
+     * Getter
+     * @return List of cards in the deck
+     */
     public List<ObjectiveCard> getDeck() {
         return deck;
     }
 
     /**
-     * Getter for commonObjectives
-     * @return commonObjectives List
+     * Getter
+     * @return List of common objectives
      */
     public List<ObjectiveCard> getCommonObjectives(){
         return commonObjectives;
@@ -66,53 +71,5 @@ public class ObjectiveCardsDeck {
         while (commonObjectives.size() < 2){
             commonObjectives.add(drawCard());
         }
-    }
-
-    /**
-     * Changes the values inside the visibleCards list so that it only contains 2 cards
-     * @param cardID ID of the card to set visible
-     */
-    public void setCommonObjective(int cardID){
-        if (commonObjectives.size() < 2){
-            commonObjectives.add(drawCard(cardID));
-        }
-    }
-
-    /**
-     * Method to draw a specific card from the deck
-     * @param cardID ID of the card to draw
-     * @return The card that has been drawn
-     */
-    public ObjectiveCard drawCard(int cardID){
-        try{
-            if (!deck.isEmpty()){
-                ObjectiveCard retCard = getCardByID(cardID);
-
-                deck.remove(retCard);
-
-                return retCard;
-            }
-            else{
-                throw new NotEnoughCardsException();
-            }
-        }
-        catch (NotEnoughCardsException e){
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * Method to get a card by its ID
-     * @param cardID ID of the card to get
-     * @return The card with the given ID
-     */
-    public ObjectiveCard getCardByID(int cardID){
-        for (ObjectiveCard card : deck){
-            if (card.getId() == cardID){
-                return card;
-            }
-        }
-        return null;
     }
 }

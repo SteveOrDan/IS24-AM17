@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.card.corner;
 
-import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ResourceType;
 
 public abstract class CardCorner {

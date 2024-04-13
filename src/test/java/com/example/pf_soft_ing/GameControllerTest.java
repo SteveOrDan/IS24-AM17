@@ -205,28 +205,26 @@ class GameControllerTest {
         // endregion
 
         // region Game simulation
-        HashMap<Integer, ArrayList<Position>> playerIdToAvailablePositions = new HashMap<>();
-        HashMap<Integer, ArrayList<Position>> playerIdToUsedPositions = new HashMap<>();
+        HashMap<Integer, ArrayList<Position>> plIdToLegalPos = new HashMap<>();
+        HashMap<Integer, ArrayList<Position>> plIdToIllegalPos = new HashMap<>();
 
         for (Integer i : gc.getIDPlayerMap().keySet()){
-            ArrayList<Position> newUsedPositions = new ArrayList<>();
-            newUsedPositions.add(new Position(0, 0));
-            playerIdToUsedPositions.put(i, newUsedPositions);
+            plIdToLegalPos.put(i, new ArrayList<>());
+            plIdToIllegalPos.put(i, new ArrayList<>());
 
-            ArrayList<Position> newAvailablePositions = calculateNewPossiblePositions(i, new Position(0, 0));
-            playerIdToAvailablePositions.put(i, newAvailablePositions);
+            updateIlLegalPositions(plIdToLegalPos, plIdToIllegalPos, i, new Position(0, 0));
         }
 
         // =============================== GAME START ===============================
 
         while (gc.getGameModel().getGameState() == GameState.PLAYING || gc.getGameModel().getGameState() == GameState.FINAL_ROUND){
-            placeCardAction(playerIdToAvailablePositions, playerIdToUsedPositions);
+            placeCardAction(plIdToLegalPos, plIdToIllegalPos);
 
             drawCardAction();
         }
 
         while (gc.getGameModel().getGameState() == GameState.EXTRA_ROUND){
-            placeCardAction(playerIdToAvailablePositions, playerIdToUsedPositions);
+            placeCardAction(plIdToLegalPos, plIdToIllegalPos);
         }
 
         // =============================== GAME END ===============================
@@ -234,7 +232,7 @@ class GameControllerTest {
         // endregion
     }
 
-    private void placeCardAction(HashMap<Integer, ArrayList<Position>> playerIdToAvailablePositions, HashMap<Integer, ArrayList<Position>> playerIdToUsedPositions){
+    private void placeCardAction(HashMap<Integer, ArrayList<Position>> plIdToLegalPos, HashMap<Integer, ArrayList<Position>> plIdToIllegalPos){
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
 
@@ -243,16 +241,27 @@ class GameControllerTest {
         ArrayList<Integer> cardIDsInHand = new ArrayList<>();
 
         for (PlaceableCard card : currPlayer.getHand()){
-            cardIDsInHand.add(card.id);
+            if (card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr())){
+                cardIDsInHand.add(card.id);
+            }
+        }
+
+        // If cant place any card because of resources, flip all cards
+        if (cardIDsInHand.isEmpty()){
+            for (PlaceableCard card : currPlayer.getHand()){
+                cardIDsInHand.add(card.id);
+
+                gc.flipCard(currPlayerID, card.id);
+            }
         }
 
         int cardIndexInHand = rng.nextInt(cardIDsInHand.size());
 
         int cardToPlaceID = cardIDsInHand.get(cardIndexInHand);
 
-        int positionIndex = rng.nextInt(playerIdToAvailablePositions.get(currPlayerID).size());
+        int positionIndex = rng.nextInt(plIdToLegalPos.get(currPlayerID).size());
 
-        Position positionToPlace = playerIdToAvailablePositions.get(currPlayerID).get(positionIndex);
+        Position positionToPlace = plIdToLegalPos.get(currPlayerID).get(positionIndex);
 
         gc.placeCard(currPlayerID, cardToPlaceID, positionToPlace);
 
@@ -278,25 +287,15 @@ class GameControllerTest {
                 cardToPlaceID = currPlayer.getHand().get(cardIndexInHand).id;
             }
 
-            positionIndex = rng.nextInt(playerIdToAvailablePositions.get(currPlayerID).size());
+            positionIndex = rng.nextInt(plIdToLegalPos.get(currPlayerID).size());
 
-            positionToPlace = playerIdToAvailablePositions.get(currPlayerID).get(positionIndex);
+            positionToPlace = plIdToLegalPos.get(currPlayerID).get(positionIndex);
 
             gc.placeCard(currPlayerID, cardToPlaceID, positionToPlace);
         }
 
-        // Remove the position from the available positions
-        playerIdToAvailablePositions.get(currPlayerID).remove(positionToPlace);
-
-        // Add the position to the used positions
-        playerIdToUsedPositions.get(currPlayerID).add(positionToPlace);
-
-        // All new possible positions based on card corners (need to remove the ones that are already used)
-        ArrayList<Position> newPossiblePos = calculateNewPossiblePositions(currPlayerID, positionToPlace);
-
-        newPossiblePos.removeIf(p -> playerIdToUsedPositions.get(currPlayerID).contains(p));
-
-        playerIdToAvailablePositions.get(currPlayerID).addAll(newPossiblePos);
+        // Update legal and illegal positions
+        updateIlLegalPositions(plIdToLegalPos, plIdToIllegalPos, currPlayerID, positionToPlace);
     }
 
     private void drawCardAction(){
@@ -337,27 +336,65 @@ class GameControllerTest {
         }
     }
 
-    private ArrayList<Position> calculateNewPossiblePositions(int playerID, Position pos){
+    private void updateIlLegalPositions(HashMap<Integer, ArrayList<Position>> plIdToLegalPos,
+                                                              HashMap<Integer, ArrayList<Position>> plIdToIllegalPos,
+                                                              int playerID, Position pos){
+
         PlayerModel player = gc.getIDPlayerMap().get(playerID);
 
-        ArrayList<Position> newAvailablePositions = new ArrayList<>();
+        ArrayList<Position> newLegalPos = new ArrayList<>();
+        ArrayList<Position> newIllegalPos = new ArrayList<>();
 
         Side currSide = player.getPlayArea().get(pos).getCurrSide();
 
         if (currSide.getBLCorner().isAvailable()){
-            newAvailablePositions.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
         }
-        if (currSide.getBRCorner().isAvailable()){
-            newAvailablePositions.add(new Position(pos.getX() + 1, pos.getY() - 1));
-        }
-        if (currSide.getTLCorner().isAvailable()){
-            newAvailablePositions.add(new Position(pos.getX() - 1, pos.getY() + 1));
-        }
-        if (currSide.getTRCorner().isAvailable()){
-            newAvailablePositions.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
         }
 
-        return newAvailablePositions;
+        if (currSide.getBRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+
+        if (currSide.getTLCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+
+        if (currSide.getTRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+
+        for (Position p : newIllegalPos){
+            if (!plIdToIllegalPos.get(playerID).contains(p)){
+                plIdToIllegalPos.get(playerID).add(p);
+            }
+
+            plIdToLegalPos.get(playerID).remove(p);
+        }
+
+        for (Position p : newLegalPos){
+            if (!plIdToLegalPos.get(playerID).contains(p) && !plIdToIllegalPos.get(playerID).contains(p)){
+                plIdToLegalPos.get(playerID).add(p);
+            }
+        }
+
+        // Set the new card's position as illegal (a card just got placed)
+        plIdToLegalPos.get(playerID).remove(pos);
+
+        if (!plIdToIllegalPos.get(playerID).contains(pos)){
+            plIdToIllegalPos.get(playerID).add(pos);
+        }
     }
 
     private PlayerModel getCurrentPlayer(){

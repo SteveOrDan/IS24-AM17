@@ -1,7 +1,5 @@
 package com.example.pf_soft_ing.deserializers.placeable_card;
 
-import com.example.pf_soft_ing.card.CardElementType;
-import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.deserializers.side.SideDeserializer;

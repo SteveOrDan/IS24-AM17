@@ -1,19 +1,11 @@
 package com.example.pf_soft_ing.card;
 
-import com.example.pf_soft_ing.Position;
-import com.example.pf_soft_ing.ResourceType;
-import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.side.Side;
-import com.example.pf_soft_ing.exceptions.MissingResourcesException;
-import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
-import com.example.pf_soft_ing.exceptions.PlacingOnInvalidCornerException;
-import com.example.pf_soft_ing.exceptions.PositionAlreadyTakenException;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ResourceCard extends PlaceableCard{
+
     public final int points;
+
     public ResourceCard(int points, CardElementType elementType, int id, Side front, Side back) {
         super(elementType, id, front, back);
 
