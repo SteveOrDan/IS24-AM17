@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameControllerTest {
 
+    static int numOfPlayers = 2;
     GameController gc = new GameController();
 
     @Test
@@ -128,7 +129,7 @@ class GameControllerTest {
         List<Integer> usedPlayerIDs = new ArrayList<>();
         Random rng = new Random();
 
-        for (int i = 1; i <= 2; i++){
+        for (int i = 1; i <= numOfPlayers; i++){
             int rand = rng.nextInt(1000);
 
             while (usedPlayerIDs.contains(rand)){
@@ -139,7 +140,7 @@ class GameControllerTest {
             gc.addPlayer(new PlayerModel("Player " + i, rand));
         }
 
-        assertEquals(2, gc.getIDPlayerMap().size());
+        assertEquals(numOfPlayers, gc.getIDPlayerMap().size());
 
         // Set up decks (initialize, shuffle and set visible cards)
         gc.setUpGame();
@@ -218,12 +219,18 @@ class GameControllerTest {
 
         // =============================== GAME START ===============================
 
-        while (gc.getGameModel().getGameState() == GameState.PLAYING){
+        while (gc.getGameModel().getGameState() == GameState.PLAYING || gc.getGameModel().getGameState() == GameState.FINAL_ROUND){
             placeCardAction(playerIdToAvailablePositions, playerIdToUsedPositions);
 
             drawCardAction();
         }
 
+        while (gc.getGameModel().getGameState() == GameState.EXTRA_ROUND){
+            placeCardAction(playerIdToAvailablePositions, playerIdToUsedPositions);
+        }
+
+        // =============================== GAME END ===============================
+        System.out.println("Game ended");
         // endregion
     }
 
@@ -360,22 +367,4 @@ class GameControllerTest {
     private int getCurrentPlayerId(){
         return gc.getGameModel().getCurrPlayerID();
     }
-
-//    private void printPlayerInfo(int currPlayerID, PlayerModel currPlayer, HashMap<Integer, ArrayList<Position>> playerIdToAvailablePositions, HashMap<Integer, ArrayList<Position>> playerIdToUsedPositions){
-//        System.out.println("\nPlay area of player " + currPlayerID);
-//        for (Position p : currPlayer.getPlayArea().keySet()){
-//            PlaceableCard card = currPlayer.getPlayArea().get(p);
-//            System.out.println("Position: " + p + " => CardID: " + card.getId() + " (" + card.currSide.sideType + ")");
-//        }
-//
-//        System.out.println("\nAvailable positions of player " + currPlayerID);
-//        for (Position p : playerIdToAvailablePositions.get(currPlayerID)){
-//            System.out.println("Pos: " + p);
-//        }
-//
-//        System.out.println("\nUsed positions of player " + currPlayerID);
-//        for (Position p : playerIdToUsedPositions.get(currPlayerID)){
-//            System.out.println("Pos: " + p);
-//        }
-//    }
 }

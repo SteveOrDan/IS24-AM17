@@ -7,14 +7,20 @@ import java.util.HashMap;
 
 public abstract class ObjectiveCard {
     public final int id;
+    public final int points;
     public String objectiveType;
 
-    public ObjectiveCard(int id) {
+    public ObjectiveCard(int id, int points) {
         this.id = id;
+        this.points = points;
     }
 
     public int getId() {
         return id;
+    }
+
+    public int getPoints() {
+        return points;
     }
 
     /**

@@ -26,6 +26,8 @@ public class PlayerModel {
 
     private int currMaxPriority;
 
+    private int numOfCompletedObjectives;
+
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
         this.id = id;
@@ -33,6 +35,14 @@ public class PlayerModel {
         currScore = 0;
         hand = new ArrayList<>();
         state = PlayerState.PRE_GAME;
+    }
+
+    /**
+     * Getter
+     * @return Number of completed objectives
+     */
+    public int getNumOfCompletedObjectives() {
+        return numOfCompletedObjectives;
     }
 
     /**
@@ -308,27 +318,17 @@ public class PlayerModel {
     }
 
     /**
-     * Adds the points given by the secret objective card to the player's score
-     */
-    public void calculateSecretObjectivePoints() {
-        try {
-            if (secretObjective == null){
-                throw new SecretObjectiveNotSetException();
-            }
-            currScore += secretObjective.calculateObjectivePoints(playArea, numOfResourcesArr);
-        }
-        catch (SecretObjectiveNotSetException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
      * Adds the points given an objective card to the player's score
      * Objective card could be the player's secret objective or one of the common objectives
      * @param oCard Card to use for points calculations
      */
     public void calculateObjectivePoints(ObjectiveCard oCard) {
-        currScore += oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
+        int points = oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
+        currScore += points;
+        if (currScore > 29){
+            currScore = 29;
+        }
+        numOfCompletedObjectives += points/oCard.getPoints();
     }
 
     /**

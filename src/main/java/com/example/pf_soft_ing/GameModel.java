@@ -7,6 +7,7 @@ import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class GameModel {
@@ -285,6 +286,10 @@ public class GameModel {
         return orderOfPlayersIDs;
     }
 
+    /**
+     * Method to end the turn of the current player and pass the turn to
+     * the next player in the order
+     */
     public void endTurn(){
         IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
 
@@ -296,13 +301,56 @@ public class GameModel {
             }
         }
 
+        if (gameState == GameState.PLAYING){
+            checkForEndGame();
+        }
         if (currPlayerIndex == orderOfPlayersIDs.length - 1){
             currPlayerID = orderOfPlayersIDs[0];
+            manageEndGame();
         }
         else {
             currPlayerID = orderOfPlayersIDs[currPlayerIndex + 1];
         }
 
         IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
+    }
+
+    /**
+     * Method to manage game state transitions
+     */
+    public void checkForEndGame(){
+        if (IDToPlayerMap.get(currPlayerID).getCurrScore() >= 20 || (resourceCardsDeck.isDeckEmpty() && goldenCardsDeck.isDeckEmpty())){
+            gameState = GameState.FINAL_ROUND;
+        }
+    }
+
+    /**
+     * Method to manage the final rounds of the game
+     */
+    public void manageEndGame() {
+        if (gameState == GameState.FINAL_ROUND){
+            gameState = GameState.EXTRA_ROUND;
+        }
+        else if (gameState == GameState.EXTRA_ROUND){
+            gameState = GameState.END_GAME;
+            determineRanking();
+        }
+    }
+
+    public void determineRanking() {
+        List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
+        List<String> playerNicknames = new ArrayList<>();
+        for (PlayerModel player : IDToPlayerMap.values()){
+            player.calculateObjectivePoints(player.getSecretObjective());
+            player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().getFirst());
+            player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().get(1));
+        }
+        players.sort(new PlayerRanker());
+        players.forEach(player -> playerNicknames.add(player.getNickname()));
+        int i = 1;
+        for (String s : playerNicknames){
+            System.out.println("Number " + i + " Player is " + s);
+            i++;
+        }
     }
 }
