@@ -12,7 +12,7 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
     public final CardElementType elementType;
 
     public DiagonalObjectiveCard(int id, CardElementType elementType) {
-        super(id);
+        super(id, points);
 
         this.elementType = elementType;
     }

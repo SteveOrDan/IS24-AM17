@@ -12,7 +12,7 @@ public class ResourcesCountObjectiveCard extends ObjectiveCard {
     public final int requiredResourceCount;
 
     public ResourcesCountObjectiveCard(int id, ResourceType resourceType, int requiredResourceCount) {
-        super(id);
+        super(id, points);
 
         this.resourceType = resourceType;
         this.requiredResourceCount = requiredResourceCount;

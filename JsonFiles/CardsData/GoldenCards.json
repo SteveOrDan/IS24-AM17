@@ -251,7 +251,7 @@
     "requiredResources": {
       "F": 5
     },
-    "points": 3,
+    "points": 5,
     "cardType": "GoldenCard",
     "id": 49,
     "elementType": "FUNGI",
@@ -523,7 +523,7 @@
     "requiredResources": {
       "P": 5
     },
-    "points": 3,
+    "points": 5,
     "cardType": "GoldenCard",
     "id": 59,
     "elementType": "PLANT",
@@ -1067,7 +1067,7 @@
     "requiredResources": {
       "I": 5
     },
-    "points": 3,
+    "points": 5,
     "cardType": "GoldenCard",
     "id": 79,
     "elementType": "INSECT",

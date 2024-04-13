@@ -1,10 +1,7 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.card.GoldenCard;
-import com.example.pf_soft_ing.card.StarterCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.exceptions.*;
 
@@ -16,7 +13,7 @@ public class PlayerModel {
     private final String nickname;
     private final int id;
 
-    private List<PlaceableCard> hand;
+    private final List<PlaceableCard> hand;
     private List<ObjectiveCard> objectivesToChoose;
     private ObjectiveCard secretObjective;
     private PlaceableCard starterCard;
@@ -25,14 +22,43 @@ public class PlayerModel {
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
     private Token token;
     private Token firstPlayerToken;
+    private PlayerState state;
 
     private int currMaxPriority;
+
+    private int numOfCompletedObjectives;
 
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
         this.id = id;
         currMaxPriority = 0;
         currScore = 0;
+        hand = new ArrayList<>();
+        state = PlayerState.PRE_GAME;
+    }
+
+    /**
+     * Getter
+     * @return Number of completed objectives
+     */
+    public int getNumOfCompletedObjectives() {
+        return numOfCompletedObjectives;
+    }
+
+    /**
+     * Getter
+     * @return Player's current state
+     */
+    public PlayerState getState() {
+        return state;
+    }
+
+    /**
+     * Setter
+     * @param state New state of the player
+     */
+    public void setState(PlayerState state){
+        this.state = state;
     }
 
     /**
@@ -51,14 +77,50 @@ public class PlayerModel {
         return id;
     }
 
+    /**
+     * Getter
+     * @return List of cards in the player's hand
+     */
+    public List<PlaceableCard> getHand() {
+        return hand;
+    }
+
+    /**
+     * Getter
+     * @return List of objective cards to choose from
+     */
+    public ObjectiveCard getSecretObjective() {
+        return secretObjective;
+    }
+
+    /**
+     * Getter
+     * @return Player's starter card
+     */
+    public PlaceableCard getStarterCard() {
+        return starterCard;
+    }
+
+    /**
+     * Getter
+     * @return Player's resources array
+     */
     public int[] getNumOfResourcesArr(){
         return numOfResourcesArr;
     }
 
+    /**
+     * Getter
+     * @return Player's current max priority for card placement
+     */
     public int getCurrMaxPriority(){
         return currMaxPriority;
     }
 
+    /**
+     * Getter
+     * @return Player's play area
+     */
     public HashMap<Position, PlaceableCard> getPlayArea() {
         return playArea;
     }
@@ -69,6 +131,44 @@ public class PlayerModel {
      */
     public int getCurrScore(){
         return currScore;
+    }
+
+    /**
+     * Getter
+     * @return Token of the player
+     */
+    public Token getToken(){
+        return token;
+    }
+
+    /**
+     * Setter
+     * @param token Player's new token
+     */
+    public void setToken(Token token){
+        this.token = token;
+    }
+
+    /**
+     * Setter
+     * @param isFirstPlayer Boolean to check if the player is the first player
+     */
+    public void setAsFirstPlayer(boolean isFirstPlayer){
+        if (isFirstPlayer){
+            firstPlayerToken = new Token(TokenColors.BLACK);
+        }
+        else{
+            firstPlayerToken = null;
+        }
+
+    }
+
+    /**
+     * Getter
+     * @return If the player is the first player
+     */
+    public boolean isFirstPlayer(){
+        return firstPlayerToken != null;
     }
 
     /**
@@ -136,8 +236,6 @@ public class PlayerModel {
             // Add card points
             currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr);
 
-
-
             // Set card priority
             card.setPriority(currMaxPriority);
 
@@ -145,6 +243,11 @@ public class PlayerModel {
 
             // Add card to playArea
             playArea.put(pos, card);
+
+            // Remove card from hand
+            hand.remove(card);
+
+            state = PlayerState.DRAWING;
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
             System.out.println(e.getMessage());
@@ -223,27 +326,17 @@ public class PlayerModel {
     }
 
     /**
-     * Adds the points given by the secret objective card to the player's score
-     */
-    public void calculateSecretObjectivePoints() {
-        try {
-            if (secretObjective == null){
-                throw new SecretObjectiveNotSetException();
-            }
-            currScore += secretObjective.calculateObjectivePoints(playArea, numOfResourcesArr);
-        }
-        catch (SecretObjectiveNotSetException e){
-            System.out.println(e.getMessage());
-        }
-    }
-
-    /**
      * Adds the points given an objective card to the player's score
      * Objective card could be the player's secret objective or one of the common objectives
      * @param oCard Card to use for points calculations
      */
     public void calculateObjectivePoints(ObjectiveCard oCard) {
-        currScore += oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
+        int points = oCard.calculateObjectivePoints(playArea, numOfResourcesArr);
+        currScore += points;
+        if (currScore > 29){
+            currScore = 29;
+        }
+        numOfCompletedObjectives += points/oCard.getPoints();
     }
 
     /**
@@ -253,5 +346,24 @@ public class PlayerModel {
         if (starterCard != null){
             starterCard.flipCard();
         }
+    }
+
+    /**
+     * Adds a card to the player's hand
+     * @param card Card to add to the player's hand
+     */
+    public void drawCard(PlaceableCard card){
+        if (card != null && hand.size() < 3){
+            hand.add(card);
+        }
+    }
+
+    public PlaceableCard getCardFromHandByID(int cardID){
+        for (PlaceableCard card : hand){
+            if (card.getId() == cardID){
+                return card;
+            }
+        }
+        return null;
     }
 }
