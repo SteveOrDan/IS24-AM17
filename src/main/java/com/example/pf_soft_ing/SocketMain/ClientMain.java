@@ -1,6 +1,4 @@
-package com.example.pf_soft_ing.Main;
-
-import com.example.pf_soft_ing.ServerConnection.RMIConnection;
+package com.example.pf_soft_ing.SocketMain;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,15 +26,15 @@ public class ClientMain {
             while (true) {
                 s = in.readLine();
                 System.out.println(s);
-                System.out.println("Enter new command here : ");
                 String input = null;
-                try {
-                    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-                    input = bufferRead.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                out.println(input + "_");
+//                try {
+//                    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+//                    input = bufferRead.readLine();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                input = stdIn.readLine();
+                out.println(input);
                 System.out.println("echo: " + input);
             }
         } catch (UnknownHostException e) {
@@ -47,7 +45,6 @@ public class ClientMain {
                     hostName);
             System.exit(1);
         }
-
 
     }
 

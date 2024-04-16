@@ -7,6 +7,8 @@ import com.example.pf_soft_ing.exceptions.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 public class GameController {
 
@@ -59,9 +61,17 @@ public class GameController {
     /**
      * Add player to the game if there isn't already a player with the same ID or nickname or if there are already 4 players
      * Handles exceptions for player ID already exists, game is full, nickname already exists
-     * @param player PlayerModel object to add
+     * @param Nickname
      */
-    public void addPlayer(PlayerModel player){
+    public Integer addPlayer(String Nickname){
+        List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
+        int id;
+        Random rand = new Random();
+        id = rand.nextInt(10);
+        while (idList.contains(id)){
+            id = rand.nextInt(10);
+        }
+        PlayerModel player = new PlayerModel(Nickname, id);
         try {
             if (IDPlayerMap.containsKey(player.getId())){
                 throw new PlayerIDAlreadyExistsException();
@@ -86,6 +96,7 @@ public class GameController {
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return id;
     }
 
     /**
