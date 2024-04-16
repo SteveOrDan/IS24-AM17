@@ -152,14 +152,6 @@ public class PlayerModel {
     }
 
     /**
-     * Getter
-     * @return Token of the player
-     */
-    public Token getToken(){
-        return token;
-    }
-
-    /**
      * Setter
      * @param token Player's new token
      */

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class GameController {
 
@@ -36,14 +35,6 @@ public class GameController {
 
     /**
      * Getter
-     * @return IDObjectiveCardMap with keys as card IDs and values as ObjectiveCard objects
-     */
-    public HashMap<Integer, ObjectiveCard> getIDObjectiveCardMap() {
-        return IDObjectiveCardMap;
-    }
-
-    /**
-     * Getter
      * @return IDPlayerMap with keys as player IDs and values as PlayerModel objects
      */
     public HashMap<Integer, PlayerModel> getIDPlayerMap() {
@@ -61,22 +52,20 @@ public class GameController {
     /**
      * Add player to the game if there isn't already a player with the same ID or nickname or if there are already 4 players
      * Handles exceptions for player ID already exists, game is full, nickname already exists
-     * @param Nickname
+     * @param nickname Player's nickname
      */
-    public Integer addPlayer(String Nickname){
+    public Integer addPlayer(String nickname){
         List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
-        int id;
         Random rand = new Random();
-        id = rand.nextInt(10);
+
+        int id = rand.nextInt(10);
         while (idList.contains(id)){
             id = rand.nextInt(10);
         }
-        PlayerModel player = new PlayerModel(Nickname, id);
-        try {
-            if (IDPlayerMap.containsKey(player.getId())){
-                throw new PlayerIDAlreadyExistsException();
-            }
 
+        PlayerModel player = new PlayerModel(nickname, id);
+
+        try {
             if (IDPlayerMap.size() >= 4){
                 throw new GameIsFullException();
             }
@@ -159,17 +148,22 @@ public class GameController {
      * @param playerID ID of the player
      */
     public void setObjectivesToChoose(int playerID){
-        if (!IDPlayerMap.containsKey(playerID)){
-            return;
+        try {
+            if (!IDPlayerMap.containsKey(playerID)){
+                // Invalid player ID
+                throw new InvalidPlayerIDException();
+            }
+
+            PlayerModel player = IDPlayerMap.get(playerID);
+
+            ArrayList<ObjectiveCard> objectives = new ArrayList<>();
+            objectives.add(gameModel.drawObjectiveCard());
+            objectives.add(gameModel.drawObjectiveCard());
+
+            player.setObjectivesToChoose(objectives);
+        } catch (InvalidPlayerIDException e) {
+            System.out.println(e.getMessage());
         }
-
-        PlayerModel player = IDPlayerMap.get(playerID);
-
-        ArrayList<ObjectiveCard> objectives = new ArrayList<>();
-        objectives.add(gameModel.drawObjectiveCard());
-        objectives.add(gameModel.drawObjectiveCard());
-
-        player.setObjectivesToChoose(objectives);
     }
 
     /**
@@ -219,7 +213,7 @@ public class GameController {
                     gameModel.getGameState() != GameState.FINAL_ROUND &&
                     gameModel.getGameState() != GameState.EXTRA_ROUND){
                 // Not playing game state
-                throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING.toString() + " or " + GameState.FINAL_ROUND.toString() + " or " + GameState.EXTRA_ROUND.toString());
+                throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
 
             }
 
@@ -426,7 +420,7 @@ public class GameController {
         if (gameModel.getGameState() != GameState.PLAYING &&
                 gameModel.getGameState() != GameState.FINAL_ROUND){
             // Not playing game state
-            throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING.toString() + " or " + GameState.FINAL_ROUND.toString());
+            throw new InvalidGameStateException(gameModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND);
         }
 
         if (!IDPlayerMap.containsKey(playerID)){

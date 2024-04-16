@@ -182,7 +182,7 @@ public class GameModel {
         if (!resourceCardsDeck.isDeckEmpty()){
             resourceCardsDeck.restoreVisibleCard();
         }
-        else if (!goldenCardsDeck.isDeckEmpty()){
+        else { // if (!goldenCardsDeck.isDeckEmpty())
             try {
                 resourceCardsDeck.restoreVisibleCardWithOtherDeck(goldenCardsDeck.drawCard());
             } catch (NotEnoughCardsException e) {
@@ -195,7 +195,7 @@ public class GameModel {
         if (!goldenCardsDeck.isDeckEmpty()){
             goldenCardsDeck.restoreVisibleCard();
         }
-        else if (!resourceCardsDeck.isDeckEmpty()){
+        else { // if (!resourceCardsDeck.isDeckEmpty())
             try {
                 goldenCardsDeck.restoreVisibleCardWithOtherDeck(resourceCardsDeck.drawCard());
             } catch (NotEnoughCardsException e) {
@@ -293,17 +293,26 @@ public class GameModel {
 
     public void determineRanking() {
         List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
-        List<String> playerNicknames = new ArrayList<>();
+
         for (PlayerModel player : IDToPlayerMap.values()){
             player.calculateObjectivePoints(player.getSecretObjective());
             player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().getFirst());
             player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().get(1));
         }
+
         players.sort(new PlayerRanker());
-        players.forEach(player -> playerNicknames.add(player.getNickname()));
-        int i = 1;
-        for (String s : playerNicknames){
-            System.out.println("Number " + i + " Player is " + s);
+
+        int pos = 1;
+        int i = 0;
+
+        for (PlayerModel p : players){
+            System.out.println("Number " + pos + " Player is " + p.getNickname());
+
+            if (i != players.size() - 1 && (p.getCurrScore() != players.get(i + 1).getCurrScore() ||
+                    p.getNumOfCompletedObjectives() != players.get(i + 1).getNumOfCompletedObjectives())) {
+                pos++;
+            }
+
             i++;
         }
     }

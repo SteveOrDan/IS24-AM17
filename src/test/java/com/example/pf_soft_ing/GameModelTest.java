@@ -2,6 +2,7 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -93,27 +94,35 @@ class GameModelTest {
         assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(gameModel.getGoldenCardsDeck().getVisibleCards().get(1)));
     }
 
-//    @Test
-//    void drawResourceCard() {
-//        gameModel.initializeDecks();
-//        gameModel.setVisibleCards();
-//
-//        PlaceableCard card = gameModel.drawResourceCard();
-//
-//        assertNotNull(card);
-//        assertFalse(gameModel.getResourceCardsDeck().getDeck().contains(card));
-//    }
+    @Test
+    void drawResourceCard() {
+        gameModel.initializeDecks();
+        gameModel.setVisibleCards();
 
-//    @Test
-//    void drawGoldenCard() {
-//        gameModel.initializeDecks();
-//        gameModel.setVisibleCards();
-//
-//        PlaceableCard card = gameModel.drawGoldenCard();
-//
-//        assertNotNull(card);
-//        assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(card));
-//    }
+        PlaceableCard card = null;
+        try {
+            card = gameModel.drawResourceCard();
+            assertNotNull(card);
+            assertFalse(gameModel.getResourceCardsDeck().getDeck().contains(card));
+        } catch (NotEnoughCardsException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    void drawGoldenCard() {
+        gameModel.initializeDecks();
+        gameModel.setVisibleCards();
+
+        PlaceableCard card = null;
+        try {
+            card = gameModel.drawGoldenCard();
+            assertNotNull(card);
+            assertFalse(gameModel.getGoldenCardsDeck().getDeck().contains(card));
+        } catch (NotEnoughCardsException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     @Test
     void drawStarterCard() {

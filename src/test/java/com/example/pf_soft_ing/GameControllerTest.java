@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class GameControllerTest {
 
-    static int numOfPlayers = 2;
+    static int numOfPlayers = 4;
     GameController gc = new GameController();
 
     @Test
@@ -22,46 +22,21 @@ class GameControllerTest {
 
     @Test
     void addPlayer() {
-        PlayerModel player1 = new PlayerModel("Player 1", 1);
-        PlayerModel player1copy = new PlayerModel("Player 1", 1);
-        PlayerModel player1SameID = new PlayerModel("Player 1 same ID", 1);
-        PlayerModel player1SameNick = new PlayerModel("Player 1", 10);
-        PlayerModel player2 = new PlayerModel("Player 2", 2);
-        PlayerModel player3 = new PlayerModel("Player 3", 3);
-        PlayerModel player4 = new PlayerModel("Player 4", 4);
-        PlayerModel player5 = new PlayerModel("Player 5", 5);
-
-        gc.addPlayer(player1);
-        gc.addPlayer(player1copy);
-        gc.addPlayer(player1SameID);
-        gc.addPlayer(player1SameNick);
-        gc.addPlayer(player2);
-        gc.addPlayer(player3);
-        gc.addPlayer(player4);
-        gc.addPlayer(player5);
+        gc.addPlayer("Player 1");
+        gc.addPlayer("Player 1");
+        gc.addPlayer("Player 2");
+        gc.addPlayer("Player 3");
+        gc.addPlayer("Player 4");
+        gc.addPlayer("Player 5");
 
         assertEquals(4, gc.getIDPlayerMap().size());
-        assertFalse(gc.getIDPlayerMap().containsValue(player1copy));
-        assertFalse(gc.getIDPlayerMap().containsValue(player1SameID));
-        assertFalse(gc.getIDPlayerMap().containsValue(player1SameNick));
-        assertFalse(gc.getIDPlayerMap().containsValue(player5));
     }
 
     @Test
     void randomGameSetUp(){
         // Add players
-        List<Integer> usedPlayerIDs = new ArrayList<>();
-        Random rng = new Random();
-
         for (int i = 1; i <= 6; i++){
-            int rand = rng.nextInt(1000);
-
-            while (usedPlayerIDs.contains(rand)){
-                rand = rng.nextInt(1000);
-            }
-
-            usedPlayerIDs.add(rand);
-            gc.addPlayer(new PlayerModel("Player " + i, rand));
+            gc.addPlayer("Player " + i);
         }
 
         assertEquals(4, gc.getIDPlayerMap().size());
@@ -137,7 +112,7 @@ class GameControllerTest {
             }
 
             usedPlayerIDs.add(rand);
-            gc.addPlayer(new PlayerModel("Player " + i, rand));
+            gc.addPlayer("Player " + i);
         }
 
         assertEquals(numOfPlayers, gc.getIDPlayerMap().size());
@@ -403,5 +378,334 @@ class GameControllerTest {
 
     private int getCurrentPlayerId(){
         return gc.getGameModel().getCurrPlayerID();
+    }
+
+    @Test
+    public void testPlaceAndDrawExceptions(){
+        setUpGame();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+
+        PlayerModel notCurrPlayer = null;
+        for (Integer i : gc.getIDPlayerMap().keySet()){
+            if (i != gc.getGameModel().getCurrPlayerID()){
+                notCurrPlayer = gc.getIDPlayerMap().get(i);
+                break;
+            }
+        }
+
+        assert notCurrPlayer != null;
+        gc.placeCard(-1, 1, new Position(0, 0)); // Invalid player id
+        gc.placeCard(notCurrPlayer.getId(), 1, new Position(0, 0)); // Not curr player
+        gc.placeCard(currPlayer.getId(), -1, new Position(0, 0)); // Invalid card id
+
+        int cardNotInHandId = 0;
+        boolean found = true;
+        while (true){
+            for (PlaceableCard card : currPlayer.getHand()){
+                if (card.getId() == cardNotInHandId){
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found){
+                break;
+            }
+            else{
+                found = true;
+                cardNotInHandId++;
+            }
+        }
+
+        gc.placeCard(currPlayer.getId(), cardNotInHandId, new Position(1, 1)); // Card not in hand
+
+        gc.flipCard(-1, 1); // Invalid player id
+        gc.flipCard(currPlayer.getId(), -1); // Invalid card id
+
+        cardNotInHandId = 0;
+        while (true){
+            for (PlaceableCard card : currPlayer.getHand()){
+                if (card.getId() == cardNotInHandId){
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found){
+                break;
+            }
+            else{
+                found = true;
+                cardNotInHandId++;
+            }
+        }
+        gc.flipCard(currPlayer.getId(), cardNotInHandId); // Card not in hand
+
+        gc.getGameModel().setGameState(GameState.SET_UP);
+        gc.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1)); // Invalid game state
+
+        gc.getGameModel().setGameState(GameState.PLAYING);
+        gc.drawResourceCard(currPlayer.getId()); // Not drawing state
+        gc.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1)); // Correct
+
+        gc.drawVisibleResourceCard(-1, 0);
+        gc.drawVisibleResourceCard(currPlayer.getId(), -1);
+        gc.drawVisibleResourceCard(currPlayer.getId(), 5);
+        gc.drawVisibleGoldenCard(-1, 0);
+        gc.drawVisibleGoldenCard(currPlayer.getId(), -1);
+        gc.drawVisibleGoldenCard(currPlayer.getId(), 5);
+
+        gc.getGameModel().setGameState(GameState.SET_UP);
+        gc.drawResourceCard(currPlayer.getId()); // Invalid game state
+
+        gc.getGameModel().setGameState(GameState.PLAYING);
+        gc.drawResourceCard(notCurrPlayer.getId()); // Correct
+    }
+
+    @Test
+    public void testPlaceAndDraw(){
+        setUpGame();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+        int currPlayerID = getCurrentPlayerId();
+
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        // Draw card
+        gc.drawResourceCard(currPlayerID);
+
+        currPlayer = getCurrentPlayer();
+        currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        // Draw card
+        gc.drawGoldenCard(currPlayerID);
+
+        currPlayer = getCurrentPlayer();
+        currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        // Draw card
+        gc.drawVisibleGoldenCard(currPlayerID, 0);
+
+        currPlayer = getCurrentPlayer();
+        currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        // Draw card
+        gc.drawVisibleResourceCard(currPlayerID, 0);
+    }
+
+    @Test
+    public void restoreVisibleResourceCardEmptyDeck(){
+        setUpGame();
+
+        gc.getGameModel().getResourceCardsDeck().getDeck().clear();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+        int currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        // Draw card
+        gc.drawVisibleResourceCard(currPlayerID, 0);
+
+        gc.getGameModel().getGoldenCardsDeck().getDeck().clear();
+
+        currPlayer = getCurrentPlayer();
+        currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        // Draw card
+        gc.drawVisibleResourceCard(currPlayerID, 0);
+    }
+
+    @Test
+    public void restoreVisibleGoldenCardEmptyDeck(){
+        setUpGame();
+
+        gc.getGameModel().getGoldenCardsDeck().getDeck().clear();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+        int currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        // Draw card
+        gc.drawVisibleGoldenCard(currPlayerID, 0);
+
+        gc.getGameModel().getResourceCardsDeck().getDeck().clear();
+
+        currPlayer = getCurrentPlayer();
+        currPlayerID = getCurrentPlayerId();
+        // Place card
+        gc.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        // Draw card
+        gc.drawVisibleGoldenCard(currPlayerID, 0);
+    }
+
+    @Test
+    public void emptyDeckDraw(){
+        setUpGame();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+        int currPlayerID = getCurrentPlayerId();
+
+        gc.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+
+        gc.getGameModel().getResourceCardsDeck().getDeck().clear();
+        gc.getGameModel().getGoldenCardsDeck().getDeck().clear();
+
+        gc.drawResourceCard(currPlayerID); // Empty deck
+        gc.drawGoldenCard(currPlayerID); // Empty deck
+    }
+
+    @Test
+    public void testPosition(){
+        Position pos1 = new Position(0, 0);
+        Position pos2 = new Position(0, 0);
+
+        assertEquals(pos1, pos2);
+        assertNotEquals(pos1, null);
+    }
+
+    @Test
+    public void setUpGameWithErrors(){
+        // region Game setup
+        // Add players
+        gc.addPlayer("Player 1");
+        gc.addPlayer("Player 2");
+        gc.addPlayer("Player 3");
+        gc.addPlayer("Player 4");
+
+        assertEquals(4, gc.getIDPlayerMap().size());
+
+        // Set up decks (initialize, shuffle and set visible cards)
+        gc.setUpGame();
+
+        gc.getGameModel().setGameState(GameState.PREGAME);
+        gc.drawStarterCard(-1); // Invalid game state
+        gc.fillPlayerHand(-1); // Invalid game state
+
+        gc.getGameModel().setGameState(GameState.SET_UP);
+        gc.drawStarterCard(-1); // Invalid id
+        gc.fillPlayerHand(-1); // Invalid id
+
+        // Foreach player...
+        for (Integer i : gc.getIDPlayerMap().keySet()) {
+            PlayerModel player = gc.getIDPlayerMap().get(i);
+
+            // Set starter card
+            gc.drawStarterCard(i);
+
+            assertNotNull(player.getStarterCard());
+
+            player.flipStarterCard();
+            player.flipStarterCard();
+
+            player.placeStarterCard();
+
+            assertTrue(player.getPlayArea().containsKey(new Position(0, 0)));
+            assertEquals(player.getPlayArea().get(new Position(0, 0)), player.getStarterCard());
+
+            // Choose token
+            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+
+            gc.fillPlayerHand(i);
+
+            assertEquals(3, player.getHand().size());
+        }
+
+        // Set common objectives
+        gc.setCommonObjectives();
+
+        assertEquals(2, gc.getGameModel().getObjectiveCardsDeck().getCommonObjectives().size());
+
+        gc.setObjectivesToChoose(-1); // Invalid id
+
+        // Set objectives to choose
+        for (Integer i : gc.getIDPlayerMap().keySet()){
+            gc.setObjectivesToChoose(i);
+
+            int randIndex = Math.random() < 0.5 ? 0 : 1;
+
+            gc.getIDPlayerMap().get(i).setSecretObjective(3); // Wrong index
+            gc.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+
+            assertNotNull(gc.getIDPlayerMap().get(i).getSecretObjective());
+        }
+
+        // Set first player
+        gc.setRandomFirstPlayer();
+
+        gc.calculateOrderOfPlayers();
+
+        int firstPlayers = 0;
+
+        for (Integer i : gc.getIDPlayerMap().keySet()){
+            if (gc.getIDPlayerMap().get(i).isFirstPlayer()){
+                firstPlayers++;
+            }
+        }
+
+        assertEquals(1, firstPlayers);
+
+        gc.endGameSetUp();
+        // endregion
+
+    }
+
+    public void setUpGame(){
+        // region Game setup
+        // Add players
+        gc.addPlayer("Player 1");
+        gc.addPlayer("Player 2");
+        gc.addPlayer("Player 3");
+        gc.addPlayer("Player 4");
+
+        // Set up decks (initialize, shuffle and set visible cards)
+        gc.setUpGame();
+
+        // Foreach player...
+        for (Integer i : gc.getIDPlayerMap().keySet()) {
+            PlayerModel player = gc.getIDPlayerMap().get(i);
+
+            // Set starter card
+            gc.drawStarterCard(i);
+
+            player.placeStarterCard();
+
+            // Choose token
+            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+
+            gc.fillPlayerHand(i);
+        }
+
+        // Set common objectives
+        gc.setCommonObjectives();
+
+        // Set objectives to choose
+        for (Integer i : gc.getIDPlayerMap().keySet()){
+            gc.setObjectivesToChoose(i);
+
+            int randIndex = Math.random() < 0.5 ? 0 : 1;
+
+            gc.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+        }
+
+        // Set first player
+        gc.setRandomFirstPlayer();
+
+        gc.calculateOrderOfPlayers();
+
+        gc.endGameSetUp();
+        // endregion
     }
 }

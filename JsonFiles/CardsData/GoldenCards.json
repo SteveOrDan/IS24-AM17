@@ -50,7 +50,7 @@
         "cornerType": "EmptyCorner"
       },
       "TRCorner": {
-        "resourceType": "QUILL",
+        "resourceType": "INKWELL",
         "cornerType": "ResourceCorner"
       }
     }
