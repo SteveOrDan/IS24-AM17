@@ -14,13 +14,13 @@ public class ServerMain {
     public static void main( String[] args ){
         ServerSocket serverSocket = SocketController.StartServerConnection(args);
         GameController gameController = new GameController();
-        while (true){
+        while (true) {
             Socket newClientSocket = ConnectClient(serverSocket);
-            new Thread(){
-                public void run(){
+            new Thread() {
+                public void run() {
                     PrintWriter out = CreateClientConnectionOUT(newClientSocket);
                     BufferedReader in = WaitClientConnectionIN(newClientSocket);
-                    SocketController.InputReader(in, out, gameController);
+                    SocketController.CreateSocketThreads(in, out, gameController);
                 }
             }.start();
         }

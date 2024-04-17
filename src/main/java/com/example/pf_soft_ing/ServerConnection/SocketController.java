@@ -9,6 +9,8 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.LongStream;
 
 import static java.lang.System.exit;
 
@@ -70,54 +72,79 @@ public class SocketController {
         return in;
     }
 
-    public static void InputReader(BufferedReader in, PrintWriter out, GameController gameController){
+    public static void CreateSocketThreads(BufferedReader in, PrintWriter out, GameController gameController){
         BufferedReader stdIn =
                 new BufferedReader(
                         new InputStreamReader(System.in));
-        String s = "";
-        out.println("Choose Nickname:");
-        try {
-            s = in.readLine();
-            System.out.println(s);
-            out.println("Your Id: " + gameController.addPlayer(s));
-            while (true) {
-                String sInput;
-//                try {
-//                    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
-//                    input = bufferRead.readLine();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                out.println(input);
-//                System.out.println("echo: " + input);
-                sInput = in.readLine();
-                System.out.println(sInput);
-                String[] inputArray = sInput.split(" ");
-                switch (inputArray[0]){
-                    case "1":
-                        System.out.println("comando 1" + sInput);
-                        out.println("Bravo");
-                        break;
-                    case "2":
-                        System.out.println("comando 2" + sInput);
-                        out.println("Meno bravo");
-                        break;
-                    case "3":
-                        System.out.println("comando 3" + sInput);
-                        out.println("Cattivo");
-                        break;
-                    default:
-                        System.out.println("extra");
-                        out.println("Errore");
+        new Thread(){
+            public void run(){
+                boolean runFlag = true;
+                while (runFlag) {
+                    String input = "";
+                    try {
+                        input = in.readLine();
+                        if (input != null) {
+                            if (input.equals("end")){
+                                runFlag = false;
+                            }
+                            String finalInput = input;
+                            new Thread() {
+                                public void run() {
+                                    MessageDecoder(finalInput, gameController, out);
+                                }
+                            }.start();
+                        }
+                    } catch (IOException e) {
+                        System.err.println(STR."Exception \{e}");
+                        runFlag = false;
+                    }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }.start();
+
+        String s = "";
+        out.println("Choose Nickname:");
+    }
+
+    public static void SendMessage(String output, PrintWriter out){
+        new Thread(){
+            public void run(){
+                out.println(output);
+            }
+        }.start();
+    }
+
+    public static void MessageDecoder(String input, GameController gameController,PrintWriter out) {
+        System.out.println(input);
+        String[] inputArray = input.split(" ");
+        switch (inputArray[0]) {
+            case "1":
+                System.out.println("comando 1" + input);
+                SendMessage("Bravo", out);
+                break;
+            case "2":
+                System.out.println("comando 2" + input);
+                SendMessage("Meno bravo", out);
+                break;
+            case "3":
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                SendMessage("Cattivo", out);
+                break;
+            case "4":
+                int id = gameController.addPlayer(inputArray[1]);
+                SendMessage("Your Id: " + id, out);
+                break;
+            case "end":
+                SendMessage("end", out);
+                break;
+            default:
+                System.out.println("extra");
+                out.println("Errore");
         }
     }
 
-
-    public static void StartClientConnection( String[] args ) {
-
-    }
 }
