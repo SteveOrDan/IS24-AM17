@@ -11,24 +11,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class ClientRMI implements ClientGameControllerInterface {
-    private static ServerGameControllerInterface obj;
+    private static ServerGameControllerInterface stub;
     private String nickname;
     private Registry registry;
-
-    public void connectionRMI(String hostName, int port) {
-        try {
-            registry = LocateRegistry.getRegistry(hostName, port);
-            obj = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            System.out.println("Client ready");
-        } catch (AccessException e) {
-            throw new RuntimeException(e);
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 
     public void main(String[] args) {
         String hostName = args[0];
@@ -43,7 +28,6 @@ public class ClientRMI implements ClientGameControllerInterface {
             System.out.println(client1.nickname);
             System.out.println(client2.nickname);
 
-
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -54,20 +38,20 @@ public class ClientRMI implements ClientGameControllerInterface {
     public Integer addPlayer(String hostName, int port,String nickname) throws RemoteException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
-            obj = (ServerGameControllerInterface) registry.lookup("RemoteController");
+            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }
         this.nickname = nickname;
-        return obj.addPlayer(nickname);
+        return stub.addPlayer(nickname);
     }
 
     @Override
     public void placeCard(String hostName, int port, int playerID, int cardID, Position pos) throws RemoteException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
-            obj = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            obj.placeCard(playerID,cardID,pos);
+            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
+            stub.placeCard(playerID,cardID,pos);
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }
@@ -77,8 +61,8 @@ public class ClientRMI implements ClientGameControllerInterface {
     public void flipCard(String hostName, int port,int playerID, int cardID) throws RemoteException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
-            obj = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            obj.flipCard(playerID,cardID);
+            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
+            stub.flipCard(playerID,cardID);
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }
@@ -88,8 +72,8 @@ public class ClientRMI implements ClientGameControllerInterface {
     public void endTurn(String hostName, int port) throws RemoteException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
-            obj = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            obj.endTurn();
+            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
+            stub.endTurn();
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }

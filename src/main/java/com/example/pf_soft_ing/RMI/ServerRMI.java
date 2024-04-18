@@ -13,7 +13,7 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class ServerRMI extends UnicastRemoteObject implements ServerGameControllerInterface {
 
-    private final ServerGameControllerInterface gameController;
+    private final GameController gameController;
     private static ServerRMI obj = null;
     private static Registry registry = null;
 
@@ -60,6 +60,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
 
         try {
             ServerRMI prova = bind(portNumber);
+
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }

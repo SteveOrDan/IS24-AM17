@@ -81,7 +81,7 @@ public class GameController implements ServerGameControllerInterface {
             gameModel.addPlayer(player);
 
             player.setState(PlayerState.PRE_GAME);
-            //System.out.println("nameOfPlayer: " + nickname + " id:" + id);
+            System.out.println("nameOfPlayer: " + nickname + " id:" + id);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
