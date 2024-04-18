@@ -1,80 +1,87 @@
 package com.example.pf_soft_ing.RMI;
 
-import com.example.pf_soft_ing.PlayerModel;
+import com.example.pf_soft_ing.GameController;
 import com.example.pf_soft_ing.Position;
-import com.example.pf_soft_ing.Token;
-import com.example.pf_soft_ing.card.Card;
-import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.StarterCard;
+import com.example.pf_soft_ing.ServerGameControllerInterface;
 
-import java.rmi.AlreadyBoundException;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 
-public class ServerRMI implements RMIController {
-    static int PORT = 1234;
-    public HashMap<Integer, PlaceableCard> CardIDMap;
-    public HashMap<Integer, PlayerModel> PlayerIDMap;
 
-    public static void main( String[] args ){
+public class ServerRMI extends UnicastRemoteObject implements ServerGameControllerInterface {
 
-        System.out.println("Hello from Server!");
-        ServerRMI obj = new ServerRMI();
+    private final ServerGameControllerInterface gameController;
+    private static ServerRMI obj = null;
+    private static Registry registry = null;
+
+    public ServerRMI(int port) throws RemoteException {
+        super(port);
+        gameController = new GameController();
+    }
+
+    public static ServerRMI bind(int port) throws RemoteException {
         try {
-
-            RMIController stub = (RMIController) UnicastRemoteObject.exportObject(obj, PORT);
-            Registry registry = LocateRegistry.createRegistry(PORT);
-            registry.bind("Loggable", stub);
+            obj = new ServerRMI(port);
+            // Bind the remote object in the registry
+            registry = LocateRegistry.createRegistry(port);
+            getRegistry().rebind("RemoteController", obj);
             System.out.println("Server ready");
-
         } catch (RemoteException e) {
             e.printStackTrace();
-        } catch (AlreadyBoundException e) {
+            System.err.println("Error Starting ServerRMI");
+        }
+        return getServerRMI(port);
+    }
+    public synchronized static ServerRMI getServerRMI(int port) throws RemoteException {
+        if (obj == null){
+            try {
+                obj = new ServerRMI(port);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return obj;
+    }
+    public synchronized static Registry getRegistry() throws RemoteException {
+        return registry;
+    }
+
+    public static void main(String[] args ){
+        System.out.println("Hello from Server!");
+
+        if (args.length != 1){
+            System.err.println("Cannot start no port.");
+            System.exit(1);
+        }
+        int portNumber = Integer.parseInt(args[0]);
+
+        try {
+            ServerRMI prova = bind(portNumber);
+        } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public boolean login(String nick) throws RemoteException {
-        System.out.println(nick + " is logging..");
-        return false;
+    public Integer addPlayer(String nickname) throws RemoteException {
+        return obj.gameController.addPlayer(nickname);
     }
 
     @Override
-    public void logout(String nick) throws RemoteException {
+    public void placeCard(int playerID, int cardID, Position pos) throws RemoteException {
+        obj.gameController.placeCard(playerID,cardID,pos);
     }
 
     @Override
-    public String flipStarterCard(int playerId) throws RemoteException {
-        System.out.println("flipping card ID :" + playerId);
-        PlayerIDMap.get(playerId).flipStarterCard();
-        return "Card Flipped";
+    public void flipCard(int playerID, int cardID) throws RemoteException {
+        obj.gameController.flipCard(playerID,cardID);
     }
 
     @Override
-    public String setToken(int playerId, Token token) throws RemoteException {
-        System.out.println("Setting token for " + playerId);
-        PlayerIDMap.get(playerId).setToken(token);
-        return "Token setted";
+    public void endTurn() throws RemoteException {
+        obj.gameController.endTurn();
     }
-
-    @Override
-    public String placeStarterCard(int playerId) throws RemoteException {
-        System.out.println("Placing starter card for " + playerId);
-        PlayerIDMap.get(playerId).placeStarterCard();
-        return "Starter Card Placed";
-    }
-
-    @Override
-    public String placeCard(int cardId, Position pos, int playerId) throws RemoteException {
-        //da sistemare, CHIEDERE
-        System.out.println("Placing card for " + playerId);
-        PlaceableCard card = CardIDMap.get(cardId);
-        PlayerIDMap.get(playerId).placeCard(card, pos);
-        return "Card placed";
-    }
-
 }

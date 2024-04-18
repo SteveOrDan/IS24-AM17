@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class GameController {
+public class GameController implements ServerGameControllerInterface {
 
     private final HashMap<Integer, PlaceableCard> IDPlaceableCardMap;
     private final HashMap<Integer, ObjectiveCard> IDObjectiveCardMap;
@@ -81,6 +81,7 @@ public class GameController {
             gameModel.addPlayer(player);
 
             player.setState(PlayerState.PRE_GAME);
+            //System.out.println("nameOfPlayer: " + nickname + " id:" + id);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
