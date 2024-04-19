@@ -13,7 +13,7 @@ import java.util.Arrays;
 import static java.lang.System.exit;
 
 public class SocketController {
-    public static ServerSocket StartServerConnection(String[] args) {
+    public static ServerSocket startServerConnection(String[] args) {
         ServerSocket serverSocket = null;
 
         if (args.length != 1) {
@@ -40,8 +40,8 @@ public class SocketController {
         return serverSocket;
     }
 
-    public static Socket ConnectClient(ServerSocket serverSocket) {
-        Socket connectionSocket = null;
+    public static Socket connectClient(ServerSocket serverSocket) {
+        Socket connectionSocket;
 
         try {
             connectionSocket = serverSocket.accept();
@@ -53,7 +53,7 @@ public class SocketController {
         return connectionSocket;
     }
 
-    public static PrintWriter CreateClientConnectionOUT(Socket connectionSocket) {
+    public static PrintWriter createClientConnectionOUT(Socket connectionSocket) {
         PrintWriter out = null;
 
         try {
@@ -66,7 +66,7 @@ public class SocketController {
         return out;
     }
 
-    public static BufferedReader WaitClientConnectionIN(Socket connectionSocket){
+    public static BufferedReader waitClientConnectionIN(Socket connectionSocket){
         BufferedReader in =null;
         try {
             in = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
@@ -79,7 +79,7 @@ public class SocketController {
         return in;
     }
 
-    public static void CreateSocketThreads(BufferedReader in, PrintWriter out, GameController gameController){
+    public static void createSocketThreads(BufferedReader in, PrintWriter out, GameController gameController){
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
         new Thread(){
@@ -87,38 +87,33 @@ public class SocketController {
                 boolean isRunning = true;
 
                 while (isRunning) {
-                    String input = "";
+                    String input;
 
                     try {
                         input = in.readLine();
-
-                        if (input != null) {
-                            if (input.equals("end")){
-                                isRunning = false;
-                            }
-
-                            String finalInput = input;
-
-                            new Thread() {
-                                public void run() {
-                                    MessageDecoder(finalInput, gameController, out);
-                                }
-                            }.start();
+                        if (input.equals("end")){
+                            isRunning = false;
                         }
+
+                        new Thread() {
+                            public void run() {
+                                messageDecoder(input, gameController, out);
+                            }
+                        }.start();
                     }
                     catch (IOException e) {
-                        System.err.println(STR."Exception \{e}");
+                        System.err.println(STR."Exception \{e.getMessage()}");
                         isRunning = false;
                     }
                 }
+                interrupt();
             }
         }.start();
 
-        String s = "";
         out.println("Choose Nickname:");
     }
 
-    public static void SendMessage(String output, PrintWriter out){
+    public static void sendMessage(String output, PrintWriter out){
         new Thread(){
             public void run(){
                 out.println(output);
@@ -126,19 +121,19 @@ public class SocketController {
         }.start();
     }
 
-    public static void MessageDecoder(String input, GameController gameController,PrintWriter out) {
+    public static void messageDecoder(String input, GameController gameController,PrintWriter out) {
         System.out.println(input);
         String[] inputArray = input.split(" ");
 
         switch (inputArray[0]) {
             case "1":
-                System.out.println("comando 1" + input);
-                SendMessage("Bravo", out);
+                System.out.println("Command 1" + input);
+                sendMessage("Good", out);
                 break;
 
             case "2":
-                System.out.println("comando 2" + input);
-                SendMessage("Meno bravo", out);
+                System.out.println("Command 2" + input);
+                sendMessage("Meh", out);
                 break;
 
             case "3":
@@ -148,21 +143,21 @@ public class SocketController {
                 catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                SendMessage("Cattivo", out);
+                sendMessage("Idiot", out);
                 break;
 
             case "4":
                 int id = gameController.addPlayer(inputArray[1]);
-                SendMessage("Your Id: " + id, out);
+                sendMessage("Your Id: " + id, out);
                 break;
 
             case "end":
-                SendMessage("end", out);
+                sendMessage("End", out);
                 break;
 
             default:
-                System.out.println("extra");
-                out.println("Errore");
+                System.out.println("Extra");
+                out.println("Error");
         }
     }
 

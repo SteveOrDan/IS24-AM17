@@ -12,16 +12,16 @@ import static com.example.pf_soft_ing.ServerConnection.SocketController.*;
 
 public class ServerMain {
     public static void main( String[] args ){
-        ServerSocket serverSocket = SocketController.StartServerConnection(args);
+        ServerSocket serverSocket = startServerConnection(args);
         GameController gameController = new GameController();
 
         while (true) {
-            Socket newClientSocket = ConnectClient(serverSocket);
+            Socket newClientSocket = connectClient(serverSocket);
             new Thread() {
                 public void run() {
-                    PrintWriter out = CreateClientConnectionOUT(newClientSocket);
-                    BufferedReader in = WaitClientConnectionIN(newClientSocket);
-                    SocketController.CreateSocketThreads(in, out, gameController);
+                    PrintWriter out = createClientConnectionOUT(newClientSocket);
+                    BufferedReader in = waitClientConnectionIN(newClientSocket);
+                    SocketController.createSocketThreads(in, out, gameController);
                 }
             }.start();
         }

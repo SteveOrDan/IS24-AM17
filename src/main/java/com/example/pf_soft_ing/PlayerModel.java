@@ -1,16 +1,17 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.ObserverPattern.Listener;
+import com.example.pf_soft_ing.ObserverPattern.Observable;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.exceptions.*;
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlayerModel {
+public class PlayerModel implements Observable {
 
     private final String nickname;
     private final int id;
@@ -34,6 +35,8 @@ public class PlayerModel {
     private PlayerState state;
 
     private int currMaxPriority;
+
+    private final List<Listener> listeners = new ArrayList<>();
 
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
@@ -358,29 +361,20 @@ public class PlayerModel {
         }
     }
 
-    // ================================================ CLIENT METHODS ================================================
-
-    void createGame(String nickname, int maxPlayersNum) {
-
+    @Override
+    public void addListener(Listener listener) {
+        listeners.add(listener);
     }
 
-    void joinGame(String nickname, String IP) {
-
+    @Override
+    public void removeListener(Listener listener) {
+        listeners.remove(listener);
     }
 
-    void placeStarterCard(int cardID, int side) {
-
-    }
-
-    void chooseSecretObjective(int cardID) {
-
-    }
-
-    void placeCard(int cardID, int side, int x, int y) {
-
-    }
-
-    void drawCard(int cardID) {
-
+    @Override
+    public void updateAll(Object data) {
+        for (Listener listener : listeners){
+            listener.update(data);
+        }
     }
 }

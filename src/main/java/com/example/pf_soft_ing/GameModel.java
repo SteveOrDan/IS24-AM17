@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.ObserverPattern.Listener;
+import com.example.pf_soft_ing.ObserverPattern.Observable;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
@@ -10,10 +12,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GameModel {
+public class GameModel implements Observable {
 
     private final HashMap<Integer, PlayerModel> IDToPlayerMap;
-    private final HashMap<Integer, Integer> board;
 
     private UsableCardsDeck resourceCardsDeck;
     private UsableCardsDeck goldenCardsDeck;
@@ -28,9 +29,9 @@ public class GameModel {
 
     private GameState gameState;
 
+    private final List<Listener> listeners = new ArrayList<>();
     public GameModel() {
         this.playerIDList = new ArrayList<>();
-        this.board = new HashMap<>();
 
         IDToPlayerMap = new HashMap<>();
         gameState = GameState.PREGAME;
@@ -95,7 +96,6 @@ public class GameModel {
     public void addPlayer(PlayerModel player){
         IDToPlayerMap.put(player.getId(), player);
         playerIDList.add(player.getId());
-        board.put(player.getId(), 0);
     }
 
     /**
@@ -291,6 +291,9 @@ public class GameModel {
         }
     }
 
+    /**
+     * Method to determine the ranking of the players based on their final scores
+     */
     public void determineRanking() {
         List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
 
@@ -314,6 +317,23 @@ public class GameModel {
             }
 
             i++;
+        }
+    }
+
+    @Override
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    @Override
+    public void removeListener(Listener listener) {
+        listeners.remove(listener);
+    }
+
+    @Override
+    public void updateAll(Object data) {
+        for (Listener listener : listeners){
+            listener.update(data);
         }
     }
 }
