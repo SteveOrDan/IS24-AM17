@@ -360,6 +360,43 @@ Post review UML
 ```mermaid
 classDiagram
 
+class MessageDecoder{
+    - out : PrintWriter
+    - in : BufferReader
+    - con : ServerRMI
+
+    <<abstract>>
+    # addPlayer(nickname : String) Integer
+    # placeCard(playerID : int, cardID : int, pos : Position) void
+    # drawResourceCard(platerId : int) void
+    # drawVisibleResourceCard(playerID : int, index : int) void
+    # drawGoldenCard(playerID : int) void
+    # drawVisibleGoldenCard(playerID : int, index : int) void
+    # drawStarterCard(playerID : int) void
+    # flipCard(playerID : int, cardID : int) void
+    # endTurn() void
+
+    # setVisibleCards() void
+    # setCommonObjectives() void
+    # setObjectivesToChoose(playerID : int) void
+    # setRandomFirstPlayer() void
+    # fillPlayerHand(playerID : int) void
+}
+
+class RMIDecoder{
+    
+}
+
+class SocketDecoder{
+    
+}
+
+MessageDecoder <|-- RMIDecoder
+MessageDecoder <|-- SocketDecoder
+
+PlayerModel*--> MessageDecoder
+
+
 class PlaceableCard{
     - cardType : String
     - id : int
@@ -588,6 +625,8 @@ class PlayerModel{
 
     - token : Token
     - firstPlayerToken : Token
+
+    - messageDecoder : MessageDecoder
 
     + getID() int
     + getNickname() String
@@ -823,6 +862,7 @@ class TokenColors{
     + getValue() int
     + getColorFromInt(n : int) TokenColors
 }
+
 ```
 
 Sequence diagram for game set up
