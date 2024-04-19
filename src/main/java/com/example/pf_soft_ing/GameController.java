@@ -81,7 +81,7 @@ public class GameController implements ServerGameControllerInterface {
             gameModel.addPlayer(player);
 
             player.setState(PlayerState.PRE_GAME);
-            System.out.println("nameOfPlayer: " + nickname + " id:" + id);
+            //System.out.println("nameOfPlayer: " + nickname + " id:" + id);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -362,6 +362,7 @@ public class GameController implements ServerGameControllerInterface {
             }
 
             IDPlayerMap.get(playerID).setStarterCard(gameModel.drawStarterCard());
+            System.out.println("DrawStarterCard invoked");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -394,6 +395,7 @@ public class GameController implements ServerGameControllerInterface {
             }
 
             hand.get(hand.indexOf(IDPlaceableCardMap.get(cardID))).flipCard();
+            System.out.println("Card flipped");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());

@@ -35,7 +35,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
         }
         return getServerRMI(port);
     }
-    public synchronized static ServerRMI getServerRMI(int port) throws RemoteException {
+    public static ServerRMI getServerRMI(int port) throws RemoteException {
         if (obj == null){
             try {
                 obj = new ServerRMI(port);
@@ -45,7 +45,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
         }
         return obj;
     }
-    public synchronized static Registry getRegistry() throws RemoteException {
+    public static Registry getRegistry() throws RemoteException {
         return registry;
     }
 
@@ -60,7 +60,6 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
 
         try {
             ServerRMI prova = bind(portNumber);
-
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
@@ -82,7 +81,57 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
     }
 
     @Override
+    public void endGameSetUp() throws RemoteException {
+        obj.gameController.endGameSetUp();
+    }
+
+    @Override
     public void endTurn() throws RemoteException {
         obj.gameController.endTurn();
+    }
+
+    @Override
+    public void setUpGame() throws RemoteException {
+        obj.gameController.setUpGame();
+    }
+
+    @Override
+    public void setObjectivesToChoose(int playerID) throws RemoteException {
+        obj.gameController.setObjectivesToChoose(playerID);
+    }
+
+    @Override
+    public void setRandomFirstPlayer() throws RemoteException {
+        obj.gameController.setRandomFirstPlayer();
+    }
+
+    @Override
+    public void fillPlayerHand(int playerID) throws RemoteException {
+        obj.fillPlayerHand(playerID);
+    }
+
+    @Override
+    public void drawResourceCard(int playerID) throws RemoteException {
+        obj.gameController.drawResourceCard(playerID);
+    }
+
+    @Override
+    public void drawVisibleResourceCard(int playerID, int index) throws RemoteException {
+        obj.gameController.drawVisibleResourceCard(playerID, index);
+    }
+
+    @Override
+    public void drawGoldenCard(int playerID) throws RemoteException {
+        obj.gameController.drawGoldenCard(playerID);
+    }
+
+    @Override
+    public void drawVisibleGoldenCard(int playerID, int index) throws RemoteException {
+        obj.gameController.drawVisibleGoldenCard(playerID, index);
+    }
+
+    @Override
+    public void drawStarterCard(int playerID) throws RemoteException {
+        obj.gameController.drawStarterCard(playerID);
     }
 }
