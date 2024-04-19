@@ -81,34 +81,10 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
     }
 
     @Override
-    public void endGameSetUp() throws RemoteException {
-        obj.gameController.endGameSetUp();
-    }
-
-    @Override
     public void endTurn() throws RemoteException {
         obj.gameController.endTurn();
     }
 
-    @Override
-    public void setUpGame() throws RemoteException {
-        obj.gameController.setUpGame();
-    }
-
-    @Override
-    public void setObjectivesToChoose(int playerID) throws RemoteException {
-        obj.gameController.setObjectivesToChoose(playerID);
-    }
-
-    @Override
-    public void setRandomFirstPlayer() throws RemoteException {
-        obj.gameController.setRandomFirstPlayer();
-    }
-
-    @Override
-    public void fillPlayerHand(int playerID) throws RemoteException {
-        obj.fillPlayerHand(playerID);
-    }
 
     @Override
     public void drawResourceCard(int playerID) throws RemoteException {
@@ -133,5 +109,31 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
     @Override
     public void drawStarterCard(int playerID) throws RemoteException {
         obj.gameController.drawStarterCard(playerID);
+    }
+
+    // server su client
+    @Override
+    public void setObjectivesToChoose(int playerID) throws RemoteException {
+        obj.gameController.setObjectivesToChoose(playerID);
+    }
+
+    @Override
+    public void setRandomFirstPlayer() throws RemoteException {
+        obj.gameController.setRandomFirstPlayer();
+    }
+
+    @Override
+    public void setCommonObjectives() throws RemoteException {
+
+    }
+
+    @Override
+    public void setVisibleCards() throws RemoteException {
+
+    }
+
+    @Override
+    public void fillPlayerHand(int playerID) throws RemoteException {
+        obj.fillPlayerHand(playerID);
     }
 }

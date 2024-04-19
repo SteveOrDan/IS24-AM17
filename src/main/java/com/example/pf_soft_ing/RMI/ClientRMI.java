@@ -4,29 +4,83 @@ import com.example.pf_soft_ing.ClientGameControllerInterface;
 import com.example.pf_soft_ing.Position;
 import com.example.pf_soft_ing.ServerGameControllerInterface;
 
+
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Objects;
+import java.util.Scanner;
+
 
 public class ClientRMI implements ClientGameControllerInterface {
     private static ServerGameControllerInterface stub;
     private String nickname;
     private Registry registry;
 
-    public void main(String[] args) {
+    public void main(String[] args) throws RemoteException {
         String hostName = args[0];
         int portNumber = Integer.parseInt(args[1]);
         ClientRMI client1 = new ClientRMI();
+        int idClient1 = -1;
+        boolean flag = true;
+        Scanner input = new Scanner(System.in);
 
-        try {
-            int idClient1 = client1.addPlayer(hostName,portNumber,"Cate");
+        while (flag) {
+            System.out.println("Inserisci comando: ");
+            String userInput = input.nextLine();
+            if (userInput != null){
+                switch (userInput){
+                    case "end" : flag = false;
+                    case "addPlayer" : {
+                        System.out.println("Inserisci nickname: ");
+                        String nickname = input.nextLine();
+                        try {
+                            idClient1 = client1.addPlayer(hostName, portNumber, nickname);
+                        } catch (RemoteException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    case "placeCard" :{
+                        if (idClient1 != -1){
+                            System.out.println("IdCarta: ");
+                            int idCard = input.nextInt();
+                            System.out.println("Insert position:");
+                            System.out.println("x :");
+                            int x = input.nextInt();
+                            System.out.println("y :");
+                            int y = input.nextInt();
+                            Position position = new Position(x, y);
+                            // da sistemare non posso mandargli un oggetto Position
+                            client1.placeCard(hostName, portNumber, idClient1, idCard, position);
+                        }else{
+                            System.out.println("Giocatore non esistente");
+                        }
+                    }
+                    case "flipCard" :{
 
-            System.out.println("Player : " + idClient1 + " Nickname : " + client1.nickname);
+                    }
+                    case "endTurn" :{
 
+                    }
+                    case "drawResourceCard" : {
 
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
+                    }
+                    case "drawVisibleResourceCard" :{
+
+                    }
+                    case "drawGoldenCard" : {
+
+                    }
+                    case "drawVisibleGoldenCard" :{
+
+                    }
+                    case "drawStarterCard" :{
+
+                    }
+                }
+
+            }
         }
 
     }
@@ -77,17 +131,6 @@ public class ClientRMI implements ClientGameControllerInterface {
     }
 
     @Override
-    public void setUpGame(String hostName, int port) throws RemoteException {
-        registry = LocateRegistry.getRegistry(hostName, port);
-        try {
-            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            stub.setUpGame();
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public void setObjectivesToChoose(String hostName, int port, int playerID) throws RemoteException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
@@ -118,6 +161,16 @@ public class ClientRMI implements ClientGameControllerInterface {
         } catch (NotBoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void setCommonObjectives() throws RemoteException {
+
+    }
+
+    @Override
+    public void setVisibleCards() throws RemoteException {
+
     }
 
     @Override
@@ -175,16 +228,4 @@ public class ClientRMI implements ClientGameControllerInterface {
             throw new RuntimeException(e);
         }
     }
-
-    @Override
-    public void endGameSetUp(String hostName, int port) throws RemoteException {
-        registry = LocateRegistry.getRegistry(hostName, port);
-        try {
-            stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
-            stub.endGameSetUp();
-        } catch (NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }
