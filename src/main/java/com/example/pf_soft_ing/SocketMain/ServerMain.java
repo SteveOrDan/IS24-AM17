@@ -14,6 +14,7 @@ public class ServerMain {
     public static void main( String[] args ){
         ServerSocket serverSocket = SocketController.StartServerConnection(args);
         GameController gameController = new GameController();
+
         while (true) {
             Socket newClientSocket = ConnectClient(serverSocket);
             new Thread() {

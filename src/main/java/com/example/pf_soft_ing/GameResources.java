@@ -25,7 +25,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GameResources {
 
@@ -38,6 +40,9 @@ public class GameResources {
     private static List<PlaceableCard> goldenDeck;
     private static List<PlaceableCard> starterDeck;
     private static List<ObjectiveCard> objectiveDeck;
+
+    private static Map<Integer, PlaceableCard> IDToPlaceableCardMap;
+    private static Map<Integer, ObjectiveCard> IDToObjectiveCardMap;
 
     public static CardCorner deserializeCorner() {
         try {
@@ -220,11 +225,41 @@ public class GameResources {
         }
     }
 
+    public static void fillCardMaps(){
+        IDToPlaceableCardMap = new HashMap<>();
+        IDToObjectiveCardMap = new HashMap<>();
+
+        for (PlaceableCard card : resourcesDeck) {
+            IDToPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (PlaceableCard card : goldenDeck) {
+            IDToPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (PlaceableCard card : starterDeck) {
+            IDToPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (ObjectiveCard card : objectiveDeck) {
+            IDToObjectiveCardMap.put(card.getId(), card);
+        }
+    }
+
     public static void initializeAllDecks() {
         initializeResourceDeck();
         initializeGoldenDeck();
         initializeStarterDeck();
         initializeObjectiveDeck();
+
+        fillCardMaps();
+    }
+
+    public static PlaceableCard getPlaceableCardByID(int ID) {
+        return IDToPlaceableCardMap.get(ID);
+    }
+    public static ObjectiveCard getObjectiveCardByID(int ID) {
+        return IDToObjectiveCardMap.get(ID);
     }
 
     /**
@@ -257,5 +292,21 @@ public class GameResources {
      */
     public static List<ObjectiveCard> getObjectiveDeck() {
         return objectiveDeck;
+    }
+
+    /**
+     * Getter
+     * @return Map of IDs to PlaceableCards
+     */
+    public static Map<Integer, PlaceableCard> getIDToPlaceableCardMap() {
+        return IDToPlaceableCardMap;
+    }
+
+    /**
+     * Getter
+     * @return Map of IDs to ObjectiveCards
+     */
+    public static Map<Integer, ObjectiveCard> getIDToObjectiveCardMap() {
+        return IDToObjectiveCardMap;
     }
 }

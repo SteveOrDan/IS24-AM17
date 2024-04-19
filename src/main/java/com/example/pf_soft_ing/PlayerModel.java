@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.exceptions.*;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -355,5 +356,31 @@ public class PlayerModel {
         if (card != null && hand.size() < 3){
             hand.add(card);
         }
+    }
+
+    // ================================================ CLIENT METHODS ================================================
+
+    void createGame(String nickname, int maxPlayersNum) {
+
+    }
+
+    void joinGame(String nickname, String IP) {
+
+    }
+
+    void placeStarterCard(int cardID, int side) {
+
+    }
+
+    void chooseSecretObjective(int cardID) {
+
+    }
+
+    void placeCard(int cardID, int side, int x, int y) {
+
+    }
+
+    void drawCard(int cardID) {
+
     }
 }

@@ -9,15 +9,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.LongStream;
 
 import static java.lang.System.exit;
-
 
 public class SocketController {
     public static ServerSocket StartServerConnection(String[] args) {
         ServerSocket serverSocket = null;
+
         if (args.length != 1) {
             System.out.println("Cannot start port:" + Arrays.toString(args));
             exit(1);
@@ -25,16 +23,18 @@ public class SocketController {
 
         int portNumber = Integer.parseInt(args[0]);
 
-        boolean ok = false;
-        while (!ok) {
+        boolean foundPort = false;
+        while (!foundPort) {
             try {
                 serverSocket = new ServerSocket(portNumber);
-                ok = true;
-            } catch (IOException e) {
-                System.out.println(e.toString());
+                foundPort = true;
+            }
+            catch (IOException e) {
+                System.out.println(e.getMessage());
                 portNumber++;
             }
         }
+
         System.out.println(STR."Server started! Port:\{portNumber}");
 
         return serverSocket;
@@ -42,61 +42,73 @@ public class SocketController {
 
     public static Socket ConnectClient(ServerSocket serverSocket) {
         Socket connectionSocket = null;
+
         try {
             connectionSocket = serverSocket.accept();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         return connectionSocket;
     }
 
     public static PrintWriter CreateClientConnectionOUT(Socket connectionSocket) {
         PrintWriter out = null;
+
         try {
             out = new PrintWriter(connectionSocket.getOutputStream(), true);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
+
         return out;
     }
 
     public static BufferedReader WaitClientConnectionIN(Socket connectionSocket){
         BufferedReader in =null;
         try {
-            in = new BufferedReader(
-                    new InputStreamReader(connectionSocket.getInputStream()));
-        } catch(IOException e) {
+            in = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
+        }
+        catch(IOException e) {
             throw new RuntimeException(e);
         }
+
         System.out.println("Client connected!");
         return in;
     }
 
     public static void CreateSocketThreads(BufferedReader in, PrintWriter out, GameController gameController){
-        BufferedReader stdIn =
-                new BufferedReader(
-                        new InputStreamReader(System.in));
+        BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+
         new Thread(){
             public void run(){
-                boolean runFlag = true;
-                while (runFlag) {
+                boolean isRunning = true;
+
+                while (isRunning) {
                     String input = "";
+
                     try {
                         input = in.readLine();
+
                         if (input != null) {
                             if (input.equals("end")){
-                                runFlag = false;
+                                isRunning = false;
                             }
+
                             String finalInput = input;
+
                             new Thread() {
                                 public void run() {
                                     MessageDecoder(finalInput, gameController, out);
                                 }
                             }.start();
                         }
-                    } catch (IOException e) {
+                    }
+                    catch (IOException e) {
                         System.err.println(STR."Exception \{e}");
-                        runFlag = false;
+                        isRunning = false;
                     }
                 }
             }
@@ -117,30 +129,37 @@ public class SocketController {
     public static void MessageDecoder(String input, GameController gameController,PrintWriter out) {
         System.out.println(input);
         String[] inputArray = input.split(" ");
+
         switch (inputArray[0]) {
             case "1":
                 System.out.println("comando 1" + input);
                 SendMessage("Bravo", out);
                 break;
+
             case "2":
                 System.out.println("comando 2" + input);
                 SendMessage("Meno bravo", out);
                 break;
+
             case "3":
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException e) {
+                }
+                catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 SendMessage("Cattivo", out);
                 break;
+
             case "4":
                 int id = gameController.addPlayer(inputArray[1]);
                 SendMessage("Your Id: " + id, out);
                 break;
+
             case "end":
                 SendMessage("end", out);
                 break;
+
             default:
                 System.out.println("extra");
                 out.println("Errore");
