@@ -20,17 +20,14 @@ public class ClientMain {
             new Thread(){
                 public void run(){
                     boolean isRunning = true;
-                    String s;
 
                     while (isRunning) {
                         try {
-                            s = in.readLine();
-                            if (s != null){
-                                if (Objects.equals(s, "end")){
-                                    isRunning = false;
-                                }
-                                System.out.println(s);
+                            String s = in.readLine();
+                            if (Objects.equals(s, "end")){
+                                isRunning = false;
                             }
+                            System.out.println(s);
                         }
                         catch (IOException e) {
                             isRunning = false;
@@ -49,14 +46,12 @@ public class ClientMain {
                         try {
                             String input = stdIn.readLine();
 
-                            if (input != null) {
-                                if (input.equals("end")) {
-                                    runFlag = false;
-                                }
-
-                                out.println(input);
-                                System.out.println(STR."echo: \{input}");
+                            if (input.equals("end")) {
+                                runFlag = false;
                             }
+
+                            out.println(input);
+                            System.out.println(STR."echo: \{input}");
                         }
                         catch (IOException e) {
                             runFlag = false;

@@ -865,14 +865,41 @@ class TokenColors{
 
 ```
 
-Sequence diagram for game set up
+Sequence diagram for game
 ```mermaid
 sequenceDiagram
-    title Game set up
+    title Game
 
     participant C as Client
     participant S as Server
     participant O as Other Clients
+
+    Note left of S: Server: Server starts
+
+    Note left of C: Client: Client starts
+
+    C->>S: Connect request
+
+    S-->>C: Success(Matches)/Failure
+    Note left of C: Client: Update view
+
+    alt Create game
+        C->>S: Nick, max players
+        S-->>C: Success/Failure
+        Note left of C: Client: Update view
+        S->>O: New Match
+        Note right of O: Other clients: Update view
+    else Join game
+        C->>S: Nick, IP
+        S-->>C: Success/Failure
+        Note left of C: Client: Update view
+        S->>O: New player in game
+        Note right of O: Other clients: Update view
+    end
+
+    Note left of S: Server: Wait for all players
+
+    Note left of S: Server: Game start
 
     Note left of S: Server: Initialize decks
 
@@ -890,7 +917,8 @@ sequenceDiagram
     Note left of C: Client: Place starter card
     C->>S: ID, side
     Note left of S: Server: Update model
-    S-->>O: New view state    
+    S-->>C: Success/Failure
+    S->>O: New view state    
     
     Note right of O: Other clients: Update model and view
 
@@ -919,20 +947,7 @@ sequenceDiagram
     Note left of C: Client: Is first player?
 
     S->>C: msg
-    Note left of S: Server: Start game
-```
-
-Sequence diagram for game turns
-```mermaid
-sequenceDiagram
-    title Turn actions
-
-    participant C as Client
-    participant S as Server
-    participant O as Other Clients
-
-    S->>C: msg
-    Note left of S: Server: Start game
+    Note left of S: Server: Start game (turns)
 
     S->>C: state
     Note left of C: Client: Change state
@@ -963,7 +978,7 @@ sequenceDiagram
         S-->>C: success
         S-->>C: 6 IDs
         Note left of C: Client: Update view and model
-        S->>O: New state
+        S->>O: 6 IDs
         Note right of O: Other clients: Update model and view
         Note left of S: Server: Update game state
     end

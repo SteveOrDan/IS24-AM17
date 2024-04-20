@@ -54,7 +54,7 @@ public class SocketController {
     }
 
     public static PrintWriter createClientConnectionOUT(Socket connectionSocket) {
-        PrintWriter out = null;
+        PrintWriter out;
 
         try {
             out = new PrintWriter(connectionSocket.getOutputStream(), true);
@@ -67,7 +67,7 @@ public class SocketController {
     }
 
     public static BufferedReader waitClientConnectionIN(Socket connectionSocket){
-        BufferedReader in =null;
+        BufferedReader in;
         try {
             in = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
         }
