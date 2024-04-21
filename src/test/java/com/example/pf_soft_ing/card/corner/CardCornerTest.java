@@ -1,7 +1,6 @@
 package com.example.pf_soft_ing.card.corner;
 
-import com.example.pf_soft_ing.ResourceType;
-import org.junit.jupiter.api.BeforeEach;
+import com.example.pf_soft_ing.card.ResourceType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

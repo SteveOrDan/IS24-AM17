@@ -2,6 +2,7 @@ package com.example.pf_soft_ing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.card.GoldenCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.ResourceCard;
