@@ -1,7 +1,7 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.game.GameResources;
-import com.example.pf_soft_ing.player.PlayerModel;
+import com.example.pf_soft_ing.game.*;
+import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.EmptyCorner;
@@ -11,8 +11,10 @@ import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.util.ArrayList;
 import java.util.List;

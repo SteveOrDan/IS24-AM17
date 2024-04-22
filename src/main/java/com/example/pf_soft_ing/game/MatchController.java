@@ -15,10 +15,26 @@ import java.util.Random;
 
 public class MatchController implements ServerGameControllerInterface {
 
+    private final HashMap<Integer, PlaceableCard> IDPlaceableCardMap;
+    private final HashMap<Integer, ObjectiveCard> IDObjectiveCardMap;
+    private final HashMap<Integer, PlayerModel> IDPlayerMap;
+
     private final MatchModel matchModel;
 
     public MatchController(int maxPlayers, int matchID){
+        IDPlaceableCardMap = new HashMap<>();
+        IDObjectiveCardMap = new HashMap<>();
+        IDPlayerMap = new HashMap<>();
+
         matchModel = new MatchModel(maxPlayers, matchID);
+    }
+
+    /**
+     * Getter
+     * @return IDPlaceableCardMap with keys as card IDs and values as PlaceableCard objects
+     */
+    public HashMap<Integer, PlaceableCard> getIDPlaceableCardMap() {
+        return IDPlaceableCardMap;
     }
 
     /**
@@ -26,7 +42,7 @@ public class MatchController implements ServerGameControllerInterface {
      * @return IDPlayerMap with keys as player IDs and values as PlayerModel objects
      */
     public HashMap<Integer, PlayerModel> getIDPlayerMap() {
-        return matchModel.getIDToPlayerMap();
+        return IDPlayerMap;
     }
 
     /**
@@ -42,35 +58,38 @@ public class MatchController implements ServerGameControllerInterface {
      * Handles exceptions for player ID already exists, game is full, nickname already exists
      * @param nickname Player's nickname
      */
-    public Integer addPlayer(String nickname) throws GameFullException, NicknameAlreadyExistsException {
-        if (getIDPlayerMap().size() >= matchModel.getMaxPlayers()){
-            // Game is full
-            throw new GameFullException();
-        }
-
-        List<Integer> idList = new ArrayList<>(getIDPlayerMap().keySet());
+    public Integer addPlayer(String nickname){
+        List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
         Random rand = new Random();
 
-        int id = rand.nextInt(100);
+        int id = rand.nextInt(10);
         while (idList.contains(id)){
-            id = rand.nextInt(100);
-        }
-
-        for (PlayerModel p : getIDPlayerMap().values()){
-            if (p.getNickname().equals(nickname)){
-                throw new NicknameAlreadyExistsException();
-            }
+            id = rand.nextInt(10);
         }
 
         PlayerModel player = new PlayerModel(nickname, id);
 
-        getIDPlayerMap().put(player.getId(), player);
+        try {
+            if (IDPlayerMap.size() >= 4){
+                throw new GameIsFullException();
+            }
 
-        matchModel.addPlayer(player);
+            for (PlayerModel p : IDPlayerMap.values()){
+                if (p.getNickname().equals(player.getNickname())){
+                    throw new NicknameAlreadyExistsException();
+                }
+            }
 
-        player.setState(PlayerState.PRE_GAME);
-        //System.out.println("nameOfPlayer: " + nickname + " , id:" + id);
+            IDPlayerMap.put(player.getId(), player);
 
+            matchModel.addPlayer(player);
+
+            player.setState(PlayerState.PRE_GAME);
+            //System.out.println("nameOfPlayer: " + nickname + " , id:" + id);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
         return id;
     }
 
@@ -90,6 +109,22 @@ public class MatchController implements ServerGameControllerInterface {
      */
     public void initializeDecks(){
         matchModel.initializeDecks();
+
+        for (PlaceableCard card : GameResources.getResourcesDeck()){
+            IDPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (PlaceableCard card : GameResources.getGoldenDeck()){
+            IDPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (PlaceableCard card : GameResources.getStarterDeck()){
+            IDPlaceableCardMap.put(card.getId(), card);
+        }
+
+        for (ObjectiveCard card : GameResources.getObjectiveDeck()){
+            IDObjectiveCardMap.put(card.getId(), card);
+        }
     }
 
     /**
@@ -107,7 +142,7 @@ public class MatchController implements ServerGameControllerInterface {
     }
 
     /**
-     * Set the common objectives for the game
+     * Set the visible cards for the game
      */
     public void setCommonObjectives(){
         matchModel.getObjectiveCardsDeck().setCommonObjectives();
@@ -119,12 +154,12 @@ public class MatchController implements ServerGameControllerInterface {
      */
     public void setObjectivesToChoose(int playerID){
         try {
-            if (!getIDPlayerMap().containsKey(playerID)){
+            if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            PlayerModel player = getIDPlayerMap().get(playerID);
+            PlayerModel player = IDPlayerMap.get(playerID);
 
             ArrayList<ObjectiveCard> objectives = new ArrayList<>();
             objectives.add(matchModel.drawObjectiveCard());
@@ -159,7 +194,7 @@ public class MatchController implements ServerGameControllerInterface {
      */
     public void placeCard(int playerID, int cardID, Position pos) {
         try {
-            if (!getIDPlayerMap().containsKey(playerID)){
+            if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
@@ -169,12 +204,12 @@ public class MatchController implements ServerGameControllerInterface {
                 throw new NotPlayerTurnException();
             }
 
-            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
+            if (!IDPlaceableCardMap.containsKey(cardID)){
                 // Invalid card ID
                 throw new InvalidCardIDException();
             }
 
-            if (!getIDPlayerMap().get(playerID).getHand().contains(GameResources.getIDToPlaceableCardMap().get(cardID))){
+            if (!IDPlayerMap.get(playerID).getHand().contains(IDPlaceableCardMap.get(cardID))){
                 // Card not in player's hand
                 throw new CardNotInHandException();
             }
@@ -187,9 +222,9 @@ public class MatchController implements ServerGameControllerInterface {
 
             }
 
-            PlayerModel player = getIDPlayerMap().get(playerID);
+            PlayerModel player = IDPlayerMap.get(playerID);
 
-            player.placeCard(GameResources.getIDToPlaceableCardMap().get(cardID), pos);
+            player.placeCard(IDPlaceableCardMap.get(cardID), pos);
 
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
@@ -212,12 +247,12 @@ public class MatchController implements ServerGameControllerInterface {
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
             }
 
-            if (!getIDPlayerMap().containsKey(playerID)){
+            if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            PlayerModel player = getIDPlayerMap().get(playerID);
+            PlayerModel player = IDPlayerMap.get(playerID);
 
             player.drawCard(matchModel.drawResourceCard());
             player.drawCard(matchModel.drawResourceCard());
@@ -236,9 +271,9 @@ public class MatchController implements ServerGameControllerInterface {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            getIDPlayerMap().get(playerID).drawCard(matchModel.drawResourceCard());
+            IDPlayerMap.get(playerID).drawCard(matchModel.drawResourceCard());
 
-            getIDPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -257,11 +292,11 @@ public class MatchController implements ServerGameControllerInterface {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            getIDPlayerMap().get(playerID).drawCard(matchModel.drawVisibleResourceCard(index));
+            IDPlayerMap.get(playerID).drawCard(matchModel.drawVisibleResourceCard(index));
 
             matchModel.restoreVisibleResourceCard();
 
-            getIDPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -279,9 +314,9 @@ public class MatchController implements ServerGameControllerInterface {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            getIDPlayerMap().get(playerID).drawCard(matchModel.drawGoldenCard());
+            IDPlayerMap.get(playerID).drawCard(matchModel.drawGoldenCard());
 
-            getIDPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -291,20 +326,20 @@ public class MatchController implements ServerGameControllerInterface {
     }
 
     /**
-     * Draw a visible golden card
+     * Draw a visible resource card
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, card not visible
      * @param playerID ID of the player
-     * @param index index of the visible golden card (either 0 or 1)
+     * @param index index of the visible resource card (either 0 or 1)
      */
     public void drawVisibleGoldenCard(int playerID, int index){
         try {
             checkPlayerDrawExceptions(playerID);
 
-            getIDPlayerMap().get(playerID).drawCard(matchModel.drawVisibleGoldenCard(index));
+            IDPlayerMap.get(playerID).drawCard(matchModel.drawVisibleGoldenCard(index));
 
             matchModel.restoreVisibleGoldenCard();
 
-            getIDPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -325,12 +360,12 @@ public class MatchController implements ServerGameControllerInterface {
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
             }
 
-            if (!getIDPlayerMap().containsKey(playerID)){
+            if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            getIDPlayerMap().get(playerID).setStarterCard(matchModel.drawStarterCard());
+            IDPlayerMap.get(playerID).setStarterCard(matchModel.drawStarterCard());
             //System.out.println("DrawStarterCard invoked");
         }
         catch (Exception e) {
@@ -346,24 +381,24 @@ public class MatchController implements ServerGameControllerInterface {
      */
     public void flipCard(int playerID, int cardID){
         try {
-            if (!getIDPlayerMap().containsKey(playerID)){
+            if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
+            if (!IDPlaceableCardMap.containsKey(cardID)){
                 // Invalid card ID
                 throw new InvalidCardIDException();
             }
 
-            List<PlaceableCard> hand = getIDPlayerMap().get(playerID).getHand();
+            List<PlaceableCard> hand = IDPlayerMap.get(playerID).getHand();
 
-            if (!hand.contains(GameResources.getIDToPlaceableCardMap().get(cardID))){
+            if (!hand.contains(IDPlaceableCardMap.get(cardID))){
                 // Card not in player's hand
                 throw new CardNotInHandException();
             }
 
-            hand.get(hand.indexOf(GameResources.getIDToPlaceableCardMap().get(cardID))).flipCard();
+            hand.get(hand.indexOf(IDPlaceableCardMap.get(cardID))).flipCard();
             //System.out.println("Card flipped");
         }
         catch (Exception e) {
@@ -395,7 +430,7 @@ public class MatchController implements ServerGameControllerInterface {
             throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND);
         }
 
-        if (!getIDPlayerMap().containsKey(playerID)){
+        if (!IDPlayerMap.containsKey(playerID)){
             // Invalid player ID
             throw new InvalidPlayerIDException();
         }
@@ -405,9 +440,9 @@ public class MatchController implements ServerGameControllerInterface {
             throw new NotPlayerTurnException();
         }
 
-        if (getIDPlayerMap().get(playerID).getState() != PlayerState.DRAWING){
+        if (IDPlayerMap.get(playerID).getState() != PlayerState.DRAWING){
             // Not in drawing state
-            throw new InvalidPlayerStateException(getIDPlayerMap().get(playerID).getState().toString(), PlayerState.DRAWING.toString());
+            throw new InvalidPlayerStateException(IDPlayerMap.get(playerID).getState().toString(), PlayerState.DRAWING.toString());
         }
     }
 }

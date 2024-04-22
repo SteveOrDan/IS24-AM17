@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.player;
 
+import com.example.pf_soft_ing.ServerConnection.MessageEncoder;
 import com.example.pf_soft_ing.observerPattern.Listener;
 import com.example.pf_soft_ing.observerPattern.Observable;
 import com.example.pf_soft_ing.card.Position;
@@ -37,6 +38,15 @@ public class PlayerModel {
     private PlayerState state = PlayerState.PRE_GAME;
 
     private int currMaxPriority = 0;
+
+    private MessageEncoder encoder;
+
+    public PlayerModel(String nickname, int id, MessageEncoder encoder) {
+        this.nickname = nickname;
+        this.id = id;
+        this.encoder = encoder;
+        encoder.sendID(id);
+    }
 
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
@@ -76,6 +86,7 @@ public class PlayerModel {
      */
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
         objectivesToChoose = objectives;
+        encoder.setObjectivesToChoose(objectives);
     }
 
     /**
@@ -96,6 +107,7 @@ public class PlayerModel {
                 throw new InvalidIndexException();
             }
             secretObjective = objectivesToChoose.get(index);
+            encoder.setSecretObjective(secretObjective);
         }
         catch (InvalidIndexException e){
             System.out.println(e.getMessage());
@@ -112,6 +124,7 @@ public class PlayerModel {
 
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
+        encoder.setStarterCard(sCard);
     }
 
     /**
@@ -144,6 +157,7 @@ public class PlayerModel {
      */
     public void setCurrScore(int score){
         currScore = score;
+        encoder.setCurrScore(score);
     }
 
     /**
@@ -160,6 +174,7 @@ public class PlayerModel {
      */
     public void setToken(Token token){
         this.token = token;
+        encoder.setToken(token);
     }
 
     /**
@@ -181,7 +196,7 @@ public class PlayerModel {
         else{
             firstPlayerToken = null;
         }
-
+        encoder.setFirstPlayerToken(firstPlayerToken);
     }
 
     /**
@@ -198,6 +213,7 @@ public class PlayerModel {
      */
     public void setState(PlayerState state){
         this.state = state;
+        encoder.setState(state);
     }
 
     /**
@@ -216,6 +232,7 @@ public class PlayerModel {
     public void placeStarterCard(){
         if (playArea.containsKey(new Position(0,0))){
             System.out.println(new StarterCardAlreadyPlacedException().getMessage());
+            encoder.placeStarterCard(false);
             return;
         }
 
@@ -228,6 +245,8 @@ public class PlayerModel {
         currMaxPriority++;
 
         playArea.put(new Position(0,0), starterCard);
+
+        encoder.placeStarterCard(true);
     }
 
     /**
@@ -281,9 +300,12 @@ public class PlayerModel {
             // Remove card from hand
             hand.remove(card);
 
+            encoder.placeCard(true);
+
             state = PlayerState.DRAWING;
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
+            encoder.placeCard(false);
             System.out.println(e.getMessage());
         }
     }
@@ -364,5 +386,6 @@ public class PlayerModel {
 //
 //        }
         hand.add(card);
+        encoder.addCardToPlayerHand(card);
     }
 }
