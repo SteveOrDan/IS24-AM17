@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.ServerConnection.MessageEncoder;
+
 public class GameController {
     private final GameModel gameModel = new GameModel();
 

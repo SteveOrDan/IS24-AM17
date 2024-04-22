@@ -79,8 +79,28 @@ public class SocketController {
         return in;
     }
 
-    public static void createSocketThreads(BufferedReader in, PrintWriter out, GameController gameController){
+    public static void startInteraction(BufferedReader in, PrintWriter out, GameController gameController){
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+//        boolean isValid = false;
+//        String input;
+//        while(!isValid) {
+//            out.println("Choose Nickname:");
+//
+//            try {
+//                input = in.readLine();
+//                if (input.equals("end")){
+//                    isValid = false;
+//                }
+//                new Thread() {
+//                    public void run() {
+//                        messageDecoder(input, gameController, out);
+//                    }
+//                }.start();
+//            } catch (IOException e) {
+//                System.err.println(STR."Exception \{e.getMessage()}");
+//                isValid = false;
+//            }
+//        }
 
         new Thread(){
             public void run(){

@@ -21,7 +21,7 @@ public class ServerMain {
                 public void run() {
                     PrintWriter out = createClientConnectionOUT(newClientSocket);
                     BufferedReader in = waitClientConnectionIN(newClientSocket);
-                    SocketController.createSocketThreads(in, out, gameController);
+                    SocketController.startInteraction(in, out, gameController);
                 }
             }.start();
         }
