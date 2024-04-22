@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerModel;
@@ -17,32 +18,41 @@ import static org.junit.jupiter.api.Assertions.*;
 class MatchControllerTest {
 
     static int numOfPlayers = 4;
-    MatchController matchController = new MatchController();
+    MatchController matchController = new MatchController(numOfPlayers, 0);
 
     @Test
     void checkResources(){
         matchController.initializeDecks();
 
-        assertEquals(86, matchController.getIDPlaceableCardMap().size());
+        assertEquals(86, GameResources.getIDToPlaceableCardMap().size());
     }
 
     @Test
     void addPlayer() {
-        matchController.addPlayer("Player 1");
-        matchController.addPlayer("Player 1");
-        matchController.addPlayer("Player 2");
-        matchController.addPlayer("Player 3");
-        matchController.addPlayer("Player 4");
-        matchController.addPlayer("Player 5");
+        addPlayers("Player 1");
+        addPlayers("Player 1");
+        addPlayers("Player 2");
+        addPlayers("Player 3");
+        addPlayers("Player 4");
+        addPlayers("Player 5");
 
         assertEquals(4, matchController.getIDPlayerMap().size());
+    }
+
+    private void addPlayers(String name) {
+        try {
+            matchController.addPlayer(name);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Test
     void randomGameSetUp(){
         // Add players
         for (int i = 1; i <= 6; i++){
-            matchController.addPlayer("Player " + i);
+            addPlayers("Player " + i);
         }
 
         assertEquals(4, matchController.getIDPlayerMap().size());
@@ -118,7 +128,7 @@ class MatchControllerTest {
             }
 
             usedPlayerIDs.add(rand);
-            matchController.addPlayer("Player " + i);
+            addPlayers("Player " + i);
         }
 
         assertEquals(numOfPlayers, matchController.getIDPlayerMap().size());
@@ -453,6 +463,17 @@ class MatchControllerTest {
 
         matchController.getMatchModel().setGameState(GameState.PLAYING);
         matchController.drawResourceCard(currPlayer.getId()); // Not drawing state
+
+        // Place card without resources
+        int cardWithoutResourcesId = 0;
+        for (PlaceableCard card : currPlayer.getHand()){
+            if (!card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr())){
+                cardWithoutResourcesId = card.getId();
+                break;
+            }
+        }
+        matchController.placeCard(currPlayer.getId(), cardWithoutResourcesId, new Position(1, 1)); // Not enough resources
+
         matchController.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1)); // Correct
 
         matchController.drawVisibleResourceCard(-1, 0);
@@ -586,10 +607,10 @@ class MatchControllerTest {
     public void setUpGameWithErrors(){
         // region Game setup
         // Add players
-        matchController.addPlayer("Player 1");
-        matchController.addPlayer("Player 2");
-        matchController.addPlayer("Player 3");
-        matchController.addPlayer("Player 4");
+        addPlayers("Player 1");
+        addPlayers("Player 2");
+        addPlayers("Player 3");
+        addPlayers("Player 4");
 
         assertEquals(4, matchController.getIDPlayerMap().size());
 
@@ -608,6 +629,8 @@ class MatchControllerTest {
         for (Integer i : matchController.getIDPlayerMap().keySet()) {
             PlayerModel player = matchController.getIDPlayerMap().get(i);
 
+            player.flipStarterCard(); // Flip without starter card
+
             // Set starter card
             matchController.drawStarterCard(i);
 
@@ -616,6 +639,7 @@ class MatchControllerTest {
             player.flipStarterCard();
             player.flipStarterCard();
 
+            player.placeStarterCard();
             player.placeStarterCard();
 
             assertTrue(player.getPlayArea().containsKey(new Position(0, 0)));
@@ -643,6 +667,7 @@ class MatchControllerTest {
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
             matchController.getIDPlayerMap().get(i).setSecretObjective(3); // Wrong index
+            matchController.getIDPlayerMap().get(i).setSecretObjective(-3); // Wrong index
             matchController.getIDPlayerMap().get(i).setSecretObjective(randIndex);
 
             assertNotNull(matchController.getIDPlayerMap().get(i).getSecretObjective());
@@ -665,16 +690,52 @@ class MatchControllerTest {
 
         matchController.endGameSetUp();
         // endregion
+    }
 
+    @Test
+    public void testMaxPointsGame(){
+        setUpGame();
+
+        // region Game simulation
+        HashMap<Integer, ArrayList<Position>> plIdToLegalPos = new HashMap<>();
+        HashMap<Integer, ArrayList<Position>> plIdToIllegalPos = new HashMap<>();
+
+        for (Integer i : matchController.getIDPlayerMap().keySet()){
+            plIdToLegalPos.put(i, new ArrayList<>());
+            plIdToIllegalPos.put(i, new ArrayList<>());
+
+            updateIlLegalPositions(plIdToLegalPos, plIdToIllegalPos, i, new Position(0, 0));
+        }
+
+        // =============================== GAME START ===============================
+
+        while (matchController.getMatchModel().getGameState() == GameState.PLAYING || matchController.getMatchModel().getGameState() == GameState.FINAL_ROUND){
+            placeCardAction(plIdToLegalPos, plIdToIllegalPos);
+
+            drawCardAction();
+        }
+
+        // Set points to max
+        for (Integer i : matchController.getIDPlayerMap().keySet()){
+            matchController.getIDPlayerMap().get(i).setCurrScore(29);
+        }
+
+        while (matchController.getMatchModel().getGameState() == GameState.EXTRA_ROUND){
+            placeCardAction(plIdToLegalPos, plIdToIllegalPos);
+        }
+
+        // =============================== GAME END ===============================
+        System.out.println("Game ended");
+        // endregion
     }
 
     public void setUpGame(){
         // region Game setup
         // Add players
-        matchController.addPlayer("Player 1");
-        matchController.addPlayer("Player 2");
-        matchController.addPlayer("Player 3");
-        matchController.addPlayer("Player 4");
+        addPlayers("Player 1");
+        addPlayers("Player 2");
+        addPlayers("Player 3");
+        addPlayers("Player 4");
 
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();

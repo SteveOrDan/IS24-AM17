@@ -7,8 +7,6 @@ import com.example.pf_soft_ing.card.decks.UsableCardsDeck;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
-import com.example.pf_soft_ing.observerPattern.Listener;
-import com.example.pf_soft_ing.observerPattern.Observable;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
 import com.example.pf_soft_ing.player.PlayerState;
@@ -18,29 +16,61 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MatchModel implements Observable {
+public class MatchModel {
 
-    private final HashMap<Integer, PlayerModel> IDToPlayerMap;
+    int maxPlayers;
+    int currPlayers = 0;
+    int matchID;
+
+    private final HashMap<Integer, PlayerModel> IDToPlayerMap = new HashMap<>();
 
     private UsableCardsDeck resourceCardsDeck;
     private UsableCardsDeck goldenCardsDeck;
     private ObjectiveCardsDeck objectiveCardsDeck;
     private StarterCardsDeck starterCardsDeck;
 
-    private final List<Integer> playerIDList;
-
     private int currPlayerID;
     private int firstPlayerID;
     private int[] orderOfPlayersIDs;
 
-    private GameState gameState;
+    private GameState gameState = GameState.PREGAME;
 
-    private final List<Listener> listeners = new ArrayList<>();
-    public MatchModel() {
-        this.playerIDList = new ArrayList<>();
+    public MatchModel(int maxPlayers, int matchID){
+        this.maxPlayers = maxPlayers;
 
-        IDToPlayerMap = new HashMap<>();
-        gameState = GameState.PREGAME;
+        this.matchID = matchID;
+    }
+
+    /**
+     * Getter
+     * @return Map of player IDs to player models
+     */
+    public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
+        return IDToPlayerMap;
+    }
+
+    /**
+     * Getter
+     * @return Number of maximum players in the match
+     */
+    public int getMaxPlayers() {
+        return maxPlayers;
+    }
+
+    /**
+     * Getter
+     * @return Number of current players in the match
+     */
+    public int getCurrPlayers() {
+        return currPlayers;
+    }
+
+    /**
+     * Getter
+     * @return ID of the match
+     */
+    public int getMatchID() {
+        return matchID;
     }
 
     /**
@@ -99,9 +129,14 @@ public class MatchModel implements Observable {
         this.gameState = gameState;
     }
 
+    /**
+     * Method to add a player to the match
+     * @param player Player to add
+     */
     public void addPlayer(PlayerModel player){
         IDToPlayerMap.put(player.getId(), player);
-        playerIDList.add(player.getId());
+
+        currPlayers++;
     }
 
     /**
@@ -184,6 +219,9 @@ public class MatchModel implements Observable {
         return goldenCardsDeck.drawVisibleCard(index);
     }
 
+    /**
+     * Method to restore the visible resource cards
+     */
     public void restoreVisibleResourceCard (){
         if (!resourceCardsDeck.isDeckEmpty()){
             resourceCardsDeck.restoreVisibleCard();
@@ -197,6 +235,9 @@ public class MatchModel implements Observable {
         }
     }
 
+    /**
+     * Method to restore the visible golden cards
+     */
     public void restoreVisibleGoldenCard (){
         if (!goldenCardsDeck.isDeckEmpty()){
             goldenCardsDeck.restoreVisibleCard();
@@ -214,10 +255,12 @@ public class MatchModel implements Observable {
      * Method to randomly choose the first player and give him the black token
      */
     public void setRandomFirstPlayer(){
-        for (Integer i : playerIDList){
+        for (Integer i : IDToPlayerMap.keySet()){
             IDToPlayerMap.get(i).setAsFirstPlayer(false);
             IDToPlayerMap.get(i).setState(PlayerState.WAITING);
         }
+
+        List<Integer> playerIDList = new ArrayList<>(IDToPlayerMap.keySet());
 
         firstPlayerID = playerIDList.get((int) Math.round(Math.random() * (playerIDList.size() - 1)));
         currPlayerID = firstPlayerID;
@@ -231,12 +274,12 @@ public class MatchModel implements Observable {
      * Method to calculate the order of the players based on the first player
      */
     public void calculateOrderOfPlayers() {
-        orderOfPlayersIDs = new int[playerIDList.size()];
+        orderOfPlayersIDs = new int[IDToPlayerMap.size()];
 
         orderOfPlayersIDs[0] = firstPlayerID;
 
         int pos = 1;
-        for (Integer i : playerIDList){
+        for (Integer i : IDToPlayerMap.keySet()){
             if (i != firstPlayerID){
                 orderOfPlayersIDs[pos] = i;
                 pos++;
@@ -323,23 +366,6 @@ public class MatchModel implements Observable {
             }
 
             i++;
-        }
-    }
-
-    @Override
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
-    }
-
-    @Override
-    public void updateAll(Object data) {
-        for (Listener listener : listeners){
-            listener.update(data);
         }
     }
 }

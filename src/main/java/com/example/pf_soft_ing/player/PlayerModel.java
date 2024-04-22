@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlayerModel implements Observable {
+public class PlayerModel {
 
     private final String nickname;
     private final int id;
@@ -38,12 +38,13 @@ public class PlayerModel implements Observable {
 
     private int currMaxPriority = 0;
 
-    private final List<Listener> listeners = new ArrayList<>();
-
     public PlayerModel(String nickname, int id) {
         this.nickname = nickname;
         this.id = id;
     }
+
+    // TODO: Implement flipCard only for client side
+    //  - Change place card parameters to include the side of the card to place
 
     /**
      * Getter
@@ -213,6 +214,11 @@ public class PlayerModel implements Observable {
      * No requirements are needed for positioning this card
      */
     public void placeStarterCard(){
+        if (playArea.containsKey(new Position(0,0))){
+            System.out.println(new StarterCardAlreadyPlacedException().getMessage());
+            return;
+        }
+
         for (ResourceType resource : starterCard.getResources()){
             numOfResourcesArr[resource.getValue()]++;
         }
@@ -354,25 +360,9 @@ public class PlayerModel implements Observable {
      * @param card Card to add to the player's hand
      */
     public void drawCard(PlaceableCard card){
-        if (card != null && hand.size() < 3){
-            hand.add(card);
-        }
-    }
-
-    @Override
-    public void addListener(Listener listener) {
-        listeners.add(listener);
-    }
-
-    @Override
-    public void removeListener(Listener listener) {
-        listeners.remove(listener);
-    }
-
-    @Override
-    public void updateAll(Object data) {
-        for (Listener listener : listeners){
-            listener.update(data);
-        }
+//        if (card != null && hand.size() < 3){
+//
+//        }
+        hand.add(card);
     }
 }

@@ -258,6 +258,7 @@ public class GameResources {
     public static PlaceableCard getPlaceableCardByID(int ID) {
         return IDToPlaceableCardMap.get(ID);
     }
+
     public static ObjectiveCard getObjectiveCardByID(int ID) {
         return IDToObjectiveCardMap.get(ID);
     }

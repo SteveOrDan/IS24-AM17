@@ -1,6 +1,8 @@
 package com.example.pf_soft_ing.network.RMI;
 
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.exceptions.GameFullException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 
 
 import java.rmi.NotBoundException;
@@ -34,7 +36,7 @@ public class ClientRMI implements ClientGameControllerInterface {
                         String nickname = input.nextLine();
                         try {
                             idClient1 = client1.addPlayer(hostName, portNumber, nickname);
-                        } catch (RemoteException e) {
+                        } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
                     }
@@ -83,7 +85,7 @@ public class ClientRMI implements ClientGameControllerInterface {
     }
 
     @Override
-    public Integer addPlayer(String hostName, int port,String nickname) throws RemoteException {
+    public Integer addPlayer(String hostName, int port,String nickname) throws RemoteException, GameFullException, NicknameAlreadyExistsException {
         registry = LocateRegistry.getRegistry(hostName, port);
         try {
             stub = (ServerGameControllerInterface) registry.lookup("RemoteController");

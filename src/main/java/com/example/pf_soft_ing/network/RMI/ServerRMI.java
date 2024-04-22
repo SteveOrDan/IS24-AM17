@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.network.RMI;
 
+import com.example.pf_soft_ing.exceptions.GameFullException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.game.MatchController;
@@ -19,7 +21,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
 
     public ServerRMI(int port) throws RemoteException {
         super(port);
-        matchController = new MatchController();
+        matchController = new MatchController(4, 0);
     }
 
     public static ServerRMI bind(int port) throws RemoteException {
@@ -66,7 +68,7 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
     }
 
     @Override
-    public Integer addPlayer(String nickname) throws RemoteException {
+    public Integer addPlayer(String nickname) throws RemoteException, GameFullException, NicknameAlreadyExistsException {
         return obj.matchController.addPlayer(nickname);
     }
 
