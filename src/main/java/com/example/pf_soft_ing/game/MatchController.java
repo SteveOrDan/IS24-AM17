@@ -60,6 +60,7 @@ public class MatchController implements ServerGameControllerInterface {
      */
     public Integer addPlayer(String nickname){
         List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
+
         Random rand = new Random();
 
         int id = rand.nextInt(10);

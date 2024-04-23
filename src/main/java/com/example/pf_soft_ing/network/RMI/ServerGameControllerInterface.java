@@ -18,11 +18,4 @@ public interface ServerGameControllerInterface extends Remote {
     void drawGoldenCard(int playerID) throws RemoteException;
     void drawVisibleGoldenCard(int playerID, int index) throws RemoteException;
     void drawStarterCard(int playerID) throws RemoteException;
-
-    // client su server
-    void setObjectivesToChoose(int playerID) throws RemoteException;
-    void fillPlayerHand(int playerID) throws RemoteException;
-    void setRandomFirstPlayer() throws RemoteException;
-    void setCommonObjectives() throws RemoteException;
-    void setVisibleCards() throws RemoteException;
 }
