@@ -12,14 +12,15 @@ import java.rmi.server.UnicastRemoteObject;
 
 
 public class ServerRMI extends UnicastRemoteObject implements ServerGameControllerInterface {
-
     private final GameController gameController;
     private static ServerRMI obj = null;
     private static Registry registry = null;
+    private final ClientRMI client1;
 
     public ServerRMI(int port) throws RemoteException {
         super(port);
         gameController = new GameController();
+        client1 = new ClientRMI();
     }
 
     public static ServerRMI bind(int port) throws RemoteException {

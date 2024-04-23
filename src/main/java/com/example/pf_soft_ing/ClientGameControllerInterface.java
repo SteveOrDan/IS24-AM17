@@ -15,9 +15,9 @@ public interface ClientGameControllerInterface extends Remote {
     void drawStarterCard(String hostName, int port, int playerID) throws RemoteException;
 
     // server su client
-    void setObjectivesToChoose(String hostName, int port, int playerID) throws RemoteException;
-    void setRandomFirstPlayer(String hostName, int port) throws RemoteException;
-    void fillPlayerHand(String hostName, int port, int playerID) throws RemoteException;
+    void setObjectivesToChoose(int playerID) throws RemoteException;
+    void setRandomFirstPlayer() throws RemoteException;
+    void fillPlayerHand(int playerID) throws RemoteException;
     void setCommonObjectives() throws RemoteException;
     void setVisibleCards() throws RemoteException;
 }
