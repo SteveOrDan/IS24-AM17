@@ -360,41 +360,33 @@ Post review UML
 ```mermaid
 classDiagram
 
-class MessageDecoder{
-    - out : PrintWriter
-    - in : BufferReader
-    - con : ServerRMI
-
+class MessageEncoder{
     <<abstract>>
-    # addPlayer(nickname : String) Integer
-    # placeCard(playerID : int, cardID : int, pos : Position) void
-    # drawResourceCard(platerId : int) void
-    # drawVisibleResourceCard(playerID : int, index : int) void
-    # drawGoldenCard(playerID : int) void
-    # drawVisibleGoldenCard(playerID : int, index : int) void
-    # drawStarterCard(playerID : int) void
-    # flipCard(playerID : int, cardID : int) void
-    # endTurn() void
-
-    # setVisibleCards() void
-    # setCommonObjectives() void
-    # setObjectivesToChoose(playerID : int) void
-    # setRandomFirstPlayer() void
-    # fillPlayerHand(playerID : int) void
+    + sendId(id : int) : void
+    + setState(state : PlayerState) : void
+    + setCurrScore(score : int) : void
+    + setToken(token : Token) : void
+    + setObjectiveToChoose(objectives : List<ObjectiveCard>) : void
+    + setFirstPlayerToken(token : Token) : void
+    + addCardToPlayerHand(card : PlaceableCard) : void
+    + setSecretObjective(card : ObjectiveCard) : void
+    + setStarterCard(card : PlaceableCard) : void
+    + placeStarterCard(placed : boolean) : void 
+    + placeCard(placed : boolean) : void
 }
 
-class RMIDecoder{
-    
+class RMIEncoder{
+    - client : ClientRMI
 }
 
-class SocketDecoder{
-    
+class SocketEncoder{
+    - out : PrintWriter
 }
 
-MessageDecoder <|-- RMIDecoder
-MessageDecoder <|-- SocketDecoder
+MessageEncoder <|-- RMIEncoder
+MessageEncoder <|-- SocketEncoder
 
-PlayerModel*--> MessageDecoder
+PlayerModel*--> MessageEncoder
 
 
 class PlaceableCard{
