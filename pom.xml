@@ -74,7 +74,7 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>com.example.pf_soft_ing/com.example.pf_soft_ing.HelloApplication</mainClass>
+              <mainClass>com.example.pf_soft_ing/com.example.pf_soft_ing.app.HelloApplication</mainClass>
               <launcher>app</launcher>
               <jlinkZipName>app</jlinkZipName>
               <jlinkImageName>app</jlinkImageName>

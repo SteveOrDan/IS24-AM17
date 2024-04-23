@@ -1,10 +1,8 @@
 package com.example.pf_soft_ing.card.side;
 
-import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.card.corner.EmptyCorner;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Back extends Side{

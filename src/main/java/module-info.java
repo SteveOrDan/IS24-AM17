@@ -6,9 +6,7 @@ module com.example.pf_soft_ing {
     requires com.google.gson;
     requires java.rmi;
 
-    exports com.example.pf_soft_ing.RMI to java.rmi;
     opens com.example.pf_soft_ing to javafx.fxml;
-    exports com.example.pf_soft_ing;
     exports com.example.pf_soft_ing.card;
     opens com.example.pf_soft_ing.card to javafx.fxml;
     exports com.example.pf_soft_ing.card.side;
@@ -25,9 +23,24 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.deserializers.placeable_card to javafx.fxml;
     exports com.example.pf_soft_ing.deserializers.corner;
     opens com.example.pf_soft_ing.deserializers.corner to javafx.fxml;
-    exports com.example.pf_soft_ing.ServerConnection;
-    opens com.example.pf_soft_ing.ServerConnection to javafx.fxml;
-    exports com.example.pf_soft_ing.ObserverPattern;
+    exports com.example.pf_soft_ing.network.ServerConnection;
+    opens com.example.pf_soft_ing.network.ServerConnection to javafx.fxml;
+    exports com.example.pf_soft_ing.observerPattern;
 
     exports com.example.pf_soft_ing.exceptions;
+    exports com.example.pf_soft_ing.network;
+    opens com.example.pf_soft_ing.network to javafx.fxml;
+    exports com.example.pf_soft_ing.network.RMI;
+    opens com.example.pf_soft_ing.network.RMI to javafx.fxml;
+    exports com.example.pf_soft_ing.game;
+    opens com.example.pf_soft_ing.game to javafx.fxml;
+    exports com.example.pf_soft_ing.deserializers;
+    opens com.example.pf_soft_ing.deserializers to javafx.fxml;
+    exports com.example.pf_soft_ing.player;
+    opens com.example.pf_soft_ing.player to javafx.fxml;
+    exports com.example.pf_soft_ing.card.decks;
+    opens com.example.pf_soft_ing.card.decks to javafx.fxml;
+    exports com.example.pf_soft_ing.app;
+    opens com.example.pf_soft_ing.app to javafx.fxml;
+
 }

@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.game.*;
+import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.corner.EmptyCorner;

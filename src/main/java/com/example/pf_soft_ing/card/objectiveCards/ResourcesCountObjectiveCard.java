@@ -1,7 +1,7 @@
 package com.example.pf_soft_ing.card.objectiveCards;
 
-import com.example.pf_soft_ing.Position;
-import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.PlaceableCard;
 
 import java.util.HashMap;

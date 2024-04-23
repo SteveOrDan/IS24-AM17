@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.card.objectiveCards;
 
-import com.example.pf_soft_ing.Position;
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.CardElementType;
 import com.example.pf_soft_ing.card.PlaceableCard;
 

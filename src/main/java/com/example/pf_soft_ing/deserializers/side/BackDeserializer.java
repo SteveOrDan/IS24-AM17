@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.deserializers.side;
 
-import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.deserializers.corner.CornerDeserializer;

@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.card.corner;
 
-import com.example.pf_soft_ing.ResourceType;
+import com.example.pf_soft_ing.card.ResourceType;
 
 public class HiddenCorner extends CardCorner{
 

@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.card;
 
-import com.example.pf_soft_ing.ResourceType;
 import com.example.pf_soft_ing.card.side.Side;
 
 import java.util.List;
