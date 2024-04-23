@@ -1,6 +1,7 @@
 # IS24-AM17
 
 Initial UML
+
 ```mermaid
 
 classDiagram
@@ -357,22 +358,24 @@ class Token{
 ```
 
 Post review UML
+
 ```mermaid
+
 classDiagram
 
 class MessageEncoder{
     <<abstract>>
-    + sendId(id : int) : void
-    + setState(state : PlayerState) : void
-    + setCurrScore(score : int) : void
-    + setToken(token : Token) : void
-    + setObjectiveToChoose(objectives : List<ObjectiveCard>) : void
-    + setFirstPlayerToken(token : Token) : void
-    + addCardToPlayerHand(card : PlaceableCard) : void
-    + setSecretObjective(card : ObjectiveCard) : void
-    + setStarterCard(card : PlaceableCard) : void
-    + placeStarterCard(placed : boolean) : void 
-    + placeCard(placed : boolean) : void
+    + sendId(int id) void
+    + setState(PlayerState state) void
+    + setCurrScore(int score) void
+    + setToken(token token) void
+    + setObjectiveToChoose(List<ObjectiveCard> objectives) void
+    + setFirstPlayerToken(Token token) void
+    + addCardToPlayerHand(PlaceableCard card) void
+    + setSecretObjective(ObjectiveCard card) void
+    + setStarterCard(PlaceableCard card) void
+    + placeStarterCard(boolean placed) void
+    + placeCard(boolean placed) void
 }
 
 class RMIEncoder{
@@ -399,15 +402,15 @@ class PlaceableCard{
     - back : Side
 
     + getResources() List ~ ResourceType ~
-    + setPriority(newPriority : int) void
+    + setPriority(int newPriority) void
     + getElementType() CardElementType
     + getBack() Side
     + getFront() Side
     + getCurrSide() Side
     + getId() int
     + flipCard() void
-    + hasEnoughRequiredResources(numOfResourcesArr : int[]) boolean
-    + calculatePlacementPoints(numOfCoveredCorners : int, numOfResourcesArr : int[]) int
+    + hasEnoughRequiredResources(int[] numOfResourcesArr) boolean
+    + calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr) int
 }
 
 class ResourceCard{
@@ -435,7 +438,7 @@ class ObjectiveCard{
 
     + getId() int
     + getPoints() int
-    + calculateObjectivePoints(playArea : HashMap<PlaceableCard, Position>, numOfResourcesArr : int[]) int
+    + calculateObjectivePoints(HashMap<PlaceableCard, Position> playArea, int[] numOfResourcesArr) int
 }
 
 class ResourcesCountObjectiveCard{
@@ -453,7 +456,7 @@ class DiagonalObjectiveCard{
     - points : int
     - elementType: CardElementType
 
-    # calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, direction : int) int
+    # calculateObjectivePoints(HashMap~Position, PlaceableCard~ playArea, int direction) int
 }
 
 class TLBRDiagonalObjectiveCard{
@@ -470,7 +473,7 @@ class LShapeObjectiveCard{
     - mainElementType: CardElementType
     - secondaryElementType: CardElementType
     
-    # calculateObjectivePoints(playArea : HashMap~Position, PlaceableCard~, xDirection : int, yDirection : int) int
+    # calculateObjectivePoints(HashMap~Position, PlaceableCard~ playArea, int xDirection, int yDirection) int
 }
 
 class TLLShapeObjectiveCard{
@@ -594,7 +597,7 @@ class ResourceType{
 
     + getValue() int
     + toString() String
-    + resourceTypeFromString(str : String) ResourceType
+    + resourceTypeFromString(String str) ResourceType
 }
 
 class PlayerModel{
@@ -623,28 +626,28 @@ class PlayerModel{
     + getID() int
     + getNickname() String
     + getHand() List ~ PlaceableCard ~
-    + setObjectivesToChoose(objectives : List ~ ObjectiveCard ~) void
+    + setObjectivesToChoose(List ~ ObjectiveCard ~ objectives) void
     + getSectretObjective() ObjectiveCard
-    + setSecretObjective(index : int) void
+    + setSecretObjective(int index) void
     + getStarterCard () PlaceableCard
-    + setStarterCard(sCard : PlaceableCard) void
+    + setStarterCard(PlaceableCard sCard) void
     + getPlayArea() Map ~ Position, PlaceableCard ~
     + getNumOfResourcesArr() int[]
     + getCurrScore() int
-    + setCurrScore(score : int) void
+    + setCurrScore(int score) void
     + getNumOfCompletedObjectives() int
-    + setToken(token : Token) void
+    + setToken(Token token) void
     + isFirstPlayer() boolean
-    + setAsFirstPlayer(isFirstPlayer : boolean) void
+    + setAsFirstPlayer(boolean isFirstPlayer) void
     + getState() PlayerState
-    + setState(state : PlayerState) void
+    + setState(PlayerState state) void
     + getCurrMaxPriority() int
     + placeStarterCard() void
-    + placeCard(card : PlaceableCard, pos : Position) void
-    + getAdjacentCorners(pos : Position) List<CardCorner>
-    + calculateObjectivePoints(oCard : ObjectiveCard) void
-    + flipStarterCard() void 
-    + drawCard(card : PlaceableCard) void
+    + placeCard(PlaceableCard card, Position pos) void
+    + getAdjacentCorners(Position pos) List ~ CardCorner ~
+    + calculateObjectivePoints(ObjectiveCard oCard) void
+    + flipStarterCard() void
+    + drawCard(PlaceableCard card) void
     
 }
 class PlayerState{
@@ -689,7 +692,7 @@ class GameResources{
     + initializeGoldenDeck() void
     + initializeStarterDeck() void
     + initializeObjectiveDeck() void
-    + initializeAllDecks()
+    + initializeAllDecks() void
     
     + getResourcesDeck() List ~ PlaceableCard ~
     + getGoldenDeck() List ~ PlaceableCard ~
@@ -697,30 +700,36 @@ class GameResources{
     + getObjectiveDeck() List ~ ObjectiveCard ~
 }
 
-class GameModel{
+class MatchModel{
+    - maxPlayers : int
+    - currPlayers : int
+    - matchID : int
+
     - IDToPlayerMap : Map ~ Integer, PlayerModel ~
-    - board : Map ~ PlayerModel, Integer ~
 
     - resourceCardsDeck : UsableCardsDeck
     - goldenCardsDeck : UsableCardsDeck
     - objectiveCardsDeck : ObjectiveCardsDeck
     - starterCardsDeck : StarterCardsDeck
 
-    - playerIDList : List ~ Integer ~
     - currPlayerID : int
     - firstPlayerID : int
     - orderOfPlayersIDs : int[]
+
     - gameState : GameState
 
+    + getIDToPlayerMap() Map ~ Integer, PlayerModel ~
+    + getMaxPlayers() int
+    + getCurrPlayers() int
+    + getMatchID() int
     + getResourceCardsDeck() UsableCardsDeck
     + getGoldenCardsDeck() UsableCardsDeck
     + getObjectiveCardsDeck() ObjectiveCardsDeck
     + getStarterCardsDeck() StarterCardsDeck
-
     + getCurrPlayerID() int
     + getGameState() GameState
-    + setGameState(gameState : GameState) void
-    + addPlater(player : PlayerModel) void
+    + setGameState(GameState gameState) void
+    + addPlayer(PlayerModel player) void
 
     + initializeDecks() void
     + shuffleAllDecks() void
@@ -729,8 +738,8 @@ class GameModel{
     + drawGoldenCard() PlaceableCard
     + drawStarterCard() PlaceableCard
     + drawObjectiveCard() ObjectiveCard
-    + drawVisibleResourceCard(index : int) PlaceableCard
-    + drawVisibleGoldenCard(index : int) PlaceableCard
+    + drawVisibleResourceCard(int index) PlaceableCard
+    + drawVisibleGoldenCard(int index) PlaceableCard
     + restoreVisibleResourceCard() void
     + restoreVisibleGoldenCard() void
     + setRandomFirstPlayer() void
@@ -741,23 +750,22 @@ class GameModel{
     + determineRanking() void
 }
 
-GameModel *-->"2" UsableCardsDeck
-GameModel *-->"1" ObjectiveCardsDeck
-GameModel *-->"1" StarterCardsDeck
+MatchModel *-->"2" UsableCardsDeck
+MatchModel *-->"1" ObjectiveCardsDeck
+MatchModel *-->"1" StarterCardsDeck
 
 class UsableCardsDeck{
     - deck : List ~ PlaceableCard ~
     - visibleCards : List ~ PlaceableCard ~
 
-
     + getDeck() List ~ PlaceableCard ~
     + getVisibleCards() List ~ PlaceableCard ~
     + shuffleDeck() void
-    + restoreInitialVisibleCards () void
+    + restoreInitialVisibleCards() void
     + drawCard() PlaceableCard
-    + drawVisibleCard(index : int) PlaceableCard
+    + drawVisibleCard(int index) PlaceableCard
     + restoreVisibleCards() void
-    + restoreVisibleCardWithOtherDeck(card : PlaceableCard) void
+    + restoreVisibleCardWithOtherDeck(PlaceableCard card) void
     + isDeckEmpty() boolean
 
 }
@@ -782,59 +790,39 @@ class StarterCardsDeck{
     + drawCard() PlaceableCard
 }
 
-%% class GameView{
-%%     + update() void
-%% }
-
-class GameController{
-
+class MatchController{
     - IDPlaceableCardMap : Map ~ Integer, PlaceableCard ~
     - IDObjectiveCardMap : : Map ~ Integer, ObjectiveCard ~
     - IDPlayerMap : Map ~ Integer, PlayerModel ~
+    - matchModel : MatchModel
 
     + getIDPlaceableCardMap() Map ~ Integer, PlaceableCard ~
     + getIDPlayerMap() Map ~ Integer, PlayerModel ~
-    + getGameModel() GameModel
-    + addPlayer(nickname : String) Integer
+    + getMatchModel() MatchModel
+    + addPlayer(String nickname) Integer
     + setUpGame() void
     + initializeDecks() void
     + shuffleAllDecks() void
     + setVisibleCards() void
     + setCommonObjectives() void
-    + setObjectivesToChoose(playerID : int) void
+    + setObjectivesToChoose(int playerID) void
     + setRandomFirstPlayer() void
     + calculateOrderOfPlayers() void
-    + placeCard(playerID : int, cardID : int, pos : Position) void
-    + fillPlayerHand(playerID : int) void
-    + drawResourceCard(platerId : int) void
-    + drawVisibleResourceCard(playerID : int, index : int) void
-    + drawGoldenCard(playerID : int) void
-    + drawVisibleGoldenCard(playerID : int, index : int) void
-    + drawStarterCard(playerID : int) void
-    + flipCard(playerID : int, cardID : int) void
+    + placeCard(int playerID, int cardID, Position pos) void
+    + fillPlayerHand(int playerID) void
+    + drawResourceCard(int platerId) void
+    + drawVisibleResourceCard(int playerID, int index) void
+    + drawGoldenCard(int playerID) void
+    + drawVisibleGoldenCard(int playerID, int index) void
+    + drawStarterCard(int playerID) void
+    + flipCard(int playerID, int cardID) void
     + endGameSetUp() void
     + endTurn() void
-    + checkPlayerDrawExceptions(playerID : int) void
-
-
-
-    + initializeGame() void
-    + flipStarterCard(playerId : int) void
-    + setToken(playerId : int, token : Token)
-    + placeStarterCard(playerId : int) void
-    + drawResourceCard() PlaceableCard
-    + drawGoldenCard() PlaceableCard
-    + setCommonObjectives() void
-    + setObjectiveChoice() void
-    + setRandomFirstPlayer() void
-    + placeCard(cardId : int, pos : Position, playerId : int) void
-    + endTurn() void
+    + checkPlayerDrawExceptions(int playerID) void
 }
 
-GameController*-->"1" GameModel
-%% GameController*-->"1" GameView
-GameController*-->"1 ... n" PlayerModel
-%% GameController*-->"1 ... n" PlayerView
+MatchController *-->"1" MatchModel
+MatchController *-->"1 ... n" PlayerModel
 
 class Token{
     - color : TokenColors
@@ -852,13 +840,37 @@ class TokenColors{
     - value :int
 
     + getValue() int
-    + getColorFromInt(n : int) TokenColors
+    + getColorFromInt(int n) TokenColors
 }
+
+class GameModel{
+    - matches : List ~ MatchController ~
+
+    + getMatch(int matchID) MatchController
+    + createGame(String nickname, int numberOfPlayers) void
+    + selectGame(int matchId) void
+    + joinGame(int matchID, String nickname) void
+    + startGame(int matchID) void
+}
+
+class GameController{
+    - gameModel : GameModel
+
+    + createGame(String nickname, int numberOfPlayers) void
+    + selectGame(int matchID) void
+    + joinGame(int matchID, String nickname) void
+    + startGame(int matchID) void
+}
+
+GameModel *-->"1...n" MatchController
+GameController *-->"1" GameModel
 
 ```
 
 Sequence diagram for game
+
 ```mermaid
+
 sequenceDiagram
     title Game
 
@@ -978,4 +990,5 @@ sequenceDiagram
     Note left of S: Server: If END_GAME
     Note left of S: Server: Determine ranking
     S->>C: Ranking
+    
 ```
