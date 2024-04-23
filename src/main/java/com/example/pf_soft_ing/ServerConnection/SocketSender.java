@@ -1,10 +1,5 @@
 package com.example.pf_soft_ing.ServerConnection;
 
-import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.StarterCard;
-import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.game.GameController;
-import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
 
@@ -12,14 +7,14 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.List;
 
-public class SocketEncoder extends MessageEncoder {
+public class SocketSender extends Encoder {
 
     private static PrintWriter out;
-    public SocketEncoder(PrintWriter out, BufferedReader in){
+    public SocketSender(PrintWriter out, BufferedReader in){
         this.out = out;
     }
 
-    private static void SendMessage(String output){
+    protected static void SendMessage(String output){
         new Thread(){
             public void run(){
                 out.println(output);
@@ -51,11 +46,11 @@ public class SocketEncoder extends MessageEncoder {
     }
 
     @Override
-    public void setObjectivesToChoose(List<ObjectiveCard> objectives){
+    protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){
         StringBuilder output = new StringBuilder("4");
-        for (ObjectiveCard card : objectives){
+        for (Integer i : objectiveIDs){
             output.append(" ");
-            output.append(card.getId());
+            output.append(i);
         }
         SendMessage(output.toString());
     }
@@ -72,18 +67,18 @@ public class SocketEncoder extends MessageEncoder {
     }
 
     @Override
-    public void addCardToPlayerHand(PlaceableCard card){
-        SendMessage(STR."6 \{card.getId()}");
+    protected void addCardToPlayerHandEncoded(int id){
+        SendMessage(STR."6 \{id}");
     }
 
     @Override
-    public void setSecretObjective(ObjectiveCard card){
-        SendMessage(STR."7 \{card.getId()}");
+    protected void setSecretObjectiveEncoded(int id){
+        SendMessage(STR."7 \{id}");
     }
 
     @Override
-    public void setStarterCard(PlaceableCard card){
-        SendMessage(STR."8 \{card.getId()}");
+    protected void setStarterCardEncoded(int id){
+        SendMessage(STR."8 \{id}");
     }
 
     @Override
@@ -94,5 +89,10 @@ public class SocketEncoder extends MessageEncoder {
     @Override
     public void placeCard(boolean placed){
         SendMessage(STR."10 \{placed}");
+    }
+
+    @Override
+    public void requestError(){
+        SendMessage("11 requestError");
     }
 }

@@ -1,8 +1,6 @@
 package com.example.pf_soft_ing.player;
 
-import com.example.pf_soft_ing.ServerConnection.MessageEncoder;
-import com.example.pf_soft_ing.observerPattern.Listener;
-import com.example.pf_soft_ing.observerPattern.Observable;
+import com.example.pf_soft_ing.ServerConnection.Encoder;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -39,9 +37,9 @@ public class PlayerModel {
 
     private int currMaxPriority = 0;
 
-    private MessageEncoder encoder;
+    private Encoder encoder;
 
-    public PlayerModel(String nickname, int id, MessageEncoder encoder) {
+    public PlayerModel(String nickname, int id, Encoder encoder) {
         this.nickname = nickname;
         this.id = id;
         this.encoder = encoder;
@@ -387,5 +385,9 @@ public class PlayerModel {
 //        }
         hand.add(card);
         encoder.addCardToPlayerHand(card);
+    }
+
+    public void requestError(){
+        encoder.requestError();
     }
 }

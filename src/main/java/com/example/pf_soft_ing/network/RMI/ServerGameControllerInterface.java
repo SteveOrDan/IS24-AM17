@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.network.RMI;
 
-import com.example.pf_soft_ing.ServerConnection.MessageEncoder;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.exceptions.GameFullException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
