@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.ServerConnection.Encoder;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -58,40 +59,36 @@ public class MatchController implements ServerGameControllerInterface {
      * Handles exceptions for player ID already exists, game is full, nickname already exists
      * @param nickname Player's nickname
      */
-    public Integer addPlayer(String nickname){
+    public Integer addPlayer(String nickname, Encoder encoder) throws GameIsFullException, NicknameAlreadyExistsException {
         List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
 
         Random rand = new Random();
 
-        int id = rand.nextInt(10);
-        while (idList.contains(id)){
-            id = rand.nextInt(10);
+        int playerId = rand.nextInt(10);
+        while (idList.contains(playerId)){
+            playerId = rand.nextInt(10);
         }
 
-        PlayerModel player = new PlayerModel(nickname, id);
+        PlayerModel player = new PlayerModel(nickname, playerId, encoder);
 
-        try {
-            if (IDPlayerMap.size() >= 4){
-                throw new GameIsFullException();
+        if (IDPlayerMap.size() >= 4){
+            throw new GameIsFullException();
+        }
+
+        for (PlayerModel p : IDPlayerMap.values()){
+            if (p.getNickname().equals(player.getNickname())){
+                throw new NicknameAlreadyExistsException();
             }
-
-            for (PlayerModel p : IDPlayerMap.values()){
-                if (p.getNickname().equals(player.getNickname())){
-                    throw new NicknameAlreadyExistsException();
-                }
-            }
-
-            IDPlayerMap.put(player.getId(), player);
-
-            matchModel.addPlayer(player);
-
-            player.setState(PlayerState.PRE_GAME);
-            //System.out.println("nameOfPlayer: " + nickname + " , id:" + id);
         }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return id;
+
+        IDPlayerMap.put(player.getId(), player);
+
+        matchModel.addPlayer(player);
+
+        player.setState(PlayerState.PRE_GAME);
+        //System.out.println("nameOfPlayer: " + nickname + " , id:" + id);
+
+        return playerId;
     }
 
     /**
@@ -445,5 +442,9 @@ public class MatchController implements ServerGameControllerInterface {
             // Not in drawing state
             throw new InvalidPlayerStateException(IDPlayerMap.get(playerID).getState().toString(), PlayerState.DRAWING.toString());
         }
+    }
+
+    public void requestError(int playerId){
+        IDPlayerMap.get(playerId).requestError();
     }
 }

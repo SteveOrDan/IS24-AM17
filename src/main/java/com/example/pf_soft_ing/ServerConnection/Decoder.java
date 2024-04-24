@@ -15,15 +15,15 @@ import java.util.List;
 
 import static com.example.pf_soft_ing.game.GameResources.getPlaceableCardByID;
 
-public abstract class Decoder {
+public class Decoder {
 
     private final MatchController matchController;
 
-    private final PlayerModel playerModel;
+    private final int playerId;
 
-    public Decoder(MatchController matchController, PlayerModel playerModel) {
+    public Decoder(MatchController matchController, int playerId) {
         this.matchController = matchController;
-        this.playerModel = playerModel;
+        this.playerId = playerId;
     }
 
     public void placeCard(int id, Position pos){
@@ -49,6 +49,6 @@ public abstract class Decoder {
     public void drawVisibleGoldenCard(int playerID, int index){}
 
     public void requestError(){
-        playerModel.requestError();
+        matchController.requestError(playerId);
     }
 }

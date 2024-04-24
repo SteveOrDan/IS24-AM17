@@ -1,5 +1,17 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.ServerConnection.Decoder;
+import com.example.pf_soft_ing.ServerConnection.Encoder;
+import com.example.pf_soft_ing.ServerConnection.RMISender;
+import com.example.pf_soft_ing.ServerConnection.SocketReceiver;
+import com.example.pf_soft_ing.exceptions.GameIsFullException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
+import com.example.pf_soft_ing.network.RMI.ServerRMI;
+import com.example.pf_soft_ing.player.PlayerModel;
+
+import java.io.BufferedReader;
+import java.util.List;
+
 public class GameController {
     private final GameModel gameModel = new GameModel();
 
@@ -15,26 +27,43 @@ public class GameController {
         // Updates player's view
     }
 
-    public void selectGame(int matchID){
+    public MatchController selectMatch(int matchID){
         // Updates player's view
+        return gameModel.getMatch(matchID);
     }
 
-    public void joinGame(int matchID, String nickname){
+    public boolean checkNickname(MatchController matchController, String nickname){
+        return matchController.getMatchModel().getIDToPlayerMap().values().stream().map(PlayerModel::getNickname).anyMatch(s -> s.contains(nickname));
+    }
+
+    public void joinGame(MatchController matchController, String nickname, Encoder encoder, BufferedReader in) throws NicknameAlreadyExistsException, GameIsFullException {
         // Adds player to the match
         // Updates player's view
-        gameModel.joinGame(matchID, nickname);
 
-        MatchModel match = gameModel.getMatch(matchID).getMatchModel();
+        new SocketReceiver(playerCreator(matchController, nickname, encoder), in);
 
-        if (match.getCurrPlayers() == match.getMaxPlayers()){
-            startGame(matchID);
-        }
+        analizePlayerNumber(matchController);
     }
 
-    public void startGame(int matchID){
-        // Updates match's state to "SET_UP"
-        // Updates player's state to "SET_UP_GAME"
+    public void joinGame(MatchController matchController, String nickname, Encoder encoder, ServerRMI serverRMI) throws NicknameAlreadyExistsException, GameIsFullException {
+        // Adds player to the match
         // Updates player's view
-        gameModel.startGame(matchID);
+
+//        new RMIReceiver(playerCreator(matchController, nickname, encoder), serverRMI);
+
+        analizePlayerNumber(matchController);
+    }
+
+    protected Decoder playerCreator(MatchController matchController, String nickname, Encoder encoder) throws NicknameAlreadyExistsException, GameIsFullException {
+        int playerId = matchController.addPlayer(nickname, encoder);
+        return new Decoder(matchController, playerId);
+    }
+
+    protected void analizePlayerNumber(MatchController matchController){
+        MatchModel match = matchController.getMatchModel();
+
+        if (match.getCurrPlayers() == match.getMaxPlayers()){
+            gameModel.startGame(matchController);
+        }
     }
 }

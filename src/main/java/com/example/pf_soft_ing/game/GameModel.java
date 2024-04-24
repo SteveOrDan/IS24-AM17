@@ -43,23 +43,21 @@ public class GameModel {
 
     }
 
-    public void joinGame(int matchID, String nickname){
+    public Integer joinGame(int matchID, String nickname){
         try {
             for (MatchController match : matches) {
                 if (match.getMatchModel().getMatchID() == matchID) {
-                    match.addPlayer(nickname);
-                    break;
+                    return match.addPlayer(nickname);
                 }
             }
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
 
-    public void startGame(int matchID){
-        new Thread(() -> {
-            getMatch(matchID).setUpGame();
-        }).start();
+    public void startGame(MatchController matchController){
+        new Thread(matchController::setUpGame).start();
     }
 }
