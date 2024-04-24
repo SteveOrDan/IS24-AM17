@@ -2,15 +2,13 @@ package com.example.pf_soft_ing.game;
 
 import com.example.pf_soft_ing.ServerConnection.Decoder;
 import com.example.pf_soft_ing.ServerConnection.Encoder;
-import com.example.pf_soft_ing.ServerConnection.RMISender;
 import com.example.pf_soft_ing.ServerConnection.SocketReceiver;
 import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
-import com.example.pf_soft_ing.network.RMI.ServerRMI;
+import com.example.pf_soft_ing.ServerConnection.RMIReceiver;
 import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.io.BufferedReader;
-import java.util.List;
 
 public class GameController {
     private final GameModel gameModel = new GameModel();
@@ -45,7 +43,7 @@ public class GameController {
         analizePlayerNumber(matchController);
     }
 
-    public void joinGame(MatchController matchController, String nickname, Encoder encoder, ServerRMI serverRMI) throws NicknameAlreadyExistsException, GameIsFullException {
+    public void joinGame(MatchController matchController, String nickname, Encoder encoder, RMIReceiver serverRMI) throws NicknameAlreadyExistsException, GameIsFullException {
         // Adds player to the match
         // Updates player's view
 

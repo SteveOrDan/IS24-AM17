@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-public class MatchController implements ServerGameControllerInterface {
+public class MatchController{
 
     private final HashMap<Integer, PlaceableCard> IDPlaceableCardMap;
     private final HashMap<Integer, ObjectiveCard> IDObjectiveCardMap;

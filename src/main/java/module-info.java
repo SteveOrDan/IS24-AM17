@@ -46,4 +46,6 @@ module com.example.pf_soft_ing {
 
     exports com.example.pf_soft_ing.app.GUI;
     opens com.example.pf_soft_ing.app.GUI to javafx.fxml;
+    exports com.example.pf_soft_ing.ServerConnection;
+    opens com.example.pf_soft_ing.ServerConnection to javafx.fxml;
 }

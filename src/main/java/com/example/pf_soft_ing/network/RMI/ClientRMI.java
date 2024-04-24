@@ -48,7 +48,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
                     case "addPlayer" : {
                         System.out.println("Add nickname: ");
                         String nickname = input.nextLine();
-                        IDclient = stub.addPlayer(nickname);
+                        //IDclient = stub.addPlayer(nickname);
                         break;
                     }
                     case "placeCard" :{
