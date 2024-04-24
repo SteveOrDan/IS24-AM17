@@ -12,6 +12,7 @@ import static com.example.pf_soft_ing.network.ServerConnection.SocketController.
 
 public class ServerMain {
     public static void main( String[] args ){
+
         ServerSocket serverSocket = startServerConnection(args);
         GameController gameController = new GameController();
 

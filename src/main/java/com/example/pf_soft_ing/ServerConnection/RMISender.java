@@ -93,6 +93,8 @@ public class RMISender extends Encoder {
         }
     }
 
-    public void requestError(){}
+    public void requestError(){
+
+    }
 
 }
