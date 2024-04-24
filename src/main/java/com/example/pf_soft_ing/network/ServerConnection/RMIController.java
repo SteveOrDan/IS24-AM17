@@ -20,14 +20,11 @@ public class RMIController {
 //    public static void startServer(String[] args){
 //        Registry registry = null;
 //        RMIReceiverInterface rmiReceiver;
-
 //        if (args.length != 1) {
 //            System.out.println("Cannot start port.");
 //            exit(1);
 //        }
-
 //        int portNumber = Integer.parseInt(args[0]);
-
 //        boolean foundPort = false;
 //        while (!foundPort) {
 //            try {

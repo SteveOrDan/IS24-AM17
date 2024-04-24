@@ -16,7 +16,6 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         this.decoder = decoder;
     }
 
-
     @Override
     public void placeCard(int id, Position pos) throws RemoteException {
         decoder.placeCard(id,pos);
