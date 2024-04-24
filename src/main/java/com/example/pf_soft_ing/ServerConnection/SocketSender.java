@@ -10,7 +10,7 @@ import java.util.List;
 public class SocketSender extends Encoder {
 
     private static PrintWriter out;
-    public SocketSender(PrintWriter out, BufferedReader in){
+    public SocketSender(PrintWriter out){
         this.out = out;
     }
 

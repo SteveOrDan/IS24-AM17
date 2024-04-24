@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientGameControllerInterface {
     private int idClient = 1;
-    protected ClientRMI() throws RemoteException {
+    public ClientRMI() throws RemoteException {
 
     }
 

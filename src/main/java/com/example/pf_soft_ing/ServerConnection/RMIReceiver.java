@@ -12,7 +12,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     private final Decoder decoder;
 
 
-    protected RMIReceiver(Decoder decoder) throws RemoteException {
+    public RMIReceiver(Decoder decoder) throws RemoteException {
         this.decoder = decoder;
     }
 

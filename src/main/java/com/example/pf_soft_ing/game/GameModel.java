@@ -30,8 +30,6 @@ public class GameModel {
 
             MatchController match = new MatchController(numberOfPlayers, newID);
 
-            match.addPlayer(nickname);
-
             matches.add(match);
         }
         catch (Exception e) {
@@ -41,20 +39,6 @@ public class GameModel {
 
     public void selectGame(int matchId){
 
-    }
-
-    public Integer joinGame(int matchID, String nickname){
-        try {
-            for (MatchController match : matches) {
-                if (match.getMatchModel().getMatchID() == matchID) {
-                    return match.addPlayer(nickname);
-                }
-            }
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
     }
 
     public void startGame(MatchController matchController){
