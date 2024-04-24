@@ -59,7 +59,6 @@ public class RMIController {
         RMIReceiverInterface stub;
 
         try {
-
             registry = LocateRegistry.getRegistry(hostName, portNumber);
             stub = (RMIReceiverInterface) registry.lookup("RemoteController");
 
@@ -69,7 +68,6 @@ public class RMIController {
         return stub;
 
     }
-
     public static void ClientRequests(ClientRMI client, RMIReceiverInterface stub){
 
         Scanner input = new Scanner(System.in);
