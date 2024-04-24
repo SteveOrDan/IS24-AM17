@@ -46,10 +46,10 @@ public class ServerRMI extends UnicastRemoteObject implements ServerGameControll
         }
     }
 
-    @Override
-    public Integer addPlayer(String nickname) throws RemoteException, GameFullException, NicknameAlreadyExistsException {
-        return serverObj.matchController.addPlayer(nickname);
-    }
+    //@Override
+    //public Integer addPlayer(String nickname) throws RemoteException, GameFullException, NicknameAlreadyExistsException {
+      //  return serverObj.matchController.addPlayer(nickname);
+    //}
 
      @Override
     public void placeCard(int playerID, int cardID, Position pos) throws RemoteException {

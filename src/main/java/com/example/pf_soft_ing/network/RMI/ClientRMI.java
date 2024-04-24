@@ -1,9 +1,16 @@
 package com.example.pf_soft_ing.network.RMI;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.player.PlayerState;
+import com.example.pf_soft_ing.player.Token;
+import com.example.pf_soft_ing.player.TokenColors;
+
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 import java.util.Scanner;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientGameControllerInterface {
@@ -15,6 +22,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
     protected ClientRMI() throws RemoteException {
 
     }
+
     public void doJob(String hostName, int port) throws Exception{
         registry = LocateRegistry.getRegistry(hostName, port);
         stub = (ServerGameControllerInterface) registry.lookup("RemoteController");
@@ -27,6 +35,12 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
             String userInput = input.nextLine();
             if (userInput != null){
                 switch (userInput){
+                    case "join" : {
+                        //stub.join(this);
+                    }
+                    case "leave": {
+                        //stub.leave(this);
+                    }
                     case "end" : {
                         flag = false;
                         break;
@@ -38,7 +52,6 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
                         break;
                     }
                     case "placeCard" :{
-                            // encoder
                             //stub.placeCard();
                         break;
                     }
@@ -76,24 +89,58 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
         }
     }
 
-    //server su client
     @Override
-    public void setObjectivesToChoose(int playerID) throws RemoteException {
+    public void sendID(int id) throws RemoteException {
+        IDclient = id;
+        System.out.println("Your id is " + id);
     }
 
     @Override
-    public void setRandomFirstPlayer() throws RemoteException {
+    public void setState(PlayerState state) throws RemoteException {
+
     }
 
     @Override
-    public void fillPlayerHand(int playerID) throws RemoteException {
+    public void setCurrScore(int score) throws RemoteException {
+
     }
 
     @Override
-    public void setCommonObjectives() throws RemoteException {
+    public void setToken(TokenColors color) throws RemoteException {
     }
 
     @Override
-    public void setVisibleCards() throws RemoteException {
+    public void setObjectivesToChoose(List<Integer> objectiveIDs) throws RemoteException {
+
+    }
+
+    @Override
+    public void setFirstPlayerToken(TokenColors color) throws RemoteException {
+
+    }
+
+    @Override
+    public void addCardToPlayerHand(int id) throws RemoteException {
+
+    }
+
+    @Override
+    public void setSecretObjective(int id) throws RemoteException {
+
+    }
+
+    @Override
+    public void setStarterCard(int id) throws RemoteException {
+
+    }
+
+    @Override
+    public void placeStarterCard(boolean placed) throws RemoteException {
+
+    }
+
+    @Override
+    public void placeCard(boolean placed) throws RemoteException {
+
     }
 }

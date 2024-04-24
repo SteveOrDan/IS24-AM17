@@ -4,6 +4,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
+import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,12 @@ public abstract class Encoder {
 
     public void setCurrScore(int score){}
 
-    public void setToken(Token token){}
+    public void setToken(Token token){
+        TokenColors color = token.getColor();
+        setTokenEncoded(color);
+    }
+
+    protected void setTokenEncoded(TokenColors color){}
 
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
         List<Integer> objectiveIDs = new ArrayList<Integer>();
@@ -27,7 +33,12 @@ public abstract class Encoder {
     }
     protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){}
 
-    public void setFirstPlayerToken(Token token){}
+    public void setFirstPlayerToken(Token token){
+        TokenColors color = token.getColor();
+        setFirstPlayerTokenEncoded(color);
+    }
+
+    protected void setFirstPlayerTokenEncoded(TokenColors color){}
 
     public void addCardToPlayerHand(PlaceableCard card){
         addCardToPlayerHandEncoded(card.getId());
