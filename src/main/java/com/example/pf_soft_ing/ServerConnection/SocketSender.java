@@ -24,12 +24,12 @@ public class SocketSender extends Encoder {
 
     @Override
     public void sendID(int id){
-        SendMessage(STR."0 \{id}");
+        SendMessage(STR."20 \{id}");
     }
 
     @Override
     public void setState(PlayerState state){
-        SendMessage(STR."1 \{state.ordinal()}");
+        SendMessage(STR."21 \{state.ordinal()}");
         /*
             In the client, to invert use: PlayerState state = PlayerState.values()[ordinal];
          */
@@ -37,17 +37,17 @@ public class SocketSender extends Encoder {
 
     @Override
     public void setCurrScore(int score){
-        SendMessage(STR."2 \{score}");
+        SendMessage(STR."22 \{score}");
     }
 
     @Override
     public void setToken(Token token){
-        SendMessage(STR."3 \{token.getColor()}");
+        SendMessage(STR."23 \{token.getColor()}");
     }
 
     @Override
     protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){
-        StringBuilder output = new StringBuilder("4");
+        StringBuilder output = new StringBuilder("24");
         for (Integer i : objectiveIDs){
             output.append(" ");
             output.append(i);

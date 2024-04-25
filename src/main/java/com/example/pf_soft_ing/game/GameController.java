@@ -9,20 +9,28 @@ import com.example.pf_soft_ing.player.PlayerModel;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.rmi.RemoteException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GameController {
     private final GameModel gameModel = new GameModel();
+
+    public GameModel getGameModel() {
+        return gameModel;
+    }
 
     public void beginGameCreation(){
         // Updates player's view
     }
 
-    public void createGame(String nickname, int numberOfPlayers){
+    public MatchController createGame(int numberOfPlayers){
         // Creates a new match in the game model
         // Creates a new player in the match
-        gameModel.createGame(nickname, numberOfPlayers);
+        MatchController matchController = gameModel.createGame(numberOfPlayers);
 
         // Updates player's view
+        return matchController;
     }
 
     public MatchController selectMatch(int matchID){

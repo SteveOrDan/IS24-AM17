@@ -1,6 +1,12 @@
 package com.example.pf_soft_ing.network.ServerConnection;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.exceptions.GameIsFullException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.GameController;
+import com.example.pf_soft_ing.game.MatchController;
+import com.example.pf_soft_ing.game.MatchModel;
+import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,7 +15,11 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static java.lang.Integer.parseInt;
 import static java.lang.System.exit;
 
 public class SocketController {
@@ -81,6 +91,9 @@ public class SocketController {
 
     public static void startInteraction(BufferedReader in, PrintWriter out, GameController gameController){
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+
+
+
 //        boolean isValid = false;
 //        String input;
 //        while(!isValid) {
@@ -114,12 +127,7 @@ public class SocketController {
                         if (input.equals("end")){
                             isRunning = false;
                         }
-
-                        new Thread() {
-                            public void run() {
-                                messageDecoder(input, gameController, out);
-                            }
-                        }.start();
+                        messageDecoder(input, gameController, out, in);
                     }
                     catch (IOException e) {
                         System.err.println(STR."Exception \{e.getMessage()}");
@@ -129,11 +137,9 @@ public class SocketController {
                 interrupt();
             }
         }.start();
-
-        out.println("Choose Nickname:");
     }
 
-    public static void sendMessage(String output, PrintWriter out){
+    private static void sendMessage(String output, PrintWriter out){
         new Thread(){
             public void run(){
                 out.println(output);
@@ -141,38 +147,117 @@ public class SocketController {
         }.start();
     }
 
-    public static void messageDecoder(String input, GameController gameController,PrintWriter out) {
+    private static void messageDecoder(String input, GameController gameController,PrintWriter out, BufferedReader in) {
         System.out.println(input);
         String[] inputArray = input.split(" ");
+        StringBuilder output = new StringBuilder("");
+        Map<Integer, List<String>> matchesNicknames = gameController.getGameModel().getMatches();
+        matchesNicknames.clear();
+        MatchController matchController;
 
         switch (inputArray[0]) {
+            case "0":
+                output.append("0");
+                for (Integer matchID : matchesNicknames.keySet()){
+                    output.append(" ");
+                    output.append(STR."M \{matchID}");
+                    for (String s : matchesNicknames.get(matchID)){
+                        output.append(" P ");
+                        output.append(s);
+                    }
+                }
+                sendMessage(output.toString(), out);
+                break;
+
+
             case "1":
-                System.out.println("Command 1" + input);
-                sendMessage("Good", out);
+                matchController = gameController.getGameModel().getMatch(Integer.parseInt(inputArray[1]));
+                if (matchController == null ){
+                    output.append("1");
+                    for (Integer matchID : matchesNicknames.keySet()){
+                        output.append(" ");
+                        output.append(STR."M \{matchID}");
+                        for (String s : matchesNicknames.get(matchID)){
+                            output.append(" P ");
+                            output.append(s);
+                        }
+                    }
+                } else {
+                    output.append("2");
+                    for (String s : matchController.getMatchModel().getNicknames()){
+                        output.append(" ");
+                        output.append(s);
+                    }
+                }
+
+                //TODO synchronize on matchController
+
+                sendMessage(output.toString(), out);
+                getNickname(input, matchController, out, in);
                 break;
 
             case "2":
-                System.out.println("Command 2" + input);
-                sendMessage("Meh", out);
+                matchController = gameController.createGame(Integer.parseInt(inputArray[1]));
+                //TODO synchronize on matchController
+
+                output.append(STR."2 \{matchController.getMatchModel().getMatchID()}");
+                getNickname( input, matchController, out, in);
                 break;
+
+            default:
+                System.out.println("Extra");
+                out.println("Error");
+        }
+    }
+
+    private static void getNickname(String input, MatchController matchController, PrintWriter out, BufferedReader in){
+        boolean isRunning = true;
+
+        while (isRunning) {
+            String input1;
+
+            try {
+                input1 = in.readLine();
+                messageDecoder(input1, matchController, out, in);
+            }
+            catch (IOException e) {
+                System.err.println(STR."Exception \{e.getMessage()}");
+                isRunning = false;
+            }
+        }
+    }
+
+    private static void messageDecoder(String input, MatchController matchController,PrintWriter out, BufferedReader in) {
+        System.out.println(input);
+        String[] inputArray = input.split(" ");
+        StringBuilder output = new StringBuilder("");
+
+        switch (inputArray[0]) {
 
             case "3":
                 try {
-                    Thread.sleep(5000);
-                }
-                catch (InterruptedException e) {
+                    Integer playerId = matchController.addPlayer(inputArray[1], out);
+                    output.append(STR."4 \{playerId} \{matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname()}");
+                    for (String s : matchController.getMatchModel().getNicknames()){
+                        if (s != matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname()){
+                            output.append(STR." \{s}");
+                        }
+                    }
+                    sendMessage(output.toString(), out);
+                } catch (GameIsFullException e) {
+                    output.append(STR."3 ");
+                    for (String s : matchController.getMatchModel().getNicknames()){
+                        output.append(STR." \{s}");
+                    }
+                    sendMessage(output.toString(), out);
+                } catch (NicknameAlreadyExistsException e) {
+                    output.append(STR."3 ");
+                    for (String s : matchController.getMatchModel().getNicknames()){
+                        output.append(STR." \{s}");
+                    }
+                    sendMessage(output.toString(), out);
                     throw new RuntimeException(e);
                 }
-                sendMessage("Idiot", out);
-                break;
-
-            case "4":
-                int id = 0; //gameController.addPlayer(inputArray[1]);
-                sendMessage("Your Id: " + id, out);
-                break;
-
-            case "end":
-                sendMessage("End", out);
                 break;
 
             default:

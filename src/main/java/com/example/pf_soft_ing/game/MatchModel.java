@@ -18,9 +18,9 @@ import java.util.List;
 
 public class MatchModel {
 
-    int maxPlayers;
-    int currPlayers = 0;
-    int matchID;
+    private int maxPlayers;
+    private int currPlayers = 0;
+    private int matchID;
 
     private final HashMap<Integer, PlayerModel> IDToPlayerMap = new HashMap<>();
 
@@ -47,6 +47,18 @@ public class MatchModel {
      */
     public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
         return IDToPlayerMap;
+    }
+
+    /**
+     * Getter
+     * @return All players' nicknames
+     */
+    public List<String> getNicknames() {
+        List<String> nicknames = new ArrayList<>();
+        for (PlayerModel playerModel : IDToPlayerMap.values()){
+            nicknames.add(playerModel.getNickname());
+        }
+        return nicknames;
     }
 
     /**

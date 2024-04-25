@@ -458,7 +458,7 @@ public class MatchController{
     /**
      * Checks for any exceptions when a player is drawing a card
      */
-    protected void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
+    private void checkPlayerDrawExceptions(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotPlayerTurnException, InvalidPlayerStateException{
         if (matchModel.getGameState() != GameState.PLAYING &&
                 matchModel.getGameState() != GameState.FINAL_ROUND){
             // Not playing game state
