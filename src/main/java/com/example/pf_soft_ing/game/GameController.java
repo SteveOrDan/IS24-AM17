@@ -41,14 +41,14 @@ public class GameController {
         analizePlayerNumber(matchController);
     }
 
-    public void joinMatch(MatchController matchController, String nickname, ClientRMI client, RMIReceiver receiver) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
+    public void joinMatch(MatchController matchController, String nickname, ClientRMI client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
         // Adds player to the match
         // Updates player's view
 
         int playerId = matchController.addPlayer(nickname, client);
         Decoder decoder = new Decoder(matchController, playerId);
-//        receiver.addDecoder(client, decoder);
 
+        RMIReceiver.addDecoder(client,decoder);
         analizePlayerNumber(matchController);
     }
 

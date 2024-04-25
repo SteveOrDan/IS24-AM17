@@ -1,6 +1,8 @@
 package com.example.pf_soft_ing.card;
 
-public class Position {
+import java.io.Serializable;
+
+public class Position implements Serializable {
     private final int x;
     private final int y;
 
