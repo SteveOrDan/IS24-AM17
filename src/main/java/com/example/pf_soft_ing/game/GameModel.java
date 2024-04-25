@@ -1,11 +1,17 @@
 package com.example.pf_soft_ing.game;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class GameModel {
     private final List<MatchController> matches = new ArrayList<>();
+
+    public Map<Integer, List<String>> getMatches(){
+        Map<Integer, List<String>> matchesNicknames = new HashMap<>();
+        for (MatchController matchController : matches){
+            matchesNicknames.put(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
+        }
+        return matchesNicknames;
+    }
 
     public MatchController getMatch(int matchID){
         for (MatchController match : matches) {
@@ -16,7 +22,7 @@ public class GameModel {
         return null;
     }
 
-    public void createGame(String nickname, int numberOfPlayers){
+    public MatchController createGame(int numberOfPlayers){
         try {
             List<Integer> matchIDs = new ArrayList<>();
             matches.forEach(match -> matchIDs.add(match.getMatchModel().getMatchID()));
@@ -31,10 +37,12 @@ public class GameModel {
             MatchController match = new MatchController(numberOfPlayers, newID);
 
             matches.add(match);
+            return match;
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
+        return null;
     }
 
     public void selectGame(int matchId){
