@@ -1,11 +1,14 @@
 package com.example.pf_soft_ing.app.GUI;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
 import javafx.application.Application;
-import javafx.application.Platform;
+import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -13,6 +16,8 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -21,8 +26,7 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * JavaFX App
@@ -31,8 +35,18 @@ public class App extends Application {
 
     String boardName = "Board.png";
 
+    List<Position> legalPosList = new ArrayList<>();
+    List<Position> illegalPosList = new ArrayList<>();
+    Map<Position, PlaceableCard> playArea = new HashMap<>();
+
+    Map<Position, Pane> validPosToButtonPane = new HashMap<>();
+
+    List<Integer> playerHand = new ArrayList<>();
+
+    boolean pressingCtrl = false;
+
     Group root;
-    Timer timer;
+    // Timer timer;
 
     double barOffset = 40;
     double defaultElementsOffset = 10;
@@ -49,12 +63,19 @@ public class App extends Application {
     double gridCellWidth;
     double gridCellHeight;
 
+    double gridWidth;
+    double gridHeight;
+
+    int gridRows;
+    int gridColumns;
+
     // Card corner 267 x 326 out of 1232 x 815
     // --> 0.215 x 0.4
     double cardCornerWidthProportion = 0.215;
     double cardCornerHeightProportion = 0.4;
 
     GridPane playerFieldGrid;
+    AnchorPane playerField;
 
     public static void main(String[] args) {
         launch(args);
@@ -77,16 +98,19 @@ public class App extends Application {
 
 //        drawMainMenuScene();
 
-        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-            root.getChildren().clear();
-            drawGameStage(stage);
-        });
-        stage.heightProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-            root.getChildren().clear();
-            drawGameStage(stage);
-        });
+//        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
+//            root.getChildren().clear();
+//            drawGameStage(stage);
+//        });
+//        stage.heightProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
+//            root.getChildren().clear();
+//            drawGameStage(stage);
+//        });
 
         drawGameStage(stage);
+
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
+        stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
     }
 
     // Game flow:
@@ -421,7 +445,7 @@ public class App extends Application {
         return cardPane;
     }
 
-    private Pane createObjectiveCardPane(ObjectiveCard card, String side, double xPos, double yPos, double scale){
+    private Pane createCardPane(ObjectiveCard card, String side, double xPos, double yPos, double scale){
         // Create Pane for card
         Pane cardPane = new Pane();
 
@@ -472,18 +496,18 @@ public class App extends Application {
         gridCellHeight = cardHeight - (cardCornerHeightProportion * cardHeight);
 
         // Calculate number of rows and columns. I need odd numbers so that starter card is in the middle
-        int totalRows = (int) Math.floor(Math.ceil(playerFieldRectHeight / gridCellHeight) / 2) * 2 + 1;
-        int totalColumns = (int) Math.floor(Math.ceil(playerFieldRectWidth / gridCellWidth) / 2) * 2 + 1;
+        gridRows = (int) Math.floor(Math.ceil(playerFieldRectHeight / gridCellHeight) / 2) * 2 + 1;
+        gridColumns = (int) Math.floor(Math.ceil(playerFieldRectWidth / gridCellWidth) / 2) * 2 + 1;
 
-        double playerFieldWidth = gridCellWidth * totalColumns + 2 * cardCornerWidthProportion * cardWidth;
-        double playerFieldHeight = gridCellHeight * totalRows + 2 * cardCornerHeightProportion * cardHeight;
+        double playerFieldWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        double playerFieldHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
 
         // Calculate total grid dimensions
-        double gridWidth = gridCellWidth * totalColumns;
-        double gridHeight = gridCellHeight * totalRows;
+        gridWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        gridHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
 
         // Create player field anchor pane
-        AnchorPane playerField = new AnchorPane();
+        playerField = new AnchorPane();
         playerField.setPrefSize(playerFieldWidth, playerFieldHeight);
         playerField.setLayoutX(0);
         playerField.setLayoutY(0);
@@ -498,7 +522,7 @@ public class App extends Application {
         playerFieldGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
 
         // I have to add an element on each column and row to make the grid "visible"
-        for (int i = 0; i < totalColumns - 1; i++){
+        for (int i = 0; i < gridColumns - 1; i++){
             AnchorPane anchorPane = new AnchorPane();
             anchorPane.setPrefSize(gridCellWidth, gridCellHeight);
 
@@ -506,22 +530,7 @@ public class App extends Application {
         }
 
         // Add starter card to the middle of the grid
-        Pane sterterCardPane = new Pane();
-        sterterCardPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-        Image starterImg = new Image("frontCard80.png");
-        ImageView starterImgV = new ImageView(starterImg);
-
-        starterImgV.setFitHeight(cardHeight);
-        starterImgV.setFitWidth(cardWidth);
-
-        PlaceableCard sCard = GameResources.getPlaceableCardByID(80);
-
-        sterterCardPane.getChildren().add(starterImgV);
-
-        addCornerButtons(sterterCardPane, sCard);
-
-        playerFieldGrid.add(sterterCardPane, totalColumns / 2, totalRows / 2);
+        placeCard(80, "front", new Position(0, 0));
 
         // Fill hierarchy of the scene
         playerField.getChildren().add(playerFieldGrid);
@@ -531,75 +540,230 @@ public class App extends Application {
         root.getChildren().add(playerFieldScroll);
     }
 
-    private void addCornerButtons(Pane cardPane, PlaceableCard card){
-        if (card.getCurrSide().getBLCorner().isAvailable()){
+    private void addCornerButtons(Pane cardPane, int ID, Position pos){
+        PlaceableCard card = GameResources.getPlaceableCardByID(ID);
+
+        Random rand = new Random();
+        int ID1 = rand.nextInt(80);
+        int ID2 = rand.nextInt(80);
+        int ID3 = rand.nextInt(80);
+        int ID4 = rand.nextInt(80);
+
+        Position blPos = new Position(pos.getX() - 1, pos.getY() - 1);
+        Position brPos = new Position(pos.getX() + 1, pos.getY() - 1);
+        Position tlPos = new Position(pos.getX() - 1, pos.getY() + 1);
+        Position trPos = new Position(pos.getX() + 1, pos.getY() + 1);
+
+        if (card.getCurrSide().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
+            Pane blPane = new Pane();
+            blPane.setPrefSize(gridCellWidth, gridCellHeight);
+
             Button blButton = new Button();
-            blButton.setPrefSize(cardWidth * cardCornerWidthProportion, cardHeight * cardCornerHeightProportion);
-            blButton.setLayoutX(0);
-            blButton.setLayoutY(cardHeight - cardHeight * cardCornerHeightProportion);
-            blButton.setOpacity(0.5);
+            blButton.setPrefSize(cardWidth, cardHeight);
+            blButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
+            blButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
+            blButton.setOpacity(0.6);
             blButton.setOnAction((_) -> {
-                placeCard(2, 4);
+                placeCard(ID1, "front", blPos);
+                cardPane.getChildren().remove(blButton);
             });
 
-            cardPane.getChildren().add(blButton);
+            blPane.getChildren().add(blButton);
+            Position buttonGridPos = mapToGridPos(blPos);
+            playerFieldGrid.add(blPane, buttonGridPos.getX(), buttonGridPos.getY());
+            validPosToButtonPane.put(blPos, blPane);
         }
-        if (card.getCurrSide().getBRCorner().isAvailable()){
+        if (card.getCurrSide().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
+            Pane brPane = new Pane();
+            brPane.setPrefSize(gridCellWidth, gridCellHeight);
+
             Button brButton = new Button();
-            brButton.setPrefSize(cardWidth * cardCornerWidthProportion, cardHeight * cardCornerHeightProportion);
-            brButton.setLayoutX(cardWidth - cardWidth * cardCornerWidthProportion);
-            brButton.setLayoutY(cardHeight - cardHeight * cardCornerHeightProportion);
-            brButton.setOpacity(0.5);
+            brButton.setPrefSize(cardWidth, cardHeight);
+            brButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth * (1 - cardCornerWidthProportion));
+            brButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
+            brButton.setOpacity(0.6);
             brButton.setOnAction((_) -> {
-                placeCard(4, 4);
+                placeCard(ID2, "front", brPos);
+                cardPane.getChildren().remove(brButton);
             });
 
-            cardPane.getChildren().add(brButton);
+            brPane.getChildren().add(brButton);
+            Position buttonGridPos = mapToGridPos(brPos);
+            playerFieldGrid.add(brPane, buttonGridPos.getX(), buttonGridPos.getY());
+            validPosToButtonPane.put(brPos, brPane);
         }
-        if (card.getCurrSide().getTLCorner().isAvailable()){
+        if (card.getCurrSide().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
+            Pane tlPane = new Pane();
+            tlPane.setPrefSize(gridCellWidth, gridCellHeight);
+
             Button tlButton = new Button();
-            tlButton.setPrefSize(cardWidth * cardCornerWidthProportion, cardHeight * cardCornerHeightProportion);
-            tlButton.setLayoutX(0);
-            tlButton.setLayoutY(0);
-            tlButton.setOpacity(0.5);
+            tlButton.setPrefSize(cardWidth, cardHeight);
+            tlButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
+            tlButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
+            tlButton.setOpacity(0.6);
             tlButton.setOnAction((_) -> {
-                placeCard(2, 2);
+                placeCard(ID3, "front", tlPos);
+                cardPane.getChildren().remove(tlButton);
             });
 
-            cardPane.getChildren().add(tlButton);
+            tlPane.getChildren().add(tlButton);
+            Position buttonGridPos = mapToGridPos(tlPos);
+            playerFieldGrid.add(tlPane, buttonGridPos.getX(), buttonGridPos.getY());
+            validPosToButtonPane.put(tlPos, tlPane);
         }
-        if (card.getCurrSide().getTRCorner().isAvailable()){
+        if (card.getCurrSide().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
+            Pane trPane = new Pane();
+            trPane.setPrefSize(gridCellWidth, gridCellHeight);
+
             Button trButton = new Button();
-            trButton.setPrefSize(cardWidth * cardCornerWidthProportion, cardHeight * cardCornerHeightProportion);
-            trButton.setLayoutX(cardWidth - cardWidth * cardCornerWidthProportion);
-            trButton.setLayoutY(0);
-            trButton.setOpacity(0.5);
+            trButton.setPrefSize(cardWidth, cardHeight);
+            trButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth - cardWidth * cardCornerWidthProportion);
+            trButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
+            trButton.setOpacity(0.6);
             trButton.setOnAction((_) -> {
-                placeCard(4, 2);
+                placeCard(ID4, "front", trPos);
+                cardPane.getChildren().remove(trButton);
             });
 
-            cardPane.getChildren().add(trButton);
+            trPane.getChildren().add(trButton);
+            Position buttonGridPos = mapToGridPos(trPos);
+            playerFieldGrid.add(trPane, buttonGridPos.getX(), buttonGridPos.getY());
+            validPosToButtonPane.put(trPos, trPane);
         }
     }
 
-    private void placeCard(int x, int y){
-        PlaceableCard card = GameResources.getPlaceableCardByID(20);
+    private void updateIlLegalPositions(Position pos){
+        ArrayList<Position> newLegalPos = new ArrayList<>();
+        ArrayList<Position> newIllegalPos = new ArrayList<>();
+
+        Side currSide = playArea.get(pos).getCurrSide();
+
+        if (currSide.getBLCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+        }
+
+        if (currSide.getBRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+
+        if (currSide.getTLCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+
+        if (currSide.getTRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+
+        for (Position p : newIllegalPos){
+            if (!illegalPosList.contains(p)){
+                illegalPosList.add(p);
+            }
+
+            legalPosList.remove(p);
+
+            if (validPosToButtonPane.containsKey(p)){
+                playerFieldGrid.getChildren().remove(validPosToButtonPane.get(p));
+                validPosToButtonPane.remove(p);
+            }
+        }
+
+        for (Position p : newLegalPos){
+            if (!legalPosList.contains(p) && !illegalPosList.contains(p)){
+                legalPosList.add(p);
+            }
+        }
+
+        // Set the new card's position as illegal (a card just got placed)
+        legalPosList.remove(pos);
+
+        if (!illegalPosList.contains(pos)){
+            illegalPosList.add(pos);
+        }
+    }
+
+    private Position mapToGridPos(Position mapPos){
+        return new Position(mapPos.getX() + gridRows / 2, gridColumns / 2 - mapPos.getY());
+    }
+
+    private void placeCard(int ID, String side, Position pos){
+        if (pos.getX() <= -gridColumns / 2 || pos.getX() >= gridColumns / 2 ||
+                pos.getY() <= -gridRows / 2 || pos.getY() >= gridRows / 2){
+            updateGridDimension();
+        }
+
+        // Create Image
+        String cardName = side + "Card" + ID + ".png";
+
+        if (!playArea.containsKey(pos)){
+            playArea.put(pos, GameResources.getPlaceableCardByID(ID));
+        }
+
+        updateIlLegalPositions(pos);
+
+        // Create Pane for card
         Pane cardPane = new Pane();
         cardPane.setPrefSize(gridCellWidth, gridCellHeight);
 
-        Image img = new Image("frontCard20.png");
-        ImageView imgV = new ImageView(img);
+        Image cardImg = new Image(cardName);
+        ImageView cardImgV = new ImageView(cardImg);
 
-        imgV.setFitHeight(cardHeight);
-        imgV.setFitWidth(cardWidth);
+        cardImgV.setFitHeight(cardHeight);
+        cardImgV.setFitWidth(cardWidth);
 
-        cardPane.getChildren().add(imgV);
+        cardImgV.setX(-cardWidth * cardCornerWidthProportion);
+        cardImgV.setY(-cardHeight * cardCornerHeightProportion);
 
-        addCornerButtons(cardPane, card);
+        cardPane.getChildren().add(cardImgV);
 
-        playerFieldGrid.add(cardPane, x, y);
+        addCornerButtons(cardPane, ID, pos);
 
-        System.out.println("Placing card on " + x + ", " + y);
+        Position gridPos = mapToGridPos(pos);
+
+        // Add card to the grid
+        playerFieldGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+
+        System.out.println("Grid dimensions: " + gridRows + ", " + gridColumns);
+        System.out.println("Placed card " + ID + " at grid position " + gridPos.getX() + ", " + gridPos.getY());
+    }
+
+    private void updateGridDimension(){
+        System.out.println("Updating grid dimensions");
+        gridRows += 2;
+        gridColumns += 2;
+
+        playerFieldGrid.getChildren().clear();
+
+        gridWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        gridHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
+
+        playerFieldGrid.setPrefSize(gridWidth, gridHeight);
+
+        for (int i = 0; i < gridColumns - 1; i++){
+            AnchorPane anchorPane = new AnchorPane();
+            anchorPane.setPrefSize(gridCellWidth, gridCellHeight);
+
+            playerFieldGrid.add(anchorPane, i, i);
+        }
+
+        legalPosList.clear();
+        illegalPosList.clear();
+        validPosToButtonPane.clear();
+
+        for (Position p : playArea.keySet()){
+            placeCard(playArea.get(p).getId(), "front", p);
+        }
     }
 
     private void drawPlayerHand(ObjectiveCard secretObjective, PlaceableCard card1, PlaceableCard card2, PlaceableCard card3){
@@ -614,7 +778,7 @@ public class App extends Application {
         // Create panes for each card
         double cardsYPos = (playerHandHeight - cardHeight) * 0.5;
 
-        Pane secretObjectivePane = createObjectiveCardPane(secretObjective, "front", defaultElementsOffset, cardsYPos, 0.9);
+        Pane secretObjectivePane = createCardPane(secretObjective, "front", defaultElementsOffset, cardsYPos, 0.9);
         Pane card1Pane = createCardPane(card1, "front", 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
         Pane card2Pane = createCardPane(card2, "front", 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
         Pane card3Pane = createCardPane(card3, "front", 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
@@ -661,7 +825,7 @@ public class App extends Application {
     }
 
     private void selectCard(PlaceableCard card){
-        // TODO
+
     }
 
     private void drawSeparationLines(){
@@ -683,18 +847,30 @@ public class App extends Application {
         root.getChildren().add(lineH);
     }
 
-    private Timer startTimer(){
-        timer = new Timer("Timer");
-        TimerTask task = new TimerTask() {
-            public void run() {
-                Platform.runLater(() -> {
-                    // method()
-                });
-            }
-        };
-        long delay = 0;
-        long period = 100L;
-        timer.schedule(task, delay, period);
-        return timer;
+    void keyPressed(KeyEvent key){
+        if (key.getCode() == KeyCode.CONTROL) {
+            pressingCtrl = true;
+        }
+
+        if (!pressingCtrl){
+            return;
+        }
+
+        switch (key.getCode()){
+            case UP:
+                playerField.setScaleX(playerField.getScaleX() + 0.05);
+                playerField.setScaleY(playerField.getScaleY() + 0.05);
+                break;
+            case DOWN:
+                playerField.setScaleX(playerField.getScaleX() - 0.05);
+                playerField.setScaleY(playerField.getScaleY() - 0.05);
+                break;
+        }
+    }
+
+    void keyReleased(KeyEvent key){
+        if (Objects.requireNonNull(key.getCode()) == KeyCode.CONTROL) {
+            pressingCtrl = false;
+        }
     }
 }

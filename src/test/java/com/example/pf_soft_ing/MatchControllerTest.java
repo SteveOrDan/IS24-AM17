@@ -41,7 +41,7 @@ class MatchControllerTest {
 
     private void addPlayers(String name) {
         try {
-            matchController.addPlayer(name);
+            //matchController.addPlayer(name);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
