@@ -24,5 +24,5 @@ public interface RMIReceiverInterface extends Remote {
     void joinMatch(MatchController matchController, String nickname, ClientRMI client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException;
 
     //prova
-    boolean prova(ClientRMI client, String name) throws RemoteException;
+    boolean prova(String name) throws RemoteException;
 }

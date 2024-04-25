@@ -74,10 +74,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public boolean prova(ClientRMI client, String name) throws RemoteException {
-        System.out.println(name + "called prova");
+    public boolean prova(String name) throws RemoteException {
         int id = 1;
-        client.sendID(id);
+        System.out.println(name + "called prova");
         return true;
     }
 

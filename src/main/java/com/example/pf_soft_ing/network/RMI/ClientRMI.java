@@ -7,25 +7,27 @@ import com.example.pf_soft_ing.player.TokenColors;
 
 
 import java.net.MalformedURLException;
-import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 
-
-
 public class ClientRMI extends UnicastRemoteObject implements ClientGameControllerInterface {
 
-
+    RMIReceiverInterface stub;
     public ClientRMI() throws RemoteException {
+
     }
 
-    public void startClient(String serverHost) throws RemoteException, NotBoundException, MalformedURLException {
-
-        RMIReceiverInterface stub = (RMIReceiverInterface) Naming.lookup("//" + serverHost + "/RMIReceiver");
-        boolean risposta = stub.prova(this, "Caterina");
+    public static void main(String[] args ) throws RemoteException, NotBoundException, MalformedURLException {
+        Registry registry = LocateRegistry.getRegistry(1099);
+        RMIReceiverInterface stub = (RMIReceiverInterface) registry.lookup("RMIReceiver");
+        boolean risposta = stub.prova("Caterina");
         System.out.println(risposta);
+        ClientRMI clientRMI = new ClientRMI();
+        stub.requestError(clientRMI);
 
     }
 
@@ -64,9 +66,5 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
 
     @Override
     public void placeCard(boolean placed) throws RemoteException {}
-
-    public static void main(String args[]) throws Exception {
-        new ClientRMI().startClient("localhost");
-    }
 
 }
