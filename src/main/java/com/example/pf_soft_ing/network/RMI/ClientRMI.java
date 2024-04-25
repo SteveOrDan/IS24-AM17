@@ -16,19 +16,17 @@ import java.util.List;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientGameControllerInterface {
 
-    RMIReceiverInterface stub;
-    public ClientRMI() throws RemoteException {
-
+    protected ClientRMI() throws RemoteException {
     }
 
-    public static void main(String[] args ) throws RemoteException, NotBoundException, MalformedURLException {
+
+    public static void main(String[] args ) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry(1099);
         RMIReceiverInterface stub = (RMIReceiverInterface) registry.lookup("RMIReceiver");
         boolean risposta = stub.prova("Caterina");
         System.out.println(risposta);
-        ClientRMI clientRMI = new ClientRMI();
-        stub.requestError(clientRMI);
-
+//        ClientRMI clientRMI = new ClientRMI();
+//        stub.requestError(clientRMI);
     }
 
     // server su client

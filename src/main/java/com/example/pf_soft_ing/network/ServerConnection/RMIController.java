@@ -148,10 +148,10 @@ public class RMIController {
 //        }
 //    }
 
-    public static void startRMIReceiver() throws RemoteException, AlreadyBoundException {
-        RMIReceiver rmiReceiver = new RMIReceiver();
-        Registry registry = LocateRegistry.createRegistry(1099);
-        registry.bind("RMIReceiver", rmiReceiver);
-        System.out.println("Waiting for invocations from clients");
-    }
+//    public static void startRMIReceiver() throws RemoteException, AlreadyBoundException {
+//        RMIReceiver rmiReceiver = new RMIReceiver();
+//        Registry registry = LocateRegistry.createRegistry(1099);
+//        registry.bind("RMIReceiver", rmiReceiver);
+//        System.out.println("Waiting for invocations from clients");
+//    }
 }
