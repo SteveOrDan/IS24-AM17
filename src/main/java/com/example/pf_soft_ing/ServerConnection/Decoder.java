@@ -49,6 +49,7 @@ public class Decoder {
     public void drawVisibleGoldenCard(int playerID, int index){}
 
     public void requestError(){
-        matchController.requestError(playerId);
+        //matchController.requestError(playerId);
+        System.out.println("Error Request");
     }
 }

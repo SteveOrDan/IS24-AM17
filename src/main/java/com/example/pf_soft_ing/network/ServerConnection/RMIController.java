@@ -18,8 +18,10 @@ import static java.lang.System.exit;
 public class RMIController {
 
 //    public static void startServer(String[] args){
+//
 //        Registry registry = null;
 //        RMIReceiverInterface rmiReceiver;
+//
 //        if (args.length != 1) {
 //            System.out.println("Cannot start port.");
 //            exit(1);
@@ -29,7 +31,7 @@ public class RMIController {
 //        while (!foundPort) {
 //            try {
 //
-//                rmiReceiver = new RMIReceiver()
+//                rmiReceiver = new RMIReceiver();
 //                registry = LocateRegistry.createRegistry(portNumber);
 //
 //                try {
@@ -47,81 +49,109 @@ public class RMIController {
 //        System.out.println(STR."Server started! Port:\{portNumber}");
 //    }
 
-    public static RMIReceiverInterface getStub(String[] args){
 
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+//    public static void ClientStarterRequest(ClientRMI client, RMIReceiverInterface stub){
+//        Scanner input = new Scanner(System.in);
+//        String clientRequest = input.nextLine();
+//
+//        switch (clientRequest){
+//            case "createGame" :{
+//                System.out.println("Nickname: ");
+//                String nickname = input.nextLine();
+//                System.out.println("NumberOfPlayers: ");
+//                int numberOfPlayers = Integer.parseInt(input.nextLine());
+//                try {
+//                    stub.createGame(client, nickname, numberOfPlayers);
+//                } catch (RemoteException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                break;
+//            }
+//            case "showMeMatches":{
+//                break;
+//            }
+//        }
+//
+//        clientRequest = input.nextLine();
+//        switch (clientRequest){
+//            case "selectMatch" :{
+//                System.out.println("Insert matchID: ");
+//                int matchID = Integer.parseInt(input.nextLine());
+//                try {
+//                    stub.selectMatch(client, matchID);
+//                } catch (RemoteException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//        }
+//    }
+//    public static void ClientRequests(ClientRMI client, RMIReceiverInterface stub){
+//        Scanner input = new Scanner(System.in);
+//        boolean flag = true;
+//
+//        while (flag) {
+//            System.out.println("Write command: ");
+//            String userInput = input.nextLine();
+//            if (userInput != null){
+//                switch (userInput){
+//                    case "placeCard" : {
+//                        System.out.println("Card Id: ");
+//                        int id = Integer.parseInt(input.nextLine());
+//                        System.out.println("Position x: ");
+//                        int x = Integer.parseInt(input.nextLine());
+//                        System.out.println("Position y: ");
+//                        int y = Integer.parseInt(input.nextLine());
+//                        Position pos = new Position(x,y);
+//                        try {
+//                            stub.placeCard(id, pos, client);
+//                        } catch (RemoteException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        break;
+//                    }
+//                    case "drawResourceCard": {
+//                        try {
+//                            stub.drawResourceCard(client);
+//                        } catch (RemoteException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        break;
+//                    }
+//                    case "drawVisibleResourceCard" : {
+//                        System.out.println("Card 0 or Card 1: ");
+//                        int index = Integer.parseInt(input.nextLine());
+//                        //stub.drawVisibleResourceCard();
+//                        break;
+//                    }
+//                    case "drawGoldenCard" : {
+//                        //stub.drawGoldenCard();
+//                        break;
+//                    }
+//                    case "drawVisibleGoldenCard" :{
+//                        //stub.drawVisibleGoldenCard();
+//                        break;
+//                    }
+//                    case "requestError" :{
+//                        try {
+//                            stub.requestError(client);
+//                        } catch (RemoteException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                        break;
+//                    }
+//                    case "end":{
+//                        flag = false;
+//                    }
+//                    default: System.out.println("Try again");
+//                }
+//            }
+//        }
+//    }
 
-        Registry registry;
-        RMIReceiverInterface stub;
-
-        try {
-            registry = LocateRegistry.getRegistry(hostName, portNumber);
-            stub = (RMIReceiverInterface) registry.lookup("RemoteController");
-
-        } catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-        return stub;
-
+    public static void startRMIReceiver() throws RemoteException, AlreadyBoundException {
+        RMIReceiver rmiReceiver = new RMIReceiver();
+        Registry registry = LocateRegistry.createRegistry(1099);
+        registry.bind("RMIReceiver", rmiReceiver);
+        System.out.println("Waiting for invocations from clients");
     }
-    public static void ClientRequests(ClientRMI client, RMIReceiverInterface stub){
-
-        Scanner input = new Scanner(System.in);
-        boolean flag = true;
-
-        while (flag) {
-            System.out.println("Write command: ");
-            String userInput = input.nextLine();
-            if (userInput != null){
-                switch (userInput){
-                    case "placeCard" : {
-                        System.out.println("Card Id: ");
-                        int id = Integer.parseInt(input.nextLine());
-                        System.out.println("Position x: ");
-                        int x = Integer.parseInt(input.nextLine());
-                        System.out.println("Position y: ");
-                        int y = Integer.parseInt(input.nextLine());
-                        Position pos = new Position(x,y);
-                        try {
-                            stub.placeCard(id, pos);
-                        } catch (RemoteException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-                    }
-                    case "drawResourceCard": {
-                        try {
-                            stub.drawResourceCard();
-                        } catch (RemoteException e) {
-                            throw new RuntimeException(e);
-                        }
-                        break;
-                    }
-                    case "drawVisibleResourceCard" : {
-                        System.out.println("Card 0 or Card 1: ");
-                        int index = Integer.parseInt(input.nextLine());
-                        //stub.drawVisibleResourceCard(, index);
-                        break;
-                    }
-                    case "drawGoldenCard" : {
-                        //stub.drawGoldenCard();
-                        break;
-                    }
-                    case "drawVisibleGoldenCard" :{
-                        //stub.drawVisibleGoldenCard();
-                        break;
-                    }
-                    case "requestError" :{
-                        break;
-                    }
-                    case "end":{
-                        flag = false;
-                    }
-                    default: System.out.println("Try again");
-                }
-            }
-        }
-    }
-
 }
