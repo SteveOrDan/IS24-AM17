@@ -866,6 +866,111 @@ GameModel *-->"1...n" MatchController
 GameController *-->"1" GameModel
 
 ```
+Start Connection sequence diagram
+
+```mermaid
+
+sequenceDiagram
+    title Start Connection sequence diagram
+
+    participant C as ClientController
+    participant Cn as Client Decoder/Encoder
+    participant Sn as Server Decoder/Encoder
+    participant G as GameController
+    participant S as ServerController
+
+    Note right of S: Server: Server starts
+
+    Note left of C: Client: Client starts
+
+    C->>S: Connect request
+
+    S->>Sn: Setup Decoder and Encoder
+
+    Note left of C: Client: If there is a failure thow exception
+
+    C->>Cn: getMatches()
+
+    Cn-->>Sn: getMatches()
+
+    Sn->>G: getMatches()
+
+    G->>Sn: printMatches(matchesNicknames)
+
+    Sn-->>Cn: printMatches(matchesNicknames)
+
+    Cn->>C: printMatches(matchesNicknames)
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "new match or join"
+    Note left of C: Client: Input validation
+
+    alt Create game
+        C->>Cn: createMatch(numbersOfPlayers)
+
+        Cn-->>Sn: createMatch(numbersOfPlayers)
+
+        Sn->>G: createMatch(numbersOfPlayers)
+
+        Note right of G: Server: Create a new match
+
+        G->>Sn: joinMatch(matchID, nicknames)
+
+        Sn-->>Cn: joinMatch(matchID, nicknames)
+
+        Cn->>C: joinMatch(matchID, nicknames)
+    else Join game
+        C->>Cn: sendMatch(matchID)
+
+        Cn-->>Sn: sendMatch(matchID)
+
+        Sn->>G: sendMatch(matchID)
+
+        Note right of G: Server: Search match with matchID
+        alt Success
+            G->>Sn: joinMatch(matchID, nicknames)
+
+            Sn-->>Cn: joinMatch(matchID, nicknames)
+
+            Cn->>C: joinMatch(matchID, nicknames)
+        else Failure
+            G->>Sn: failedMatch(matchesNicknames)
+
+            Sn-->>Cn: failedMatch(matchesNicknames)
+
+            Cn->>C: failedMatch(matchesNicknames)
+            Note left of C: Client Back to: Ask "new match or join"
+        end
+    end
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "nickname"
+
+    C->>Cn: sendNickname(nickname)
+
+    Cn-->>Sn: sendNickname(nickname)
+
+    Sn->>G: sendNickname(nickname)
+
+    Note right of G: Server: Check nicknames
+    alt Success
+        G->>Sn: addNickname(playerID, nickname, opponents)
+
+        Sn-->>Cn: addNickname(playerID, nickname, opponents)
+
+        Cn->>C: addNickname(playerID, nickname, opponents)
+    else Failure
+        G->>Sn: failedNickname(nicknames)
+
+        Sn-->>Cn: failedNickname(nicknames)
+
+        Cn->>C: failedNickname(nicknames)
+        Note left of C: Client Back to: Ask "nickname"
+    end
+    
+    Note right of G: Server: Wait for all players
+
+```
 
 Sequence diagram for game
 
