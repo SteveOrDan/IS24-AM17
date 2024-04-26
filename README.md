@@ -877,7 +877,7 @@ sequenceDiagram
     participant Cn as Client Decoder/Encoder
     participant Sn as Server Decoder/Encoder
     participant G as GameController
-    participant S as ServerController
+    participant S as ServerMain
 
     Note right of S: Server: Server starts
 
@@ -969,6 +969,213 @@ sequenceDiagram
     end
     
     Note right of G: Server: Wait for all players
+
+```
+Sequence diagram for game setup
+
+```mermaid
+
+sequenceDiagram
+    title Game setup sequence diagram
+
+    participant C as ClientController
+    participant Cn as Client Decoder/Encoder
+    participant Sn as Server Decoder/Encoder
+    participant M as MatchController
+    
+    Note right of M: Server: All players connected
+    Note right of M: Server: Game start
+    Note right of M: Server: Initialize decks
+
+    M->>Sn: sendInitializedVisibleDecks(visibleResourceCards,<br> visibleGoldenCards)
+
+    Sn-->>Cn: sendInitializedVisibleDecks(visibleResourceCardsIDs,<br> visibleGoldenCardsIDs)
+
+    Cn->>C: sendInitializedVisibleDecks(visibleResourceCards,<br> visibleGoldenCards)
+
+    M->>Sn: sendStarterCard(starterCard)
+
+    Sn-->>Cn: sendStarterCard(starterCardID)
+
+    Cn->>C: sendStarterCard(starterCard)
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "Starter card side"
+    Note left of C: Client: Input validation
+
+    C->>Cn: selectStarterSide(starterCard)
+
+    Cn-->>Sn: selectStarterSide(starterCardID)
+
+    Sn->>M: selectStarterSide(starterCard)
+
+    Note right of M: Server: Starter card validation
+
+    alt Success
+        Note right of M: Server: Store starter card
+        M->>Sn: confirmStarterCard(starterCard)
+
+        Sn-->>Cn: confirmStarterCard(starterCardID)
+
+        Cn->>C: confirmStarterCard(starterCard)
+        Note left of C: Client: Update view
+    else Failure
+        M->>Sn: failureStarterCard()
+
+        Sn-->>Cn: failureStarterCard()
+
+        Cn->>C: failureStarterCard()
+        Note left of C: Client back to: Ask "Starter card side"
+    end
+
+    Note right of M: Server: Wait for all players
+
+    M->>Sn: sendOpponentsStarterCard(starterCard)
+
+    Sn-->>Cn: sendOpponentsStarterCard(starterCardID)
+
+    Cn->>C: sendOpponentsStarterCard(starterCard)
+
+    M->>Sn: sendToken(Token, opponentsTokens)
+
+    Sn-->>Cn: sendToken(Token, opponentsTokens)
+
+    Cn->>C: sendToken(Token, opponentsTokens)
+
+    M->>Sn: sendHand(handList)
+
+    Sn-->>Cn: sendHand(handListOfIDs)
+
+    Cn->>C: sendHand(handList)
+
+    M->>Sn: sendCommonObjectives(commonObjectiveCards)
+
+    Sn-->>Cn: sendCommonObjectives(commonObjectiveCardsIDs)
+
+    Cn->>C: sendCommonObjectives(commonObjectiveCards)
+
+    M->>Sn: sendSecretObjectives(secretObjectiveCards)
+
+    Sn-->>Cn: sendSecretObjectives(secretObjectiveCardsIDs)
+
+    Cn->>C: sendSecretObjectives(secretObjectiveCards)
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "Secret objective"
+    Note left of C: Client: Input validation
+
+    C->>Cn: selectSecretObjective(secretObjectiveCard)
+
+    Cn-->>Sn: selectSecretObjective(secretObjectiveCardID)
+
+    Sn->>M: selectSecretObjective(secretObjectiveCard)
+
+    Note right of M: Server: Secret objective validation
+
+    alt Success
+        Note right of M: Server: Store secret objective
+        M->>Sn: confirmSecretObjective(objectiveCard)
+
+        Sn-->>Cn: confirmSecretObjective(objectiveCardID)
+
+        Cn->>C: confirmSecretObjective(objectiveCard)
+        Note left of C: Client: Update view
+    else Failure
+        M->>Sn: failureSecretObjective()
+
+        Sn-->>Cn: failureSecretObjective()
+
+        Cn->>C: failureSecretObjective()
+        Note left of C: Client back to: Ask "Secret objective"
+    end
+
+    Note right of M: Server: Wait for all players
+
+    Note right of M: Server: Choose random first player
+
+    M->>Sn: firstPlayer(playerID)
+
+    Sn-->>Cn: firstPlayer(playerID)
+
+    Cn->>C: firstPlayer(playerID)
+
+    Note left of C: Client: Update view
+
+    Note right of M: Server: Start game
+
+```
+
+Your turn sequence diagram
+
+```mermaid
+
+sequenceDiagram
+    title Your turn sequence diagram
+
+    participant C as ClientController
+    participant Cn as Client Decoder/Encoder
+    participant Sn as Server Decoder/Encoder
+    participant M as MatchController
+    
+    Note left of C: Client:<br><br> If you are the first player<br>call placeCard() on view<br>else wait your turn
+    Note left of C: Client: Place card validation
+
+    C->>Cn: palceCard(placeableCard)
+
+    Cn-->>Sn: palceCard(placeableCardID)
+
+    Sn->>M: palceCard(placeableCard)
+
+    Note right of M: Server: Place card validation
+
+    alt Success
+        Note right of M: Server: Store placed card
+        M->>Sn: confirmPalceCard(placeableCard)
+
+        Sn-->>Cn: confirmPalceCard(placeableCardID)
+
+        Cn->>C: confirmPalceCard(placeableCard)
+        Note left of C: Client: Update view
+    else Failure
+        M->>Sn: failurePalceCard()
+
+        Sn-->>Cn: failurePalceCard()
+
+        Cn->>C: failurePalceCard()
+        Note left of C: Client back to: Place card validation
+    end
+
+    Note left of C: Client: Draw card validation
+
+    C->>Cn: drawCard(placeableCard)
+
+    Cn-->>Sn: drawCard(placeableCardID)
+
+    Sn->>M: drawCard(placeableCard)
+
+    Note right of M: Server: Draw card validation
+
+    alt Success
+        Note right of M: Server: Store drawn card
+        M->>Sn: confirmDrawCard(placeableCard, newVisibleCard)
+
+        Sn-->>Cn: confirmDrawCard(placeableCardID, newVisibleCard)
+
+        Cn->>C: confirmDrawCard(placeableCard, newVisibleCard)
+        Note left of C: Client: Update view
+    else Failure
+        M->>Sn: failureDrawCard()
+
+        Sn-->>Cn: failureDrawCard()
+
+        Cn->>C: failureDrawCard()
+        Note left of C: Client back to: Draw card validation
+    end
+
+    Note right of M: Server: Notify opponents
+    Note right of M: Server: Pick next player
+    Note right of M: Server: Notify all players<br> next player ID
+
 
 ```
 
