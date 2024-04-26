@@ -27,6 +27,7 @@ public class ClientController {
     }
 
     public void printMatches(Map<Integer, List<String>> matches){
+        System.out.println(matches);
         if (matches.isEmpty()){
             String inputPlayers = view.noMatches();
 

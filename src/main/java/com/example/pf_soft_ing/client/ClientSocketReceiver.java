@@ -48,65 +48,58 @@ public class ClientSocketReceiver {
     }
 
     protected void messageDecoder(String input){
+        System.out.println(input);
         String[] inputArray = input.split(" ");
-        List<String> nicknames = new ArrayList<>();
-        Map<Integer, List<String>> matches= new HashMap<>();
+
+        Map<Integer, List<String>> matches= new HashMap<Integer, List<String>>();
 
         switch (inputArray[0]) {
             case "0":
                 for(int i = 1; i < inputArray.length; i++){
                     int key;
-                    if (inputArray[i].equals("M")){
+                    if (Objects.equals(inputArray[i], "M")){
                         key = parseInt(inputArray[i+1]);
-                        i += 2;
-                        if (inputArray[i].equals("P")){
-                            for(int j = i+1; j < i+1+ Integer.parseInt(inputArray[i+1]); j++) {
-                                nicknames.add(inputArray[i + 1]);
-                            }
+                        i = i + 2;
+                        if (Objects.equals(inputArray[i], "P")){
+                            i++;
+                            List<String> nicknames = new ArrayList<String>(Arrays.asList(inputArray).subList(i + 1, i + 1 + parseInt(inputArray[i])));
+                            matches.put(key, nicknames);
                         }
-                        matches.put(key, nicknames);
-                        nicknames.clear();
                     }
                 }
                 clientDecoder.printMatches(matches);
-                matches.clear();
                 break;
 
             case "1":
                 for(int i = 1; i < inputArray.length; i++){
                     int key;
-
-                    if (inputArray[i].equals("M")){
+                    if (Objects.equals(inputArray[i], "M")){
                         key = parseInt(inputArray[i+1]);
                         i += 2;
-
-                        if (inputArray[i].equals("P")){
-                            for(int j = i+1; j < i+1+ Integer.parseInt(inputArray[i+1]); j++) {
-                                nicknames.add(inputArray[i + 1]);
-                            }
+                        if (Objects.equals(inputArray[i], "P")){
+                            i++;
+                            List<String> nicknames = new ArrayList<String>(Arrays.asList(inputArray).subList(i + 1, i + 1 + parseInt(inputArray[i])));
+                            matches.put(key, nicknames);
                         }
-                        matches.put(key, nicknames);
-                        nicknames.clear();
                     }
                 }
                 clientDecoder.failedMatch(matches);
-                matches.clear();
                 break;
 
             case "2":
+                List<String> nicknames2 = new ArrayList<String>();
                 if (inputArray.length > 2) {
-                    nicknames.addAll(Arrays.asList(inputArray).subList(2, inputArray.length));
+                    nicknames2.addAll(Arrays.asList(inputArray).subList(2, inputArray.length));
                 }
-                clientDecoder.joinMatch(Integer.parseInt(inputArray[1]), nicknames);
-                nicknames.clear();
+                clientDecoder.joinMatch(Integer.parseInt(inputArray[1]), nicknames2);
                 break;
 
             case "3":
+                List<String> nicknames3 = new ArrayList<String>();
                 if (inputArray.length > 1) {
-                    nicknames.addAll(Arrays.asList(inputArray).subList(1, inputArray.length));
+                    nicknames3.addAll(Arrays.asList(inputArray).subList(1, inputArray.length));
                 }
-                clientDecoder.failedNickname(nicknames);
-                nicknames.clear();
+                clientDecoder.failedNickname(nicknames3);
                 break;
 
             case "4":
@@ -118,7 +111,6 @@ public class ClientSocketReceiver {
                     }
                 }
                 clientDecoder.addNickname(Integer.parseInt(inputArray[1]), inputArray[2], opponents);
-                opponents.clear();
                 break;
 
             case "5":

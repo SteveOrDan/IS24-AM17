@@ -24,11 +24,13 @@ public class NewPlayerController {
         for (Integer matchID : matchesNicknames.keySet()){
             output.append(" ");
             output.append(STR."M \{matchID}");
+            output.append(STR." P \{matchesNicknames.get(matchID).size()}");
             for (String s : matchesNicknames.get(matchID)){
-                output.append(" P ");
+                output.append(" ");
                 output.append(s);
             }
         }
+        System.out.println(output.toString());
         return output.toString();
     }
 
@@ -59,7 +61,7 @@ public class NewPlayerController {
         if (matchController == null ){
             output.append(STR."1\{getMatchesSoket(gameController)}");
         } else {
-            output.append("2");
+            output.append(STR."2 \{matchID}");
             for (String s : matchController.getMatchModel().getNicknames()){
                 output.append(" ");
                 output.append(s);
@@ -91,13 +93,13 @@ public class NewPlayerController {
             }
             sendMessage(output.toString(), out);
         } catch (GameIsFullException e) {
-            output.append("3 ");
+            output.append("3");
             for (String s : matchController.getMatchModel().getNicknames()){
                 output.append(STR." \{s}");
             }
             sendMessage(output.toString(), out);
         } catch (NicknameAlreadyExistsException e) {
-            output.append("3 ");
+            output.append("3");
             for (String s : matchController.getMatchModel().getNicknames()){
                 output.append(STR." \{s}");
             }
