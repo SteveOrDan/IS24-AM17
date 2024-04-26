@@ -46,11 +46,11 @@ public class RMIController {
                 foundPort = true;
             }
             catch (IOException e) {
-                System.out.println(e.getMessage());
+//                System.out.println(e.getMessage());
                 portNumber++;
             }
         }
-        System.out.println(STR."Server started! Port:\{portNumber}");
+        System.out.println(STR."RMI port:\{portNumber}");
     }
 
 

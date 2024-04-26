@@ -35,12 +35,12 @@ public class SocketController {
                 foundPort = true;
             }
             catch (IOException e) {
-                System.out.println(e.getMessage());
+//                System.out.println(e.getMessage());
                 portNumber++;
             }
         }
 
-        System.out.println(STR."Server started! Port:\{portNumber}");
+        System.out.println(STR."Soket port:\{portNumber}");
 
         return serverSocket;
     }
