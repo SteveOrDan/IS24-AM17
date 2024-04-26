@@ -52,6 +52,12 @@ public class TUIView extends View{
     }
 
     @Override
+    public String errorNoMatches() {
+        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.\n");
+        return noMatches();
+    }
+
+    @Override
     public String numberOfPlayers() {
         System.out.println("\nDigit the number of the players:\n");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -62,6 +68,12 @@ public class TUIView extends View{
             throw new RuntimeException(e);
         }
         return input;
+    }
+
+    @Override
+    public String errorNumberOfPlayers() {
+        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.\n");
+        return numberOfPlayers();
     }
 
     @Override

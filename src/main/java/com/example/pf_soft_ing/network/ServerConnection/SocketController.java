@@ -92,29 +92,6 @@ public class SocketController {
     public static void startInteraction(BufferedReader in, PrintWriter out, GameController gameController){
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-
-
-//        boolean isValid = false;
-//        String input;
-//        while(!isValid) {
-//            out.println("Choose Nickname:");
-//
-//            try {
-//                input = in.readLine();
-//                if (input.equals("end")){
-//                    isValid = false;
-//                }
-//                new Thread() {
-//                    public void run() {
-//                        messageDecoder(input, gameController, out);
-//                    }
-//                }.start();
-//            } catch (IOException e) {
-//                System.err.println(STR."Exception \{e.getMessage()}");
-//                isValid = false;
-//            }
-//        }
-
         new Thread(){
             public void run(){
                 boolean isRunning = true;
@@ -127,6 +104,7 @@ public class SocketController {
                         if (input.equals("end")){
                             isRunning = false;
                         }
+                        System.out.println(input);
                         messageDecoder(input, gameController, out, in);
                     }
                     catch (IOException e) {
@@ -140,15 +118,12 @@ public class SocketController {
     }
 
     private static void sendMessage(String output, PrintWriter out){
-        new Thread(){
-            public void run(){
-                out.println(output);
-            }
-        }.start();
+        out.println(output);
     }
 
     private static void messageDecoder(String input, GameController gameController,PrintWriter out, BufferedReader in) {
         System.out.println(input);
+
         String[] inputArray = input.split(" ");
         StringBuilder output = new StringBuilder("");
         Map<Integer, List<String>> matchesNicknames = gameController.getGameModel().getMatches();
@@ -197,10 +172,12 @@ public class SocketController {
                 break;
 
             case "2":
+                System.out.println(inputArray[1]);
                 matchController = gameController.createGame(Integer.parseInt(inputArray[1]));
                 //TODO synchronize on matchController
 
                 output.append(STR."2 \{matchController.getMatchModel().getMatchID()}");
+                sendMessage(output.toString(), out);
                 getNickname( input, matchController, out, in);
                 break;
 

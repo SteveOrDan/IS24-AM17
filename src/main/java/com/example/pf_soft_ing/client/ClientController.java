@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.ServerConnection.Encoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ClientController {
     private HashMap<Integer, OpponentModel> otherPlayerMap;
@@ -27,31 +28,36 @@ public class ClientController {
     public void printMatches(Map<Integer, List<String>> matches){
         if (matches.isEmpty()){
             String inputPlayers = view.noMatches();
-            while (!isNumeric(inputPlayers) || (Integer.parseInt(inputPlayers) > 1 && Integer.parseInt(inputPlayers) < 5)){
-                inputPlayers = view.noMatches();
+            while (!validNumberOfPlayers(inputPlayers)){
+                inputPlayers = view.errorNoMatches();
             }
             createMatch(Integer.parseInt(inputPlayers));
-        }
-        String input = view.printMatches(matches);
-        boolean inputFlag = true;
-        while (inputFlag){
-            if (input == "new") {
-                inputFlag = false;
-                String inputPlayers = view.numberOfPlayers();
-                while (!isNumeric(inputPlayers) || (Integer.parseInt(inputPlayers) > 1 && Integer.parseInt(inputPlayers) < 5)){
-                    inputPlayers = view.numberOfPlayers();
-                }
-                createMatch(Integer.parseInt(inputPlayers));
-            } else {
-                if (matches.keySet().contains(Integer.parseInt(input))){
+        } else {
+            String input = view.printMatches(matches);
+            boolean inputFlag = true;
+            while (inputFlag) {
+                if (Objects.equals(input, "new")) {
                     inputFlag = false;
-
-                    sendMatch(Integer.parseInt(input));
+                    String inputPlayers = view.numberOfPlayers();
+                    while (!validNumberOfPlayers(inputPlayers)) {
+                        inputPlayers = view.errorNumberOfPlayers();
+                    }
+                    createMatch(Integer.parseInt(inputPlayers));
                 } else {
-                    input = view.failedMatch(matches);
+                    if (matches.keySet().contains(Integer.parseInt(input))) {
+                        inputFlag = false;
+
+                        sendMatch(Integer.parseInt(input));
+                    } else {
+                        input = view.failedMatch(matches);
+                    }
                 }
             }
         }
+    }
+
+    private boolean validNumberOfPlayers(String input){
+        return (Objects.equals(input, "2") || Objects.equals(input, "3") || Objects.equals(input, "4"));
     }
 
     public void failedMatch(Map<Integer, List<String>> matches){

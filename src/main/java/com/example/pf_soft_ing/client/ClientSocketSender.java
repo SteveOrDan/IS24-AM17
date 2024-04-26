@@ -14,11 +14,7 @@ public class ClientSocketSender extends ClientEncoder{
     }
 
     protected static void SendMessage(String output){
-        new Thread(){
-            public void run(){
-                out.println(output);
-            }
-        }.start();
+        out.println(output);
     }
 
     @Override

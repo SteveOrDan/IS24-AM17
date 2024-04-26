@@ -14,8 +14,12 @@ public class View {
     }
 
     public String noMatches(){return null;}
+    public String errorNoMatches(){return null;}
 
     public String numberOfPlayers(){
+        return null;
+    }
+    public String errorNumberOfPlayers(){
         return null;
     }
 

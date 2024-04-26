@@ -16,7 +16,7 @@ public class ClientMain {
 
     public static void main( String[] args ) {
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".\n\nBefore starting you have to choose view; digit:\n\t-\'1\' for TUI;\n\t-\'2\' for GUI;\n");
+        System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".\n\nBefore starting you have to choose view; digit:\n\t-\'1\' for TUI;\n\t-\'2\' for GUI;");
         String input = null;
         boolean UIFlag = true;
         View view = null;
@@ -37,8 +37,14 @@ public class ClientMain {
                 }
             }
         }
-
-        System.out.println("\n\nNow you have to choose the connection protocol; digit:\n\t-\'1\' for Socket connection;\n\t-\'2\' for RMI connection;\n");
+        System.out.println("\nInsert the IP and the port separated by a space:\n");
+        try {
+            input = stdIn.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        args = input.split(" ");
+        System.out.println("\nNow you have to choose the connection protocol; digit:\n\t-\'1\' for Socket connection;\n\t-\'2\' for RMI connection;");
         boolean startFlag = true;
         ClientController clientController = null;
         while (startFlag){
@@ -79,11 +85,11 @@ public class ClientMain {
             return clientController;
         }
         catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
+            System.out.println("Don't know about host " + hostName);
             System.exit(1);
         }
         catch (IOException e) {
-            System.err.println("Couldn't get I/O for the connection to " + hostName);
+            System.out.println("Couldn't get I/O for the connection to " + hostName);
             System.exit(1);
         }
         return null;
