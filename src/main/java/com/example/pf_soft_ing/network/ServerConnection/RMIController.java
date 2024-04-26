@@ -7,6 +7,7 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
 
 import java.io.IOException;
+import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -17,9 +18,26 @@ import static java.lang.System.exit;
 
 public class RMIController {
 
-    public static void startRMIReceiver(String[] args){
+//    public static void startRMIReceiver(int portNumber){
+//            Registry registry = null;
+//            RMIReceiverInterface rmiReceiver;
+//            try {
+//                rmiReceiver = new RMIReceiver();
+//                registry = LocateRegistry.createRegistry(portNumber);
+//                registry.bind("RMIReceiver", rmiReceiver);
+//            } catch (AccessException e) {
+//                throw new RuntimeException(e);
+//            } catch (AlreadyBoundException e) {
+//                throw new RuntimeException(e);
+//            } catch (RemoteException e) {
+//                throw new RuntimeException(e);
+//            }
+//            System.out.println(STR."Server started! Port:\{portNumber}");
+//
+//    }
+    public static void startRMIReceiver(String args[]){
 
-        Registry registry = null;
+       Registry registry = null;
         RMIReceiverInterface rmiReceiver;
 
         if (args.length != 1) {

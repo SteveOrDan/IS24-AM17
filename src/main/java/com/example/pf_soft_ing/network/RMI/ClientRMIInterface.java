@@ -6,7 +6,7 @@ import com.example.pf_soft_ing.player.TokenColors;
 import java.rmi.*;
 import java.util.List;
 
-public interface ClientGameControllerInterface extends Remote {
+public interface ClientRMIInterface extends Remote {
     // server su client
     void sendID(int id) throws RemoteException;
     void setState(PlayerState state) throws RemoteException;

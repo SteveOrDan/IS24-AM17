@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.client;
 
 import com.example.pf_soft_ing.ServerConnection.Encoder;
+import com.example.pf_soft_ing.network.RMI.ClientRMI;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +9,11 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.Objects;
+
+import static com.example.pf_soft_ing.network.ServerConnection.RMIController.startRMIReceiver;
 
 public class ClientMain {
 
@@ -95,5 +100,20 @@ public class ClientMain {
         return null;
     }
 
-    protected static void startRMI(){}
+//    protected static void startRMI(String[] args, View view){
+//        String hostName = args[0];
+//        int portNumber = Integer.parseInt(args[1]);
+//        try {
+//            startRMIReceiver(portNumber);
+//            ClientRMI clientRMI = new ClientRMI(hostName, portNumber);
+//            clientRMI.startClient();
+//            ClientEncoder clientEncoder = new ClientRMISender();
+//            ClientController clientController = new ClientController(ClientEncoder, view);
+//
+//        } catch (NotBoundException e) {
+//            throw new RuntimeException(e);
+//        } catch (RemoteException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 }

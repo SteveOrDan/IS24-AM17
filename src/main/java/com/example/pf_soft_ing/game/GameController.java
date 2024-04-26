@@ -4,6 +4,7 @@ import com.example.pf_soft_ing.ServerConnection.*;
 import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
+import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.io.BufferedReader;
@@ -49,7 +50,7 @@ public class GameController {
         analizePlayerNumber(matchController);
     }
 
-    public void joinMatch(MatchController matchController, String nickname, ClientRMI client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
+    public void joinMatch(MatchController matchController, String nickname, ClientRMIInterface client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
         // Adds player to the match
         // Updates player's view
 

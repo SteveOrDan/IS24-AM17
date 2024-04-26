@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Scanner;
 
-public class ClientRMI extends UnicastRemoteObject implements ClientGameControllerInterface {
+public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface {
     public final String hostName;
     public final int portNumber;
     public ClientRMI(String hostName, int portNumber) throws RemoteException {
@@ -24,6 +24,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
         try {
             Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
             RMIReceiverInterface stub = (RMIReceiverInterface) registry.lookup("RMIReceiver");
+
             boolean flag = true;
 
             // iniza ciclo di richieste
@@ -45,6 +46,9 @@ public class ClientRMI extends UnicastRemoteObject implements ClientGameControll
                     case 3 : {
                         stub.requestError(this);
                         break;
+                    }
+                    case 4: {
+                        stub.createGame(this,"caterina", 4);
                     }
                 }
 

@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.ServerConnection;
 
 
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
+import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -9,8 +10,8 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 public class RMISender extends Encoder {
-    ClientRMI client;
-    public RMISender(ClientRMI client){
+    ClientRMIInterface client;
+    public RMISender(ClientRMIInterface client){
         this.client = client;
     }
     public void sendID(int id){
@@ -94,7 +95,6 @@ public class RMISender extends Encoder {
     }
 
     public void requestError(){
-
     }
 
 }

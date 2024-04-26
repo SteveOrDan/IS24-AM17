@@ -8,6 +8,7 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
+import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 
@@ -96,7 +97,7 @@ public class MatchController{
         return playerId;
     }
 
-    public Integer addPlayer(String nickname, ClientRMI clientRMI) throws GameIsFullException, NicknameAlreadyExistsException {
+    public Integer addPlayer(String nickname, ClientRMIInterface clientRMI) throws GameIsFullException, NicknameAlreadyExistsException {
         if (IDPlayerMap.size() >= 4){
             throw new GameIsFullException();
         }
