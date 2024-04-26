@@ -7,9 +7,7 @@ public class GameModel {
 
     public Map<Integer, List<String>> getMatches(){
         Map<Integer, List<String>> matchesNicknames = new HashMap<>();
-        for (MatchController matchController : matches){
-            matchesNicknames.put(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
-        }
+        matches.forEach(match -> matchesNicknames.put(match.getMatchModel().getMatchID(), match.getMatchModel().getNicknames()));
         return matchesNicknames;
     }
 

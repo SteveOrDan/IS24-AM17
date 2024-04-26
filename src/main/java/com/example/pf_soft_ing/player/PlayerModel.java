@@ -43,7 +43,7 @@ public class PlayerModel {
         this.nickname = nickname;
         this.id = id;
         this.encoder = encoder;
-        encoder.sendID(id);
+//        encoder.sendID(id);
     }
 
     public PlayerModel(String nickname, int id) {

@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.exceptions.GameIsFullException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.networkControllers.RMIController;
 import com.example.pf_soft_ing.game.networkControllers.SocketController;
 
@@ -17,7 +19,16 @@ public class ServerMain {
 
         GameController gameController = new GameController();
         ServerSocket serverSocket = startServerConnection(args);
-        RMIController rmiController = new RMIController(gameController, args);
+        new RMIController(gameController, args);
+
+        try {
+            gameController.createGame(3).addPlayer("AAA", (PrintWriter) null);
+            System.out.println(gameController.getGameModel().getMatches().values());
+        } catch (GameIsFullException e) {
+            throw new RuntimeException(e);
+        } catch (NicknameAlreadyExistsException e) {
+            throw new RuntimeException(e);
+        }
 
         new Thread() {
             public void run() {

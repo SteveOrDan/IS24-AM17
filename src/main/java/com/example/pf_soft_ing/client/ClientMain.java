@@ -14,13 +14,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ClientMain {
 
 //    private ClientController clientController;
 
-    public static void main( String[] args ) {
+    public static void main( String[] ip ) {
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".\n\nBefore starting you have to choose view; digit:\n\t-\'1\' for TUI;\n\t-\'2\' for GUI;");
         String input = null;
@@ -43,13 +44,13 @@ public class ClientMain {
                 }
             }
         }
-        System.out.println("\nInsert the IP and the port separated by a space:");
+        System.out.println("\nInsert the port number:");
+        String port;
         try {
-            input = stdIn.readLine();
+            port = stdIn.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        args = input.split(" ");
         System.out.println("\nNow you have to choose the connection protocol; digit:\n\t-\'1\' for Socket connection;\n\t-\'2\' for RMI connection;");
         boolean startFlag = true;
         ClientController clientController = null;
@@ -61,12 +62,11 @@ public class ClientMain {
             }
             if (Objects.equals(input, "1")) {
                 startFlag = false;
-                clientController = startSocket(args, view);
+                clientController = startSocket(ip, port, view);
             } else {
                 if (Objects.equals(input, "2")) {
-//                    System.out.println("Work in progress ¯\\_(ツ)_/¯");
                     startFlag = false;
-                    clientController = startRMI(args, view);
+                    clientController = startRMI(ip, port, view);
                 }
             }
         }
@@ -75,9 +75,9 @@ public class ClientMain {
 
     }
 
-    protected static ClientController startSocket(String[] args, View view){
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+    protected static ClientController startSocket(String[] ip, String port, View view){
+        String hostName = ip[0];
+        int portNumber = Integer.parseInt(port);
 
         try {
             Socket echoSocket = new Socket(hostName, portNumber);
@@ -101,9 +101,9 @@ public class ClientMain {
         return null;
     }
 
-    protected static ClientController startRMI(String[] args, View view){
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
+    protected static ClientController startRMI(String[] ip, String port, View view){
+        String hostName = ip[0];
+        int portNumber = Integer.parseInt(port);
 
         try {
 //            ClientRMI clientRMI = new ClientRMI(hostName, portNumber);
