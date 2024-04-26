@@ -1,16 +1,9 @@
 package com.example.pf_soft_ing.network.RMI;
 
-import com.example.pf_soft_ing.card.PlaceableCard;
-import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.exceptions.GameFullException;
-import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.player.PlayerState;
-import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
 
-import java.rmi.Remote;
-import java.rmi.RemoteException;
+import java.rmi.*;
 import java.util.List;
 
 public interface ClientGameControllerInterface extends Remote {

@@ -7,28 +7,14 @@ import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
 
-
-import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-
-
 
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
     private static HashMap<ClientRMI, Decoder> clientRMIDecoderHashMap;
     public static GameController gameController;
-    public static void main(String[] args ) throws RemoteException, AlreadyBoundException {
-        RMIReceiver rmiReceiver = new RMIReceiver();
-        Registry registry = LocateRegistry.createRegistry(1099);
-        registry.bind("RMIReceiver", rmiReceiver);
-        System.out.println("Waiting for invocations from clients");
-    }
 
     public RMIReceiver() throws RemoteException {
         clientRMIDecoderHashMap = new HashMap<>();
@@ -38,6 +24,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     public static void addDecoder(ClientRMI client, Decoder decoder){
         clientRMIDecoderHashMap.put(client,decoder);
     }
+
     @Override
     public void placeCard(int id, Position pos, ClientRMI client) throws RemoteException {
         clientRMIDecoderHashMap.get(client).placeCard(id, pos);
@@ -65,7 +52,8 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
     @Override
     public void requestError(ClientRMI client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).requestError();
+        //clientRMIDecoderHashMap.get(client).requestError();
+        System.out.println("Method request error called");
     }
 
     @Override

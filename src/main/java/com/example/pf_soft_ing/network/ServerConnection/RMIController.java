@@ -17,37 +17,37 @@ import static java.lang.System.exit;
 
 public class RMIController {
 
-//    public static void startServer(String[] args){
-//
-//        Registry registry = null;
-//        RMIReceiverInterface rmiReceiver;
-//
-//        if (args.length != 1) {
-//            System.out.println("Cannot start port.");
-//            exit(1);
-//        }
-//        int portNumber = Integer.parseInt(args[0]);
-//        boolean foundPort = false;
-//        while (!foundPort) {
-//            try {
-//
-//                rmiReceiver = new RMIReceiver();
-//                registry = LocateRegistry.createRegistry(portNumber);
-//
-//                try {
-//                    registry.bind("RemoteController", rmiReceiver);
-//                } catch (AlreadyBoundException e) {
-//                    throw new RuntimeException(e);
-//                }
-//                foundPort = true;
-//            }
-//            catch (IOException e) {
-//                System.out.println(e.getMessage());
-//                portNumber++;
-//            }
-//        }
-//        System.out.println(STR."Server started! Port:\{portNumber}");
-//    }
+    public static void startRMIReceiver(String[] args){
+
+        Registry registry = null;
+        RMIReceiverInterface rmiReceiver;
+
+        if (args.length != 1) {
+            System.out.println("Cannot start port.");
+            exit(1);
+        }
+        int portNumber = Integer.parseInt(args[0]);
+        boolean foundPort = false;
+        while (!foundPort) {
+            try {
+
+                rmiReceiver = new RMIReceiver();
+                registry = LocateRegistry.createRegistry(portNumber);
+
+                try {
+                    registry.bind("RMIReceiver", rmiReceiver);
+                } catch (AlreadyBoundException e) {
+                    throw new RuntimeException(e);
+                }
+                foundPort = true;
+            }
+            catch (IOException e) {
+                System.out.println(e.getMessage());
+                portNumber++;
+            }
+        }
+        System.out.println(STR."Server started! Port:\{portNumber}");
+    }
 
 
 //    public static void ClientStarterRequest(ClientRMI client, RMIReceiverInterface stub){

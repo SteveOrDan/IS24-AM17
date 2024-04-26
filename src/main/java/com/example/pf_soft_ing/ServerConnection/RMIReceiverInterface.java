@@ -25,4 +25,5 @@ public interface RMIReceiverInterface extends Remote {
 
     //prova
     boolean prova(String name) throws RemoteException;
+
 }
