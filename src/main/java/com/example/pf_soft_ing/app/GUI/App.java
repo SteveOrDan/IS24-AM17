@@ -4,6 +4,7 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 import com.example.pf_soft_ing.game.GameResources;
 import javafx.application.Application;
 import javafx.fxml.FXML;
@@ -554,143 +555,143 @@ public class App extends Application {
         Position tlPos = new Position(pos.getX() - 1, pos.getY() + 1);
         Position trPos = new Position(pos.getX() + 1, pos.getY() + 1);
 
-        if (card.getCurrSide().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
-            Pane blPane = new Pane();
-            blPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button blButton = new Button();
-            blButton.setPrefSize(cardWidth, cardHeight);
-            blButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
-            blButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
-            blButton.setOpacity(0.6);
-            blButton.setOnAction((_) -> {
-                placeCard(ID1, "front", blPos);
-                cardPane.getChildren().remove(blButton);
-            });
-
-            blPane.getChildren().add(blButton);
-            Position buttonGridPos = mapToGridPos(blPos);
-            playerFieldGrid.add(blPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(blPos, blPane);
-        }
-        if (card.getCurrSide().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
-            Pane brPane = new Pane();
-            brPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button brButton = new Button();
-            brButton.setPrefSize(cardWidth, cardHeight);
-            brButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth * (1 - cardCornerWidthProportion));
-            brButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
-            brButton.setOpacity(0.6);
-            brButton.setOnAction((_) -> {
-                placeCard(ID2, "front", brPos);
-                cardPane.getChildren().remove(brButton);
-            });
-
-            brPane.getChildren().add(brButton);
-            Position buttonGridPos = mapToGridPos(brPos);
-            playerFieldGrid.add(brPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(brPos, brPane);
-        }
-        if (card.getCurrSide().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
-            Pane tlPane = new Pane();
-            tlPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button tlButton = new Button();
-            tlButton.setPrefSize(cardWidth, cardHeight);
-            tlButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
-            tlButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
-            tlButton.setOpacity(0.6);
-            tlButton.setOnAction((_) -> {
-                placeCard(ID3, "front", tlPos);
-                cardPane.getChildren().remove(tlButton);
-            });
-
-            tlPane.getChildren().add(tlButton);
-            Position buttonGridPos = mapToGridPos(tlPos);
-            playerFieldGrid.add(tlPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(tlPos, tlPane);
-        }
-        if (card.getCurrSide().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
-            Pane trPane = new Pane();
-            trPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button trButton = new Button();
-            trButton.setPrefSize(cardWidth, cardHeight);
-            trButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth - cardWidth * cardCornerWidthProportion);
-            trButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
-            trButton.setOpacity(0.6);
-            trButton.setOnAction((_) -> {
-                placeCard(ID4, "front", trPos);
-                cardPane.getChildren().remove(trButton);
-            });
-
-            trPane.getChildren().add(trButton);
-            Position buttonGridPos = mapToGridPos(trPos);
-            playerFieldGrid.add(trPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(trPos, trPane);
-        }
+//        if (card.getCurrSide().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
+//            Pane blPane = new Pane();
+//            blPane.setPrefSize(gridCellWidth, gridCellHeight);
+//
+//            Button blButton = new Button();
+//            blButton.setPrefSize(cardWidth, cardHeight);
+//            blButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
+//            blButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
+//            blButton.setOpacity(0.6);
+//            blButton.setOnAction((_) -> {
+//                placeCard(ID1, "front", blPos);
+//                cardPane.getChildren().remove(blButton);
+//            });
+//
+//            blPane.getChildren().add(blButton);
+//            Position buttonGridPos = mapToGridPos(blPos);
+//            playerFieldGrid.add(blPane, buttonGridPos.getX(), buttonGridPos.getY());
+//            validPosToButtonPane.put(blPos, blPane);
+//        }
+//        if (card.getCurrSide().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
+//            Pane brPane = new Pane();
+//            brPane.setPrefSize(gridCellWidth, gridCellHeight);
+//
+//            Button brButton = new Button();
+//            brButton.setPrefSize(cardWidth, cardHeight);
+//            brButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth * (1 - cardCornerWidthProportion));
+//            brButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
+//            brButton.setOpacity(0.6);
+//            brButton.setOnAction((_) -> {
+//                placeCard(ID2, "front", brPos);
+//                cardPane.getChildren().remove(brButton);
+//            });
+//
+//            brPane.getChildren().add(brButton);
+//            Position buttonGridPos = mapToGridPos(brPos);
+//            playerFieldGrid.add(brPane, buttonGridPos.getX(), buttonGridPos.getY());
+//            validPosToButtonPane.put(brPos, brPane);
+//        }
+//        if (card.getCurrSide().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
+//            Pane tlPane = new Pane();
+//            tlPane.setPrefSize(gridCellWidth, gridCellHeight);
+//
+//            Button tlButton = new Button();
+//            tlButton.setPrefSize(cardWidth, cardHeight);
+//            tlButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
+//            tlButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
+//            tlButton.setOpacity(0.6);
+//            tlButton.setOnAction((_) -> {
+//                placeCard(ID3, "front", tlPos);
+//                cardPane.getChildren().remove(tlButton);
+//            });
+//
+//            tlPane.getChildren().add(tlButton);
+//            Position buttonGridPos = mapToGridPos(tlPos);
+//            playerFieldGrid.add(tlPane, buttonGridPos.getX(), buttonGridPos.getY());
+//            validPosToButtonPane.put(tlPos, tlPane);
+//        }
+//        if (card.getCurrSide().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
+//            Pane trPane = new Pane();
+//            trPane.setPrefSize(gridCellWidth, gridCellHeight);
+//
+//            Button trButton = new Button();
+//            trButton.setPrefSize(cardWidth, cardHeight);
+//            trButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth - cardWidth * cardCornerWidthProportion);
+//            trButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
+//            trButton.setOpacity(0.6);
+//            trButton.setOnAction((_) -> {
+//                placeCard(ID4, "front", trPos);
+//                cardPane.getChildren().remove(trButton);
+//            });
+//
+//            trPane.getChildren().add(trButton);
+//            Position buttonGridPos = mapToGridPos(trPos);
+//            playerFieldGrid.add(trPane, buttonGridPos.getX(), buttonGridPos.getY());
+//            validPosToButtonPane.put(trPos, trPane);
+//        }
     }
 
     private void updateIlLegalPositions(Position pos){
-        ArrayList<Position> newLegalPos = new ArrayList<>();
-        ArrayList<Position> newIllegalPos = new ArrayList<>();
-
-        Side currSide = playArea.get(pos).getCurrSide();
-
-        if (currSide.getBLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
-        }
-
-        if (currSide.getBRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
-        }
-
-        if (currSide.getTLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
-        }
-
-        if (currSide.getTRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
-        }
-
-        for (Position p : newIllegalPos){
-            if (!illegalPosList.contains(p)){
-                illegalPosList.add(p);
-            }
-
-            legalPosList.remove(p);
-
-            if (validPosToButtonPane.containsKey(p)){
-                playerFieldGrid.getChildren().remove(validPosToButtonPane.get(p));
-                validPosToButtonPane.remove(p);
-            }
-        }
-
-        for (Position p : newLegalPos){
-            if (!legalPosList.contains(p) && !illegalPosList.contains(p)){
-                legalPosList.add(p);
-            }
-        }
-
-        // Set the new card's position as illegal (a card just got placed)
-        legalPosList.remove(pos);
-
-        if (!illegalPosList.contains(pos)){
-            illegalPosList.add(pos);
-        }
+//        ArrayList<Position> newLegalPos = new ArrayList<>();
+//        ArrayList<Position> newIllegalPos = new ArrayList<>();
+//
+//        Side currSide = playArea.get(pos).getCurrSide();
+//
+//        if (currSide.getBLCorner().isAvailable()){
+//            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+//        }
+//        else{
+//            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+//        }
+//
+//        if (currSide.getBRCorner().isAvailable()){
+//            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+//        }
+//        else{
+//            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+//        }
+//
+//        if (currSide.getTLCorner().isAvailable()){
+//            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+//        }
+//        else{
+//            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+//        }
+//
+//        if (currSide.getTRCorner().isAvailable()){
+//            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+//        }
+//        else{
+//            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+//        }
+//
+//        for (Position p : newIllegalPos){
+//            if (!illegalPosList.contains(p)){
+//                illegalPosList.add(p);
+//            }
+//
+//            legalPosList.remove(p);
+//
+//            if (validPosToButtonPane.containsKey(p)){
+//                playerFieldGrid.getChildren().remove(validPosToButtonPane.get(p));
+//                validPosToButtonPane.remove(p);
+//            }
+//        }
+//
+//        for (Position p : newLegalPos){
+//            if (!legalPosList.contains(p) && !illegalPosList.contains(p)){
+//                legalPosList.add(p);
+//            }
+//        }
+//
+//        // Set the new card's position as illegal (a card just got placed)
+//        legalPosList.remove(pos);
+//
+//        if (!illegalPosList.contains(pos)){
+//            illegalPosList.add(pos);
+//        }
     }
 
     private Position mapToGridPos(Position mapPos){

@@ -1,5 +1,8 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.ServerConnection.SocketSender;
+import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
+import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
 import com.example.pf_soft_ing.game.*;
 import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
@@ -16,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +56,7 @@ class PlayerModelTest {
     @Test
     void placeStarterCard() {
         playerModel.setStarterCard(starterCard1);
-        starterCard1.flipCard();
-        starterCard1.flipCard();
-        playerModel.placeStarterCard();
+        playerModel.placeStarterCard(starterFront1);
 
         assertEquals(0, playerModel.getCurrScore());
         assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.INSECT.getValue()]);
@@ -69,12 +71,16 @@ class PlayerModelTest {
     void placeCardInValidPos() {
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard();
+        playerModel.placeStarterCard(starterFront1);
         assertEquals(0, playerModel.getCurrScore());
 
         //Now place a card in a valid position
         Position pos = new Position(1,1);
-        playerModel.placeCard(normalCard, pos);
+        try {
+            playerModel.placeCard(normalCard, pos, normalFront);
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         assertTrue(playerModel.getPlayArea().containsKey(pos));
         assertEquals(playerModel.getPlayArea().get(pos), normalCard);
@@ -86,7 +92,7 @@ class PlayerModelTest {
     void placeCardInInvalidPos() {
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard();
+        playerModel.placeStarterCard(starterFront1);
         assertEquals(0, playerModel.getCurrScore());
 
         //Now place a card in a valid position
@@ -94,9 +100,13 @@ class PlayerModelTest {
         Position pos2 = new Position(1,0);
         Position pos3 = new Position(-1,-1);
 
-        playerModel.placeCard(normalCard, pos1);
-        playerModel.placeCard(normalCard, pos2);
-        playerModel.placeCard(normalCard, pos3);
+        try {
+            playerModel.placeCard(normalCard, pos1, normalFront);
+            playerModel.placeCard(normalCard, pos2, normalFront);
+            playerModel.placeCard(normalCard, pos3, normalFront);
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         assertFalse(playerModel.getPlayArea().containsValue(normalCard));
 
@@ -124,32 +134,38 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 3 fungi resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
         ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(1);
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
-        resourceCard1.flipCard();
-        resourceCard2.flipCard();
-        resourceCard3.flipCard();
 
         //Place the resource cards
-        playerModel.placeCard(resourceCard1, new Position(-1, 1));
-        playerModel.placeCard(resourceCard2, new Position(0, 2));
-        playerModel.placeCard(resourceCard3, new Position(-2, 0));
+        try {
+            playerModel.placeCard(resourceCard1, new Position(-1, 1), resourceCard1.getBack());
+            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
+            playerModel.placeCard(resourceCard3, new Position(-2, 0), resourceCard3.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Same thing with 3 animal golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
-        goldenCard1.flipCard();
-        goldenCard2.flipCard();
-        goldenCard3.flipCard();
 
-        playerModel.placeCard(goldenCard1, new Position(1, -1));
-        playerModel.placeCard(goldenCard2, new Position(2, 0));
-        playerModel.placeCard(goldenCard3, new Position(0, -2));
+        try {
+            playerModel.placeCard(goldenCard1, new Position(1, -1), goldenCard1.getBack());
+            playerModel.placeCard(goldenCard2, new Position(2, 0), goldenCard2.getBack());
+            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
@@ -179,32 +195,38 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().front);
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 3 plant resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
         ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
-        resourceCard1.flipCard();
-        resourceCard2.flipCard();
-        resourceCard3.flipCard();
 
         //Place the resource cards
-        playerModel.placeCard(resourceCard1, new Position(1, 1));
-        playerModel.placeCard(resourceCard2, new Position(0, 2));
-        playerModel.placeCard(resourceCard3, new Position(2, 0));
+        try {
+            playerModel.placeCard(resourceCard1, new Position(1, 1), resourceCard1.getBack());
+            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
+            playerModel.placeCard(resourceCard3, new Position(2, 0), resourceCard3.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Same thing with 3 insect golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
-        goldenCard1.flipCard();
-        goldenCard2.flipCard();
-        goldenCard3.flipCard();
 
-        playerModel.placeCard(goldenCard1, new Position(-1, -1));
-        playerModel.placeCard(goldenCard2, new Position(-2, 0));
-        playerModel.placeCard(goldenCard3, new Position(0, -2));
+        try {
+            playerModel.placeCard(goldenCard1, new Position(-1, -1), goldenCard1.getBack());
+            playerModel.placeCard(goldenCard2, new Position(-2, 0), goldenCard2.getBack());
+            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
@@ -234,7 +256,11 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 6 fungi resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
@@ -243,18 +269,16 @@ class PlayerModelTest {
         ResourceCard resourceCard4 = (ResourceCard) resourceDeck.get(3);
         ResourceCard resourceCard5 = (ResourceCard) resourceDeck.get(4);
         ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(5);
-        resourceCard1.flipCard();
-        resourceCard2.flipCard();
-        resourceCard3.flipCard();
-        resourceCard4.flipCard();
-        resourceCard5.flipCard();
-        resourceCard6.flipCard();
 
         //Place the resource cards
-        playerModel.placeCard(resourceCard1, new Position(-1, 1));
-        playerModel.placeCard(resourceCard2, new Position(0, 2));
-        playerModel.placeCard(resourceCard3, new Position(-2, 0));
-        playerModel.placeCard(resourceCard4, new Position(1, 3));
+        try {
+            playerModel.placeCard(resourceCard1, new Position(-1, 1), resourceCard1.getBack());
+            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
+            playerModel.placeCard(resourceCard3, new Position(-2, 0), resourceCard3.getBack());
+            playerModel.placeCard(resourceCard4, new Position(1, 3), resourceCard4.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Same thing with 6 animal golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
@@ -263,17 +287,15 @@ class PlayerModelTest {
         GoldenCard goldenCard4 = (GoldenCard) goldenDeck.get(23);
         GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(24);
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(25);
-        goldenCard1.flipCard();
-        goldenCard2.flipCard();
-        goldenCard3.flipCard();
-        goldenCard4.flipCard();
-        goldenCard5.flipCard();
-        goldenCard6.flipCard();
 
-        playerModel.placeCard(goldenCard1, new Position(1, -1));
-        playerModel.placeCard(goldenCard2, new Position(2, 0));
-        playerModel.placeCard(goldenCard3, new Position(0, -2));
-        playerModel.placeCard(goldenCard4, new Position(3, 1));
+        try {
+            playerModel.placeCard(goldenCard1, new Position(1, -1), goldenCard1.getBack());
+            playerModel.placeCard(goldenCard2, new Position(2, 0), goldenCard2.getBack());
+            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
+            playerModel.placeCard(goldenCard4, new Position(3, 1), goldenCard4.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
@@ -286,8 +308,12 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a fifth card in the diagonal
-        playerModel.placeCard(resourceCard5, new Position(-3, -1));
-        playerModel.placeCard(goldenCard5, new Position(4,2));
+        try {
+            playerModel.placeCard(resourceCard5, new Position(-3, -1), resourceCard5.getBack());
+            playerModel.placeCard(goldenCard5, new Position(4,2), goldenCard5.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -299,8 +325,12 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a sixth card in the diagonal
-        playerModel.placeCard(resourceCard6, new Position(-4, -2));
-        playerModel.placeCard(goldenCard6, new Position(5,3));
+        try {
+            playerModel.placeCard(resourceCard6, new Position(-4, -2), resourceCard6.getBack());
+            playerModel.placeCard(goldenCard6, new Position(5,3), goldenCard6.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -329,7 +359,11 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 6 plant resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
@@ -338,18 +372,16 @@ class PlayerModelTest {
         ResourceCard resourceCard4 = (ResourceCard) resourceDeck.get(13);
         ResourceCard resourceCard5 = (ResourceCard) resourceDeck.get(14);
         ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(15);
-        resourceCard1.flipCard();
-        resourceCard2.flipCard();
-        resourceCard3.flipCard();
-        resourceCard4.flipCard();
-        resourceCard5.flipCard();
-        resourceCard6.flipCard();
 
         //Place the resource cards
-        playerModel.placeCard(resourceCard1, new Position(1, 1));
-        playerModel.placeCard(resourceCard2, new Position(2, 0));
-        playerModel.placeCard(resourceCard3, new Position(3, -1));
-        playerModel.placeCard(resourceCard4, new Position(4, -2));
+        try {
+            playerModel.placeCard(resourceCard1, new Position(1, 1), resourceCard1.getBack());
+            playerModel.placeCard(resourceCard2, new Position(2, 0), resourceCard2.getBack());
+            playerModel.placeCard(resourceCard3, new Position(3, -1), resourceCard3.getBack());
+            playerModel.placeCard(resourceCard4, new Position(4, -2), resourceCard4.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Same thing with 6 insect golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
@@ -358,17 +390,15 @@ class PlayerModelTest {
         GoldenCard goldenCard4 = (GoldenCard) goldenDeck.get(33);
         GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(34);
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(35);
-        goldenCard1.flipCard();
-        goldenCard2.flipCard();
-        goldenCard3.flipCard();
-        goldenCard4.flipCard();
-        goldenCard5.flipCard();
-        goldenCard6.flipCard();
 
-        playerModel.placeCard(goldenCard1, new Position(-1, -1));
-        playerModel.placeCard(goldenCard2, new Position(0, -2));
-        playerModel.placeCard(goldenCard3, new Position(1, -3));
-        playerModel.placeCard(goldenCard4, new Position(2, -4));
+        try {
+            playerModel.placeCard(goldenCard1, new Position(-1, -1), goldenCard1.getBack());
+            playerModel.placeCard(goldenCard2, new Position(0, -2), goldenCard2.getBack());
+            playerModel.placeCard(goldenCard3, new Position(1, -3), goldenCard3.getBack());
+            playerModel.placeCard(goldenCard4, new Position(2, -4), goldenCard4.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
@@ -381,8 +411,12 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a fifth card in the diagonal
-        playerModel.placeCard(resourceCard5, new Position(5, -3));
-        playerModel.placeCard(goldenCard5, new Position(3,-5));
+        try {
+            playerModel.placeCard(resourceCard5, new Position(5, -3), resourceCard5.getBack());
+            playerModel.placeCard(goldenCard5, new Position(3,-5), goldenCard5.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -394,8 +428,12 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a sixth card in the diagonal
-        playerModel.placeCard(resourceCard6, new Position(6, -4));
-        playerModel.placeCard(goldenCard6, new Position(4,-6));
+        try {
+            playerModel.placeCard(resourceCard6, new Position(6, -4), resourceCard6.getBack());
+            playerModel.placeCard(goldenCard6, new Position(4,-6), goldenCard6.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -424,20 +462,25 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 1 fungi golden card and 2 animal resource cards and flip them
         PlaceableCard mainCard = goldenDeck.getFirst();
         PlaceableCard card1 = resourceDeck.get(20);
         PlaceableCard card2 = resourceDeck.get(21);
-        mainCard.flipCard();
-        card1.flipCard();
-        card2.flipCard();
 
         //Place the cards
-        playerModel.placeCard(card1, new Position(1, 1));
-        playerModel.placeCard(mainCard, new Position(2,2));
-        playerModel.placeCard(card2, new Position(1,-1));
+        try {
+            playerModel.placeCard(card1, new Position(1, 1), card1.getBack());
+            playerModel.placeCard(mainCard, new Position(2,2), mainCard.getBack());
+            playerModel.placeCard(card2, new Position(1,-1), card2.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(6);
@@ -464,20 +507,25 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 1 animal golden card and 2 insect resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(20);
         PlaceableCard card1 = resourceDeck.get(30);
         PlaceableCard card2 = resourceDeck.get(31);
-        mainCard.flipCard();
-        card1.flipCard();
-        card2.flipCard();
 
         //Place the cards
-        playerModel.placeCard(card1, new Position(-1, 1));
-        playerModel.placeCard(mainCard, new Position(-2,2));
-        playerModel.placeCard(card2, new Position(-1,-1));
+        try {
+            playerModel.placeCard(card1, new Position(-1, 1), card1.getBack());
+            playerModel.placeCard(mainCard, new Position(-2,2), mainCard.getBack());
+            playerModel.placeCard(card2, new Position(-1,-1), card2.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(7);
@@ -504,20 +552,25 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 1 plant golden card and 2 fungi resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(10);
         PlaceableCard card1 = resourceDeck.get(0);
         PlaceableCard card2 = resourceDeck.get(1);
-        mainCard.flipCard();
-        card1.flipCard();
-        card2.flipCard();
 
         //Place the cards
-        playerModel.placeCard(card1, new Position(1, -1));
-        playerModel.placeCard(mainCard, new Position(2,-2));
-        playerModel.placeCard(card2, new Position(1,1));
+        try {
+            playerModel.placeCard(card1, new Position(1, -1), card1.getBack());
+            playerModel.placeCard(mainCard, new Position(2,-2), mainCard.getBack());
+            playerModel.placeCard(card2, new Position(1,1), card2.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(4);
@@ -544,20 +597,25 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        playerModel.placeStarterCard();
+        try {
+            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
+        } catch (StarterCardNotSetException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Use 1 fungus golden card and 2 animal resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(30);
         PlaceableCard card1 = resourceDeck.get(10);
         PlaceableCard card2 = resourceDeck.get(11);
-        mainCard.flipCard();
-        card1.flipCard();
-        card2.flipCard();
 
         //Place the cards
-        playerModel.placeCard(card1, new Position(-1, -1));
-        playerModel.placeCard(mainCard, new Position(-2,-2));
-        playerModel.placeCard(card2, new Position(-1,1));
+        try {
+            playerModel.placeCard(card1, new Position(-1, -1), card1.getBack());
+            playerModel.placeCard(mainCard, new Position(-2,-2), mainCard.getBack());
+            playerModel.placeCard(card2, new Position(-1,1), card2.getBack());
+        } catch (CardNotPlacedException e) {
+            System.out.println(e.getMessage());
+        }
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(5);

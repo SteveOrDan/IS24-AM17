@@ -2,23 +2,13 @@ package com.example.pf_soft_ing.ServerConnection;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.player.PlayerModel;
-import com.example.pf_soft_ing.player.PlayerState;
-import com.example.pf_soft_ing.player.Token;
-import javafx.geometry.Pos;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static com.example.pf_soft_ing.game.GameResources.getPlaceableCardByID;
 
 public class Decoder {
 
     private final MatchController matchController;
-
     private final int playerId;
 
     public Decoder(MatchController matchController, int playerId) {
@@ -32,7 +22,7 @@ public class Decoder {
 
     protected void placeCardDecoded(PlaceableCard card, Position pos){
         int playerId = 0; //Provvisorio
-        matchController.placeCard(playerId, playerId, pos);
+        //matchController.placeCard(playerId, playerId, pos);
 //        matchController.placeCard(playerModel, card, pos);
     }
 

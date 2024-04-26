@@ -11,12 +11,12 @@ public class StarterCard extends PlaceableCard{
     }
 
     @Override
-    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr) {
-        return false;
+    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide) {
+        return true;
     }
 
     @Override
-    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr) {
+    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side chosenSide) {
         return 0;
     }
 }

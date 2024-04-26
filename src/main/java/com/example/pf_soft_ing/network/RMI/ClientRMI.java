@@ -14,8 +14,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface {
+
     public final String hostName;
     public final int portNumber;
+
     public ClientRMI(String hostName, int portNumber) throws RemoteException {
         this.hostName = hostName;
         this.portNumber = portNumber;
@@ -25,38 +27,36 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
         try {
             Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
             RMIReceiverInterface server = (RMIReceiverInterface) registry.lookup("RMIReceiver");
-
             boolean flag = true;
 
-            // iniza ciclo di richieste
-
+            // Waiting for commands
             Scanner stdin = new Scanner(System.in);
+
             while (flag){
                 int command = Integer.parseInt(stdin.nextLine());
+
                 switch (command){
-                    case 1 : {
+                    case 1 :
                         System.out.println("Insert nickname: ");
                         String nickname = stdin.nextLine();
-                        server.prova(nickname);
+                        server.foo(nickname);
                         break;
-                    }
-                    case 2 : {
+
+                    case 2 :
                         flag = false;
                         break;
-                    }
-                    case 3 : {
+
+                    case 3 :
                         server.requestError(this);
                         break;
-                    }
-                    case 4: {
+
+                    case 4 :
                         server.createGame(this,"caterina", 4);
-                    }
+                        break;
                 }
-
             }
-
-
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
@@ -86,7 +86,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
 
     }
 
-    // server su client
+    // RMI client reference for the server
     @Override
     public void sendID(int id) throws RemoteException {
         System.out.println(id);
@@ -121,5 +121,4 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
 
     @Override
     public void placeCard(boolean placed) throws RemoteException {}
-
 }

@@ -12,20 +12,25 @@ public class TUIView extends View{
     public String printMatches(Map<Integer, List<String>> matches) {
         for (Integer matchID : matches.keySet()){
             System.out.println(STR."Match \{matchID}, players:");
+
             if (matches.get(matchID).isEmpty()){
                 System.out.println("\tEmpty match");
-            } else {
+            }
+            else {
                 for (String s : matches.get(matchID)) {
                     System.out.println(STR."\t- \{s}");
                 }
             }
         }
+
         System.out.println("\nDigit the code of the match you want to join or \'new\' to create a new match:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
+
         try {
             input = stdIn.readLine();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         return input;
@@ -42,9 +47,11 @@ public class TUIView extends View{
         System.out.println("There is no match, a new match will be created.\nDigit the number of the players:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
+
         try {
             input = stdIn.readLine();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         return input;
@@ -61,9 +68,11 @@ public class TUIView extends View{
         System.out.println("\nDigit the number of the players:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
+
         try {
             input = stdIn.readLine();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         return input;
@@ -94,14 +103,18 @@ public class TUIView extends View{
                 System.out.println(STR."\t- \{s}");
             }
             System.out.println("\nDigit your nickname:");
-        } else {
+        }
+        else {
             System.out.println("You are the first player of this match.\nDigit your nickname:");
         }
+
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
+
         try {
             input = stdIn.readLine();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         return input;

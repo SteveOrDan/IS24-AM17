@@ -3,7 +3,6 @@ package com.example.pf_soft_ing.ServerConnection;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
 
-import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.util.List;
 
@@ -48,6 +47,7 @@ public class SocketSender extends Encoder {
     @Override
     protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){
         StringBuilder output = new StringBuilder("24");
+
         for (Integer i : objectiveIDs){
             output.append(" ");
             output.append(i);
@@ -58,9 +58,11 @@ public class SocketSender extends Encoder {
     @Override
     public void setFirstPlayerToken(Token token){
         String color;
+
         if (token == null){
             color = "null";
-        } else {
+        }
+        else {
             color = "black";
         }
         SendMessage(STR."5 \{color}");

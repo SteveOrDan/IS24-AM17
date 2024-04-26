@@ -18,7 +18,6 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
     private static HashMap<ClientRMIInterface, Decoder> clientRMIDecoderHashMap;
     private final GameController gameController;
-
     private MatchController matchController;
 
     public RMIReceiver(GameController gameController) throws RemoteException {
@@ -33,7 +32,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     @Override
     public void getMatches(ClientRMIInterface client) throws RemoteException {
         NewPlayerController.getMatches(gameController, client);
-//        client.printMatches(gameController.getGameModel().getMatches());
+        //client.printMatches(gameController.getGameModel().getMatches());
     }
 
     @Override
@@ -42,7 +41,8 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 //        MatchController matchController = gameController.getGameModel().getMatch(matchID);
 //        if (matchController == null ){
 //            client.failedMatch(gameController.getGameModel().getMatches());
-//        } else {
+//        }
+//        else {
 //            client.joinMatch(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
 //            this.matchController = matchController;
 //        }
@@ -52,14 +52,12 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     public void sendNickname(String nickname, ClientRMIInterface client) throws RemoteException {
         NewPlayerController.sendNickname(matchController, nickname, client);
 //        try {
-//            Integer playerId = matchController.addPlayer(nickname, client);
-//            client.addNickname(playerId, matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname(), matchController.getMatchModel().getNicknamesMap(playerId));
-//        } catch (GameIsFullException e) {
-//            client.failedNickname(matchController.getMatchModel().getNicknames());
-//        } catch (NicknameAlreadyExistsException e) {
-//            client.failedNickname(matchController.getMatchModel().getNicknames());
-//            throw new RuntimeException(e);
-//        }
+//          Integer playerId = matchController.addPlayer(nickname, client);
+//          client.addNickname(playerId, matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname(), matchController.getMatchModel().getNicknamesMap(playerId));
+//      }
+//      catch (GameIsFullException | NicknameAlreadyExistsException e) {
+//          client.failedNickname(matchController.getMatchModel().getNicknames());
+//      }
     }
 
 
@@ -118,10 +116,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public boolean prova(String name) throws RemoteException {
+    public boolean foo(String name) throws RemoteException {
         int id = 1;
-        System.out.println(name + "called prova");
+        System.out.println(name + "called foo");
         return true;
     }
-
 }

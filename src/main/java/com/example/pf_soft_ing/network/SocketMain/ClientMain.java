@@ -49,7 +49,6 @@ public class ClientMain {
                             if (input.equals("end")) {
                                 runFlag = false;
                             }
-
                             out.println(input);
                             System.out.println(STR."echo: \{input}");
                         }
@@ -62,14 +61,12 @@ public class ClientMain {
             }.start();
         }
         catch (UnknownHostException e) {
-            System.err.println("Don't know about host " + hostName);
+            System.err.println("Unknown host: " + hostName);
             System.exit(1);
         }
         catch (IOException e) {
             System.err.println("Couldn't get I/O for the connection to " + hostName);
             System.exit(1);
         }
-
     }
-
 }

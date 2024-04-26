@@ -1,10 +1,13 @@
 package com.example.pf_soft_ing.card;
 
 import com.example.pf_soft_ing.card.side.Side;
+import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 
 import java.util.List;
 
 public abstract class PlaceableCard{
+
+    // Todo: set public attributes to private with due corrections
 
     public String cardType;
 
@@ -12,9 +15,9 @@ public abstract class PlaceableCard{
 
     public final CardElementType elementType;
 
-    public int priority;
+    private int priority;
 
-    public Side currSide;
+    private Side chosenSide = null;
     public final Side front;
     public final Side back;
 
@@ -22,7 +25,6 @@ public abstract class PlaceableCard{
         this.priority = 0;
         this.elementType = element;
         this.id = id;
-        this.currSide = front;
         this.front = front;
         this.back = back;
     }
@@ -58,10 +60,23 @@ public abstract class PlaceableCard{
 
     /**
      * Getter
-     * @return Card's current side
+     * @return the chosen side of the card for the placement in the play area
      */
-    public Side getCurrSide() {
-        return currSide;
+    public Side getChosenSide() throws CardNotPlacedException{
+        if (chosenSide != null) {
+            return chosenSide;
+        }
+        else {
+            throw new CardNotPlacedException();
+        }
+    }
+
+    /**
+     * Setter
+     * @param chosenSide New chosen side of the card
+     */
+    public void setChosenSide(Side chosenSide) {
+        this.chosenSide = chosenSide;
     }
 
     /**
@@ -86,23 +101,11 @@ public abstract class PlaceableCard{
      * If card side is back gets the values from a list
      * @return Hash map of resources based on the current side of the card
      */
-    public List<ResourceType> getResources(){
-        return currSide.getResources();
+    public List<ResourceType> getResources(Side chosenSide){
+        return chosenSide.getResources();
     }
 
-    /**
-     * Switches the card's current side from front and back and vice versa
-     */
-    public void flipCard(){
-        if (currSide.equals(front)){
-            currSide = back;
-        }
-        else{
-            currSide = front;
-        }
-    }
+    public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide);
 
-    public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr);
-
-    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr);
+    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side choesenSide);
 }

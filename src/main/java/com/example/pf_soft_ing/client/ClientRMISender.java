@@ -24,7 +24,8 @@ public class ClientRMISender extends ClientEncoder{
     public void getMatches() {
         try {
             server.getMatches(client);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
@@ -33,7 +34,8 @@ public class ClientRMISender extends ClientEncoder{
     public void sendMatch(int matchID) {
         try {
             server.sendMatch(matchID, client);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
@@ -42,7 +44,8 @@ public class ClientRMISender extends ClientEncoder{
     public void sendNickname(String nickname) {
         try {
             server.sendNickname(nickname, client);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }
@@ -51,7 +54,8 @@ public class ClientRMISender extends ClientEncoder{
     public void createMatch(int numberOfPlayers) {
         try {
             server.createMatch(numberOfPlayers, client);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             throw new RuntimeException(e);
         }
     }

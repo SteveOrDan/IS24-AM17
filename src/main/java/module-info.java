@@ -26,7 +26,6 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.deserializers.corner to javafx.fxml;
     exports com.example.pf_soft_ing.network.ServerConnection;
     opens com.example.pf_soft_ing.network.ServerConnection to javafx.fxml;
-    exports com.example.pf_soft_ing.observerPattern;
 
     exports com.example.pf_soft_ing.exceptions;
     exports com.example.pf_soft_ing.network;

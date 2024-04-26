@@ -6,6 +6,7 @@ import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
+import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
 
 import java.util.ArrayList;
@@ -116,8 +117,13 @@ public class PlayerModel {
      * Getter
      * @return Player's starter card
      */
-    public PlaceableCard getStarterCard() {
-        return starterCard;
+    public PlaceableCard getStarterCard() throws StarterCardNotSetException {
+        if (starterCard != null) {
+            return starterCard;
+        }
+        else {
+            throw new StarterCardNotSetException();
+        }
     }
 
     public void setStarterCard(PlaceableCard sCard){
@@ -227,20 +233,22 @@ public class PlayerModel {
      * Adds resources on the card's side
      * No requirements are needed for positioning this card
      */
-    public void placeStarterCard(){
+    public void placeStarterCard(Side chosenSide){
         if (playArea.containsKey(new Position(0,0))){
             System.out.println(new StarterCardAlreadyPlacedException().getMessage());
             encoder.placeStarterCard(false);
             return;
         }
 
-        for (ResourceType resource : starterCard.getResources()){
+        for (ResourceType resource : starterCard.getResources(chosenSide)){
             numOfResourcesArr[resource.getValue()]++;
         }
 
         starterCard.setPriority(currMaxPriority);
 
         currMaxPriority++;
+
+        starterCard.setChosenSide(chosenSide);
 
         playArea.put(new Position(0,0), starterCard);
 
@@ -260,13 +268,13 @@ public class PlayerModel {
      * @param card Golden card to place in the player's playArea
      * @param pos Card's position to add to the player's playArea
      */
-    public void placeCard(PlaceableCard card, Position pos){
+    public void placeCard(PlaceableCard card, Position pos, Side chosenSide) throws CardNotPlacedException {
         try {
             if (playArea.containsKey(pos)){
                 throw new PositionAlreadyTakenException();
             }
 
-            if(!card.hasEnoughRequiredResources(numOfResourcesArr)){
+            if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
                 throw new MissingResourcesException();
             }
 
@@ -280,12 +288,12 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : card.getResources()){
+            for (ResourceType resource : chosenSide.getResources()){
                 numOfResourcesArr[resource.getValue()]++;
             }
 
             // Add card points
-            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr);
+            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, chosenSide);
 
             // Set card priority
             card.setPriority(currMaxPriority);
@@ -297,6 +305,9 @@ public class PlayerModel {
 
             // Remove card from hand
             hand.remove(card);
+
+            // Set chosen side
+            card.setChosenSide(chosenSide);
 
             encoder.placeCard(true);
 
@@ -316,7 +327,7 @@ public class PlayerModel {
      * @throws NoAdjacentCardsException If there are no adjacent cards to the reference card
      * @throws PlacingOnInvalidCornerException If a corner is hidden
      */
-    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
+    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException, CardNotPlacedException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
             PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
             PlaceableCard BRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() - 1));
@@ -324,16 +335,16 @@ public class PlayerModel {
             PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
 
             if (TRCard != null){
-                add(TRCard.getCurrSide().getBLCorner());
+                add(TRCard.getChosenSide().getBLCorner());
             }
             if (BRCard != null){
-                add(BRCard.getCurrSide().getTLCorner());
+                add(BRCard.getChosenSide().getTLCorner());
             }
             if (BLCard != null){
-                add(BLCard.getCurrSide().getTRCorner());
+                add(BLCard.getChosenSide().getTRCorner());
             }
             if (TLCard != null){
-                add(TLCard.getCurrSide().getBRCorner());
+                add(TLCard.getChosenSide().getBRCorner());
             }
         }};
 
@@ -364,15 +375,6 @@ public class PlayerModel {
             currScore = 29;
         }
         numOfCompletedObjectives += points/oCard.getPoints();
-    }
-
-    /**
-     * Flips the starter card
-     */
-    public void flipStarterCard() {
-        if (starterCard != null){
-            starterCard.flipCard();
-        }
     }
 
     /**

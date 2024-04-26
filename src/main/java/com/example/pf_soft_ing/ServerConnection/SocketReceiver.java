@@ -1,14 +1,9 @@
 package com.example.pf_soft_ing.ServerConnection;
 
 import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.player.PlayerState;
-import com.example.pf_soft_ing.player.Token;
-import javafx.geometry.Pos;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -16,19 +11,16 @@ public class SocketReceiver {
 
     private final Decoder decoder;
 
-    private final BufferedReader in;
-
     public SocketReceiver(Decoder decoder, BufferedReader in) {
         this.decoder = decoder;
-        this.in = in;
 
         new Thread(){
             public void run(){
                 boolean isRunning = true;
 
                 while (isRunning) {
-
                     String input;
+
                     try {
                         input = in.readLine();
                         if (input.equals("end")){
@@ -53,8 +45,7 @@ public class SocketReceiver {
 
     protected void messageDecoder(String input){
         String[] inputArray = input.split(" ");
-
-        int playerId = 0; //Provvisorio
+        int playerId = 0; // Temporary value
 
         switch (inputArray[0]) {
             case "1":
@@ -82,7 +73,7 @@ public class SocketReceiver {
                 break;
 
             case "end":
-                //TODO cosa fare se ricevo end??
+                //TODO What to do when I receive end?
                 break;
 
             default:

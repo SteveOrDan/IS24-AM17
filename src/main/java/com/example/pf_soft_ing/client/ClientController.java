@@ -8,7 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public class ClientController {
-    private HashMap<Integer, OpponentModel> otherPlayerMap;
+
+    private Map<Integer, OpponentModel> otherPlayerMap;
 
     private final ClientModel clientModel;
 
@@ -28,27 +29,35 @@ public class ClientController {
     public void printMatches(Map<Integer, List<String>> matches){
         if (matches.isEmpty()){
             String inputPlayers = view.noMatches();
+
             while (!validNumberOfPlayers(inputPlayers)){
                 inputPlayers = view.errorNoMatches();
             }
+
             createMatch(Integer.parseInt(inputPlayers));
-        } else {
+        }
+        else {
             String input = view.printMatches(matches);
             boolean inputFlag = true;
+
             while (inputFlag) {
                 if (Objects.equals(input, "new")) {
                     inputFlag = false;
                     String inputPlayers = view.numberOfPlayers();
+
                     while (!validNumberOfPlayers(inputPlayers)) {
                         inputPlayers = view.errorNumberOfPlayers();
                     }
+
                     createMatch(Integer.parseInt(inputPlayers));
-                } else {
+                }
+                else {
                     if (matches.keySet().contains(Integer.parseInt(input))) {
                         inputFlag = false;
 
                         sendMatch(Integer.parseInt(input));
-                    } else {
+                    }
+                    else {
                         input = view.failedMatch(matches);
                     }
                 }
@@ -76,6 +85,7 @@ public class ClientController {
         this.matchID = matchID;
         sendNickname(view.askNickname(nicknames));
     }
+
     private void sendNickname(String nickname){
         clientModel.sendNickname(nickname);
     }
@@ -87,9 +97,11 @@ public class ClientController {
     public void addNickname(Integer playerID, String nickname, Map<Integer, String> opponents){
         clientModel.setId(playerID);
         clientModel.setNickname(nickname);
+
         for (int opponentId : opponents.keySet()){
             otherPlayerMap.put(opponentId, new OpponentModel(opponents.get(opponentId), opponentId));
         }
+
         view.entered();
     }
 }

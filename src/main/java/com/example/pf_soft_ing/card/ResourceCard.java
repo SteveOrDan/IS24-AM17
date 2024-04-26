@@ -27,7 +27,7 @@ public class ResourceCard extends PlaceableCard{
      * @return True since a resource card doesn't require any resources to be placed
      */
     @Override
-    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr){
+    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide){
         return true;
     }
 
@@ -38,7 +38,10 @@ public class ResourceCard extends PlaceableCard{
      * @return Points given by the card
      */
     @Override
-    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr){
-        return points;
+    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side chosenSide){
+        if (chosenSide.equals(front)) {
+            return points;
+        }
+        return 0;
     }
 }

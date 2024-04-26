@@ -1,12 +1,9 @@
 package com.example.pf_soft_ing.network.ServerConnection;
 
-import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.game.MatchModel;
-import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,14 +12,13 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.Integer.parseInt;
 import static java.lang.System.exit;
 
 public class SocketController {
+
     public static ServerSocket startServerConnection(String[] args) {
         ServerSocket serverSocket = null;
 
@@ -34,6 +30,7 @@ public class SocketController {
         int portNumber = Integer.parseInt(args[0]);
 
         boolean foundPort = false;
+
         while (!foundPort) {
             try {
                 serverSocket = new ServerSocket(portNumber);
@@ -153,7 +150,8 @@ public class SocketController {
                             output.append(s);
                         }
                     }
-                } else {
+                }
+                else {
                     output.append("2");
                     for (String s : matchController.getMatchModel().getNicknames()){
                         output.append(" ");
@@ -211,20 +209,25 @@ public class SocketController {
                 try {
                     Integer playerId = matchController.addPlayer(inputArray[1], out);
                     output.append(STR."4 \{playerId} \{matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname()}");
+
                     for (String s : matchController.getMatchModel().getNicknames()){
                         if (s != matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname()){
                             output.append(STR." \{s}");
                         }
                     }
                     sendMessage(output.toString(), out);
-                } catch (GameIsFullException e) {
+                }
+                catch (GameIsFullException e) {
                     output.append(STR."3 ");
+
                     for (String s : matchController.getMatchModel().getNicknames()){
                         output.append(STR." \{s}");
                     }
                     sendMessage(output.toString(), out);
-                } catch (NicknameAlreadyExistsException e) {
+                }
+                catch (NicknameAlreadyExistsException e) {
                     output.append(STR."3 ");
+
                     for (String s : matchController.getMatchModel().getNicknames()){
                         output.append(STR." \{s}");
                     }
@@ -238,5 +241,4 @@ public class SocketController {
                 out.println("Error");
         }
     }
-
 }

@@ -25,7 +25,7 @@ public abstract class Encoder {
     protected void setTokenEncoded(TokenColors color){}
 
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
-        List<Integer> objectiveIDs = new ArrayList<Integer>();
+        List<Integer> objectiveIDs = new ArrayList<>();
         for (ObjectiveCard card : objectives) {
             objectiveIDs.add(card.getId());
         }

@@ -1,8 +1,11 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
+import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
+import com.example.pf_soft_ing.network.RMI.ClientRMI;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -11,6 +14,7 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.Test;
 
+import java.io.PrintWriter;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,7 +45,7 @@ class MatchControllerTest {
 
     private void addPlayers(String name) {
         try {
-            //matchController.addPlayer(name);
+            matchController.addPlayer(name, new PrintWriter(System.out, true));
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -67,10 +71,11 @@ class MatchControllerTest {
             // Set starter card
             matchController.drawStarterCard(i);
 
-            player.flipStarterCard();
-            player.flipStarterCard();
-
-            player.placeStarterCard();
+            try {
+                player.placeStarterCard(player.getStarterCard().getFront());
+            } catch (StarterCardNotSetException e) {
+                System.out.println(e.getMessage());
+            }
 
             // Choose token
             player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
@@ -103,7 +108,11 @@ class MatchControllerTest {
                 firstPlayers++;
             }
 
-            assertNotNull(matchController.getIDPlayerMap().get(i).getStarterCard());
+            try {
+                assertNotNull(matchController.getIDPlayerMap().get(i).getStarterCard());
+            } catch (StarterCardNotSetException e) {
+                System.out.println(e.getMessage());
+            }
 
             assertEquals(3, matchController.getIDPlayerMap().get(i).getHand().size());
 
@@ -136,22 +145,26 @@ class MatchControllerTest {
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();
 
-        // Foreach player...
+        // For each player...
         for (Integer i : matchController.getIDPlayerMap().keySet()) {
             PlayerModel player = matchController.getIDPlayerMap().get(i);
+            PlaceableCard starterCard = null;
 
             // Set starter card
             matchController.drawStarterCard(i);
 
-            assertNotNull(player.getStarterCard());
+            try {
+                starterCard = player.getStarterCard();
+            } catch (StarterCardNotSetException e) {
+                System.out.println(e.getMessage());
+            }
 
-            player.flipStarterCard();
-            player.flipStarterCard();
+            assertNotNull(starterCard);
 
-            player.placeStarterCard();
+            player.placeStarterCard(starterCard.getFront());
 
             assertTrue(player.getPlayArea().containsKey(new Position(0, 0)));
-            assertEquals(player.getPlayArea().get(new Position(0, 0)), player.getStarterCard());
+            assertEquals(player.getPlayArea().get(new Position(0, 0)), starterCard);
 
             // Choose token
             player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
@@ -232,17 +245,19 @@ class MatchControllerTest {
         ArrayList<Integer> cardIDsInHand = new ArrayList<>();
 
         for (PlaceableCard card : currPlayer.getHand()){
-            if (card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr())){
+            if (card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr(), card.getFront())){
                 cardIDsInHand.add(card.id);
             }
         }
 
-        // If cant place any card because of resources, flip all cards
+        // 0: front, 1: back
+        int side = 0;
+
+        // If we can't place any card because of missing resources, side is now back
         if (cardIDsInHand.isEmpty()){
+            side = 1;
             for (PlaceableCard card : currPlayer.getHand()){
                 cardIDsInHand.add(card.id);
-
-                matchController.flipCard(currPlayerID, card.id);
             }
         }
 
@@ -254,36 +269,7 @@ class MatchControllerTest {
 
         Position positionToPlace = plIdToLegalPos.get(currPlayerID).get(positionIndex);
 
-        matchController.placeCard(currPlayerID, cardToPlaceID, positionToPlace);
-
-        while (!currPlayer.getPlayArea().containsKey(positionToPlace)){
-            // Remove the card from the options
-            cardIDsInHand.remove((Integer) cardToPlaceID);
-
-            // If all card options have been exhausted, place a random card flipped
-            if (cardIDsInHand.isEmpty()){
-                for (PlaceableCard card : currPlayer.getHand()){
-                    cardIDsInHand.add(card.id);
-                }
-
-                cardIndexInHand = rng.nextInt(currPlayer.getHand().size());
-
-                cardToPlaceID = currPlayer.getHand().get(cardIndexInHand).id;
-
-                matchController.flipCard(currPlayerID, cardToPlaceID);
-            }
-            else{
-                cardIndexInHand = rng.nextInt(currPlayer.getHand().size());
-
-                cardToPlaceID = currPlayer.getHand().get(cardIndexInHand).id;
-            }
-
-            positionIndex = rng.nextInt(plIdToLegalPos.get(currPlayerID).size());
-
-            positionToPlace = plIdToLegalPos.get(currPlayerID).get(positionIndex);
-
-            matchController.placeCard(currPlayerID, cardToPlaceID, positionToPlace);
-        }
+        matchController.placeCard(currPlayerID, cardToPlaceID, positionToPlace, side == 0 ? currPlayer.getHand().get(cardIndexInHand).getFront() : currPlayer.getHand().get(cardIndexInHand).getBack());
 
         // Update legal and illegal positions
         updateIlLegalPositions(plIdToLegalPos, plIdToIllegalPos, currPlayerID, positionToPlace);
@@ -336,30 +322,37 @@ class MatchControllerTest {
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
 
-        Side currSide = player.getPlayArea().get(pos).getCurrSide();
+        Side chosenSide = null;
 
-        if (currSide.getBLCorner().isAvailable()){
+        try {
+            chosenSide = player.getPlayArea().get(pos).getChosenSide();
+        }
+        catch (CardNotPlacedException e){
+            System.out.println(e.getMessage());
+        }
+
+        if (chosenSide.getBLCorner().isAvailable()){
             newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
         }
         else{
             newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
         }
 
-        if (currSide.getBRCorner().isAvailable()){
+        if (chosenSide.getBRCorner().isAvailable()){
             newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
         }
         else{
             newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
         }
 
-        if (currSide.getTLCorner().isAvailable()){
+        if (chosenSide.getTLCorner().isAvailable()){
             newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
         }
         else{
             newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
         }
 
-        if (currSide.getTRCorner().isAvailable()){
+        if (chosenSide.getTRCorner().isAvailable()){
             newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
         }
         else{
@@ -411,9 +404,9 @@ class MatchControllerTest {
         }
 
         assert notCurrPlayer != null;
-        matchController.placeCard(-1, 1, new Position(0, 0)); // Invalid player id
-        matchController.placeCard(notCurrPlayer.getId(), 1, new Position(0, 0)); // Not curr player
-        matchController.placeCard(currPlayer.getId(), -1, new Position(0, 0)); // Invalid card id
+        matchController.placeCard(-1, 1, new Position(0, 0), GameResources.getPlaceableCardByID(1).getFront()); // Invalid player id
+        matchController.placeCard(notCurrPlayer.getId(), 1, new Position(0, 0), GameResources.getPlaceableCardByID(1).getFront()); // Not curr player
+        matchController.placeCard(currPlayer.getId(), -1, new Position(0, 0), GameResources.getPlaceableCardByID(1).getFront()); // Invalid card id
 
         int cardNotInHandId = 0;
         boolean found = true;
@@ -434,10 +427,7 @@ class MatchControllerTest {
             }
         }
 
-        matchController.placeCard(currPlayer.getId(), cardNotInHandId, new Position(1, 1)); // Card not in hand
-
-        matchController.flipCard(-1, 1); // Invalid player id
-        matchController.flipCard(currPlayer.getId(), -1); // Invalid card id
+        matchController.placeCard(currPlayer.getId(), cardNotInHandId, new Position(1, 1), GameResources.getPlaceableCardByID(cardNotInHandId).getFront()); // Card not in hand
 
         cardNotInHandId = 0;
         while (true){
@@ -456,10 +446,9 @@ class MatchControllerTest {
                 cardNotInHandId++;
             }
         }
-        matchController.flipCard(currPlayer.getId(), cardNotInHandId); // Card not in hand
 
         matchController.getMatchModel().setGameState(GameState.SET_UP);
-        matchController.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1)); // Invalid game state
+        matchController.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getFront()); // Invalid game state
 
         matchController.getMatchModel().setGameState(GameState.PLAYING);
         matchController.drawResourceCard(currPlayer.getId()); // Not drawing state
@@ -467,14 +456,14 @@ class MatchControllerTest {
         // Place card without resources
         int cardWithoutResourcesId = 0;
         for (PlaceableCard card : currPlayer.getHand()){
-            if (!card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr())){
+            if (!card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr(), card.getFront())){
                 cardWithoutResourcesId = card.getId();
                 break;
             }
         }
-        matchController.placeCard(currPlayer.getId(), cardWithoutResourcesId, new Position(1, 1)); // Not enough resources
+        matchController.placeCard(currPlayer.getId(), cardWithoutResourcesId, new Position(1, 1), GameResources.getPlaceableCardByID(cardWithoutResourcesId).getFront()); // Not enough resources
 
-        matchController.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1)); // Correct
+        matchController.placeCard(currPlayer.getId(), currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getFront()); // Correct
 
         matchController.drawVisibleResourceCard(-1, 0);
         matchController.drawVisibleResourceCard(currPlayer.getId(), -1);
@@ -498,32 +487,28 @@ class MatchControllerTest {
         int currPlayerID = getCurrentPlayerId();
 
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawResourceCard(currPlayerID);
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawGoldenCard(currPlayerID);
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleGoldenCard(currPlayerID, 0);
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleResourceCard(currPlayerID, 0);
     }
@@ -537,8 +522,7 @@ class MatchControllerTest {
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleResourceCard(currPlayerID, 0);
 
@@ -547,8 +531,7 @@ class MatchControllerTest {
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleResourceCard(currPlayerID, 0);
     }
@@ -562,8 +545,7 @@ class MatchControllerTest {
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleGoldenCard(currPlayerID, 0);
 
@@ -572,8 +554,7 @@ class MatchControllerTest {
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
         // Place card
-        matchController.flipCard(currPlayerID, currPlayer.getHand().getFirst().getId());
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(-1, 1), currPlayer.getHand().getFirst().getBack());
         // Draw card
         matchController.drawVisibleGoldenCard(currPlayerID, 0);
     }
@@ -585,7 +566,7 @@ class MatchControllerTest {
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
 
-        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1));
+        matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getId(), new Position(1, 1), currPlayer.getHand().getFirst().getFront());
 
         matchController.getMatchModel().getResourceCardsDeck().getDeck().clear();
         matchController.getMatchModel().getGoldenCardsDeck().getDeck().clear();
@@ -628,22 +609,24 @@ class MatchControllerTest {
         // Foreach player...
         for (Integer i : matchController.getIDPlayerMap().keySet()) {
             PlayerModel player = matchController.getIDPlayerMap().get(i);
-
-            player.flipStarterCard(); // Flip without starter card
+            PlaceableCard starterCard = null;
 
             // Set starter card
             matchController.drawStarterCard(i);
 
-            assertNotNull(player.getStarterCard());
+            try {
+                starterCard = player.getStarterCard();
+            } catch (StarterCardNotSetException e) {
+                System.out.println(e.getMessage());
+            }
 
-            player.flipStarterCard();
-            player.flipStarterCard();
+            assertNotNull(starterCard);
 
-            player.placeStarterCard();
-            player.placeStarterCard();
+            player.placeStarterCard(starterCard.getFront());
+            player.placeStarterCard(starterCard.getFront());
 
             assertTrue(player.getPlayArea().containsKey(new Position(0, 0)));
-            assertEquals(player.getPlayArea().get(new Position(0, 0)), player.getStarterCard());
+            assertEquals(player.getPlayArea().get(new Position(0, 0)), starterCard);
 
             // Choose token
             player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
@@ -743,11 +726,18 @@ class MatchControllerTest {
         // Foreach player...
         for (Integer i : matchController.getIDPlayerMap().keySet()) {
             PlayerModel player = matchController.getIDPlayerMap().get(i);
+            PlaceableCard starterCard = null;
 
             // Set starter card
             matchController.drawStarterCard(i);
 
-            player.placeStarterCard();
+            try {
+                starterCard = player.getStarterCard();
+            } catch (StarterCardNotSetException e) {
+                System.out.println(e.getMessage());
+            }
+
+            player.placeStarterCard(starterCard.getFront());
 
             // Choose token
             player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));

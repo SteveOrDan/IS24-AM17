@@ -22,7 +22,6 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
         return this;
     }
 
-
     @Override
     public void printMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
         clientDecoder.printMatches(matchesNicknames);
@@ -47,7 +46,6 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     public void failedNickname(List<String> nicknames) throws RemoteException {
         clientDecoder.failedNickname(nicknames);
     }
-
 
     @Override
     public void sendID(int id) throws RemoteException {

@@ -6,6 +6,7 @@ import com.example.pf_soft_ing.ServerConnection.SocketSender;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
 import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
@@ -21,26 +22,14 @@ import java.util.Random;
 
 public class MatchController{
 
-    private final HashMap<Integer, PlaceableCard> IDPlaceableCardMap;
-    private final HashMap<Integer, ObjectiveCard> IDObjectiveCardMap;
     private final HashMap<Integer, PlayerModel> IDPlayerMap;
 
     private final MatchModel matchModel;
 
     public MatchController(int maxPlayers, int matchID){
-        IDPlaceableCardMap = new HashMap<>();
-        IDObjectiveCardMap = new HashMap<>();
         IDPlayerMap = new HashMap<>();
 
         matchModel = new MatchModel(maxPlayers, matchID);
-    }
-
-    /**
-     * Getter
-     * @return IDPlaceableCardMap with keys as card IDs and values as PlaceableCard objects
-     */
-    public HashMap<Integer, PlaceableCard> getIDPlaceableCardMap() {
-        return IDPlaceableCardMap;
     }
 
     /**
@@ -85,7 +74,7 @@ public class MatchController{
         }
 
         Encoder encoder = new SocketSender(out);
-        PlayerModel player = new PlayerModel(nickname, playerId, encoder);
+        PlayerModel player = new PlayerModel(nickname, playerId);
 
         IDPlayerMap.put(player.getId(), player);
 
@@ -118,7 +107,7 @@ public class MatchController{
         }
 
         Encoder encoder = new RMISender(clientRMI);
-        PlayerModel player = new PlayerModel(nickname, playerId, encoder);
+        PlayerModel player = new PlayerModel(nickname, playerId);
 
         IDPlayerMap.put(player.getId(), player);
 
@@ -145,22 +134,6 @@ public class MatchController{
      */
     public void initializeDecks(){
         matchModel.initializeDecks();
-
-        for (PlaceableCard card : GameResources.getResourcesDeck()){
-            IDPlaceableCardMap.put(card.getId(), card);
-        }
-
-        for (PlaceableCard card : GameResources.getGoldenDeck()){
-            IDPlaceableCardMap.put(card.getId(), card);
-        }
-
-        for (PlaceableCard card : GameResources.getStarterDeck()){
-            IDPlaceableCardMap.put(card.getId(), card);
-        }
-
-        for (ObjectiveCard card : GameResources.getObjectiveDeck()){
-            IDObjectiveCardMap.put(card.getId(), card);
-        }
     }
 
     /**
@@ -228,7 +201,7 @@ public class MatchController{
      * @param cardID ID of the card
      * @param pos Position to place the card
      */
-    public void placeCard(int playerID, int cardID, Position pos) {
+    public void placeCard(int playerID, int cardID, Position pos, Side chosenSide) {
         try {
             if (!IDPlayerMap.containsKey(playerID)){
                 // Invalid player ID
@@ -240,12 +213,12 @@ public class MatchController{
                 throw new NotPlayerTurnException();
             }
 
-            if (!IDPlaceableCardMap.containsKey(cardID)){
+            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
                 // Invalid card ID
                 throw new InvalidCardIDException();
             }
 
-            if (!IDPlayerMap.get(playerID).getHand().contains(IDPlaceableCardMap.get(cardID))){
+            if (!IDPlayerMap.get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
                 // Card not in player's hand
                 throw new CardNotInHandException();
             }
@@ -260,7 +233,7 @@ public class MatchController{
 
             PlayerModel player = IDPlayerMap.get(playerID);
 
-            player.placeCard(IDPlaceableCardMap.get(cardID), pos);
+            player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
 
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
@@ -408,39 +381,39 @@ public class MatchController{
             System.out.println(e.getMessage());
         }
     }
-
-    /**
-     * Flip a card in the player's hand
-     * Handles exceptions for invalid player ID, invalid card ID, card not in player's hand
-     * @param playerID ID of the player
-     * @param cardID ID of the card
-     */
-    public void flipCard(int playerID, int cardID){
-        try {
-            if (!IDPlayerMap.containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            if (!IDPlaceableCardMap.containsKey(cardID)){
-                // Invalid card ID
-                throw new InvalidCardIDException();
-            }
-
-            List<PlaceableCard> hand = IDPlayerMap.get(playerID).getHand();
-
-            if (!hand.contains(IDPlaceableCardMap.get(cardID))){
-                // Card not in player's hand
-                throw new CardNotInHandException();
-            }
-
-            hand.get(hand.indexOf(IDPlaceableCardMap.get(cardID))).flipCard();
-            //System.out.println("Card flipped");
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
+//
+//    /**
+//     * Flip a card in the player's hand
+//     * Handles exceptions for invalid player ID, invalid card ID, card not in player's hand
+//     * @param playerID ID of the player
+//     * @param cardID ID of the card
+//     */
+//    public void flipCard(int playerID, int cardID){
+//        try {
+//            if (!IDPlayerMap.containsKey(playerID)){
+//                // Invalid player ID
+//                throw new InvalidPlayerIDException();
+//            }
+//
+//            if (!IDPlaceableCardMap.containsKey(cardID)){
+//                // Invalid card ID
+//                throw new InvalidCardIDException();
+//            }
+//
+//            List<PlaceableCard> hand = IDPlayerMap.get(playerID).getHand();
+//
+//            if (!hand.contains(IDPlaceableCardMap.get(cardID))){
+//                // Card not in player's hand
+//                throw new CardNotInHandException();
+//            }
+//
+//            hand.get(hand.indexOf(IDPlaceableCardMap.get(cardID))).flipCard();
+//            //System.out.println("Card flipped");
+//        }
+//        catch (Exception e) {
+//            System.out.println(e.getMessage());
+//        }
+//    }
 
     /**
      * End the game set up and set the game state to "playing"

@@ -47,7 +47,7 @@ public class GameController {
         Decoder decoder = new Decoder(matchController, playerId);
         new SocketReceiver(decoder, in);
 
-        analizePlayerNumber(matchController);
+        analyzePlayerNumber(matchController);
     }
 
     public void joinMatch(MatchController matchController, String nickname, ClientRMIInterface client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
@@ -58,10 +58,10 @@ public class GameController {
         Decoder decoder = new Decoder(matchController, playerId);
 
         RMIReceiver.addDecoder(client,decoder);
-        analizePlayerNumber(matchController);
+        analyzePlayerNumber(matchController);
     }
 
-    protected void analizePlayerNumber(MatchController matchController){
+    protected void analyzePlayerNumber(MatchController matchController){
         MatchModel match = matchController.getMatchModel();
 
         if (match.getCurrPlayers() == match.getMaxPlayers()){

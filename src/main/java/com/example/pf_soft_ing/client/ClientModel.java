@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class ClientModel {
+
     private String nickname;
     private int id;
 

@@ -27,16 +27,20 @@ public class ClientMain {
         String input = null;
         boolean UIFlag = true;
         View view = null;
+
         while (UIFlag){
             try {
                 input = stdIn.readLine();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
             if (Objects.equals(input, "1")) {
                 UIFlag = false;
                 view = new TUIView();
-            } else {
+            }
+            else {
                 if (Objects.equals(input, "2")) {
                     System.out.println("Work in progress ¯\\_(ツ)_/¯");
 //                    UIFlag = false;
@@ -54,12 +58,15 @@ public class ClientMain {
         System.out.println("\nNow you have to choose the connection protocol; digit:\n\t-\'1\' for Socket connection;\n\t-\'2\' for RMI connection;");
         boolean startFlag = true;
         ClientController clientController = null;
+        
         while (startFlag){
             try {
                 input = stdIn.readLine();
-            } catch (IOException e) {
+            }
+            catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
             if (Objects.equals(input, "1")) {
                 startFlag = false;
                 clientController = startSocket(ip, port, view);
@@ -70,9 +77,7 @@ public class ClientMain {
                 }
             }
         }
-
         clientController.getMatches();
-
     }
 
     protected static ClientController startSocket(String[] ip, String port, View view){
@@ -117,9 +122,11 @@ public class ClientMain {
             clientEncoder.setClient(clientRMIReceiver.getClient());
 
             return clientController;
-        } catch (RemoteException | NotBoundException e) {
+        }
+        catch (RemoteException | NotBoundException e) {
             throw new RuntimeException(e);
         }
+
 //        String hostName = args[0];
 //        int portNumber = Integer.parseInt(args[1]);
 //        try {

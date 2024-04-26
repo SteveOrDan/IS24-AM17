@@ -41,8 +41,8 @@ public class GoldenCard extends PlaceableCard{
      * @return True if the player has enough resources to place the card
      */
     @Override
-    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr){
-        if (currSide.equals(front)) {
+    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide){
+        if (chosenSide.equals(front)) {
             for (ResourceType res : requiredResources.keySet()) {
                 if (numOfResourcesArr[res.getValue()] < requiredResources.get(res)) {
                     return false;
@@ -59,8 +59,7 @@ public class GoldenCard extends PlaceableCard{
      * @return Points given by the card placement
      */
     @Override
-    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr) {
-
+    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side currSide){
         if (currSide.equals(front)) {
             if (points == 0) {
                 if (isPointPerResource) {

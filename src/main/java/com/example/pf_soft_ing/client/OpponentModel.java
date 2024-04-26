@@ -6,6 +6,7 @@ import com.example.pf_soft_ing.card.Position;
 import java.util.HashMap;
 
 public class OpponentModel {
+
     private String nickname;
     private int id;
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
