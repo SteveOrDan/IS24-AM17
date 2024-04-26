@@ -12,6 +12,14 @@ import java.rmi.RemoteException;
 
 public interface RMIReceiverInterface extends Remote {
 
+    void getMatches(ClientRMIInterface client) throws RemoteException;
+
+    void sendMatch(int matchID, ClientRMIInterface client) throws RemoteException;
+
+    void sendNickname(String nickname, ClientRMIInterface client) throws RemoteException;
+
+    void createMatch(int numberOfPlayers, ClientRMIInterface client) throws RemoteException;
+
     void placeCard(int id, Position pos, ClientRMIInterface client) throws RemoteException;
     void drawResourceCard(ClientRMIInterface client) throws RemoteException;
     void drawVisibleResourceCard(int playerID, int index, ClientRMIInterface client) throws RemoteException;

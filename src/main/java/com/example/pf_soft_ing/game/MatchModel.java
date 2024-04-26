@@ -11,16 +11,13 @@ import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
 import com.example.pf_soft_ing.player.PlayerState;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class MatchModel {
 
-    private int maxPlayers;
+    private final int maxPlayers;
     private int currPlayers = 0;
-    private int matchID;
+    private final int matchID;
 
     private final HashMap<Integer, PlayerModel> IDToPlayerMap = new HashMap<>();
 
@@ -59,6 +56,20 @@ public class MatchModel {
             nicknames.add(playerModel.getNickname());
         }
         return nicknames;
+    }
+
+    /**
+     * Getter
+     * @return A map with other players ID (as key) and nickname (as value)
+     */
+    public Map<Integer, String> getNicknamesMap(int currPlayerID) {
+        Map<Integer, String> nicknamesMap = new HashMap<>();
+        for (PlayerModel playerModel : IDToPlayerMap.values()){
+            if (playerModel.getId() != currPlayerID) {
+                nicknamesMap.put(playerModel.getId(), playerModel.getNickname());
+            }
+        }
+        return nicknamesMap;
     }
 
     /**

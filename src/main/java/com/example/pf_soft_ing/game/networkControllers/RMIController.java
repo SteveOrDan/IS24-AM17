@@ -1,71 +1,57 @@
-package com.example.pf_soft_ing.network.ServerConnection;
+package com.example.pf_soft_ing.game.networkControllers;
 
-import com.example.pf_soft_ing.ServerConnection.Decoder;
 import com.example.pf_soft_ing.ServerConnection.RMIReceiver;
 import com.example.pf_soft_ing.ServerConnection.RMIReceiverInterface;
-import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.network.RMI.ClientRMI;
+import com.example.pf_soft_ing.game.GameController;
 
 import java.io.IOException;
-import java.rmi.AccessException;
 import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Scanner;
+
 import static java.lang.System.exit;
 
 public class RMIController {
 
-//    public static void startRMIReceiver(int portNumber){
-//            Registry registry = null;
-//            RMIReceiverInterface rmiReceiver;
-//            try {
-//                rmiReceiver = new RMIReceiver();
-//                registry = LocateRegistry.createRegistry(portNumber);
-//                registry.bind("RMIReceiver", rmiReceiver);
-//            } catch (AccessException e) {
-//                throw new RuntimeException(e);
-//            } catch (AlreadyBoundException e) {
-//                throw new RuntimeException(e);
-//            } catch (RemoteException e) {
-//                throw new RuntimeException(e);
-//            }
-//            System.out.println(STR."Server started! Port:\{portNumber}");
-//
-//    }
-//    public static void startRMIReceiver(String args[]){
-//
-//        Registry registry = null;
-//        RMIReceiverInterface rmiReceiver;
-//
-//        if (args.length != 1) {
-//            System.out.println("Cannot start port.");
-//            exit(1);
-//        }
-//        int portNumber = Integer.parseInt(args[0]);
-//        boolean foundPort = false;
-//        while (!foundPort) {
-//            try {
-//
-//                rmiReceiver = new RMIReceiver();
-//                registry = LocateRegistry.createRegistry(portNumber);
-//
-//                try {
-//                    registry.bind("RMIReceiver", rmiReceiver);
-//                } catch (AlreadyBoundException e) {
-//                    throw new RuntimeException(e);
-//                }
-//                foundPort = true;
-//            }
-//            catch (IOException e) {
-//                System.out.println(e.getMessage());
-//                portNumber++;
-//            }
-//        }
-//        System.out.println(STR."Server started! Port:\{portNumber}");
-//    }
+    private GameController gameController;
+
+    public RMIController(GameController gameController, String[] args) {
+        this.gameController = gameController;
+
+        startRMIReceiver(args);
+    }
+
+    private void startRMIReceiver(String[] args){
+
+        Registry registry = null;
+        RMIReceiverInterface rmiReceiver;
+
+        if (args.length != 1) {
+            System.out.println("Cannot start port.");
+            exit(1);
+        }
+        int portNumber = Integer.parseInt(args[0]);
+        boolean foundPort = false;
+        while (!foundPort) {
+            try {
+
+                rmiReceiver = new RMIReceiver(gameController);
+                registry = LocateRegistry.createRegistry(portNumber);
+
+                try {
+                    registry.bind("RMIReceiver", rmiReceiver);
+                } catch (AlreadyBoundException e) {
+                    throw new RuntimeException(e);
+                }
+                foundPort = true;
+            }
+            catch (IOException e) {
+                System.out.println(e.getMessage());
+                portNumber++;
+            }
+        }
+        System.out.println(STR."Server started! Port:\{portNumber}");
+    }
 
 
 //    public static void ClientStarterRequest(ClientRMI client, RMIReceiverInterface stub){

@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.client;
 
 import com.example.pf_soft_ing.ServerConnection.Encoder;
+import com.example.pf_soft_ing.ServerConnection.RMIReceiverInterface;
 import com.example.pf_soft_ing.network.RMI.ClientRMI;
 
 import java.io.BufferedReader;
@@ -11,9 +12,9 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.util.Objects;
-
-import static com.example.pf_soft_ing.network.ServerConnection.RMIController.startRMIReceiver;
 
 public class ClientMain {
 
@@ -42,7 +43,7 @@ public class ClientMain {
                 }
             }
         }
-        System.out.println("\nInsert the IP and the port separated by a space:\n");
+        System.out.println("\nInsert the IP and the port separated by a space:");
         try {
             input = stdIn.readLine();
         } catch (IOException e) {
@@ -63,9 +64,9 @@ public class ClientMain {
                 clientController = startSocket(args, view);
             } else {
                 if (Objects.equals(input, "2")) {
-                    System.out.println("Work in progress ¯\\_(ツ)_/¯");
-//                    startFlag = false;
-//                    startRMI(view);
+//                    System.out.println("Work in progress ¯\\_(ツ)_/¯");
+                    startFlag = false;
+                    clientController = startRMI(args, view);
                 }
             }
         }
@@ -100,7 +101,25 @@ public class ClientMain {
         return null;
     }
 
-//    protected static void startRMI(String[] args, View view){
+    protected static ClientController startRMI(String[] args, View view){
+        String hostName = args[0];
+        int portNumber = Integer.parseInt(args[1]);
+
+        try {
+//            ClientRMI clientRMI = new ClientRMI(hostName, portNumber);
+//            clientRMI.startClient();
+            Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
+            RMIReceiverInterface server = (RMIReceiverInterface) registry.lookup("RMIReceiver");
+
+            ClientEncoder clientEncoder = new ClientRMISender(server);
+            ClientController clientController = new ClientController(clientEncoder, view);
+            ClientRMIReceiver clientRMIReceiver = new ClientRMIReceiver(new ClientDecoder(clientController));
+            clientEncoder.setClient(clientRMIReceiver.getClient());
+
+            return clientController;
+        } catch (RemoteException | NotBoundException e) {
+            throw new RuntimeException(e);
+        }
 //        String hostName = args[0];
 //        int portNumber = Integer.parseInt(args[1]);
 //        try {
@@ -115,5 +134,5 @@ public class ClientMain {
 //        } catch (RemoteException e) {
 //            throw new RuntimeException(e);
 //        }
-//    }
+    }
 }

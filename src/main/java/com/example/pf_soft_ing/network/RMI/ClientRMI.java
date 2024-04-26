@@ -10,6 +10,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface {
@@ -23,7 +24,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
     public void startClient() throws NotBoundException {
         try {
             Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
-            RMIReceiverInterface stub = (RMIReceiverInterface) registry.lookup("RMIReceiver");
+            RMIReceiverInterface server = (RMIReceiverInterface) registry.lookup("RMIReceiver");
 
             boolean flag = true;
 
@@ -36,7 +37,7 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
                     case 1 : {
                         System.out.println("Insert nickname: ");
                         String nickname = stdin.nextLine();
-                        stub.prova(nickname);
+                        server.prova(nickname);
                         break;
                     }
                     case 2 : {
@@ -44,11 +45,11 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
                         break;
                     }
                     case 3 : {
-                        stub.requestError(this);
+                        server.requestError(this);
                         break;
                     }
                     case 4: {
-                        stub.createGame(this,"caterina", 4);
+                        server.createGame(this,"caterina", 4);
                     }
                 }
 
@@ -58,6 +59,31 @@ public class ClientRMI extends UnicastRemoteObject implements ClientRMIInterface
         } catch (RemoteException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void printMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
+
+    }
+
+    @Override
+    public void failedMatch(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
+
+    }
+
+    @Override
+    public void joinMatch(int matchID, List<String> nicknames) throws RemoteException {
+
+    }
+
+    @Override
+    public void addNickname(Integer playerID, String nickname, Map<Integer, String> opponents) throws RemoteException {
+
+    }
+
+    @Override
+    public void failedNickname(List<String> nicknames) throws RemoteException {
+
     }
 
     // server su client

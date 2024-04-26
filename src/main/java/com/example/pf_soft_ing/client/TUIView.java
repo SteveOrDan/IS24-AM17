@@ -19,9 +19,8 @@ public class TUIView extends View{
                     System.out.println(STR."\t- \{s}");
                 }
             }
-            System.out.println("\n");
         }
-        System.out.println("\nDigit the code of the match you want to join or \'new\' to create a new match:\n");
+        System.out.println("\nDigit the code of the match you want to join or \'new\' to create a new match:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
         try {
@@ -34,13 +33,13 @@ public class TUIView extends View{
 
     @Override
     public String failedMatch(Map<Integer, List<String>> matches) {
-        System.out.println("\nYou choose an invalid ID.\n");
+        System.out.println("\nYou choose an invalid ID.");
         return printMatches(matches);
     }
 
     @Override
     public String noMatches() {
-        System.out.println("There is no match, a new match will be created.\nDigit the number of the players:\n");
+        System.out.println("There is no match, a new match will be created.\nDigit the number of the players:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
         try {
@@ -53,13 +52,13 @@ public class TUIView extends View{
 
     @Override
     public String errorNoMatches() {
-        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.\n");
+        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.");
         return noMatches();
     }
 
     @Override
     public String numberOfPlayers() {
-        System.out.println("\nDigit the number of the players:\n");
+        System.out.println("\nDigit the number of the players:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
         try {
@@ -72,7 +71,7 @@ public class TUIView extends View{
 
     @Override
     public String errorNumberOfPlayers() {
-        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.\n");
+        System.out.println("You choose an invalid number of players, it has to be between 2 and 4.");
         return numberOfPlayers();
     }
 
@@ -90,13 +89,13 @@ public class TUIView extends View{
 
     private String printNicknames(List<String> nicknames){
         if (!nicknames.isEmpty()) {
-            System.out.println(".\nYour oppenents nicknames are:");
+            System.out.println("Your oppenents nicknames are:");
             for (String s : nicknames) {
                 System.out.println(STR."\t- \{s}");
             }
-            System.out.println("\nDigit your nickname:\n");
+            System.out.println("\nDigit your nickname:");
         } else {
-            System.out.println("\nYou are the first player of this match.\nDigit your nickname:\n");
+            System.out.println("You are the first player of this match.\nDigit your nickname:");
         }
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         String input = null;
@@ -110,6 +109,6 @@ public class TUIView extends View{
 
     @Override
     public void entered() {
-        System.out.println(".\nYou entered the match.");
+        System.out.println("\nYou successfully joined the match.\nWait for all players connection.");
     }
 }

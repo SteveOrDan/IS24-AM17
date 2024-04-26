@@ -10,22 +10,60 @@ import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
     private static HashMap<ClientRMIInterface, Decoder> clientRMIDecoderHashMap;
-    public static GameController gameController;
+    private final GameController gameController;
 
-    public RMIReceiver() throws RemoteException {
+    private MatchController matchController;
+
+    public RMIReceiver(GameController gameController) throws RemoteException {
         clientRMIDecoderHashMap = new HashMap<>();
-        gameController = new GameController();
+        this.gameController = gameController;
     }
 
     public static void addDecoder(ClientRMIInterface client, Decoder decoder){
         clientRMIDecoderHashMap.put(client,decoder);
     }
 
+    @Override
+    public void getMatches(ClientRMIInterface client) throws RemoteException {
+         client.printMatches(gameController.getGameModel().getMatches());
+    }
+
+    @Override
+    public void sendMatch(int matchID, ClientRMIInterface client) throws RemoteException {
+        MatchController matchController = gameController.getGameModel().getMatch(matchID);
+        if (matchController == null ){
+            client.failedMatch(gameController.getGameModel().getMatches());
+        } else {
+            client.joinMatch(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
+            this.matchController = matchController;
+        }
+    }
+
+    @Override
+    public void sendNickname(String nickname, ClientRMIInterface client) throws RemoteException {
+        try {
+            Integer playerId = matchController.addPlayer(nickname, client);
+            client.addNickname(playerId, matchController.getMatchModel().getIDToPlayerMap().get(playerId).getNickname(), matchController.getMatchModel().getNicknamesMap(playerId));
+        } catch (GameIsFullException e) {
+            client.failedNickname(matchController.getMatchModel().getNicknames());
+        } catch (NicknameAlreadyExistsException e) {
+            client.failedNickname(matchController.getMatchModel().getNicknames());
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    @Override
+    public void createMatch(int numberOfPlayers, ClientRMIInterface client) throws RemoteException {
+        matchController = gameController.createGame(numberOfPlayers);
+        client.joinMatch(matchController.getMatchModel().getMatchID(), new ArrayList<String>());
+    }
 
     @Override
     public void placeCard(int id, Position pos, ClientRMIInterface client) throws RemoteException {

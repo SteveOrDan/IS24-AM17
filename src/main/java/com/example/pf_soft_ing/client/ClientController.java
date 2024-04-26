@@ -72,16 +72,6 @@ public class ClientController {
         clientModel.sendMatch(matchID);
     }
 
-    private boolean isNumeric(String input){
-        int intValue;
-        try {
-            intValue = Integer.parseInt(input);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     public void joinMatch(int matchID, List<String> nicknames){
         this.matchID = matchID;
         sendNickname(view.askNickname(nicknames));
