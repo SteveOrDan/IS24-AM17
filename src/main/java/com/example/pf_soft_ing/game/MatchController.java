@@ -80,7 +80,7 @@ public class MatchController{
 
         matchModel.addPlayer(player);
 
-//        player.setState(PlayerState.PRE_GAME);
+        player.setState(PlayerState.PRE_GAME);
 //        System.out.println("nameOfPlayer: " + nickname + " , id:" + playerId);
 
         return playerId;

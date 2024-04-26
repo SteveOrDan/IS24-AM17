@@ -21,15 +21,6 @@ public class ServerMain {
         ServerSocket serverSocket = startServerConnection(args);
         new RMIController(gameController, args);
 
-        try {
-            gameController.createGame(3).addPlayer("AAA", (PrintWriter) null);
-            System.out.println(gameController.getGameModel().getMatches().values());
-        } catch (GameIsFullException e) {
-            throw new RuntimeException(e);
-        } catch (NicknameAlreadyExistsException e) {
-            throw new RuntimeException(e);
-        }
-
         new Thread() {
             public void run() {
                 while (true) {
@@ -45,10 +36,5 @@ public class ServerMain {
             }
         }.start();
 
-//        new Thread() {
-//            public void run() {
-//                //code to wait RMI connections
-//            }
-//        }.start();
     }
 }

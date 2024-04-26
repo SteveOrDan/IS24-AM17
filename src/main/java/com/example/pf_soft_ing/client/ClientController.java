@@ -9,7 +9,7 @@ import java.util.Objects;
 
 public class ClientController {
 
-    private Map<Integer, OpponentModel> otherPlayerMap;
+    private Map<Integer, OpponentModel> otherPlayerMap = new HashMap<>();
 
     private final ClientModel clientModel;
 
@@ -36,8 +36,7 @@ public class ClientController {
             }
 
             createMatch(Integer.parseInt(inputPlayers));
-        }
-        else {
+        } else {
             String input = view.printMatches(matches);
             boolean inputFlag = true;
 
@@ -51,9 +50,8 @@ public class ClientController {
                     }
 
                     createMatch(Integer.parseInt(inputPlayers));
-                }
-                else {
-                    if (matches.keySet().contains(Integer.parseInt(input))) {
+                } else {
+                    if (matches.containsKey(Integer.parseInt(input))) {
                         inputFlag = false;
 
                         sendMatch(Integer.parseInt(input));

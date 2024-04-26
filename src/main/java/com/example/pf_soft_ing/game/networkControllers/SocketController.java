@@ -114,18 +114,18 @@ public class SocketController {
 
         switch (inputArray[0]) {
             case "0":
-                NewPlayerController.getMatches(gameController, out);
+                gameController.getMatches(out);
                 return null;
 
             case "1":
-                return NewPlayerController.sendMatch(gameController, Integer.parseInt(inputArray[1]), out);
+                return gameController.sendMatch(Integer.parseInt(inputArray[1]), out);
 
             case "2":
-                return NewPlayerController.createMatch(gameController, Integer.parseInt(inputArray[1]), out);
+                return gameController.createMatch(Integer.parseInt(inputArray[1]), out);
 
             case "3":
-                NewPlayerController.sendNickname(matchController, inputArray[1], out);
-                return null;
+                gameController.sendNickname(matchController, inputArray[1], out, in);
+                return matchController;
 
             default:
                 System.out.println("Extra");

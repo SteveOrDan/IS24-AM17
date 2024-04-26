@@ -217,7 +217,7 @@ public class PlayerModel {
      */
     public void setState(PlayerState state){
         this.state = state;
-        encoder.setState(state);
+//        encoder.setState(state);
     }
 
     /**
