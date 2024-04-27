@@ -866,16 +866,16 @@ GameModel *-->"1...n" MatchController
 GameController *-->"1" GameModel
 
 ```
-Start Connection sequence diagram
+Start socket connection sequence diagram
 
 ```mermaid
 
 sequenceDiagram
-    title Start Connection sequence diagram
+    title Start socket connection sequence diagram
 
     participant C as ClientController
     participant Cn as Client Decoder/Encoder
-    participant Sn as Server Decoder/Encoder
+    participant Sn as SocketController
     participant G as GameController
     participant S as ServerMain
 
@@ -883,9 +883,9 @@ sequenceDiagram
 
     Note left of C: Client: Client starts
 
-    C->>S: Connect request
+    C->>S: socket(hostName, portNumber)
 
-    S->>Sn: Setup Decoder and Encoder
+    S->>Sn: startInteraction(in, out, gameController)
 
     Note left of C: Client: If there is a failure thow exception
 
@@ -895,9 +895,7 @@ sequenceDiagram
 
     Sn->>G: getMatches()
 
-    G->>Sn: printMatches(matchesNicknames)
-
-    Sn-->>Cn: printMatches(matchesNicknames)
+    G-->>Cn: printMatches(matchesNicknames)
 
     Cn->>C: printMatches(matchesNicknames)
 
@@ -914,9 +912,7 @@ sequenceDiagram
 
         Note right of G: Server: Create a new match
 
-        G->>Sn: joinMatch(matchID, nicknames)
-
-        Sn-->>Cn: joinMatch(matchID, nicknames)
+        G-->>Cn: joinMatch(matchID, nicknames)
 
         Cn->>C: joinMatch(matchID, nicknames)
     else Join game
@@ -928,15 +924,11 @@ sequenceDiagram
 
         Note right of G: Server: Search match with matchID
         alt Success
-            G->>Sn: joinMatch(matchID, nicknames)
-
-            Sn-->>Cn: joinMatch(matchID, nicknames)
+            G-->>Cn: joinMatch(matchID, nicknames)
 
             Cn->>C: joinMatch(matchID, nicknames)
         else Failure
-            G->>Sn: failedMatch(matchesNicknames)
-
-            Sn-->>Cn: failedMatch(matchesNicknames)
+            G-->>Cn: failedMatch(matchesNicknames)
 
             Cn->>C: failedMatch(matchesNicknames)
             Note left of C: Client Back to: Ask "new match or join"
@@ -954,15 +946,13 @@ sequenceDiagram
 
     Note right of G: Server: Check nicknames
     alt Success
-        G->>Sn: addNickname(playerID, nickname, opponents)
+        Note right of G: Server: Create PlayerModel,<br> SocketReceiver, Decoder,<br> Encoder = new SocketSender
 
-        Sn-->>Cn: addNickname(playerID, nickname, opponents)
+        G-->>Cn: addNickname(playerID, nickname, opponents)
 
         Cn->>C: addNickname(playerID, nickname, opponents)
     else Failure
-        G->>Sn: failedNickname(nicknames)
-
-        Sn-->>Cn: failedNickname(nicknames)
+        G-->>Cn: failedNickname(nicknames)
 
         Cn->>C: failedNickname(nicknames)
         Note left of C: Client Back to: Ask "nickname"
@@ -971,6 +961,104 @@ sequenceDiagram
     Note right of G: Server: Wait for all players
 
 ```
+Start RMI connection sequence diagram
+
+```mermaid
+
+sequenceDiagram
+    title Start RMI connection sequence diagram
+
+    participant C as ClientController
+    participant Cn as Client Decoder/Encoder
+    participant Sn as RMIreceiver
+    participant G as GameController
+    participant S as ServerMain
+
+    Note right of S: Server: Server starts
+
+    S->>Sn: startRMIreceiver()
+
+    Note left of C: Client: Client starts
+
+    C->>S: startRMI(hostName, port)
+
+    Note left of C: Client: If there is a failure thow exception
+
+    C->>Cn: getMatches(client)
+
+    Cn->>Sn: getMatches(client)
+
+    Sn->>G: getMatches(client)
+
+    G->>Cn: printMatches(matchesNicknames)
+
+    Cn->>C: printMatches(matchesNicknames)
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "new match or join"
+    Note left of C: Client: Input validation
+
+    alt Create game
+        C->>Cn: createMatch(numbersOfPlayers, client)
+
+        Cn->>Sn: createMatch(numbersOfPlayers, client)
+
+        Sn->>G: createMatch(numbersOfPlayers, client)
+
+        Note right of G: Server: Create a new match
+
+        G->>Cn: joinMatch(matchID, nicknames)
+
+        Cn->>C: joinMatch(matchID, nicknames)
+    else Join game
+        C->>Cn: sendMatch(matchID, client)
+
+        Cn->>Sn: sendMatch(matchID, client)
+
+        Sn->>G: sendMatch(matchID, client)
+
+        Note right of G: Server: Search match with matchID
+        alt Success
+            G->>Cn: joinMatch(matchID, nicknames)
+
+            Cn->>C: joinMatch(matchID, nicknames)
+        else Failure
+            G->>Cn: failedMatch(matchesNicknames)
+
+            Cn->>C: failedMatch(matchesNicknames)
+            Note left of C: Client Back to: Ask "new match or join"
+        end
+    end
+
+    Note left of C: Client: Update view
+    Note left of C: Client: Ask "nickname"
+
+    C->>Cn: sendNickname(nickname, client)
+
+    Cn->>Sn: sendNickname(nickname, client)
+
+    Sn->>G: sendNickname(nickname, client)
+
+    Note right of G: Server: Check nicknames
+    alt Success
+        Note right of G: Server: Create PlayerModel, Decoder,<br>RMIreceiver.addDecoder(client, decoder),<br> Encoder = new RMISender
+
+        G->>Cn: addNickname(playerID, nickname, opponents)
+
+        Cn->>C: addNickname(playerID, nickname, opponents)
+    else Failure
+        G->>Cn: failedNickname(nicknames)
+
+        Cn->>C: failedNickname(nicknames)
+        Note left of C: Client Back to: Ask "nickname"
+    end
+    
+    Note right of G: Server: Wait for all players
+
+```
+
+
+
 Sequence diagram for game setup
 
 ```mermaid
@@ -1003,38 +1091,38 @@ sequenceDiagram
     Note left of C: Client: Ask "Starter card side"
     Note left of C: Client: Input validation
 
-    C->>Cn: selectStarterSide(starterCard)
+    C->>Cn: selectedStarterSide(starterCard, side)
 
-    Cn-->>Sn: selectStarterSide(starterCardID)
+    Cn-->>Sn: selectedStarterSide(starterCardID, side)
 
-    Sn->>M: selectStarterSide(starterCard)
+    Sn->>M: selectedStarterSide(starterCard, side)
 
     Note right of M: Server: Starter card validation
 
     alt Success
         Note right of M: Server: Store starter card
-        M->>Sn: confirmStarterCard(starterCard)
+        M->>Sn: confirmStarterSide(starterCard, side)
 
-        Sn-->>Cn: confirmStarterCard(starterCardID)
+        Sn-->>Cn: confirmStarterSide(starterCardID, side)
 
-        Cn->>C: confirmStarterCard(starterCard)
+        Cn->>C: confirmStarterSide(starterCard, side)
         Note left of C: Client: Update view
     else Failure
-        M->>Sn: failureStarterCard()
+        M->>Sn: failureStarterSide()
 
-        Sn-->>Cn: failureStarterCard()
+        Sn-->>Cn: failureStarterSide()
 
-        Cn->>C: failureStarterCard()
+        Cn->>C: failureStarterSide()
         Note left of C: Client back to: Ask "Starter card side"
     end
 
     Note right of M: Server: Wait for all players
 
-    M->>Sn: sendOpponentsStarterCard(starterCard)
+    M->>Sn: sendOpponentsStarterCard(starterCard,<br> side, playerID)
 
-    Sn-->>Cn: sendOpponentsStarterCard(starterCardID)
+    Sn-->>Cn: sendOpponentsStarterCard(starterCardID,<br> side, playerID)
 
-    Cn->>C: sendOpponentsStarterCard(starterCard)
+    Cn->>C: sendOpponentsStarterCard(starterCard,<br> side, playerID)
 
     M->>Sn: sendToken(Token, opponentsTokens)
 
@@ -1042,11 +1130,11 @@ sequenceDiagram
 
     Cn->>C: sendToken(Token, opponentsTokens)
 
-    M->>Sn: sendHand(handList)
+    M->>Sn: sendHand(handCards)
 
-    Sn-->>Cn: sendHand(handListOfIDs)
+    Sn-->>Cn: sendHand(handCardIDs)
 
-    Cn->>C: sendHand(handList)
+    Cn->>C: sendHand(handCards)
 
     M->>Sn: sendCommonObjectives(commonObjectiveCards)
 
@@ -1117,34 +1205,38 @@ sequenceDiagram
     participant Sn as Server Decoder/Encoder
     participant M as MatchController
     
-    Note left of C: Client:<br><br> If you are the first player<br>call placeCard() on view<br>else wait your turn
+    Note left of C: Client:<br><br> If you are the first player<br>Client: Ask "Place card"<br>else wait your turn
+    Note left of C: Client: Ask "Place card"
     Note left of C: Client: Place card validation
 
-    C->>Cn: palceCard(placeableCard)
+    C->>Cn: placeCard(placeableCard, pos)
 
-    Cn-->>Sn: palceCard(placeableCardID)
+    Cn-->>Sn: placeCard(placeableCardID, pos)
 
-    Sn->>M: palceCard(placeableCard)
+    Sn->>M: placeCard(placeableCard, pos)
 
     Note right of M: Server: Place card validation
 
     alt Success
         Note right of M: Server: Store placed card
-        M->>Sn: confirmPalceCard(placeableCard)
+        M->>Sn: confirmPlaceCard(placeableCard, pos)
 
-        Sn-->>Cn: confirmPalceCard(placeableCardID)
+        Sn-->>Cn: confirmPlaceCard(placeableCardID, pos)
 
-        Cn->>C: confirmPalceCard(placeableCard)
+        Cn->>C: confirmPlaceCard(placeableCard, pos)
         Note left of C: Client: Update view
     else Failure
-        M->>Sn: failurePalceCard()
+        M->>Sn: failurePlaceCard()
 
-        Sn-->>Cn: failurePalceCard()
+        Sn-->>Cn: failurePlaceCard()
 
-        Cn->>C: failurePalceCard()
-        Note left of C: Client back to: Place card validation
+        Cn->>C: failurePlaceCard()
+        Note left of C: Client back to: Ask "Place card"
     end
 
+    Note right of M: Server: Notify opponents
+
+    Note left of C: Client: Ask "Draw card"
     Note left of C: Client: Draw card validation
 
     C->>Cn: drawCard(placeableCard)
@@ -1169,13 +1261,69 @@ sequenceDiagram
         Sn-->>Cn: failureDrawCard()
 
         Cn->>C: failureDrawCard()
-        Note left of C: Client back to: Draw card validation
+        Note left of C: Client back to: Ask "Draw card"
+    end
+
+    Note right of M: Server: Notify opponents
+    Note right of M: Server: checkForEndGame()<br>If true "check notes"
+    Note right of M: Server: Pick next player
+    Note right of M: Server: Notify all players<br> next player ID
+
+
+```
+
+End game sequence diagram
+
+```mermaid
+sequenceDiagram
+    title Extra round turn sequence diagram
+
+    participant C as ClientController
+    participant Cn as Client Decoder/Encoder
+    participant Sn as Server Decoder/Encoder
+    participant M as MatchController
+    
+    Note left of C: Client:<br><br> If nextPlayerID is your ID<br>Client: Ask "Place card"<br>else wait your turn
+    Note left of C: Client: Ask "Place card"
+    Note left of C: Client: Place card validation
+
+    C->>Cn: placeCard(placeableCard, pos)
+
+    Cn-->>Sn: placeCard(placeableCardID, pos)
+
+    Sn->>M: placeCard(placeableCard, pos)
+
+    Note right of M: Server: Place card validation
+
+    alt Success
+        Note right of M: Server: Store placed card
+        M->>Sn: confirmPlaceCard(placeableCard, pos)
+
+        Sn-->>Cn: confirmPlaceCard(placeableCardID, pos)
+
+        Cn->>C: confirmPlaceCard(placeableCard, pos)
+        Note left of C: Client: Update view
+    else Failure
+        M->>Sn: failurePlaceCard()
+
+        Sn-->>Cn: failurePlaceCard()
+
+        Cn->>C: failurePlaceCard()
+        Note left of C: Client back to: Ask "Place card"
     end
 
     Note right of M: Server: Notify opponents
     Note right of M: Server: Pick next player
-    Note right of M: Server: Notify all players<br> next player ID
+    Note right of M: Server: Notify all players<br> next player ID<br>or End Game state
+    Note right of M: Server: If End Game<br>matchController<br>determines ranking
 
+    Note right of M: Server: Notify all
+    M->>Sn: finalRanking(ranking)
+
+    Sn-->>Cn: finalRanking(ranking)
+
+    Cn->>C: finalRanking(ranking)
+    Note left of C: Client: Update view
 
 ```
 
