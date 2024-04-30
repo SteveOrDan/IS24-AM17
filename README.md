@@ -1560,7 +1560,7 @@ sequenceDiagram
     title Start socket connection sequence diagram
 
     participant C as ClientController
-    participant Cn as Client Decoder/Encoder
+    participant Cn as Client Sender/Receiver
     participant Sn as SocketController
     participant G as GameController
     participant S as ServerMain
@@ -1581,7 +1581,8 @@ sequenceDiagram
 
     Sn->>G: getMatches()
 
-    G-->>Cn: printMatches(matchesNicknames)
+    G->>Sn: printMatches(matchesNicknames)
+    Sn-->>Cn: printMatches(matchesNicknames)
 
     Cn->>C: printMatches(matchesNicknames)
 
@@ -1598,7 +1599,8 @@ sequenceDiagram
 
         Note right of G: Server: Create a new match
 
-        G-->>Cn: joinMatch(matchID, nicknames)
+        G->>Sn: joinMatch(matchID, nicknames)
+        Sn-->>Cn: joinMatch(matchID, nicknames)
 
         Cn->>C: joinMatch(matchID, nicknames)
     else Join game
@@ -1610,11 +1612,13 @@ sequenceDiagram
 
         Note right of G: Server: Search match with matchID
         alt Success
-            G-->>Cn: joinMatch(matchID, nicknames)
+            G->>Sn: joinMatch(matchID, nicknames)
+            Sn-->>Cn: joinMatch(matchID, nicknames)
 
             Cn->>C: joinMatch(matchID, nicknames)
         else Failure
-            G-->>Cn: failedMatch(matchesNicknames)
+            G->>Sn: failedMatch(matchesNicknames)
+            Sn-->>Cn: failedMatch(matchesNicknames)
 
             Cn->>C: failedMatch(matchesNicknames)
             Note left of C: Client Back to: Ask "new match or join"
@@ -1634,11 +1638,13 @@ sequenceDiagram
     alt Success
         Note right of G: Server: Create PlayerModel,<br> SocketReceiver, Decoder,<br> Encoder = new SocketSender
 
-        G-->>Cn: addNickname(playerID, nickname, opponents)
+        G->>Sn: addNickname(playerID, nickname, opponents)
+        Sn-->>Cn: addNickname(playerID, nickname, opponents)
 
         Cn->>C: addNickname(playerID, nickname, opponents)
     else Failure
-        G-->>Cn: failedNickname(nicknames)
+        G->>Sn: failedNickname(nicknames)
+        Sn-->>Cn: failedNickname(nicknames)
 
         Cn->>C: failedNickname(nicknames)
         Note left of C: Client Back to: Ask "nickname"
@@ -1655,7 +1661,7 @@ sequenceDiagram
     title Start RMI connection sequence diagram
 
     participant C as ClientController
-    participant Cn as Client Decoder/Encoder
+    participant Cn as Client Sender/Receiver
     participant Sn as RMIreceiver
     participant G as GameController
     participant S as ServerMain
@@ -1676,7 +1682,8 @@ sequenceDiagram
 
     Sn->>G: getMatches(client)
 
-    G->>Cn: printMatches(matchesNicknames)
+    G->>Sn: printMatches(matchesNicknames)
+    Sn->>Cn: printMatches(matchesNicknames)
 
     Cn->>C: printMatches(matchesNicknames)
 
@@ -1693,7 +1700,8 @@ sequenceDiagram
 
         Note right of G: Server: Create a new match
 
-        G->>Cn: joinMatch(matchID, nicknames)
+        G->>Sn: joinMatch(matchID, nicknames)
+        Sn->>Cn: joinMatch(matchID, nicknames)
 
         Cn->>C: joinMatch(matchID, nicknames)
     else Join game
@@ -1705,11 +1713,13 @@ sequenceDiagram
 
         Note right of G: Server: Search match with matchID
         alt Success
-            G->>Cn: joinMatch(matchID, nicknames)
+            G->>Sn: joinMatch(matchID, nicknames)
+            Sn->>Cn: joinMatch(matchID, nicknames)
 
             Cn->>C: joinMatch(matchID, nicknames)
         else Failure
-            G->>Cn: failedMatch(matchesNicknames)
+            G->>Sn: failedMatch(matchesNicknames)
+            Sn->>Cn: failedMatch(matchesNicknames)
 
             Cn->>C: failedMatch(matchesNicknames)
             Note left of C: Client Back to: Ask "new match or join"
@@ -1729,11 +1739,13 @@ sequenceDiagram
     alt Success
         Note right of G: Server: Create PlayerModel, Decoder,<br>RMIreceiver.addDecoder(client, decoder),<br> Encoder = new RMISender
 
-        G->>Cn: addNickname(playerID, nickname, opponents)
+        G->>Sn: addNickname(playerID, nickname, opponents)
+        Sn->>Cn: addNickname(playerID, nickname, opponents)
 
         Cn->>C: addNickname(playerID, nickname, opponents)
     else Failure
-        G->>Cn: failedNickname(nicknames)
+        G->>Sn: failedNickname(nicknames)
+        Sn->>Cn: failedNickname(nicknames)
 
         Cn->>C: failedNickname(nicknames)
         Note left of C: Client Back to: Ask "nickname"
@@ -1753,7 +1765,7 @@ sequenceDiagram
     title Game setup sequence diagram
 
     participant C as ClientController
-    participant Cn as Client Decoder/Encoder
+    participant Cn as Client Sender/Receiver
     participant Sn as Server Decoder/Encoder
     participant M as MatchController
     
@@ -1887,7 +1899,7 @@ sequenceDiagram
     title Your turn sequence diagram
 
     participant C as ClientController
-    participant Cn as Client Decoder/Encoder
+    participant Cn as Client Sender/Receiver
     participant Sn as Server Decoder/Encoder
     participant M as MatchController
     
@@ -1965,7 +1977,7 @@ sequenceDiagram
     title Extra round turn sequence diagram
 
     participant C as ClientController
-    participant Cn as Client Decoder/Encoder
+    participant Cn as Client Sender/Receiver
     participant Sn as Server Decoder/Encoder
     participant M as MatchController
     
@@ -2011,130 +2023,4 @@ sequenceDiagram
     Cn->>C: finalRanking(ranking)
     Note left of C: Client: Update view
 
-```
-
-Sequence diagram for game
-
-```mermaid
-
-sequenceDiagram
-    title Game
-
-    participant C as Client
-    participant S as Server
-    participant O as Other Clients
-
-    Note left of S: Server: Server starts
-
-    Note left of C: Client: Client starts
-
-    C->>S: Connect request
-
-    S-->>C: Success(Matches)/Failure
-    Note left of C: Client: Update view
-
-    alt Create game
-        C->>S: Nick, max players
-        S-->>C: Success/Failure
-        Note left of C: Client: Update view
-        S->>O: New Match
-        Note right of O: Other clients: Update view
-    else Join game
-        C->>S: Nick, IP
-        S-->>C: Success/Failure
-        Note left of C: Client: Update view
-        S->>O: New player in game
-        Note right of O: Other clients: Update view
-    end
-
-    Note left of S: Server: Wait for all players
-
-    Note left of S: Server: Game start
-
-    Note left of S: Server: Initialize decks
-
-    S->>C: 4 visible card IDs<br/>2 covered card IDs
-    Note left of C: Client: Update model and view
-
-    S->>C: 1 ID
-    Note left of C: Client: Got starter card
-
-    opt Flip card
-        Note left of C: Client: Update model and view
-    end
-
-
-    Note left of C: Client: Place starter card
-    C->>S: ID, side
-    Note left of S: Server: Update model
-    S-->>C: Success/Failure
-    S->>O: New view state    
-    
-    Note right of O: Other clients: Update model and view
-
-    Note left of S: Server: Wait for all players
-
-    S->>C: token
-    Note left of C: Client: Set token
-    S-->>O: New view state
-
-    S->>C: 3 IDs
-    Note left of C: Client: Fill hand
-    S-->>O: New view state
-
-    S->>C: 2 IDs
-    Note left of C: Client: Common objectives
-
-    S->>C: 2 IDs
-    Note left of C: Client: Secret objective options
-
-    Note left of C: Client: Choose secret objective
-    C-->>S: 1 ID
-
-    Note left of S: Server: Wait for all players
-
-    S->>C: bool
-    Note left of C: Client: Is first player?
-
-    S->>C: msg
-    Note left of S: Server: Start game (turns)
-
-    S->>C: state
-    Note left of C: Client: Change state
-
-    S->>O: nick
-    Note right of O: Other clients: See curr player's turn
-
-    alt Invalid place
-        Note left of C: Client: Place
-        C->>S: ID, side, pos
-        S-->>C: fail
-    else Valid place
-        Note left of C: Client: Place
-        C->>S: ID, side, pos
-        S-->>C: success
-        S->>O: New state
-        Note right of O: Other clients: Update model and view
-        Note left of S: Server: Update game state
-    end
-
-    alt Invalid draw
-        Note left of C: Client: Draw
-        C->>S: ID
-        S-->>C: fail
-    else Valid draw
-        Note left of C: Client: Draw
-        C->>S: ID
-        S-->>C: success
-        S-->>C: 6 IDs
-        Note left of C: Client: Update view and model
-        S->>O: 6 IDs
-        Note right of O: Other clients: Update model and view
-        Note left of S: Server: Update game state
-    end
-
-    Note left of S: Server: If END_GAME
-    Note left of S: Server: Determine ranking
-    S->>C: Ranking
-    
 ```
