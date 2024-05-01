@@ -3,31 +3,27 @@ package com.example.pf_soft_ing.client;
 import java.util.List;
 import java.util.Map;
 
-public class View {
+public abstract class View {
 
-    public String printMatches(Map<Integer, List<String>> matches){
-        return null;
-    }
+    public abstract String printMatches(Map<Integer, List<String>> matches);
 
-    public String failedMatch(Map<Integer, List<String>> matches){
-        return null;
-    }
+    public abstract String failedMatch(Map<Integer, List<String>> matches);
 
-    public String noMatches(){return null;}
+    public abstract void matchCreated(int matchID);
 
-    public String errorNoMatches(){return null;}
+    public abstract String noMatches();
 
-    public String numberOfPlayers(){
-        return null;
-    }
+    public abstract String errorNoMatches();
 
-    public String errorNumberOfPlayers(){
-        return null;
-    }
+    public abstract String numberOfPlayers();
 
-    public String askNickname(List<String> nicknames){return null;}
+    public abstract String errorNumberOfPlayers();
 
-    public String failedNickname(List<String> nicknames){return null;}
+    public abstract String askNickname(List<String> nicknames);
 
-    public void entered(){}
+    public abstract String failedNickname(List<String> nicknames);
+
+    public abstract void entered();
+
+    public abstract void errorMessage(String message);
 }

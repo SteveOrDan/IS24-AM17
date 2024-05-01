@@ -43,6 +43,11 @@ public class TUIView extends View{
     }
 
     @Override
+    public void matchCreated(int matchID) {
+        System.out.println("\nMatch created with ID: " + matchID);
+    }
+
+    @Override
     public String noMatches() {
         System.out.println("There is no match, a new match will be created.\nDigit the number of the players:");
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -123,5 +128,10 @@ public class TUIView extends View{
     @Override
     public void entered() {
         System.out.println("\nYou successfully joined the match.\nWait for all players connection.");
+    }
+
+    @Override
+    public void errorMessage(String message) {
+
     }
 }

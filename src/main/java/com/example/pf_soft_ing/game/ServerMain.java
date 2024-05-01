@@ -1,40 +1,26 @@
 package com.example.pf_soft_ing.game;
 
-import com.example.pf_soft_ing.exceptions.GameIsFullException;
-import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
+import com.example.pf_soft_ing.ServerConnection.Decoder;
 import com.example.pf_soft_ing.game.networkControllers.RMIController;
 import com.example.pf_soft_ing.game.networkControllers.SocketController;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import static com.example.pf_soft_ing.game.networkControllers.SocketController.*;
-import static com.example.pf_soft_ing.game.networkControllers.SocketController.waitClientConnectionIN;
-
 public class ServerMain {
 
-    public static void main( String[] args ){
+    private static final GameController gameController = new GameController();
 
-        GameController gameController = new GameController();
-        ServerSocket serverSocket = startServerConnection(args);
-        new RMIController(gameController, args);
+    public static void main(String[] args) {
+        startRMIServer(args);
+        startSocketServer(args);
+    }
 
-        new Thread() {
-            public void run() {
-                while (true) {
-                    Socket newClientSocket = connectClient(serverSocket);
-                    new Thread() {
-                        public void run() {
-                            PrintWriter out = createClientConnectionOUT(newClientSocket);
-                            BufferedReader in = waitClientConnectionIN(newClientSocket);
-                            SocketController.startInteraction(in, out, gameController);
-                        }
-                    }.start();
-                }
-            }
-        }.start();
+    public static void startRMIServer(String[] args){
+        RMIController rmiController = new RMIController(gameController);
+        rmiController.startRMIReceiver(Integer.parseInt(args[0]));
+    }
 
+    public static void startSocketServer(String[] args){
+        SocketController server = new SocketController(Integer.parseInt(args[0]), gameController);
+        Decoder.setGameController(gameController);
+        server.startServer();
     }
 }

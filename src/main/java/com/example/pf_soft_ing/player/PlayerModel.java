@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.player;
 
-import com.example.pf_soft_ing.ServerConnection.Encoder;
+import com.example.pf_soft_ing.ServerConnection.Sender;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -15,8 +15,9 @@ import java.util.List;
 
 public class PlayerModel {
 
-    private final String nickname;
-    private final int id;
+    private String nickname;
+    private final int ID;
+    private int matchID = 0;
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
@@ -38,22 +39,28 @@ public class PlayerModel {
 
     private int currMaxPriority = 0;
 
-    private Encoder encoder;
+    private final Sender sender;
 
-    public PlayerModel(String nickname, int id, Encoder encoder) {
-        this.nickname = nickname;
-        this.id = id;
-        this.encoder = encoder;
-//        encoder.sendID(id);
+    public PlayerModel(int ID, Sender sender) {
+        this.ID = ID;
+        this.sender = sender;
     }
 
-    public PlayerModel(String nickname, int id) {
-        this.nickname = nickname;
-        this.id = id;
+    /**
+     * Getter
+     * @return Player's sender
+     */
+    public Sender getSender() {
+        return sender;
     }
 
-    // TODO: Implement flipCard only for client side
-    //  - Change place card parameters to include the side of the card to place
+    /**
+     * Setter
+     * @param nickname Player's nickname as a string
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 
     /**
      * Getter
@@ -67,8 +74,24 @@ public class PlayerModel {
      * Getter
      * @return Player's ID as an int
      */
-    public int getId() {
-        return id;
+    public int getID() {
+        return ID;
+    }
+
+    /**
+     * Getter
+     * @return Player's match ID
+     */
+    public int getMatchID() {
+        return matchID;
+    }
+
+    /**
+     * Setter
+     * @param matchID Player's match ID
+     */
+    public void setMatchID(int matchID) {
+        this.matchID = matchID;
     }
 
     /**
@@ -85,7 +108,7 @@ public class PlayerModel {
      */
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
         objectivesToChoose = objectives;
-        encoder.setObjectivesToChoose(objectives);
+//        sender.setObjectivesToChoose(objectives);
     }
 
     /**
@@ -106,7 +129,7 @@ public class PlayerModel {
                 throw new InvalidIndexException();
             }
             secretObjective = objectivesToChoose.get(index);
-            encoder.setSecretObjective(secretObjective);
+//            sender.setSecretObjective(secretObjective);
         }
         catch (InvalidIndexException e){
             System.out.println(e.getMessage());
@@ -128,7 +151,7 @@ public class PlayerModel {
 
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
-        encoder.setStarterCard(sCard);
+//        sender.setStarterCard(sCard);
     }
 
     /**
@@ -161,7 +184,7 @@ public class PlayerModel {
      */
     public void setCurrScore(int score){
         currScore = score;
-        encoder.setCurrScore(score);
+//        sender.setCurrScore(score);
     }
 
     /**
@@ -178,7 +201,7 @@ public class PlayerModel {
      */
     public void setToken(Token token){
         this.token = token;
-        encoder.setToken(token);
+//        sender.setToken(token);
     }
 
     /**
@@ -200,7 +223,7 @@ public class PlayerModel {
         else{
             firstPlayerToken = null;
         }
-        encoder.setFirstPlayerToken(firstPlayerToken);
+//        sender.setFirstPlayerToken(firstPlayerToken);
     }
 
     /**
@@ -236,7 +259,7 @@ public class PlayerModel {
     public void placeStarterCard(Side chosenSide){
         if (playArea.containsKey(new Position(0,0))){
             System.out.println(new StarterCardAlreadyPlacedException().getMessage());
-            encoder.placeStarterCard(false);
+//            sender.placeStarterCard(false);
             return;
         }
 
@@ -252,7 +275,7 @@ public class PlayerModel {
 
         playArea.put(new Position(0,0), starterCard);
 
-        encoder.placeStarterCard(true);
+//        sender.placeStarterCard(true);
     }
 
     /**
@@ -309,12 +332,12 @@ public class PlayerModel {
             // Set chosen side
             card.setChosenSide(chosenSide);
 
-            encoder.placeCard(true);
+//            sender.placeCard(true);
 
             state = PlayerState.DRAWING;
         }
         catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
-            encoder.placeCard(false);
+//            sender.placeCard(false);
             System.out.println(e.getMessage());
         }
     }
@@ -386,10 +409,10 @@ public class PlayerModel {
 //
 //        }
         hand.add(card);
-        encoder.addCardToPlayerHand(card);
+//        sender.addCardToPlayerHand(card);
     }
 
-    public void requestError(){
-        encoder.requestError();
-    }
+//    public void requestError(){
+//        sender.sendError();
+//    }
 }

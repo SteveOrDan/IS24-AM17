@@ -1,26 +1,17 @@
 package com.example.pf_soft_ing.game;
 
-import com.example.pf_soft_ing.ServerConnection.Encoder;
-import com.example.pf_soft_ing.ServerConnection.RMISender;
-import com.example.pf_soft_ing.ServerConnection.SocketSender;
-import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
-import com.example.pf_soft_ing.network.RMI.ClientRMI;
-import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 
-import java.io.BufferedReader;
-import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
-public class MatchController{
+public class MatchController implements Serializable {
 
     private final HashMap<Integer, PlayerModel> IDPlayerMap;
 
@@ -48,76 +39,6 @@ public class MatchController{
         return matchModel;
     }
 
-    /**
-     * Add player to the game if there isn't already a player with the same ID or nickname or if there are already 4 players
-     * Handles exceptions for player ID already exists, game is full, nickname already exists
-     * @param nickname Player's nickname
-     */
-    public Integer addPlayer(String nickname, PrintWriter out) throws GameIsFullException, NicknameAlreadyExistsException {
-        if (IDPlayerMap.size() >= 4){
-            throw new GameIsFullException();
-        }
-
-        for (PlayerModel p : IDPlayerMap.values()){
-            if (p.getNickname().equals(nickname)){
-                throw new NicknameAlreadyExistsException();
-            }
-        }
-
-        List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
-
-        Random rand = new Random();
-
-        int playerId = rand.nextInt(10);
-        while (idList.contains(playerId)){
-            playerId = rand.nextInt(10);
-        }
-
-        Encoder encoder = new SocketSender(out);
-        PlayerModel player = new PlayerModel(nickname, playerId);
-
-        IDPlayerMap.put(player.getId(), player);
-
-        matchModel.addPlayer(player);
-
-        player.setState(PlayerState.PRE_GAME);
-//        System.out.println("nameOfPlayer: " + nickname + " , id:" + playerId);
-
-        return playerId;
-    }
-
-    public Integer addPlayer(String nickname, ClientRMIInterface clientRMI) throws GameIsFullException, NicknameAlreadyExistsException {
-        if (IDPlayerMap.size() >= 4){
-            throw new GameIsFullException();
-        }
-
-        for (PlayerModel p : IDPlayerMap.values()){
-            if (p.getNickname().equals(nickname)){
-                throw new NicknameAlreadyExistsException();
-            }
-        }
-
-        List<Integer> idList = new ArrayList<>(IDPlayerMap.keySet());
-
-        Random rand = new Random();
-
-        int playerId = rand.nextInt(10);
-        while (idList.contains(playerId)){
-            playerId = rand.nextInt(10);
-        }
-
-        Encoder encoder = new RMISender(clientRMI);
-        PlayerModel player = new PlayerModel(nickname, playerId);
-
-        IDPlayerMap.put(player.getId(), player);
-
-        matchModel.addPlayer(player);
-
-        player.setState(PlayerState.PRE_GAME);
-        //System.out.println("nameOfPlayer: " + nickname + " , id:" + id);
-
-        return playerId;
-    }
     /**
      * Initialize decks, shuffle them and set visible cards
      */
@@ -453,9 +374,5 @@ public class MatchController{
             // Not in drawing state
             throw new InvalidPlayerStateException(IDPlayerMap.get(playerID).getState().toString(), PlayerState.DRAWING.toString());
         }
-    }
-
-    public void requestError(int playerId){
-        IDPlayerMap.get(playerId).requestError();
     }
 }

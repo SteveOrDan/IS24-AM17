@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.decks.ObjectiveCardsDeck;
 import com.example.pf_soft_ing.card.decks.StarterCardsDeck;
 import com.example.pf_soft_ing.card.decks.UsableCardsDeck;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 import com.example.pf_soft_ing.player.PlayerModel;
@@ -17,6 +18,7 @@ public class MatchModel {
 
     private final int maxPlayers;
     private int currPlayers = 0;
+    private int playersReady = 0;
     private final int matchID;
 
     private final HashMap<Integer, PlayerModel> IDToPlayerMap = new HashMap<>();
@@ -65,8 +67,8 @@ public class MatchModel {
     public Map<Integer, String> getNicknamesMap(int currPlayerID) {
         Map<Integer, String> nicknamesMap = new HashMap<>();
         for (PlayerModel playerModel : IDToPlayerMap.values()){
-            if (playerModel.getId() != currPlayerID) {
-                nicknamesMap.put(playerModel.getId(), playerModel.getNickname());
+            if (playerModel.getID() != currPlayerID) {
+                nicknamesMap.put(playerModel.getID(), playerModel.getNickname());
             }
         }
         return nicknamesMap;
@@ -86,6 +88,14 @@ public class MatchModel {
      */
     public int getCurrPlayers() {
         return currPlayers;
+    }
+
+    /**
+     * Getter
+     * @return Number of players ready in the match
+     */
+    public int getPlayersReady() {
+        return playersReady;
     }
 
     /**
@@ -153,11 +163,20 @@ public class MatchModel {
     }
 
     /**
-     * Method to add a player to the match
-     * @param player Player to add
+     * Increase by one the number of players ready in the match
      */
-    public void addPlayer(PlayerModel player){
-        IDToPlayerMap.put(player.getId(), player);
+    public void addReadyPlayer(){
+        playersReady++;
+    }
+
+    /**
+     * Increase by one the number of current players in the match
+     */
+    public void addCurrPlayer(PlayerModel playerModel) throws GameIsFullException {
+        if (currPlayers >= maxPlayers){
+            throw new GameIsFullException();
+        }
+        IDToPlayerMap.put(playerModel.getID(), playerModel);
 
         currPlayers++;
     }

@@ -13,24 +13,16 @@ import static java.lang.System.exit;
 
 public class RMIController {
 
-    private GameController gameController;
+    private final GameController gameController;
 
-    public RMIController(GameController gameController, String[] args) {
+    public RMIController(GameController gameController) {
         this.gameController = gameController;
-
-        startRMIReceiver(args);
     }
 
-    private void startRMIReceiver(String[] args){
-
-        Registry registry = null;
+    public void startRMIReceiver(int portNumber){
+        Registry registry;
         RMIReceiverInterface rmiReceiver;
 
-        if (args.length != 1) {
-            System.out.println("Cannot start port.");
-            exit(1);
-        }
-        int portNumber = Integer.parseInt(args[0]);
         boolean foundPort = false;
         while (!foundPort) {
             try {
@@ -40,7 +32,8 @@ public class RMIController {
 
                 try {
                     registry.bind("RMIReceiver", rmiReceiver);
-                } catch (AlreadyBoundException e) {
+                }
+                catch (AlreadyBoundException e) {
                     throw new RuntimeException(e);
                 }
                 foundPort = true;

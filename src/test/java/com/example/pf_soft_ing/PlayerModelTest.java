@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.ServerConnection.SocketSender;
 import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
 import com.example.pf_soft_ing.game.*;
@@ -14,12 +13,9 @@ import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Back;
 import com.example.pf_soft_ing.card.side.Front;
 import com.example.pf_soft_ing.card.side.Side;
-import com.example.pf_soft_ing.exceptions.NoAdjacentCardsException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +46,11 @@ class PlayerModelTest {
 
     ResourceCard normalCard = new ResourceCard(resourceCardPoints, CardElementType.ANIMAL, 3, normalFront, normalBack);
 
-    PlayerModel playerModel = new PlayerModel("John Smith", 34);
+    PlayerModel playerModel;
+
+    public void createPlayerModel(){
+        //playerModel = new PlayerModel(34);
+    }
 
     @DisplayName("Test for placing a starter card in the player area")
     @Test
@@ -128,7 +128,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -189,7 +189,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -250,7 +250,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -353,7 +353,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -456,7 +456,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -501,7 +501,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -546,7 +546,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());
@@ -591,7 +591,7 @@ class PlayerModelTest {
         List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
 
         //Initialize the player
-        PlayerModel playerModel = new PlayerModel("John Smith", 34);
+        createPlayerModel();
 
         //Set the player's starter card
         playerModel.setStarterCard(starterDeck.getFirst());

@@ -230,15 +230,15 @@ public class GameResources {
         IDToObjectiveCardMap = new HashMap<>();
 
         for (PlaceableCard card : resourcesDeck) {
-            IDToPlaceableCardMap.put(card.getId(), card);
+            IDToPlaceableCardMap.put(card.getID(), card);
         }
 
         for (PlaceableCard card : goldenDeck) {
-            IDToPlaceableCardMap.put(card.getId(), card);
+            IDToPlaceableCardMap.put(card.getID(), card);
         }
 
         for (PlaceableCard card : starterDeck) {
-            IDToPlaceableCardMap.put(card.getId(), card);
+            IDToPlaceableCardMap.put(card.getID(), card);
         }
 
         for (ObjectiveCard card : objectiveDeck) {

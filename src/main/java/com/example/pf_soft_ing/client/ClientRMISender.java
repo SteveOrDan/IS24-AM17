@@ -1,11 +1,11 @@
 package com.example.pf_soft_ing.client;
 
 import com.example.pf_soft_ing.ServerConnection.RMIReceiverInterface;
-import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
+import com.example.pf_soft_ing.ServerConnection.ClientRMIInterface;
 
 import java.rmi.RemoteException;
 
-public class ClientRMISender extends ClientEncoder{
+public class ClientRMISender extends ClientSender {
 
     private final RMIReceiverInterface server;
 
@@ -16,12 +16,17 @@ public class ClientRMISender extends ClientEncoder{
     }
 
     @Override
+    public void startInputReading() {
+
+    }
+
+    @Override
     public void setClient(ClientRMIInterface client) {
         this.client = client;
     }
 
     @Override
-    public void getMatches() {
+    public void getMatches(int playerID) {
         try {
             server.getMatches(client);
         }
@@ -31,32 +36,42 @@ public class ClientRMISender extends ClientEncoder{
     }
 
     @Override
-    public void sendMatch(int matchID) {
-        try {
-            server.sendMatch(matchID, client);
-        }
-        catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+    public void createMatch(int playerID, int numberOfPlayers, String nickname) {
+
     }
 
     @Override
-    public void sendNickname(String nickname) {
-        try {
-            server.sendNickname(nickname, client);
-        }
-        catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+    public void selectMatch(int playerID, int matchID) {
+
     }
 
     @Override
-    public void createMatch(int numberOfPlayers) {
-        try {
-            server.createMatch(numberOfPlayers, client);
-        }
-        catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+    public void chooseNickname(int playerID, String nickname) {
+
+    }
+
+    @Override
+    public void placeCard(int playerID, int id, int side, int pos) {
+
+    }
+
+    @Override
+    public void drawResourceCard(int playerID) {
+
+    }
+
+    @Override
+    public void drawVisibleResourceCard(int playerID, int index) {
+
+    }
+
+    @Override
+    public void drawGoldenCard(int playerID) {
+
+    }
+
+    @Override
+    public void drawVisibleGoldenCard(int playerID, int index) {
+
     }
 }

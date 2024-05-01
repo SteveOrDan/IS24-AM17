@@ -1,30 +1,22 @@
 package com.example.pf_soft_ing.client;
 
-import com.example.pf_soft_ing.ServerConnection.Encoder;
 import com.example.pf_soft_ing.ServerConnection.RMIReceiverInterface;
-import com.example.pf_soft_ing.network.RMI.ClientRMI;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class ClientMain {
 
-//    private ClientController clientController;
+    public static void main(String[] ip) {
+        System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".\n\nBefore starting you have to choose view; digit:\n\t-'1' for TUI;\n\t-'2' for GUI;");
 
-    public static void main( String[] ip ) {
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".\n\nBefore starting you have to choose view; digit:\n\t-\'1\' for TUI;\n\t-\'2\' for GUI;");
-        String input = null;
+        String input;
         boolean UIFlag = true;
         View view = null;
 
@@ -48,98 +40,79 @@ public class ClientMain {
                 }
             }
         }
+
         System.out.println("\nInsert the port number:");
-        String port;
-        try {
-            port = stdIn.readLine();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("\nNow you have to choose the connection protocol; digit:\n\t-\'1\' for Socket connection;\n\t-\'2\' for RMI connection;");
-        boolean startFlag = true;
+
         ClientController clientController = null;
-        
-        while (startFlag){
-            try {
-                input = stdIn.readLine();
-            }
-            catch (IOException e) {
-                throw new RuntimeException(e);
+        boolean connected = false;
+
+        while (!connected){
+            boolean havePort = false;
+            int portNumber = 0;
+
+            while (!havePort){
+                try {
+                    portNumber = Integer.parseInt(stdIn.readLine());
+                    havePort = true;
+                }
+                catch (Exception e) {
+                    System.out.println("Error: " + e.getMessage());
+                    System.out.println("Please insert a valid number.");
+                }
             }
 
-            if (Objects.equals(input, "1")) {
-                startFlag = false;
-                clientController = startSocket(ip, port, view);
-            } else {
-                if (Objects.equals(input, "2")) {
-                    startFlag = false;
-                    clientController = startRMI(ip, port, view);
+            try {
+                clientController = startSocket(ip[0], portNumber, view);
+
+                connected = true;
+                System.out.println("Socket connection established.");
+            }
+            catch (Exception e) {
+                try {
+                    clientController = startRMI(ip[0], portNumber, view);
+
+                    connected = true;
+                    System.out.println("RMI connection established.");
+                }
+                catch (Exception ex) {
+                    System.out.println("Error: " + ex.getMessage());
+                    System.out.println("Please insert a valid port number.");
                 }
             }
         }
+
         clientController.getMatches();
     }
 
-    protected static ClientController startSocket(String[] ip, String port, View view){
-        String hostName = ip[0];
-        int portNumber = Integer.parseInt(port);
+    private static ClientController startSocket(String hostName, int portNumber, View view) throws IOException {
+        Socket echoSocket = new Socket(hostName, portNumber);
 
-        try {
-            Socket echoSocket = new Socket(hostName, portNumber);
-            PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
+        ObjectOutputStream out = new ObjectOutputStream(echoSocket.getOutputStream());
+        ObjectInputStream in = new ObjectInputStream(echoSocket.getInputStream());
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
-            ClientEncoder clientEncoder = new ClientSocketSender(out);
-            ClientController clientController = new ClientController(clientEncoder, view);
-            new ClientSocketReceiver(new ClientDecoder(clientController), in);
+        ClientSender clientSender = new ClientSocketSender(out, stdin);
+        clientSender.startInputReading();
 
-            return clientController;
-        }
-        catch (UnknownHostException e) {
-            System.out.println("Don't know about host " + hostName);
-            System.exit(1);
-        }
-        catch (IOException e) {
-            System.out.println("Couldn't get I/O for the connection to " + hostName);
-            System.exit(1);
-        }
-        return null;
+
+        ClientController clientController = new ClientController(clientSender, view);
+
+        ClientSocketReceiver clientReceiver = new ClientSocketReceiver(clientController);
+        clientReceiver.startReceivingThread(in);
+
+        return clientController;
     }
 
-    protected static ClientController startRMI(String[] ip, String port, View view){
-        String hostName = ip[0];
-        int portNumber = Integer.parseInt(port);
+    private static ClientController startRMI(String hostName, int portNumber, View view) throws RemoteException, NotBoundException {
+        Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
+        RMIReceiverInterface server = (RMIReceiverInterface) registry.lookup("RMIReceiver");
 
-        try {
-//            ClientRMI clientRMI = new ClientRMI(hostName, portNumber);
-//            clientRMI.startClient();
-            Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
-            RMIReceiverInterface server = (RMIReceiverInterface) registry.lookup("RMIReceiver");
+        ClientSender clientSender = new ClientRMISender(server);
+        ClientController clientController = new ClientController(clientSender, view);
 
-            ClientEncoder clientEncoder = new ClientRMISender(server);
-            ClientController clientController = new ClientController(clientEncoder, view);
-            ClientRMIReceiver clientRMIReceiver = new ClientRMIReceiver(new ClientDecoder(clientController));
-            clientEncoder.setClient(clientRMIReceiver.getClient());
+        ClientRMIReceiver clientReceiver = new ClientRMIReceiver(clientController);
+        clientSender.setClient(clientReceiver.getClient());
 
-            return clientController;
-        }
-        catch (RemoteException | NotBoundException e) {
-            throw new RuntimeException(e);
-        }
-
-//        String hostName = args[0];
-//        int portNumber = Integer.parseInt(args[1]);
-//        try {
-//            startRMIReceiver(portNumber);
-//            ClientRMI clientRMI = new ClientRMI(hostName, portNumber);
-//            clientRMI.startClient();
-//            ClientEncoder clientEncoder = new ClientRMISender();
-//            ClientController clientController = new ClientController(ClientEncoder, view);
-//
-//        } catch (NotBoundException e) {
-//            throw new RuntimeException(e);
-//        } catch (RemoteException e) {
-//            throw new RuntimeException(e);
-//        }
+        return clientController;
     }
 }

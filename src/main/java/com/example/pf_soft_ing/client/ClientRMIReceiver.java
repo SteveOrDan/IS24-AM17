@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.client;
 
-import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
+import com.example.pf_soft_ing.ServerConnection.ClientRMIInterface;
+import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -11,11 +12,11 @@ import java.util.Map;
 
 public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMIInterface {
 
-    private final ClientDecoder clientDecoder;
+    private final ClientController clientController;
 
-    public ClientRMIReceiver(ClientDecoder clientDecoder) throws RemoteException {
+    public ClientRMIReceiver(ClientController clientController) throws RemoteException {
         super();
-        this.clientDecoder = clientDecoder;
+        this.clientController = clientController;
     }
 
     public ClientRMIInterface getClient(){
@@ -23,28 +24,28 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void printMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
-        clientDecoder.printMatches(matchesNicknames);
+    public void printMatches(List<MatchController> matchesNicknames) throws RemoteException {
+        clientController.printMatches(matchesNicknames);
     }
 
     @Override
     public void failedMatch(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
-        clientDecoder.failedMatch(matchesNicknames);
+        clientController.failedMatch(matchesNicknames);
     }
 
     @Override
     public void joinMatch(int matchID, List<String> nicknames) throws RemoteException {
-        clientDecoder.joinMatch(matchID, nicknames);
+        clientController.joinMatch(matchID, nicknames);
     }
 
     @Override
     public void addNickname(Integer playerID, String nickname, Map<Integer, String> opponents) {
-        clientDecoder.addNickname(playerID, nickname, opponents);
+        clientController.addNickname(playerID, nickname, opponents);
     }
 
     @Override
     public void failedNickname(List<String> nicknames) throws RemoteException {
-        clientDecoder.failedNickname(nicknames);
+        clientController.failedNickname(nicknames);
     }
 
     @Override

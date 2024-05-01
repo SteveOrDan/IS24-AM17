@@ -1,6 +1,6 @@
-package com.example.pf_soft_ing.network.RMI;
+package com.example.pf_soft_ing.ServerConnection;
 
-import com.example.pf_soft_ing.exceptions.GameIsFullException;
+import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface ClientRMIInterface extends Remote {
     // server su client
-    void printMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException;
+    void printMatches(List<MatchController> matchesNicknames) throws RemoteException;
 
     void failedMatch(Map<Integer, List<String>> matchesNicknames) throws RemoteException;
 

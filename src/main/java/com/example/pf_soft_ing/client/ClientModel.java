@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.client;
 
-import com.example.pf_soft_ing.ServerConnection.Encoder;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -14,7 +13,7 @@ import java.util.List;
 public class ClientModel {
 
     private String nickname;
-    private int id;
+    private int ID;
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
@@ -36,33 +35,49 @@ public class ClientModel {
 
     private int currMaxPriority = 0;
 
-    private ClientEncoder clientEncoder;
+    private ClientSender clientSender;
 
-    public ClientModel(ClientEncoder clientEncoder){
-        this.clientEncoder = clientEncoder;
+    public ClientModel(ClientSender clientSender){
+        this.clientSender = clientSender;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void getMatches(){
-        clientEncoder.getMatches();
-    }
-
-    public void sendMatch(int matchID){
-        clientEncoder.sendMatch(matchID);
-    }
-
-    public void sendNickname(String nickname){
-        clientEncoder.sendNickname(nickname);
-    }
-
-    public void createMatch(int numberOfPlayers){
-        clientEncoder.createMatch(numberOfPlayers);
-    }
+//    public void setClient(ClientRMIInterface client) {
+//        clientSender.setClient(client);
+//    }
+//
+//    public void getMatches(int playerID) {
+//        clientSender.getMatches(playerID);
+//    }
+//
+//    public void createMatch(int playerID, int numberOfPlayers, String nickname) {
+//        clientSender.createMatch(playerID, numberOfPlayers, nickname);
+//    }
+//
+//    public void selectMatch(int playerID, int matchID) {
+//        clientSender.selectMatch(playerID, matchID);
+//    }
+//
+//    public void chooseNickname(int playerID, String nickname) {
+//        clientSender.chooseNickname(playerID, nickname);
+//    }
+//
+//    public void placeCard(int playerID, int id, int side, int pos) {
+//        clientSender.placeCard(playerID, id, side, pos);
+//    }
+//
+//    public void drawResourceCard(int playerID) {
+//        clientSender.drawResourceCard(playerID);
+//    }
+//
+//    public void drawVisibleResourceCard(int playerID, int index) {
+//        clientSender.drawVisibleResourceCard(playerID, index);
+//    }
+//
+//    public void drawGoldenCard(int playerID) {
+//        clientSender.drawGoldenCard(playerID);
+//    }
+//
+//    public void drawVisibleGoldenCard(int playerID, int index) {
+//        clientSender.drawVisibleGoldenCard(playerID, index);
+//    }
 }

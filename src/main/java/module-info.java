@@ -24,14 +24,8 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.deserializers.placeable_card to javafx.fxml;
     exports com.example.pf_soft_ing.deserializers.corner;
     opens com.example.pf_soft_ing.deserializers.corner to javafx.fxml;
-    exports com.example.pf_soft_ing.network.ServerConnection;
-    opens com.example.pf_soft_ing.network.ServerConnection to javafx.fxml;
 
     exports com.example.pf_soft_ing.exceptions;
-    exports com.example.pf_soft_ing.network;
-    opens com.example.pf_soft_ing.network to javafx.fxml;
-    exports com.example.pf_soft_ing.network.RMI;
-    opens com.example.pf_soft_ing.network.RMI to javafx.fxml;
     exports com.example.pf_soft_ing.game;
     opens com.example.pf_soft_ing.game to javafx.fxml;
     exports com.example.pf_soft_ing.deserializers;
@@ -47,4 +41,10 @@ module com.example.pf_soft_ing {
     opens com.example.pf_soft_ing.app.GUI to javafx.fxml;
     exports com.example.pf_soft_ing.ServerConnection;
     opens com.example.pf_soft_ing.ServerConnection to javafx.fxml;
+    exports com.example.pf_soft_ing.ServerConnection.messages;
+    opens com.example.pf_soft_ing.ServerConnection.messages to javafx.fxml;
+    exports com.example.pf_soft_ing.ServerConnection.messages.answers;
+    opens com.example.pf_soft_ing.ServerConnection.messages.answers to javafx.fxml;
+    exports com.example.pf_soft_ing.ServerConnection.messages.requests;
+    opens com.example.pf_soft_ing.ServerConnection.messages.requests to javafx.fxml;
 }

@@ -42,6 +42,8 @@ public class App extends Application {
     private int selectedCardID = -1;
     private double lastPlacedCardX;
     private double lastPlacedCardY;
+    private double selectedCardX;
+    private double selectedCardY;
     private Pane selectedCardPane;
 
     private boolean pressingCtrl = false;
@@ -750,6 +752,10 @@ public class App extends Application {
             updateGridDimension();
         }
 
+        // Update last placed card position in hand
+        lastPlacedCardX = selectedCardX;
+        lastPlacedCardY = selectedCardY;
+
         // Remove card from hand
         playerHand.remove(Integer.valueOf(ID));
 
@@ -872,14 +878,16 @@ public class App extends Application {
         selectButton.setOpacity(0.1);
 
         selectButton.setOnAction((_) -> {
-            if (selectedCardPane != null && selectedCardPane != cardPane){
-                selectedCardPane.setLayoutY(selectedCardPane.getLayoutY() + selectedCardOffset);
+            if (selectedCardPane != cardPane){
+                if (selectedCardPane != null){
+                    selectedCardPane.setLayoutY(selectedCardPane.getLayoutY() + selectedCardOffset);
+                }
+                selectedCardID = cardID;
+                selectedCardX = cardPane.getLayoutX();
+                selectedCardY = cardPane.getLayoutY();
+                selectedCardPane = cardPane;
+                cardPane.setLayoutY(cardPane.getLayoutY() - selectedCardOffset);
             }
-            selectedCardID = cardID;
-            lastPlacedCardX = cardPane.getLayoutX();
-            lastPlacedCardY = cardPane.getLayoutY();
-            selectedCardPane = cardPane;
-            cardPane.setLayoutY(cardPane.getLayoutY() - selectedCardOffset);
         });
 
         cardPane.getChildren().add(selectButton);

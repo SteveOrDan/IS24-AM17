@@ -4,7 +4,6 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -13,31 +12,19 @@ public interface RMIReceiverInterface extends Remote {
 
     void getMatches(ClientRMIInterface client) throws RemoteException;
 
-    void sendMatch(int matchID, ClientRMIInterface client) throws RemoteException;
+    MatchController createMatch(ClientRMIInterface client, int numberOfPlayers) throws RemoteException;
 
-    void sendNickname(String nickname, ClientRMIInterface client) throws RemoteException;
+    MatchController selectMatch(ClientRMIInterface client, int playerID, int matchID) throws RemoteException;
 
-    void createMatch(int numberOfPlayers, ClientRMIInterface client) throws RemoteException;
+    void chooseNickname(ClientRMIInterface client, String nickname) throws RemoteException;
 
-    void placeCard(int id, Position pos, ClientRMIInterface client) throws RemoteException;
+    void placeCard(ClientRMIInterface client, int id, Position pos) throws RemoteException;
 
-    void drawResourceCard(ClientRMIInterface client) throws RemoteException;
+    void drawResourceCard(ClientRMIInterface client, int playerID) throws RemoteException;
 
-    void drawVisibleResourceCard(int playerID, int index, ClientRMIInterface client) throws RemoteException;
+    void drawVisibleResourceCard(ClientRMIInterface client, int playerID, int index) throws RemoteException;
 
-    void drawGoldenCard(int playerID, ClientRMIInterface client) throws RemoteException;
+    void drawGoldenCard(ClientRMIInterface client, int playerID) throws RemoteException;
 
-    void drawVisibleGoldenCard(int playerID, int index, ClientRMIInterface client) throws RemoteException;
-
-    void requestError(ClientRMIInterface client) throws RemoteException;
-
-    // Initial methods
-    void createGame(ClientRMIInterface client, String nickname, int numberOfPlayers) throws RemoteException;
-
-    MatchController selectMatch(ClientRMIInterface client, int matchID) throws RemoteException;
-
-    void joinMatch(MatchController matchController, String nickname, ClientRMIInterface client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException;
-
-    // Prototype method
-    boolean foo(String name) throws RemoteException;
+    void drawVisibleGoldenCard(ClientRMIInterface client, int playerID, int index) throws RemoteException;
 }

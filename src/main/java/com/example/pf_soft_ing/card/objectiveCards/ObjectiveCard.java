@@ -3,6 +3,7 @@ package com.example.pf_soft_ing.card.objectiveCards;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.PlaceableCard;
 
+import java.io.Serializable;
 import java.util.HashMap;
 
 public abstract class ObjectiveCard {

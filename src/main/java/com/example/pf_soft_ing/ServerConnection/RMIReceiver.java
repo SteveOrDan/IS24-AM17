@@ -1,11 +1,8 @@
 package com.example.pf_soft_ing.ServerConnection;
 
 import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.exceptions.GameIsFullException;
-import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.network.RMI.ClientRMIInterface;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -13,98 +10,68 @@ import java.util.HashMap;
 
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
-    private static final HashMap<ClientRMIInterface, Decoder> clientRMIDecoderHashMap = new HashMap<>();
     private final GameController gameController;
-    private static final HashMap<ClientRMIInterface, MatchController> MatchControllerHashMap = new HashMap<>();
+    private static final HashMap<ClientRMIInterface, MatchController> matchControllerMap = new HashMap<>();
+    private static final HashMap<Integer, ClientRMIInterface> playerIDToClient = new HashMap<>();
 
     public RMIReceiver(GameController gameController) throws RemoteException {
         this.gameController = gameController;
     }
 
-    public static void addDecoder(ClientRMIInterface client, Decoder decoder){
-        clientRMIDecoderHashMap.put(client, decoder);
+    private static void addMatchController(ClientRMIInterface client, MatchController matchController){
+        matchControllerMap.put(client, matchController);
     }
 
-    private static void addMatchController(ClientRMIInterface client, MatchController matchController){
-        MatchControllerHashMap.put(client, matchController);
+    private static void addPlayerID(ClientRMIInterface client, int playerID){
+        playerIDToClient.put(playerID, client);
     }
 
     private MatchController getMatchController(ClientRMIInterface client){
-        return MatchControllerHashMap.get(client);
+        return matchControllerMap.get(client);
     }
 
     @Override
     public void getMatches(ClientRMIInterface client) throws RemoteException {
-        gameController.getMatches(client);
+
     }
 
     @Override
-    public void sendMatch(int matchID, ClientRMIInterface client) throws RemoteException {
-        addMatchController(client, gameController.sendMatch(matchID, client));
+    public MatchController createMatch(ClientRMIInterface client, int numberOfPlayers) throws RemoteException {
+        return null;
     }
 
     @Override
-    public void sendNickname(String nickname, ClientRMIInterface client) throws RemoteException {
-        gameController.sendNickname(getMatchController(client), nickname, client);
-    }
-
-
-    @Override
-    public void createMatch(int numberOfPlayers, ClientRMIInterface client) throws RemoteException {
-        addMatchController(client, gameController.createMatch(numberOfPlayers, client));
+    public MatchController selectMatch(ClientRMIInterface client, int playerID, int matchID) throws RemoteException {
+        return null;
     }
 
     @Override
-    public void placeCard(int id, Position pos, ClientRMIInterface client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).placeCard(id, pos);
+    public void chooseNickname(ClientRMIInterface client, String nickname) throws RemoteException {
+
     }
 
     @Override
-    public void drawResourceCard(ClientRMIInterface client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).drawResourceCard();
+    public void placeCard(ClientRMIInterface client, int id, Position pos) throws RemoteException {
+
     }
 
     @Override
-    public void drawVisibleResourceCard(int playerID, int index, ClientRMIInterface client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).drawVisibleResourceCard(playerID,index);
+    public void drawResourceCard(ClientRMIInterface client, int playerID) throws RemoteException {
+
     }
 
     @Override
-    public void drawGoldenCard(int playerID, ClientRMIInterface client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).drawGoldenCard(playerID);
+    public void drawVisibleResourceCard(ClientRMIInterface client, int playerID, int index) throws RemoteException {
+
     }
 
     @Override
-    public void drawVisibleGoldenCard(int playerID, int index, ClientRMIInterface client) throws RemoteException {
-        clientRMIDecoderHashMap.get(client).drawVisibleGoldenCard(playerID, index);
+    public void drawGoldenCard(ClientRMIInterface client, int playerID) throws RemoteException {
+
     }
 
     @Override
-    public void requestError(ClientRMIInterface client) throws RemoteException {
-        //clientRMIDecoderHashMap.get(client).requestError();
-        System.out.println("Method request error called");
-        client.sendID(4);
-    }
+    public void drawVisibleGoldenCard(ClientRMIInterface client, int playerID, int index) throws RemoteException {
 
-    @Override
-    public void createGame(ClientRMIInterface client, String nickname, int numberOfPlayers) throws RemoteException {
-        //gameController.createGame(nickname, numberOfPlayers);
-    }
-
-    @Override
-    public MatchController selectMatch(ClientRMIInterface client, int matchID) throws RemoteException {
-        return gameController.selectMatch(matchID);
-    }
-
-    @Override
-    public void joinMatch(MatchController matchController, String nickname, ClientRMIInterface client) throws NicknameAlreadyExistsException, GameIsFullException, RemoteException {
-        ///gameController.joinMatch(matchController, nickname, client);
-    }
-
-    @Override
-    public boolean foo(String name) throws RemoteException {
-        int id = 1;
-        System.out.println(name + "called foo");
-        return true;
     }
 }

@@ -1,22 +1,35 @@
 package com.example.pf_soft_ing.ServerConnection;
 
+import com.example.pf_soft_ing.ServerConnection.messages.Message;
+import com.example.pf_soft_ing.ServerConnection.messages.answers.MatchCreatedMsg;
+import com.example.pf_soft_ing.ServerConnection.messages.answers.ReturnMatchesMsg;
+import com.example.pf_soft_ing.ServerConnection.messages.answers.SelectMatchResultMsg;
+import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
+import com.example.pf_soft_ing.player.TokenColors;
 
-import java.io.PrintWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.List;
 
-public class SocketSender extends Encoder {
+public class SocketSender extends Sender {
 
-    private static PrintWriter out;
-    public SocketSender(PrintWriter out){
+    private final ObjectOutputStream out;
+
+    public SocketSender(ObjectOutputStream out){
         this.out = out;
     }
 
-    protected static void SendMessage(String output){
+    protected void sendMessage(Message output){
         new Thread(){
             public void run(){
-                out.println(output);
+                try {
+                    out.writeObject(output);
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }.start();
     }
@@ -26,7 +39,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void sendID(int id){
-        SendMessage(STR."20 \{id}");
+//        SendMessage(STR."20 \{id}");
     }
 
     /**
@@ -34,7 +47,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void setState(PlayerState state){
-        SendMessage(STR."21 \{state.ordinal()}");
+//        SendMessage(STR."21 \{state.ordinal()}");
         /*
             In the client, to invert use: PlayerState state = PlayerState.values()[ordinal];
          */
@@ -45,7 +58,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void setCurrScore(int score){
-        SendMessage(STR."22 \{score}");
+//        SendMessage(STR."22 \{score}");
     }
 
     /**
@@ -53,7 +66,12 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void setToken(Token token){
-        SendMessage(STR."23 \{token.getColor()}");
+//        SendMessage(STR."23 \{token.getColor()}");
+    }
+
+    @Override
+    protected void setTokenEncoded(TokenColors color) {
+
     }
 
     /**
@@ -61,13 +79,13 @@ public class SocketSender extends Encoder {
      */
     @Override
     protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){
-        StringBuilder output = new StringBuilder("24");
-
-        for (Integer i : objectiveIDs){
-            output.append(" ");
-            output.append(i);
-        }
-        SendMessage(output.toString());
+//        StringBuilder output = new StringBuilder("24");
+//
+//        for (Integer i : objectiveIDs){
+//            output.append(" ");
+//            output.append(i);
+//        }
+//        SendMessage(output.toString());
     }
 
     /**
@@ -75,15 +93,20 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void setFirstPlayerToken(Token token){
-        String color;
+//        String color;
+//
+//        if (token == null){
+//            color = "null";
+//        }
+//        else {
+//            color = "black";
+//        }
+//        SendMessage(STR."5 \{color}");
+    }
 
-        if (token == null){
-            color = "null";
-        }
-        else {
-            color = "black";
-        }
-        SendMessage(STR."5 \{color}");
+    @Override
+    protected void setFirstPlayerTokenEncoded(TokenColors color) {
+
     }
 
     /**
@@ -92,7 +115,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     protected void addCardToPlayerHandEncoded(int id){
-        SendMessage(STR."6 \{id}");
+//        SendMessage(STR."6 \{id}");
     }
 
     /**
@@ -100,7 +123,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     protected void setSecretObjectiveEncoded(int id){
-        SendMessage(STR."7 \{id}");
+//        SendMessage(STR."7 \{id}");
     }
 
     /**
@@ -108,7 +131,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     protected void setStarterCardEncoded(int id){
-        SendMessage(STR."8 \{id}");
+//        SendMessage(STR."8 \{id}");
     }
 
     /**
@@ -117,7 +140,7 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void placeStarterCard(boolean placed){
-        SendMessage(STR."9 \{placed}");
+//        SendMessage(STR."9 \{placed}");
     }
 
     /**
@@ -126,14 +149,34 @@ public class SocketSender extends Encoder {
      */
     @Override
     public void placeCard(boolean placed){
-        SendMessage(STR."10 \{placed}");
+//        SendMessage(STR."10 \{placed}");
     }
 
     /**
      * Method to requestError to the Player
      */
     @Override
-    public void requestError(){
-        SendMessage("11 requestError");
+    public void sendError(String errorMsg){
+//        SendMessage("11 requestError " + errorMsg);
+    }
+
+    @Override
+    public void sendMatches(List<MatchController> matches) {
+        sendMessage(new ReturnMatchesMsg(matches));
+    }
+
+    @Override
+    public void createMatchResult(MatchController match) {
+        sendMessage(new MatchCreatedMsg(match.getMatchModel().getMatchID()));
+    }
+
+    @Override
+    public void selectMatchResult(MatchController match) {
+        sendMessage(new SelectMatchResultMsg(match.getMatchModel().getMatchID(), match.getMatchModel().getNicknames()));
+    }
+
+    @Override
+    public void chooseNicknameResult() {
+
     }
 }

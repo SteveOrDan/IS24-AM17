@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.ServerConnection;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -9,22 +10,22 @@ import com.example.pf_soft_ing.player.TokenColors;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Encoder {
+public abstract class Sender {
 
     /**
      * Send the ID to the Player
      */
-    public void sendID(int id){}
+    public abstract void sendID(int id);
 
     /**
      * Sets the state for the Player
      */
-    public void setState(PlayerState state){}
+    public abstract void setState(PlayerState state);
 
     /**
      * Sets the score for the Player
      */
-    public void setCurrScore(int score){}
+    public abstract void setCurrScore(int score);
 
     /**
      * Sets the token for the Player
@@ -37,7 +38,7 @@ public abstract class Encoder {
     /**
      * Sets the token's color for the Player
      */
-    protected void setTokenEncoded(TokenColors color){}
+    protected abstract void setTokenEncoded(TokenColors color);
 
 
     /**
@@ -54,7 +55,7 @@ public abstract class Encoder {
     /**
      * Sets the list of IDs of objectives to choose for the Player
      */
-    protected void setObjectivesToChooseEncoded(List<Integer> objectiveIDs){}
+    protected abstract void setObjectivesToChooseEncoded(List<Integer> objectiveIDs);
 
     /**
      * Sets the first player's token
@@ -67,21 +68,21 @@ public abstract class Encoder {
     /**
      * Sets the color of the token for the first Player
      */
-    protected void setFirstPlayerTokenEncoded(TokenColors color){}
+    protected abstract void setFirstPlayerTokenEncoded(TokenColors color);
 
     /**
      * Method to add a card to Player hand
      * @param card Card to add
      */
     public void addCardToPlayerHand(PlaceableCard card){
-        addCardToPlayerHandEncoded(card.getId());
+        addCardToPlayerHandEncoded(card.getID());
     }
 
     /**
      * Method to add a cardID to Player hand
      * @param id CardID to add
      */
-    protected void addCardToPlayerHandEncoded(int id){}
+    protected abstract void addCardToPlayerHandEncoded(int id);
 
     /**
      * Sets the secret objective card for the Player
@@ -93,34 +94,45 @@ public abstract class Encoder {
     /**
      * Sets the id of the secret objective card for the Player
      */
-    protected void setSecretObjectiveEncoded(int id){}
+    protected abstract void setSecretObjectiveEncoded(int id);
 
     /**
      * Sets the starter card for the Player
      */
     public void setStarterCard(PlaceableCard card){
-        setStarterCardEncoded(card.getId());
+        setStarterCardEncoded(card.getID());
     }
 
     /**
      * Sets the starter cardID for the Player
      */
-    protected void setStarterCardEncoded(int id){}
+    protected abstract void setStarterCardEncoded(int id);
 
     /**
      * Method to place starter card
      * @param placed boolean
      */
-    public void placeStarterCard(boolean placed){}
+    public abstract void placeStarterCard(boolean placed);
 
     /**
      * Method to place a card
      * @param placed boolean
      */
-    public void placeCard(boolean placed){}
+    public abstract void placeCard(boolean placed);
 
     /**
      * Method to requestError to the Player
      */
-    public void requestError(){}
+    public abstract void sendError(String errorMsg);
+
+    /**
+     * Method to return all the matches
+     */
+    public abstract void sendMatches(List<MatchController> matches);
+
+    public abstract void createMatchResult(MatchController match);
+
+    public abstract void selectMatchResult(MatchController match);
+
+    public abstract void chooseNicknameResult();
 }

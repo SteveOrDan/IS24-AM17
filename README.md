@@ -1103,7 +1103,7 @@ class PlayerModel{
     - state : PlayerState
     - currMaxPriority : int
 
-    - encoder : Encoder
+    - sender : Encoder
 
     + getID() int
     + getNickname() String

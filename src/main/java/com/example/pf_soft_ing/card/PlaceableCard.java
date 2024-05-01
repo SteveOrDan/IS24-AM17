@@ -3,15 +3,16 @@ package com.example.pf_soft_ing.card;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class PlaceableCard{
+public abstract class PlaceableCard {
 
     // Todo: set public attributes to private with due corrections
 
     public String cardType;
 
-    public final int id;
+    public final int ID;
 
     public final CardElementType elementType;
 
@@ -21,10 +22,10 @@ public abstract class PlaceableCard{
     public final Side front;
     public final Side back;
 
-    public PlaceableCard(CardElementType element, int id, Side front, Side back){
+    public PlaceableCard(CardElementType element, int ID, Side front, Side back){
         this.priority = 0;
         this.elementType = element;
-        this.id = id;
+        this.ID = ID;
         this.front = front;
         this.back = back;
     }
@@ -38,8 +39,8 @@ public abstract class PlaceableCard{
      * Getter
      * @return Card's ID
      */
-    public int getId() {
-        return id;
+    public int getID() {
+        return ID;
     }
 
     /**
