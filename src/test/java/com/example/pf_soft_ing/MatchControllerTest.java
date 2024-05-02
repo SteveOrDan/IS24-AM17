@@ -2,11 +2,13 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
+import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.network.RMI.ClientRMI;
+import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.PlayerModel;
+import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
 import com.example.pf_soft_ing.card.PlaceableCard;
@@ -14,7 +16,10 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.Test;
 
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,7 +27,9 @@ import static org.junit.jupiter.api.Assertions.*;
 class MatchControllerTest {
 
     static int numOfPlayers = 4;
-    MatchController matchController = new MatchController(numOfPlayers, 0);
+    MatchController matchController = new MatchController(numOfPlayers, 1);
+
+    GameController gameController = new GameController();
 
     @Test
     void checkResources(){
@@ -40,12 +47,19 @@ class MatchControllerTest {
         addPlayers("Player 4");
         addPlayers("Player 5");
 
-        assertEquals(4, matchController.getIDPlayerMap().size());
+        assertEquals(4, matchController.getIDToPlayerMap().size());
     }
 
     private void addPlayers(String name) {
         try {
-            matchController.addPlayer(name, new PrintWriter(System.out, true));
+            PlayerModel player = gameController.getGameModel().createPlayer(new SocketSender(new ObjectOutputStream(System.out)));
+
+            matchController.getMatchModel().addCurrPlayer(player);
+            matchController.getMatchModel().addReadyPlayer();
+
+            player.setNickname(name);
+            player.setState(PlayerState.MATCH_LOBBY);
+            player.setMatchID(1);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -59,14 +73,14 @@ class MatchControllerTest {
             addPlayers("Player " + i);
         }
 
-        assertEquals(4, matchController.getIDPlayerMap().size());
+        assertEquals(4, matchController.getIDToPlayerMap().size());
 
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();
 
         // Foreach player...
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
-            PlayerModel player = matchController.getIDPlayerMap().get(i);
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
+            PlayerModel player = matchController.getIDToPlayerMap().get(i);
 
             // Set starter card
             matchController.drawStarterCard(i);
@@ -88,12 +102,12 @@ class MatchControllerTest {
         matchController.setCommonObjectives();
 
         // Set objectives to choose
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             matchController.setObjectivesToChoose(i);
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
-            matchController.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(randIndex);
         }
 
         // Set first player
@@ -103,20 +117,20 @@ class MatchControllerTest {
 
         int firstPlayers = 0;
 
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
-            if (matchController.getIDPlayerMap().get(i).isFirstPlayer()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
+            if (matchController.getIDToPlayerMap().get(i).isFirstPlayer()){
                 firstPlayers++;
             }
 
             try {
-                assertNotNull(matchController.getIDPlayerMap().get(i).getStarterCard());
+                assertNotNull(matchController.getIDToPlayerMap().get(i).getStarterCard());
             } catch (StarterCardNotSetException e) {
                 System.out.println(e.getMessage());
             }
 
-            assertEquals(3, matchController.getIDPlayerMap().get(i).getHand().size());
+            assertEquals(3, matchController.getIDToPlayerMap().get(i).getHand().size());
 
-            assertNotNull(matchController.getIDPlayerMap().get(i).getSecretObjective());
+            assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());
         }
 
         assertEquals(1, firstPlayers);
@@ -140,14 +154,14 @@ class MatchControllerTest {
             addPlayers("Player " + i);
         }
 
-        assertEquals(numOfPlayers, matchController.getIDPlayerMap().size());
+        assertEquals(numOfPlayers, matchController.getIDToPlayerMap().size());
 
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();
 
         // For each player...
-        for (Integer i : matchController.getIDPlayerMap().keySet()) {
-            PlayerModel player = matchController.getIDPlayerMap().get(i);
+        for (Integer i : matchController.getIDToPlayerMap().keySet()) {
+            PlayerModel player = matchController.getIDToPlayerMap().get(i);
             PlaceableCard starterCard = null;
 
             // Set starter card
@@ -180,14 +194,14 @@ class MatchControllerTest {
         assertEquals(2, matchController.getMatchModel().getObjectiveCardsDeck().getCommonObjectives().size());
 
         // Set objectives to choose
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             matchController.setObjectivesToChoose(i);
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
-            matchController.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(randIndex);
 
-            assertNotNull(matchController.getIDPlayerMap().get(i).getSecretObjective());
+            assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());
         }
 
         // Set first player
@@ -197,8 +211,8 @@ class MatchControllerTest {
 
         int firstPlayers = 0;
 
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
-            if (matchController.getIDPlayerMap().get(i).isFirstPlayer()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
+            if (matchController.getIDToPlayerMap().get(i).isFirstPlayer()){
                 firstPlayers++;
             }
         }
@@ -212,7 +226,7 @@ class MatchControllerTest {
         HashMap<Integer, ArrayList<Position>> plIdToLegalPos = new HashMap<>();
         HashMap<Integer, ArrayList<Position>> plIdToIllegalPos = new HashMap<>();
 
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             plIdToLegalPos.put(i, new ArrayList<>());
             plIdToIllegalPos.put(i, new ArrayList<>());
 
@@ -317,7 +331,7 @@ class MatchControllerTest {
                                                               HashMap<Integer, ArrayList<Position>> plIdToIllegalPos,
                                                               int playerID, Position pos){
 
-        PlayerModel player = matchController.getIDPlayerMap().get(playerID);
+        PlayerModel player = matchController.getIDToPlayerMap().get(playerID);
 
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
@@ -382,7 +396,7 @@ class MatchControllerTest {
     }
 
     private PlayerModel getCurrentPlayer(){
-        return matchController.getIDPlayerMap().get(matchController.getMatchModel().getCurrPlayerID());
+        return matchController.getIDToPlayerMap().get(matchController.getMatchModel().getCurrPlayerID());
     }
 
     private int getCurrentPlayerId(){
@@ -396,9 +410,9 @@ class MatchControllerTest {
         PlayerModel currPlayer = getCurrentPlayer();
 
         PlayerModel notCurrPlayer = null;
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             if (i != matchController.getMatchModel().getCurrPlayerID()){
-                notCurrPlayer = matchController.getIDPlayerMap().get(i);
+                notCurrPlayer = matchController.getIDToPlayerMap().get(i);
                 break;
             }
         }
@@ -593,7 +607,7 @@ class MatchControllerTest {
         addPlayers("Player 3");
         addPlayers("Player 4");
 
-        assertEquals(4, matchController.getIDPlayerMap().size());
+        assertEquals(4, matchController.getIDToPlayerMap().size());
 
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();
@@ -607,8 +621,8 @@ class MatchControllerTest {
         matchController.fillPlayerHand(-1); // Invalid id
 
         // Foreach player...
-        for (Integer i : matchController.getIDPlayerMap().keySet()) {
-            PlayerModel player = matchController.getIDPlayerMap().get(i);
+        for (Integer i : matchController.getIDToPlayerMap().keySet()) {
+            PlayerModel player = matchController.getIDToPlayerMap().get(i);
             PlaceableCard starterCard = null;
 
             // Set starter card
@@ -644,16 +658,16 @@ class MatchControllerTest {
         matchController.setObjectivesToChoose(-1); // Invalid id
 
         // Set objectives to choose
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             matchController.setObjectivesToChoose(i);
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
-            matchController.getIDPlayerMap().get(i).setSecretObjective(3); // Wrong index
-            matchController.getIDPlayerMap().get(i).setSecretObjective(-3); // Wrong index
-            matchController.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(3); // Wrong index
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(-3); // Wrong index
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(randIndex);
 
-            assertNotNull(matchController.getIDPlayerMap().get(i).getSecretObjective());
+            assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());
         }
 
         // Set first player
@@ -663,8 +677,8 @@ class MatchControllerTest {
 
         int firstPlayers = 0;
 
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
-            if (matchController.getIDPlayerMap().get(i).isFirstPlayer()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
+            if (matchController.getIDToPlayerMap().get(i).isFirstPlayer()){
                 firstPlayers++;
             }
         }
@@ -683,7 +697,7 @@ class MatchControllerTest {
         HashMap<Integer, ArrayList<Position>> plIdToLegalPos = new HashMap<>();
         HashMap<Integer, ArrayList<Position>> plIdToIllegalPos = new HashMap<>();
 
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             plIdToLegalPos.put(i, new ArrayList<>());
             plIdToIllegalPos.put(i, new ArrayList<>());
 
@@ -699,8 +713,8 @@ class MatchControllerTest {
         }
 
         // Set points to max
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
-            matchController.getIDPlayerMap().get(i).setCurrScore(29);
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
+            matchController.getIDToPlayerMap().get(i).setCurrScore(29);
         }
 
         while (matchController.getMatchModel().getGameState() == GameState.EXTRA_ROUND){
@@ -724,8 +738,8 @@ class MatchControllerTest {
         matchController.setUpGame();
 
         // Foreach player...
-        for (Integer i : matchController.getIDPlayerMap().keySet()) {
-            PlayerModel player = matchController.getIDPlayerMap().get(i);
+        for (Integer i : matchController.getIDToPlayerMap().keySet()) {
+            PlayerModel player = matchController.getIDToPlayerMap().get(i);
             PlaceableCard starterCard = null;
 
             // Set starter card
@@ -749,12 +763,12 @@ class MatchControllerTest {
         matchController.setCommonObjectives();
 
         // Set objectives to choose
-        for (Integer i : matchController.getIDPlayerMap().keySet()){
+        for (Integer i : matchController.getIDToPlayerMap().keySet()){
             matchController.setObjectivesToChoose(i);
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
-            matchController.getIDPlayerMap().get(i).setSecretObjective(randIndex);
+            matchController.getIDToPlayerMap().get(i).setSecretObjective(randIndex);
         }
 
         // Set first player

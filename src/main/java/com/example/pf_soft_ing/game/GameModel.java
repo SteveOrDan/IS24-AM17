@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.game;
 
-import com.example.pf_soft_ing.ServerConnection.Sender;
+import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
@@ -14,10 +14,17 @@ public class GameModel {
 
     /**
      * Getter
-     * @return List of matches
+     * @return Map of match IDs with the corresponding nicknames
      */
-    public List<MatchController> getMatches(){
-        return matches;
+    public Map<Integer, List<String>> getMatches(){
+        Map<Integer, List<String>> allMatches = new HashMap<>();
+
+        for (MatchController match : matches){
+            List<String> nicknames = new ArrayList<>(match.getMatchModel().getNicknames());
+            allMatches.put(match.getMatchModel().getMatchID(), nicknames);
+        }
+
+        return allMatches;
     }
 
     /**
@@ -49,13 +56,17 @@ public class GameModel {
      * @param nickname Nickname of the host player
      * @throws InvalidNumOfPlayers If the number of players is not between 2 and 4
      */
-    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayers, InvalidPlayerStateException {
+    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayers, InvalidPlayerStateException, GameIsFullException {
         if (numberOfPlayers > 4 || numberOfPlayers < 2){
             throw new InvalidNumOfPlayers();
         }
-        if (IDToPlayers.get(playerID).getMatchID() != 0){
-            throw new InvalidPlayerStateException(IDToPlayers.get(playerID).getState().name(), "MAIN_MENU");
+
+        PlayerModel player = IDToPlayers.get(playerID);
+
+        if (player.getState() != PlayerState.MAIN_MENU){
+            throw new InvalidPlayerStateException(player.getState().name(), PlayerState.MAIN_MENU.name());
         }
+
         List<Integer> matchIDs = new ArrayList<>();
         matches.forEach(match -> matchIDs.add(match.getMatchModel().getMatchID()));
 
@@ -67,8 +78,13 @@ public class GameModel {
         }
 
         MatchController match = new MatchController(numberOfPlayers, newID);
-        IDToPlayers.get(playerID).setNickname(nickname);
-        IDToPlayers.get(playerID).setState(PlayerState.MATCH_LOBBY);
+
+        match.getMatchModel().addCurrPlayer(player);
+        match.getMatchModel().addReadyPlayer();
+
+        player.setNickname(nickname);
+        player.setState(PlayerState.MATCH_LOBBY);
+        player.setMatchID(newID);
 
         matches.add(match);
 
@@ -83,7 +99,12 @@ public class GameModel {
      * @throws InvalidMatchID If the match ID is invalid
      */
     public MatchController selectMatch(int playerID, int matchID) throws InvalidMatchID, GameIsFullException {
-        getMatchByID(matchID).getMatchModel().addCurrPlayer(IDToPlayers.get(playerID));
+        PlayerModel player = IDToPlayers.get(playerID);
+
+        getMatchByID(matchID).getMatchModel().addCurrPlayer(player);
+
+        player.setState(PlayerState.MATCH_LOBBY);
+        player.setMatchID(matchID);
 
         return getMatchByID(matchID);
     }
@@ -116,7 +137,7 @@ public class GameModel {
      * @param sender Sender of the player
      * @return ID of the new player
      */
-    public int createPlayer(Sender sender){
+    public PlayerModel createPlayer(Sender sender){
         Random rng = new Random();
 
         int newID = rng.nextInt(1000);
@@ -130,7 +151,7 @@ public class GameModel {
         PlayerModel player = new PlayerModel(newID, sender);
         IDToPlayers.put(newID, player);
 
-        return newID;
+        return player;
     }
 
     /**

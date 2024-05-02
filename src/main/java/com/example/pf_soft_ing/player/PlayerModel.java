@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.player;
 
-import com.example.pf_soft_ing.ServerConnection.Sender;
+import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -35,7 +35,7 @@ public class PlayerModel {
     private Token token;
     private Token firstPlayerToken;
 
-    private PlayerState state = PlayerState.PRE_GAME;
+    private PlayerState state = PlayerState.MAIN_MENU;
 
     private int currMaxPriority = 0;
 

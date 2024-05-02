@@ -1,9 +1,10 @@
 package com.example.pf_soft_ing.game;
 
-import com.example.pf_soft_ing.ServerConnection.Sender;
+import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.exceptions.*;
 
 import java.util.List;
+import java.util.Map;
 
 public class GameController {
 
@@ -19,9 +20,9 @@ public class GameController {
 
     /**
      * Getter
-     * @return List of matches
+     * @return Map of match IDs with the corresponding nicknames
      */
-    public List<MatchController> getMatches() {
+    public Map<Integer, List<String>> getMatches() {
         return gameModel.getMatches();
     }
 
@@ -32,7 +33,7 @@ public class GameController {
      * @param nickname Nickname of the host player
      * @throws InvalidNumOfPlayers If the number of players is not between 2 and 4
      */
-    public MatchController createMatch(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayers, InvalidPlayerStateException {
+    public MatchController createMatch(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayers, InvalidPlayerStateException, GameIsFullException {
         // Creates a new match in the game model
         return gameModel.createGame(playerID, numberOfPlayers, nickname);
     }
@@ -81,4 +82,15 @@ public class GameController {
     public Sender getPlayerSender(int playerID) {
         return gameModel.getIDToPlayers().get(playerID).getSender();
     }
+
+// Broadcast Area === KEEP OUT!!!! ===
+//    public List<Sender> getAllOtherSenders(int playerID){
+//        for (PlayerModel player : gameModel.getIDToPlayers().values()){
+//
+//        }
+//    }
+//
+//    public List<Sender> getOpponentSenders(int matchID, int playerID){
+//
+//    }
 }

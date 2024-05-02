@@ -13,22 +13,18 @@ import java.util.HashMap;
 
 public class MatchController implements Serializable {
 
-    private final HashMap<Integer, PlayerModel> IDPlayerMap;
-
     private final MatchModel matchModel;
 
     public MatchController(int maxPlayers, int matchID){
-        IDPlayerMap = new HashMap<>();
-
         matchModel = new MatchModel(maxPlayers, matchID);
     }
 
     /**
      * Getter
-     * @return IDPlayerMap with keys as player IDs and values as PlayerModel objects
+     * @return getIDToPlayerMap with keys as player IDs and values as PlayerModel objects
      */
-    public HashMap<Integer, PlayerModel> getIDPlayerMap() {
-        return IDPlayerMap;
+    public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
+        return matchModel.getIDToPlayerMap();
     }
 
     /**
@@ -84,12 +80,12 @@ public class MatchController implements Serializable {
      */
     public void setObjectivesToChoose(int playerID){
         try {
-            if (!IDPlayerMap.containsKey(playerID)){
+            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            PlayerModel player = IDPlayerMap.get(playerID);
+            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
 
             ArrayList<ObjectiveCard> objectives = new ArrayList<>();
             objectives.add(matchModel.drawObjectiveCard());
@@ -124,7 +120,7 @@ public class MatchController implements Serializable {
      */
     public void placeCard(int playerID, int cardID, Position pos, Side chosenSide) {
         try {
-            if (!IDPlayerMap.containsKey(playerID)){
+            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
@@ -139,7 +135,7 @@ public class MatchController implements Serializable {
                 throw new InvalidCardIDException();
             }
 
-            if (!IDPlayerMap.get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
+            if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
                 // Card not in player's hand
                 throw new CardNotInHandException();
             }
@@ -152,7 +148,7 @@ public class MatchController implements Serializable {
 
             }
 
-            PlayerModel player = IDPlayerMap.get(playerID);
+            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
 
             player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
 
@@ -177,12 +173,12 @@ public class MatchController implements Serializable {
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
             }
 
-            if (!IDPlayerMap.containsKey(playerID)){
+            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            PlayerModel player = IDPlayerMap.get(playerID);
+            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
 
             player.drawCard(matchModel.drawResourceCard());
             player.drawCard(matchModel.drawResourceCard());
@@ -201,9 +197,9 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            IDPlayerMap.get(playerID).drawCard(matchModel.drawResourceCard());
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawResourceCard());
 
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -222,11 +218,11 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            IDPlayerMap.get(playerID).drawCard(matchModel.drawVisibleResourceCard(index));
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawVisibleResourceCard(index));
 
             matchModel.restoreVisibleResourceCard();
 
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -244,9 +240,9 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            IDPlayerMap.get(playerID).drawCard(matchModel.drawGoldenCard());
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawGoldenCard());
 
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -265,11 +261,11 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            IDPlayerMap.get(playerID).drawCard(matchModel.drawVisibleGoldenCard(index));
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawVisibleGoldenCard(index));
 
             matchModel.restoreVisibleGoldenCard();
 
-            IDPlayerMap.get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
         }
@@ -290,12 +286,12 @@ public class MatchController implements Serializable {
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
             }
 
-            if (!IDPlayerMap.containsKey(playerID)){
+            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
                 // Invalid player ID
                 throw new InvalidPlayerIDException();
             }
 
-            IDPlayerMap.get(playerID).setStarterCard(matchModel.drawStarterCard());
+            matchModel.getIDToPlayerMap().get(playerID).setStarterCard(matchModel.drawStarterCard());
             //System.out.println("DrawStarterCard invoked");
         }
         catch (Exception e) {
@@ -311,7 +307,7 @@ public class MatchController implements Serializable {
 //     */
 //    public void flipCard(int playerID, int cardID){
 //        try {
-//            if (!IDPlayerMap.containsKey(playerID)){
+//            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
 //                // Invalid player ID
 //                throw new InvalidPlayerIDException();
 //            }
@@ -321,7 +317,7 @@ public class MatchController implements Serializable {
 //                throw new InvalidCardIDException();
 //            }
 //
-//            List<PlaceableCard> hand = IDPlayerMap.get(playerID).getHand();
+//            List<PlaceableCard> hand = matchModel.getIDToPlayerMap().get(playerID).getHand();
 //
 //            if (!hand.contains(IDPlaceableCardMap.get(cardID))){
 //                // Card not in player's hand
@@ -360,7 +356,7 @@ public class MatchController implements Serializable {
             throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND);
         }
 
-        if (!IDPlayerMap.containsKey(playerID)){
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
             // Invalid player ID
             throw new InvalidPlayerIDException();
         }
@@ -370,9 +366,9 @@ public class MatchController implements Serializable {
             throw new NotPlayerTurnException();
         }
 
-        if (IDPlayerMap.get(playerID).getState() != PlayerState.DRAWING){
+        if (matchModel.getIDToPlayerMap().get(playerID).getState() != PlayerState.DRAWING){
             // Not in drawing state
-            throw new InvalidPlayerStateException(IDPlayerMap.get(playerID).getState().toString(), PlayerState.DRAWING.toString());
+            throw new InvalidPlayerStateException(matchModel.getIDToPlayerMap().get(playerID).getState().toString(), PlayerState.DRAWING.toString());
         }
     }
 }

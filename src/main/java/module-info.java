@@ -39,12 +39,14 @@ module com.example.pf_soft_ing {
 
     exports com.example.pf_soft_ing.app.GUI;
     opens com.example.pf_soft_ing.app.GUI to javafx.fxml;
-    exports com.example.pf_soft_ing.ServerConnection;
-    opens com.example.pf_soft_ing.ServerConnection to javafx.fxml;
-    exports com.example.pf_soft_ing.ServerConnection.messages;
-    opens com.example.pf_soft_ing.ServerConnection.messages to javafx.fxml;
-    exports com.example.pf_soft_ing.ServerConnection.messages.answers;
-    opens com.example.pf_soft_ing.ServerConnection.messages.answers to javafx.fxml;
-    exports com.example.pf_soft_ing.ServerConnection.messages.requests;
-    opens com.example.pf_soft_ing.ServerConnection.messages.requests to javafx.fxml;
+    exports com.example.pf_soft_ing.network.messages;
+    opens com.example.pf_soft_ing.network.messages to javafx.fxml;
+    exports com.example.pf_soft_ing.network.messages.answers;
+    opens com.example.pf_soft_ing.network.messages.answers to javafx.fxml;
+    exports com.example.pf_soft_ing.network.messages.requests;
+    opens com.example.pf_soft_ing.network.messages.requests to javafx.fxml;
+    exports com.example.pf_soft_ing.network.server;
+    opens com.example.pf_soft_ing.network.server to javafx.fxml;
+    exports com.example.pf_soft_ing.network.client;
+    opens com.example.pf_soft_ing.network.client to javafx.fxml;
 }
