@@ -176,4 +176,10 @@ public class SocketSender extends Sender {
     public void chooseNicknameResult(String nickname) {
         sendMessage(new ChosenNicknameMsg(nickname));
     }
+
+    @Override
+    public void sendGameStart(int visibleResCardID1, int visibleResCardID2,
+                              int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
+        sendMessage(new GameStartMsg(visibleResCardID1, visibleResCardID2, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+    }
 }

@@ -7,7 +7,6 @@ module com.example.pf_soft_ing {
     requires java.rmi;
     requires java.desktop;
 
-    opens com.example.pf_soft_ing to javafx.fxml;
     exports com.example.pf_soft_ing.card;
     opens com.example.pf_soft_ing.card to javafx.fxml;
     exports com.example.pf_soft_ing.card.side;
@@ -37,8 +36,6 @@ module com.example.pf_soft_ing {
     exports com.example.pf_soft_ing.app;
     opens com.example.pf_soft_ing.app to javafx.fxml;
 
-    exports com.example.pf_soft_ing.app.GUI;
-    opens com.example.pf_soft_ing.app.GUI to javafx.fxml;
     exports com.example.pf_soft_ing.network.messages;
     opens com.example.pf_soft_ing.network.messages to javafx.fxml;
     exports com.example.pf_soft_ing.network.messages.answers;

@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.server;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.requests.ChooseNicknameMsg;
 import com.example.pf_soft_ing.network.messages.requests.CreateMatchMsg;
@@ -50,9 +51,28 @@ public class Decoder {
                 try {
                     gameController.chooseNickname(playerID, castedMsg.getNickname());
 
-                    sender.chooseNicknameResult(castedMsg.getNickname());
+                    // if match reached max players, start the game ; else send the nickname to the player
+                    MatchController matchController = gameController.getMatchWithPlayer(playerID);
+
+                    if (gameController.checkForGameStart(matchController)) {
+                        gameController.getGameModel().startGame(matchController);
+
+                        List<PlaceableCard> visibleResCards = matchController.getVisibleResourceCards();
+                        List<PlaceableCard> visibleGoldCards = matchController.getVisibleGoldenCards();
+
+                        for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
+                            PlaceableCard starterCard = matchController.getMatchModel().drawStarterCard();
+
+                            gameController.getPlayerSender(ID).sendGameStart(visibleResCards.getFirst().getID(),
+                                    visibleResCards.get(1).getID(), visibleGoldCards.getFirst().getID(),
+                                    visibleGoldCards.get(1).getID(), starterCard.getID());
+                        }
+                    }
+                    else {
+                        sender.chooseNicknameResult(castedMsg.getNickname());
+                    }
                 }
-                catch (InvalidMatchID | NicknameAlreadyExistsException e) {
+                catch (InvalidMatchID | NicknameAlreadyExistsException | InvalidPlayerIDException e) {
                     sender.sendError(e.getMessage());
                 }
             }

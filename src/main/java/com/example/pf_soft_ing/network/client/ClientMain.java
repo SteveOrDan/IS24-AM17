@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.app.GUIApp;
+import com.example.pf_soft_ing.app.TUIApp;
 import com.example.pf_soft_ing.network.server.RMIReceiverInterface;
 
 import java.io.*;
@@ -17,7 +19,6 @@ public class ClientMain {
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
         String input;
-        View view = null;
         boolean hasChosenUI = false;
 
         while (!hasChosenUI){
@@ -25,61 +26,18 @@ public class ClientMain {
                 input = stdIn.readLine();
 
                 if (input.equals("1")) {
+                    TUIApp.main(ip);
                     hasChosenUI = true;
-                    view = new TUIView();
                 }
                 else if (input.equals("2")) {
-                    System.out.println("Work in progress ¯\\_(ツ)_/¯");
+                    GUIApp.main(ip);
                     hasChosenUI = true;
-                    view = new GUIView();
                 }
             }
             catch (IOException e) {
                 System.out.println("Error: " + e.getMessage());
             }
         }
-
-        System.out.println("\nInsert the port number:");
-
-        boolean connected = false;
-        ClientSender sender = null;
-
-        while (!connected){
-            boolean havePort = false;
-            int portNumber = 0;
-
-            while (!havePort){
-                try {
-                    portNumber = Integer.parseInt(stdIn.readLine());
-                    havePort = true;
-                }
-                catch (Exception e) {
-                    System.out.println("Error: " + e.getMessage());
-                    System.out.println("Please insert a valid number.");
-                }
-            }
-
-            try {
-                sender = startSocket(ip[0], portNumber, view);
-
-                connected = true;
-                System.out.println("Socket connection established.");
-            }
-            catch (Exception e) {
-                try {
-                    sender = startRMI(ip[0], portNumber, view);
-
-                    connected = true;
-                    System.out.println("RMI connection established.");
-                }
-                catch (Exception ex) {
-                    System.out.println("Error: " + ex.getMessage());
-                    System.out.println("Please insert a valid port number.");
-                }
-            }
-        }
-
-        sender.getMatches();
     }
 
     public static ClientSender startSocket(String hostName, int portNumber, View view) throws IOException {

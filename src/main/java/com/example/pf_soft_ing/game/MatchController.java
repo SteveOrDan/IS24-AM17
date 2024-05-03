@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Side;
@@ -10,6 +11,7 @@ import com.example.pf_soft_ing.player.PlayerState;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MatchController implements Serializable {
 
@@ -65,6 +67,22 @@ public class MatchController implements Serializable {
      */
     public void setVisibleCards(){
         matchModel.setVisibleCards();
+    }
+
+    /**
+     * Getter
+     * @return List of visible resource cards
+     */
+    public List<PlaceableCard> getVisibleResourceCards(){
+        return matchModel.getVisibleResourceCards();
+    }
+
+    /**
+     * Getter
+     * @return List of visible golden cards
+     */
+    public List<PlaceableCard> getVisibleGoldenCards(){
+        return matchModel.getVisibleGoldenCards();
     }
 
     /**

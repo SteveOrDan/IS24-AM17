@@ -14,6 +14,14 @@ public class GameModel {
 
     /**
      * Getter
+     * @return List of match controllers
+     */
+    public List<MatchController> getMatchesList(){
+        return matches;
+    }
+
+    /**
+     * Getter
      * @return Map of match IDs with the corresponding nicknames
      */
     public Map<Integer, List<String>> getMatches(){
@@ -159,6 +167,6 @@ public class GameModel {
      * @param matchController MatchController of the match
      */
     public void startGame(MatchController matchController){
-        new Thread(matchController::setUpGame).start();
+        matchController.setUpGame();
     }
 }

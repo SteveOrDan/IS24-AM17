@@ -136,4 +136,7 @@ public abstract class Sender {
     public abstract void selectMatchResult(MatchController match);
 
     public abstract void chooseNicknameResult(String nickname);
+
+    public abstract void sendGameStart(int visibleResCardID1, int visibleResCardID2,
+                                       int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID);
 }

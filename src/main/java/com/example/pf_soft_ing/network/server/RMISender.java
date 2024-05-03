@@ -187,4 +187,9 @@ public class RMISender extends Sender {
 
     }
 
+    @Override
+    public void sendGameStart(int visibleResCardID1, int visibleResCardID2, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
+
+    }
+
 }

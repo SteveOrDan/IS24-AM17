@@ -66,12 +66,25 @@ public class GameController {
      * Starts the game if the match has reached the maximum number of players
      * @param matchController MatchController of the match
      */
-    private void checkForGameStart(MatchController matchController) {
+    public boolean checkForGameStart(MatchController matchController) {
         MatchModel match = matchController.getMatchModel();
 
         if (match.getPlayersReady() == match.getMaxPlayers()){
             gameModel.startGame(matchController);
+            return true;
         }
+
+        return false;
+    }
+
+    public MatchController getMatchWithPlayer(int playerID) throws InvalidPlayerIDException {
+        for (MatchController match : gameModel.getMatchesList()){
+            if (match.getIDToPlayerMap().containsKey(playerID)){
+                return match;
+            }
+        }
+
+        throw new InvalidPlayerIDException();
     }
 
     /**

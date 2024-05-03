@@ -212,6 +212,22 @@ public class MatchModel {
     }
 
     /**
+     * Getter
+     * @return Visible resource cards
+     */
+    public List<PlaceableCard> getVisibleResourceCards(){
+        return resourceCardsDeck.getVisibleCards();
+    }
+
+    /**
+     * Getter
+     * @return Visible golden cards
+     */
+    public List<PlaceableCard> getVisibleGoldenCards(){
+        return goldenCardsDeck.getVisibleCards();
+    }
+
+    /**
      * Method to draw the first resource card of the deck
      * @return First resource card of the deck
      */

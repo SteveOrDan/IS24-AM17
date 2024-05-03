@@ -3,8 +3,7 @@ package com.example.pf_soft_ing.network.client;
 import java.util.List;
 import java.util.Map;
 
-public class TUIView extends View {
-
+public class TUIView implements View {
 
     @Override
     public void getMatches(Map<Integer, List<String>> matches) {

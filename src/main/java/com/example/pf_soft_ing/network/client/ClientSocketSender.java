@@ -101,22 +101,22 @@ public class ClientSocketSender extends ClientSender {
     }
 
     @Override
-    public void createMatch(int playerID, int numberOfPlayers, String nickname) {
+    public void createMatch(int numberOfPlayers, String nickname) {
         sendMessage(new CreateMatchMsg(numberOfPlayers, nickname));
     }
 
     @Override
-    public void selectMatch(int playerID, int matchID) {
+    public void selectMatch(int matchID) {
         sendMessage(new SelectMatchMsg(matchID));
     }
 
     @Override
-    public void chooseNickname(int playerID, String nickname) {
+    public void chooseNickname(String nickname) {
         sendMessage(new ChooseNicknameMsg(nickname));
     }
 
     @Override
-    public void placeCard(int playerID, int id, int side, int pos) {
+    public void placeCard(int id, int side, int pos) {
 
     }
 

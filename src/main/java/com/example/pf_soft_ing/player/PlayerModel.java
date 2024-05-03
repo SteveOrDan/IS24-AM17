@@ -15,9 +15,9 @@ import java.util.List;
 
 public class PlayerModel {
 
-    private String nickname;
+    private String nickname = "";
     private final int ID;
-    private int matchID = 0;
+    private int matchID = -1;
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
