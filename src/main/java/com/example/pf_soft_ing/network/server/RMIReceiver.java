@@ -1,9 +1,14 @@
 package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.exceptions.GameIsFullException;
+import com.example.pf_soft_ing.exceptions.InvalidMatchID;
+import com.example.pf_soft_ing.exceptions.InvalidNumOfPlayers;
+import com.example.pf_soft_ing.exceptions.InvalidPlayerStateException;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
+import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,67 +17,73 @@ import java.util.HashMap;
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
     private final GameController gameController;
-    private static final HashMap<ClientRMIInterface, MatchController> matchControllerMap = new HashMap<>();
-    private static final HashMap<Integer, ClientRMIInterface> playerIDToClient = new HashMap<>();
+    private static final HashMap<Integer, PlayerModel> IDToPlayer = new HashMap<>();
 
     public RMIReceiver(GameController gameController) throws RemoteException {
         this.gameController = gameController;
     }
 
-    private static void addMatchController(ClientRMIInterface client, MatchController matchController){
-        matchControllerMap.put(client, matchController);
-    }
+    @Override
+    public int getMatches(ClientRMIInterface client) throws RemoteException {
+        PlayerModel playerModel = gameController.getGameModel().createPlayer(new RMISender(client));
+        IDToPlayer.put(playerModel.getID(), playerModel);
 
-    private static void addPlayerID(ClientRMIInterface client, int playerID){
-        playerIDToClient.put(playerID, client);
-    }
+        playerModel.getSender().sendMatches(gameController.getGameModel().getMatches());
 
-    private MatchController getMatchController(ClientRMIInterface client){
-        return matchControllerMap.get(client);
+        return playerModel.getID();
     }
 
     @Override
-    public void getMatches(ClientRMIInterface client) throws RemoteException {
+    public void createMatch(int playerID, int numberOfPlayers, String nickname) throws RemoteException {
+        try {
+            MatchController match = gameController.createMatch(playerID, numberOfPlayers, nickname);
 
+            IDToPlayer.get(playerID).getSender().createMatchResult(match.getMatchModel().getMatchID(), nickname);
+        }
+        catch (InvalidNumOfPlayers | InvalidPlayerStateException | GameIsFullException e) {
+            IDToPlayer.get(playerID).getSender().sendError(e.getMessage());
+        }
     }
 
     @Override
-    public MatchController createMatch(ClientRMIInterface client, int numberOfPlayers) throws RemoteException {
-        return null;
+    public void selectMatch(int playerID, int matchID) throws RemoteException {
+        try {
+            MatchController matchController = gameController.selectMatch(playerID, matchID);
+
+            IDToPlayer.get(playerID).getSender().selectMatchResult(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
+        }
+        catch (InvalidMatchID | GameIsFullException e) {
+            IDToPlayer.get(playerID).getSender().sendError(e.getMessage());
+        }
     }
 
     @Override
-    public MatchController selectMatch(ClientRMIInterface client, int playerID, int matchID) throws RemoteException {
-        return null;
-    }
-
-    @Override
-    public void chooseNickname(ClientRMIInterface client, String nickname) throws RemoteException {
-
-    }
-
-    @Override
-    public void placeCard(ClientRMIInterface client, int id, Position pos) throws RemoteException {
-
-    }
-
-    @Override
-    public void drawResourceCard(ClientRMIInterface client, int playerID) throws RemoteException {
+    public void chooseNickname(int playerID, String nickname) throws RemoteException {
 
     }
 
     @Override
-    public void drawVisibleResourceCard(ClientRMIInterface client, int playerID, int index) throws RemoteException {
+    public void placeCard(int playerID, int cardID, Position pos) throws RemoteException {
 
     }
 
     @Override
-    public void drawGoldenCard(ClientRMIInterface client, int playerID) throws RemoteException {
+    public void drawResourceCard(int playerID) throws RemoteException {
 
     }
 
     @Override
-    public void drawVisibleGoldenCard(ClientRMIInterface client, int playerID, int index) throws RemoteException {
+    public void drawVisibleResourceCard(int playerID, int index) throws RemoteException {
+
+    }
+
+    @Override
+    public void drawGoldenCard(int playerID) throws RemoteException {
+
+    }
+
+    @Override
+    public void drawVisibleGoldenCard(int playerID, int index) throws RemoteException {
 
     }
 }

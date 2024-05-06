@@ -1136,7 +1136,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void getMatches(Map<Integer, List<String>> matches) {
+    public void showMatches(Map<Integer, List<String>> matches) {
         Platform.runLater(() -> drawMainMenuScene(matches));
     }
 

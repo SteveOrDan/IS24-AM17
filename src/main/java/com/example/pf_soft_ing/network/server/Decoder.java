@@ -31,7 +31,7 @@ public class Decoder {
                 try {
                     MatchController match = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
 
-                    sender.createMatchResult(match);
+                    sender.createMatchResult(match.getMatchModel().getMatchID(), castedMsg.getNickname());
                 }
                 catch (InvalidNumOfPlayers | InvalidPlayerStateException | GameIsFullException e) {
                     sender.sendError(e.getMessage());
@@ -39,9 +39,9 @@ public class Decoder {
             }
             case SelectMatchMsg castedMsg -> {
                 try {
-                    MatchController match = gameController.selectMatch(playerID, castedMsg.getMatchID());
+                    MatchController matchController = gameController.selectMatch(playerID, castedMsg.getMatchID());
 
-                    sender.selectMatchResult(match);
+                    sender.selectMatchResult(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
                 }
                 catch (InvalidMatchID | GameIsFullException e) {
                     sender.sendError(e.getMessage());

@@ -163,13 +163,13 @@ public class SocketSender extends Sender {
     }
 
     @Override
-    public void createMatchResult(MatchController match) {
-        sendMessage(new MatchCreatedMsg(match.getMatchModel().getMatchID(), match.getMatchModel().getNicknames().getFirst()));
+    public void createMatchResult(int matchID, String hostNickname) {
+        sendMessage(new MatchCreatedMsg(matchID, hostNickname));
     }
 
     @Override
-    public void selectMatchResult(MatchController match) {
-        sendMessage(new SelectMatchResultMsg(match.getMatchModel().getMatchID(), match.getMatchModel().getNicknames()));
+    public void selectMatchResult(int matchID, List<String> nicknames) {
+        sendMessage(new SelectMatchResultMsg(matchID, nicknames));
     }
 
     @Override

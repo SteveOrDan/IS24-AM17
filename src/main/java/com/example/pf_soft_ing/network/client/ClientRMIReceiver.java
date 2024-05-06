@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -23,7 +24,7 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
 
     @Override
     public void showMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
-//        view.getMatches(matchesNicknames);
+        view.showMatches(matchesNicknames);
     }
 
     @Override
@@ -99,5 +100,20 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void placeCard(boolean placed) throws RemoteException {
 
+    }
+
+    @Override
+    public void sendError(String errorMsg) throws RemoteException {
+        view.errorMessage(errorMsg);
+    }
+
+    @Override
+    public void selectMatchResult(int matchID, List<String> nicknames) throws RemoteException {
+        view.selectMatch(matchID, nicknames);
+    }
+
+    @Override
+    public void createMatchResult(int matchID, String hostNickname) throws RemoteException {
+        view.createMatch(matchID, hostNickname);
     }
 }

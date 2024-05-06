@@ -61,6 +61,7 @@ public class ClientMain {
         RMIReceiverInterface serverInterface = (RMIReceiverInterface) registry.lookup("RMIReceiver");
 
         ClientSender clientSender = new ClientRMISender(serverInterface);
+        clientSender.startInputReading();
 
         ClientRMIReceiver clientReceiver = new ClientRMIReceiver(view);
         clientSender.setClient(clientReceiver.getClient());

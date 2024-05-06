@@ -131,9 +131,9 @@ public abstract class Sender {
      */
     public abstract void sendMatches(Map<Integer, List<String>> matches);
 
-    public abstract void createMatchResult(MatchController match);
+    public abstract void createMatchResult(int matchID, String hostNickname);
 
-    public abstract void selectMatchResult(MatchController match);
+    public abstract void selectMatchResult(int matchID, List<String> nicknames);
 
     public abstract void chooseNicknameResult(String nickname);
 

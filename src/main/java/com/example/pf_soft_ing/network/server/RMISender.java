@@ -1,7 +1,5 @@
 package com.example.pf_soft_ing.network.server;
 
-
-import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -164,22 +162,38 @@ public class RMISender extends Sender {
 
     @Override
     public void sendError(String errorMsg) {
-
+        try {
+            client.sendError(errorMsg);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+        }
     }
 
     @Override
     public void sendMatches(Map<Integer, List<String>> matches) {
-
+        try {
+            client.showMatches(matches);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+        }
     }
 
     @Override
-    public void createMatchResult(MatchController match) {
-
+    public void createMatchResult(int matchID, String hostNickname) {
+        try {
+            client.createMatchResult(matchID, hostNickname);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+        }
     }
 
     @Override
-    public void selectMatchResult(MatchController match) {
-
+    public void selectMatchResult(int matchID, List<String> nicknames) {
+        try {
+            client.selectMatchResult(matchID, nicknames);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+        }
     }
 
     @Override
@@ -193,5 +207,4 @@ public class RMISender extends Sender {
                               int starterCardID) {
 
     }
-
 }

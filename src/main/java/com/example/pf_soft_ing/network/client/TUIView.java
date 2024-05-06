@@ -8,7 +8,7 @@ import java.util.Map;
 public class TUIView implements View {
 
     @Override
-    public void getMatches(Map<Integer, List<String>> matches) {
+    public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
             System.out.println("No matches available");
             return;

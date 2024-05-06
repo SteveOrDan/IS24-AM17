@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface View {
 
-    void getMatches(Map<Integer, List<String>> matches);
+    void showMatches(Map<Integer, List<String>> matches);
 
     void createMatch(int matchID, String hostNickname);
 
