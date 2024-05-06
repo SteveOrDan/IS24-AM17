@@ -11,7 +11,9 @@ public abstract class ClientSender {
     public abstract void selectMatch(int matchID);
     public abstract void chooseNickname(String nickname);
 
-    public abstract void placeCard(int id, int side, int pos);
+    public abstract void placeStarterCard(int cardID, String side);
+    public abstract void chooseSecretObjective(int cardID);
+    public abstract void placeCard(int cardID, int side, int pos);
     public abstract void drawResourceCard(int playerID);
     public abstract void drawVisibleResourceCard(int playerID, int index);
     public abstract void drawGoldenCard(int playerID);

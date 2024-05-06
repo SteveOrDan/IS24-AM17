@@ -9,10 +9,15 @@ public class GameStartMsg extends Message {
     private final int visibleGoldCardID1;
     private final int visibleGoldCardID2;
     private final int starterCardID;
+    private final int resDeckCardID;
+    private final int goldDeckCardID;
 
-    public GameStartMsg(int visibleResCardID1, int visibleResCardID2, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
+    public GameStartMsg(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                        int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
+        this.resDeckCardID = resDeckCardID;
         this.visibleResCardID1 = visibleResCardID1;
         this.visibleResCardID2 = visibleResCardID2;
+        this.goldDeckCardID = goldDeckCardID;
         this.visibleGoldCardID1 = visibleGoldCardID1;
         this.visibleGoldCardID2 = visibleGoldCardID2;
         this.starterCardID = starterCardID;
@@ -36,6 +41,14 @@ public class GameStartMsg extends Message {
 
     public int getStarterCardID() {
         return starterCardID;
+    }
+
+    public int getResDeckCardID() {
+        return resDeckCardID;
+    }
+
+    public int getGoldDeckCardID() {
+        return goldDeckCardID;
     }
 
     @Override

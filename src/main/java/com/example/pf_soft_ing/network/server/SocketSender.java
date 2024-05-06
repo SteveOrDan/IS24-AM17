@@ -178,8 +178,9 @@ public class SocketSender extends Sender {
     }
 
     @Override
-    public void sendGameStart(int visibleResCardID1, int visibleResCardID2,
-                              int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
-        sendMessage(new GameStartMsg(visibleResCardID1, visibleResCardID2, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+    public void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                              int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                              int starterCardID) {
+        sendMessage(new GameStartMsg(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
     }
 }

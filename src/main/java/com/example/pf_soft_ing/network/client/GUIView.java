@@ -2,9 +2,9 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
-import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
+import com.example.pf_soft_ing.player.TokenColors;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -34,6 +34,9 @@ public class GUIView implements View {
     private final Map<Position, Pane> validPosToButtonPane = new HashMap<>();
 
     private final List<Integer> playerHand = new ArrayList<>();
+
+    private String starterCardSide;
+    private int starterCardID;
 
     private int selectedCardID = -1;
     private double lastPlacedCardX;
@@ -79,6 +82,7 @@ public class GUIView implements View {
     private GridPane playerFieldGrid;
     private AnchorPane playerField;
     private AnchorPane playerHandPane;
+    private AnchorPane tempChoicePane;
 
     private final String ip;
     private ClientSender sender;
@@ -106,35 +110,6 @@ public class GUIView implements View {
         stage.setMaximized(true);
 
         drawConnectionChoiceScene();
-
-//        ============================== TESTING ==============================
-//        Map<Integer, List<String>> matches = new HashMap<>();
-//        List<String> players = new ArrayList<>();
-//        players.add("Player 1");
-//        players.add("Player 2");
-//        players.add("Player 3");
-//        matches.put(1, players);
-//        matches.put(2, players);
-//        matches.put(3, players);
-//        matches.put(4, players);
-//
-//        drawMainMenuScene(matches);
-
-//        drawMainMenuScene();
-
-//        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-//            root.getChildren().clear();
-//            drawGameStage(stage);
-//        });
-//        stage.heightProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-//            root.getChildren().clear();
-//            drawGameStage(stage);
-//        });
-
-//        drawGameStage(stage);
-//
-//        stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
-//        stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
     }
 
     // Game flow:
@@ -417,37 +392,155 @@ public class GUIView implements View {
         root.getChildren().add(anchorPane);
     }
 
-    private void drawGameStage(Stage stage){
-        // Set basic stage dimensions
-        stageWidth = stage.getWidth() - 15; // Don't ask me why 15
-        stageHeight = stage.getHeight() - barOffset;
+    private void drawGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                               int starterCardID){
+        root.getChildren().clear();
 
-        // Calculate card dimensions
+        // Create player field
+        setPlayArea();
+
+        // Add common cards to the stage
+        renderCommonCards(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+
+        // Add board to the stage
+        drawBoard();
+
+        // Add vertical and horizontal lines to separate player field, hand and common view
+        drawSeparationLines();
+
+        // Draw starter card side choice
+        renderStarterCardChoice(starterCardID);
+    }
+
+    private void setPlayArea(){
         cardWidth = (stageWidth - (9 * defaultElementsOffset)) / 7;
         cardHeight = cardWidth / 1.5;
 
         playerFieldRectWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
         playerFieldRectHeight = stageHeight - (2 * cardHeight) - (3 * defaultElementsOffset);
 
-        GameResources.initializeAllDecks();
+        // Calculate grid cell dimensions
+        gridCellWidth = cardWidth - (cardCornerWidthProportion * cardWidth);
+        gridCellHeight = cardHeight - (cardCornerHeightProportion * cardHeight);
 
-        // Add common cards to the stage
-        renderCommonCards(1, 22, 13, 54, 45, 66);
+        // Calculate number of rows and columns. I need odd numbers so that starter card is in the middle
+        gridRows = (int) Math.floor(Math.ceil(playerFieldRectHeight / gridCellHeight) / 2) * 2 + 1;
+        gridColumns = (int) Math.floor(Math.ceil(playerFieldRectWidth / gridCellWidth) / 2) * 2 + 1;
 
-        // Add board to the stage
-        drawBoard();
+        // Calculate total grid dimensions
+        gridWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        gridHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
 
-        // Add common objectives to the stage
-        renderCommonObjectives(97, 99);
 
-        // Create player field
-        drawPlayArea();
+        // Create scroll pane for player field
+        ScrollPane playerFieldScroll = new ScrollPane();
+        playerFieldScroll.setPrefSize(playerFieldRectWidth, playerFieldRectHeight);
+        playerFieldScroll.setPannable(true);
+        playerFieldScroll.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
+        playerFieldScroll.setLayoutY(0);
 
-        // Create player hand
-        drawPlayerHand(96, 16, 3, 69);
 
-        // Add vertical and horizontal lines to separate player field, hand and common view
-        drawSeparationLines();
+        // Create player field anchor pane
+        double playerFieldWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        double playerFieldHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
+
+        playerField = new AnchorPane();
+        playerField.setPrefSize(playerFieldWidth, playerFieldHeight);
+        playerField.setLayoutX(0);
+        playerField.setLayoutY(0);
+
+
+        // Create grid for player field
+        playerFieldGrid = new GridPane();
+
+        playerFieldGrid.setPrefSize(gridWidth, gridHeight);
+        playerFieldGrid.setLayoutX(cardCornerWidthProportion * cardWidth);
+        playerFieldGrid.setLayoutY(cardCornerHeightProportion * cardHeight);
+
+        playerFieldGrid.getColumnConstraints().add(new ColumnConstraints(gridCellWidth));
+        playerFieldGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
+
+        // I have to add an element on each column and row to make the grid "visible"
+        for (int i = 0; i < gridColumns - 1; i++){
+            AnchorPane anchorPane = new AnchorPane();
+            anchorPane.setPrefSize(gridCellWidth, gridCellHeight);
+
+            playerFieldGrid.add(anchorPane, i, i);
+        }
+
+        // Create player hand's pane
+        playerHandPane = new AnchorPane();
+
+        double playerHandWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
+        double playerHandHeight = (2 * cardHeight) + (3 * defaultElementsOffset);
+
+        playerHandPane.setPrefSize(playerHandWidth, playerHandHeight);
+        playerHandPane.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
+        playerHandPane.setLayoutY(playerFieldRectHeight);
+
+        // Create a temporary pane for starter card and secret objective choice
+        tempChoicePane = new AnchorPane();
+        tempChoicePane.setPrefSize(stageWidth, stageHeight);
+        tempChoicePane.setLayoutX(0);
+        tempChoicePane.setLayoutY(0);
+
+        // Fill hierarchy of the scene
+        playerField.getChildren().add(playerFieldGrid);
+
+        playerFieldScroll.setContent(playerField);
+
+        root.getChildren().add(playerFieldScroll);
+        root.getChildren().add(playerHandPane);
+    }
+
+    private void renderStarterCardChoice(int starterCardID){
+        this.starterCardID = starterCardID;
+
+        Rectangle paneRect = new Rectangle();
+        paneRect.setWidth(stageWidth);
+        paneRect.setHeight(stageHeight);
+        paneRect.setFill(Color.rgb(0, 0, 0, 0.2));
+
+        // Render starter card
+        Pane starterCardPane = createCardPane(starterCardID, "front", (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5, 1);
+        starterCardSide = "front";
+
+        // Render a button to flip the card
+        Button flipButton = new Button("Flip");
+        flipButton.setPrefSize(100, 50);
+        flipButton.setLayoutX((stageWidth - 100) * 0.5);
+        flipButton.setLayoutY((stageHeight + cardHeight) * 0.5);
+        flipButton.setOnAction((_) -> {
+            // Flip the card
+            String newSide = "back";
+            if (starterCardSide.equals("back")){
+                newSide = "front";
+            }
+
+            Pane newPane = createCardPane(starterCardID, newSide, starterCardPane.getLayoutX(), starterCardPane.getLayoutY(), 1);
+            tempChoicePane.getChildren().add(newPane);
+
+            tempChoicePane.getChildren().remove(starterCardPane);
+        });
+
+        // Render a button to place the starter card
+        Button placeButton = new Button("Place");
+        placeButton.setPrefSize(100, 50);
+        placeButton.setLayoutX((stageWidth - 100) * 0.5);
+        placeButton.setLayoutY((stageHeight + cardHeight) * 0.5 + 60);
+        placeButton.setOnAction((_) -> {
+            // Send the choice to the server
+            sender.placeStarterCard(starterCardID, starterCardSide);
+        });
+
+        // Add all elements to the root
+        tempChoicePane.getChildren().add(paneRect);
+        tempChoicePane.getChildren().add(starterCardPane);
+        tempChoicePane.getChildren().add(flipButton);
+        tempChoicePane.getChildren().add(placeButton);
+
+        root.getChildren().add(tempChoicePane);
     }
 
     private void drawBoard(){
@@ -496,9 +589,58 @@ public class GUIView implements View {
         root.getChildren().add(goldVisible2Pane);
     }
 
+    private void drawMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID,
+                                  TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2,
+                                  int secretObjectiveCardID1, int secretObjectiveCardID2){
+        // Create player hand
+        drawPlayerHand(resourceCardID1, resourceCardID2, goldenCardID, TokenColors.getColorFromToken(tokenColor));
+
+        // Create common objectives
+        renderCommonObjectives(commonObjectiveCardID1, commonObjectiveCardID2);
+
+        // Render secret objective choice
+        renderSecretObjectiveChoice(secretObjectiveCardID1, secretObjectiveCardID2);
+    }
+
     private void renderCommonObjectives(int objective1ID, int objective2ID){
-        ObjectiveCard objective1 = GameResources.getObjectiveCardByID(objective1ID);
-        ObjectiveCard objective2 = GameResources.getObjectiveCardByID(objective2ID);
+        Pane objective1Pane = createCardPane(objective1ID, "front", 200, 100, 1);
+        Pane objective2Pane = createCardPane(objective2ID, "front", 200, 300, 1);
+
+        root.getChildren().add(objective1Pane);
+        root.getChildren().add(objective2Pane);
+    }
+
+    private void renderSecretObjectiveChoice(int secretObjective1ID, int secretObjective2ID){
+        Rectangle paneRect = new Rectangle();
+        paneRect.setWidth(stageWidth);
+        paneRect.setHeight(stageHeight);
+        paneRect.setFill(Color.rgb(0, 0, 0, 0.2));
+
+        // Create secret objective panes
+        Pane secretObjective1Pane = createCardPane(secretObjective1ID, "front", 200, 500, 1);
+        Pane secretObjective2Pane = createCardPane(secretObjective2ID, "front", 200, 700, 1);
+
+        // Create buttons to select secret objectives
+        Button secretObjective1Button = new Button();
+        secretObjective1Button.setPrefSize(cardWidth, cardHeight);
+        secretObjective1Button.setLayoutX(0);
+        secretObjective1Button.setLayoutY(0);
+        secretObjective1Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective1ID));
+
+        // Create button to confirm choice
+        Button secretObjective2Button = new Button();
+        secretObjective2Button.setPrefSize(cardWidth, cardHeight);
+        secretObjective2Button.setLayoutX(0);
+        secretObjective2Button.setLayoutY(0);
+        secretObjective2Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective2ID));
+
+        // Add everything to the root
+        secretObjective1Pane.getChildren().add(secretObjective1Button);
+        secretObjective2Pane.getChildren().add(secretObjective2Button);
+
+        tempChoicePane.getChildren().add(paneRect);
+        tempChoicePane.getChildren().add(secretObjective1Pane);
+        tempChoicePane.getChildren().add(secretObjective2Pane);
     }
 
     private void addDrawButtonToCard(Pane cardPane, int cardID, String commonCardType){
@@ -536,7 +678,7 @@ public class GUIView implements View {
                 root.getChildren().remove(cardPane);
             }
             else {
-                System.out.println("Hand is full!");
+                showError("Cannot draw more cards!");
             }
         });
 
@@ -576,73 +718,6 @@ public class GUIView implements View {
         return (1 - scale) * cardHeight / 2;
     }
 
-    private void drawPlayArea(){
-        // - Scroll
-        //   - AnchorPane
-        //     - GridPane
-        //       - Pane
-        //         - ImageView
-        //         - Button
-        //         - Button
-        //       - Pane
-        //         - ...
-
-        // Create scroll pane for player field
-        ScrollPane playerFieldScroll = new ScrollPane();
-        playerFieldScroll.setPrefSize(playerFieldRectWidth, playerFieldRectHeight);
-        playerFieldScroll.setPannable(true);
-        playerFieldScroll.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
-        playerFieldScroll.setLayoutY(0);
-
-        // Calculate grid cell dimensions
-        gridCellWidth = cardWidth - (cardCornerWidthProportion * cardWidth);
-        gridCellHeight = cardHeight - (cardCornerHeightProportion * cardHeight);
-
-        // Calculate number of rows and columns. I need odd numbers so that starter card is in the middle
-        gridRows = (int) Math.floor(Math.ceil(playerFieldRectHeight / gridCellHeight) / 2) * 2 + 1;
-        gridColumns = (int) Math.floor(Math.ceil(playerFieldRectWidth / gridCellWidth) / 2) * 2 + 1;
-
-        double playerFieldWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
-        double playerFieldHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
-
-        // Calculate total grid dimensions
-        gridWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
-        gridHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
-
-        // Create player field anchor pane
-        playerField = new AnchorPane();
-        playerField.setPrefSize(playerFieldWidth, playerFieldHeight);
-        playerField.setLayoutX(0);
-        playerField.setLayoutY(0);
-
-        // Create grid for player field
-        playerFieldGrid = new GridPane();
-        playerFieldGrid.setPrefSize(gridWidth, gridHeight);
-        playerFieldGrid.setLayoutX(cardCornerWidthProportion * cardWidth);
-        playerFieldGrid.setLayoutY(cardCornerHeightProportion * cardHeight);
-
-        playerFieldGrid.getColumnConstraints().add(new ColumnConstraints(gridCellWidth));
-        playerFieldGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
-
-        // I have to add an element on each column and row to make the grid "visible"
-        for (int i = 0; i < gridColumns - 1; i++){
-            AnchorPane anchorPane = new AnchorPane();
-            anchorPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            playerFieldGrid.add(anchorPane, i, i);
-        }
-
-        // Add starter card to the middle of the grid
-        placeCard(80, "front", new Position(0, 0));
-
-        // Fill hierarchy of the scene
-        playerField.getChildren().add(playerFieldGrid);
-
-        playerFieldScroll.setContent(playerField);
-
-        root.getChildren().add(playerFieldScroll);
-    }
-
     private void addPlaceButtons(Pane cardPane, int ID, Position pos){
         PlaceableCard card = GameResources.getPlaceableCardByID(ID);
 
@@ -672,7 +747,7 @@ public class GUIView implements View {
                     playerHandPane.getChildren().remove(selectedCardPane);
                 }
                 else {
-                    System.out.println("Cannot place a card!");
+                    showError("Cannot place a card!");
                 }
             });
 
@@ -702,7 +777,7 @@ public class GUIView implements View {
                     playerHandPane.getChildren().remove(selectedCardPane);
                 }
                 else {
-                    System.out.println("Cannot place a card!");
+                    showError("Cannot place a card!");
                 }
             });
 
@@ -732,7 +807,7 @@ public class GUIView implements View {
                     playerHandPane.getChildren().remove(selectedCardPane);
                 }
                 else {
-                    System.out.println("Cannot place a card!");
+                    showError("Cannot place a card!");
                 }
             });
 
@@ -762,7 +837,7 @@ public class GUIView implements View {
                     playerHandPane.getChildren().remove(selectedCardPane);
                 }
                 else {
-                    System.out.println("Cannot place a card!");
+                    showError("Cannot place a card!");
                 }
             });
 
@@ -881,13 +956,9 @@ public class GUIView implements View {
 
         // Add card to the grid
         playerFieldGrid.add(cardPane, gridPos.getX(), gridPos.getY());
-
-        System.out.println("Grid dimensions: " + gridRows + ", " + gridColumns);
-        System.out.println("Placed card " + ID + " at grid position " + gridPos.getX() + ", " + gridPos.getY());
     }
 
     private void updateGridDimension(){
-        System.out.println("Updating grid dimensions");
         gridRows += 2;
         gridColumns += 2;
 
@@ -914,23 +985,17 @@ public class GUIView implements View {
         }
     }
 
-    private void drawPlayerHand(int secretObjectiveID, int card1ID, int card2ID, int card3ID){
+    private void drawPlayerHand(int card1ID, int card2ID, int card3ID, Color playerColor){
         playerHand.add(card1ID);
         playerHand.add(card2ID);
         playerHand.add(card3ID);
 
-        playerHandPane = new AnchorPane();
-        double playerHandWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
-        double playerHandHeight = (2 * cardHeight) + (3 * defaultElementsOffset);
-
-        playerHandPane.setPrefSize(playerHandWidth, playerHandHeight);
-        playerHandPane.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
-        playerHandPane.setLayoutY(playerFieldRectHeight);
+        double playerHandWidth = playerHandPane.getPrefWidth();
+        double playerHandHeight = playerHandPane.getPrefHeight();
 
         // Create panes for each card
         double cardsYPos = (playerHandHeight - cardHeight) * 0.5;
 
-        Pane secretObjectivePane = createCardPane(secretObjectiveID, "front", defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
         Pane card1Pane = createCardPane(card1ID, "front", 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
         Pane card2Pane = createCardPane(card2ID, "front", 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
         Pane card3Pane = createCardPane(card3ID, "front", 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
@@ -948,12 +1013,11 @@ public class GUIView implements View {
         plRect.setWidth(playerHandWidth - 5);
         plRect.setHeight(playerHandHeight - 2);
         plRect.setFill(Color.TRANSPARENT);
-        plRect.setStroke(Color.LIME);
+        plRect.setStroke(playerColor);
 
         playerHandPane.getChildren().add(plRect);
 
         // Add cards to stage
-        playerHandPane.getChildren().add(secretObjectivePane);
         playerHandPane.getChildren().add(card1Pane);
         playerHandPane.getChildren().add(card2Pane);
         playerHandPane.getChildren().add(card3Pane);
@@ -1092,6 +1156,52 @@ public class GUIView implements View {
     public void chooseNickname(String nickname) {
         // Create window for waiting for other players
         Platform.runLater(() -> selectNickname(0, nickname));
+    }
+
+    @Override
+    public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                          int starterCardID) {
+        Platform.runLater(() -> drawGameStart(resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+
+//        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
+//            root.getChildren().clear();
+//            updateWindow();
+//        });
+//        stage.heightProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
+//            root.getChildren().clear();
+//            updateWindow();
+//        });
+
+        // Add events for zooming
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
+        stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
+    }
+
+    @Override
+    public void setMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        Platform.runLater(() -> {
+            // Clear temp choice pane and place starter card before proceeding
+            tempChoicePane.getChildren().clear();
+
+            placeCard(starterCardID, starterCardSide, new Position(0, 0));
+
+            drawMissingSetUp(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2);
+        });
+    }
+
+    @Override
+    public void confirmSecretObjective(int secretObjectiveID) {
+        Platform.runLater(() -> {
+            tempChoicePane.getChildren().clear();
+
+            // Place secret objective in player hand
+            double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
+            Pane secretObjectivePane = createCardPane(secretObjectiveID, "front", defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+
+            playerHandPane.getChildren().add(secretObjectivePane);
+        });
     }
 
     @Override

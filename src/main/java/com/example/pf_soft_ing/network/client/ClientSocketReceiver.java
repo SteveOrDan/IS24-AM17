@@ -59,6 +59,12 @@ public class ClientSocketReceiver {
 
             case ErrorMessage castedMsg -> view.errorMessage(castedMsg.getMessage());
 
+            case GameStartMsg castedMsg -> view.startGame(
+                    castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
+                    castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2(),
+                    castedMsg.getStarterCardID()
+            );
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

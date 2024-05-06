@@ -137,6 +137,7 @@ public abstract class Sender {
 
     public abstract void chooseNicknameResult(String nickname);
 
-    public abstract void sendGameStart(int visibleResCardID1, int visibleResCardID2,
-                                       int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID);
+    public abstract void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                       int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                       int starterCardID);
 }

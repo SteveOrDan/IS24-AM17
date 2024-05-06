@@ -60,12 +60,15 @@ public class Decoder {
                         List<PlaceableCard> visibleResCards = matchController.getVisibleResourceCards();
                         List<PlaceableCard> visibleGoldCards = matchController.getVisibleGoldenCards();
 
+                        PlaceableCard resDeckCardID = matchController.getMatchModel().getResourceCardsDeck().getDeck().getFirst();
+                        PlaceableCard goldDeckCardID = matchController.getMatchModel().getGoldenCardsDeck().getDeck().getFirst();
+
                         for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
                             PlaceableCard starterCard = matchController.getMatchModel().drawStarterCard();
 
-                            gameController.getPlayerSender(ID).sendGameStart(visibleResCards.getFirst().getID(),
-                                    visibleResCards.get(1).getID(), visibleGoldCards.getFirst().getID(),
-                                    visibleGoldCards.get(1).getID(), starterCard.getID());
+                            gameController.getPlayerSender(ID).sendGameStart(resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                                    goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(),
+                                    starterCard.getID());
                         }
                     }
                     else {

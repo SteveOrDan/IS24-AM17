@@ -50,6 +50,16 @@ public class ClientRMISender extends ClientSender {
     }
 
     @Override
+    public void placeStarterCard(int cardID, String side) {
+
+    }
+
+    @Override
+    public void chooseSecretObjective(int cardID) {
+
+    }
+
+    @Override
     public void placeCard(int id, int side, int pos) {
 
     }
