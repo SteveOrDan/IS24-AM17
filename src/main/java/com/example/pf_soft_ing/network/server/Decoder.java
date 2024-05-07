@@ -6,7 +6,6 @@ import com.example.pf_soft_ing.network.messages.requests.*;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.List;
@@ -34,7 +33,7 @@ public class Decoder {
 
                     sender.createMatchResult(matchController.getMatchModel().getMatchID(), castedMsg.getNickname());
                 }
-                catch (InvalidNumOfPlayers | InvalidPlayerStateException | GameIsFullException e) {
+                catch (InvalidNumOfPlayersException | InvalidPlayerStateException | GameIsFullException e) {
                     sender.sendError(e.getMessage());
                 }
             }
@@ -44,7 +43,7 @@ public class Decoder {
 
                     sender.selectMatchResult(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
                 }
-                catch (InvalidMatchID | GameIsFullException e) {
+                catch (InvalidMatchIDException | GameIsFullException e) {
                     sender.sendError(e.getMessage());
                 }
             }
@@ -80,7 +79,7 @@ public class Decoder {
                         sender.chooseNicknameResult(castedMsg.getNickname());
                     }
                 }
-                catch (InvalidMatchID | NicknameAlreadyExistsException e) {
+                catch (InvalidMatchIDException | NicknameAlreadyExistsException e) {
                     sender.sendError(e.getMessage());
                 }
             }
@@ -118,7 +117,7 @@ public class Decoder {
                         }
                     }
                 }
-                catch (InvalidPlayerIDException e) {
+                catch (InvalidPlayerIDException | InvalidObjectiveCardException e) {
                     sender.sendError(e.getMessage());
                 }
             }

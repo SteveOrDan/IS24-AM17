@@ -1,7 +1,7 @@
 package com.example.pf_soft_ing.exceptions;
 
-public class InvalidMatchID extends Exception{
-    public InvalidMatchID() {
+public class InvalidMatchIDException extends Exception{
+    public InvalidMatchIDException() {
         super("Invalid match ID. Please try again.");
     }
 }

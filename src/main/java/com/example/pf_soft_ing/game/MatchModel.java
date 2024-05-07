@@ -7,6 +7,7 @@ import com.example.pf_soft_ing.card.decks.UsableCardsDeck;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
+import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
@@ -464,5 +465,13 @@ public class MatchModel {
         setRandomFirstPlayer();
 
         calculateOrderOfPlayers();
+    }
+
+    public void checkNickname(String nickname) throws NicknameAlreadyExistsException {
+        for (String otherNickname : getNicknames()) {
+            if (otherNickname.equals(nickname)) {
+                throw new NicknameAlreadyExistsException();
+            }
+        }
     }
 }

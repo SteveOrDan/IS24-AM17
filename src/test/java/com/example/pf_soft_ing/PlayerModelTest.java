@@ -1,8 +1,7 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
-import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
+import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.*;
 import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.*;
@@ -88,11 +87,7 @@ class PlayerModelTest {
 
         //Now place a card in a valid position
         Position pos = new Position(1,1);
-        try {
-            playerModel.placeCard(normalCard, pos, CardSideType.FRONT);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(normalCard, pos, CardSideType.FRONT));
 
         assertTrue(playerModel.getPlayArea().containsKey(pos));
         assertEquals(playerModel.getPlayArea().get(pos), normalCard);
@@ -108,18 +103,15 @@ class PlayerModelTest {
         playerModel.placeStarterCard(CardSideType.FRONT);
         assertEquals(0, playerModel.getCurrScore());
 
-        //Now place a card in a valid position
+        //Now place a card in an invalid position
         Position pos1 = new Position(0,0);
         Position pos2 = new Position(1,0);
         Position pos3 = new Position(-1,-1);
 
-        try {
-            playerModel.placeCard(normalCard, pos1, CardSideType.FRONT);
-            playerModel.placeCard(normalCard, pos2, CardSideType.FRONT);
-            playerModel.placeCard(normalCard, pos3, CardSideType.FRONT);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+
+        assertThrows(PositionAlreadyTakenException.class, () -> playerModel.placeCard(normalCard, pos1, CardSideType.FRONT));
+        assertThrows(NoAdjacentCardsException.class, () -> playerModel.placeCard(normalCard, pos2, CardSideType.FRONT));
+        assertThrows(PlacingOnInvalidCornerException.class, () -> playerModel.placeCard(normalCard, pos3, CardSideType.FRONT));
 
         assertFalse(playerModel.getPlayArea().containsValue(normalCard));
 
@@ -156,26 +148,18 @@ class PlayerModelTest {
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
 
         //Place the resource cards
-        try {
-            playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK);
-            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
-            playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK));
 
         //Same thing with 3 animal golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
 
-        try {
-            playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK);
-            playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK);
-            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
@@ -215,26 +199,18 @@ class PlayerModelTest {
         ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
 
         //Place the resource cards
-        try {
-            playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK);
-            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
-            playerModel.placeCard(resourceCard3, new Position(2, 0), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(2, 0), CardSideType.BACK));
 
         //Same thing with 3 insect golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
         GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
 
-        try {
-            playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK);
-            playerModel.placeCard(goldenCard2, new Position(-2, 0), CardSideType.BACK);
-            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(-2, 0), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
@@ -276,14 +252,10 @@ class PlayerModelTest {
         ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(5);
 
         //Place the resource cards
-        try {
-            playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK);
-            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
-            playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK);
-            playerModel.placeCard(resourceCard4, new Position(1, 3), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard4, new Position(1, 3), CardSideType.BACK));
 
         //Same thing with 6 animal golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
@@ -293,14 +265,10 @@ class PlayerModelTest {
         GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(24);
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(25);
 
-        try {
-            playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK);
-            playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK);
-            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
-            playerModel.placeCard(goldenCard4, new Position(3, 1), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard4, new Position(3, 1), CardSideType.BACK));
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
@@ -313,12 +281,8 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a fifth card in the diagonal
-        try {
-            playerModel.placeCard(resourceCard5, new Position(-3, -1), CardSideType.BACK);
-            playerModel.placeCard(goldenCard5, new Position(4,2), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(-3, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(4,2), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -330,12 +294,8 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a sixth card in the diagonal
-        try {
-            playerModel.placeCard(resourceCard6, new Position(-4, -2), CardSideType.BACK);
-            playerModel.placeCard(goldenCard6, new Position(5,3), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(-4, -2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(5,3), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -376,14 +336,10 @@ class PlayerModelTest {
         ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(15);
 
         //Place the resource cards
-        try {
-            playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK);
-            playerModel.placeCard(resourceCard2, new Position(2, 0), CardSideType.BACK);
-            playerModel.placeCard(resourceCard3, new Position(3, -1), CardSideType.BACK);
-            playerModel.placeCard(resourceCard4, new Position(4, -2), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(2, 0), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(3, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard4, new Position(4, -2), CardSideType.BACK));
 
         //Same thing with 6 insect golden cards
         GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
@@ -393,14 +349,10 @@ class PlayerModelTest {
         GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(34);
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(35);
 
-        try {
-            playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK);
-            playerModel.placeCard(goldenCard2, new Position(0, -2), CardSideType.BACK);
-            playerModel.placeCard(goldenCard3, new Position(1, -3), CardSideType.BACK);
-            playerModel.placeCard(goldenCard4, new Position(2, -4), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(0, -2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(1, -3), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard4, new Position(2, -4), CardSideType.BACK));
 
         //Select 2 objective cards
         ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
@@ -413,12 +365,8 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a fifth card in the diagonal
-        try {
-            playerModel.placeCard(resourceCard5, new Position(5, -3), CardSideType.BACK);
-            playerModel.placeCard(goldenCard5, new Position(3,-5), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(5, -3), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(3, -5), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -430,12 +378,8 @@ class PlayerModelTest {
         assertEquals(4, playerModel.getCurrScore());
 
         //Place a sixth card in the diagonal
-        try {
-            playerModel.placeCard(resourceCard6, new Position(6, -4), CardSideType.BACK);
-            playerModel.placeCard(goldenCard6, new Position(4,-6), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(6, -4), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(4,-6), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -473,13 +417,9 @@ class PlayerModelTest {
         PlaceableCard card2 = resourceDeck.get(21);
 
         //Place the cards
-        try {
-            playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK);
-            playerModel.placeCard(mainCard, new Position(2,2), CardSideType.BACK);
-            playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(2,2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK));
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(6);
@@ -515,13 +455,9 @@ class PlayerModelTest {
         PlaceableCard card2 = resourceDeck.get(31);
 
         //Place the cards
-        try {
-            playerModel.placeCard(card1, new Position(-1, 1), CardSideType.BACK);
-            playerModel.placeCard(mainCard, new Position(-2,2), CardSideType.BACK);
-            playerModel.placeCard(card2, new Position(-1,-1), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(-1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(-2,2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(-1,-1), CardSideType.BACK));
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(7);
@@ -557,13 +493,9 @@ class PlayerModelTest {
         PlaceableCard card2 = resourceDeck.get(1);
 
         //Place the cards
-        try {
-            playerModel.placeCard(card1, new Position(1, -1), CardSideType.BACK);
-            playerModel.placeCard(mainCard, new Position(2,-2), CardSideType.BACK);
-            playerModel.placeCard(card2, new Position(1,1), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(2,-2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,1), CardSideType.BACK));
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(4);
@@ -599,13 +531,9 @@ class PlayerModelTest {
         PlaceableCard card2 = resourceDeck.get(11);
 
         //Place the cards
-        try {
-            playerModel.placeCard(card1, new Position(-1, -1), CardSideType.BACK);
-            playerModel.placeCard(mainCard, new Position(-2,-2), CardSideType.BACK);
-            playerModel.placeCard(card2, new Position(-1,1), CardSideType.BACK);
-        } catch (CardNotPlacedException e) {
-            System.out.println(e.getMessage());
-        }
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(-1, -1), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(-2,-2), CardSideType.BACK));
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(-1,1), CardSideType.BACK));
 
         //Select an objective card
         ObjectiveCard objectiveCard = objectiveDeck.get(5);

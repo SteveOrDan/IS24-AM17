@@ -159,46 +159,45 @@ public class MatchController implements Serializable {
      * @param cardID ID of the card
      * @param pos Position to place the card
      */
-    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-        try {
-            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide)
+            throws InvalidPlayerIDException, NotPlayerTurnException, InvalidCardIDException,
+            CardNotInHandException, InvalidGameStateException, CardNotPlacedException, NoAdjacentCardsException,
+            PositionAlreadyTakenException, MissingResourcesException, PlacingOnInvalidCornerException {
 
-            if (matchModel.getCurrPlayerID() != playerID){
-                // Not player's turn
-                throw new NotPlayerTurnException();
-            }
-
-            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
-                // Invalid card ID
-                throw new InvalidCardIDException();
-            }
-
-            if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
-                // Card not in player's hand
-                throw new CardNotInHandException();
-            }
-
-            if (matchModel.getGameState() != GameState.PLAYING &&
-                    matchModel.getGameState() != GameState.FINAL_ROUND &&
-                    matchModel.getGameState() != GameState.EXTRA_ROUND){
-                // Not playing game state
-                throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
-
-            }
-
-            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
-
-            player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
-
-            if (matchModel.getGameState() == GameState.EXTRA_ROUND){
-                endTurn();
-            }
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+            // Invalid player ID
+            throw new InvalidPlayerIDException();
         }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
+
+        if (matchModel.getCurrPlayerID() != playerID){
+            // Not player's turn
+            throw new NotPlayerTurnException();
+        }
+
+        if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
+            // Invalid card ID
+            throw new InvalidCardIDException();
+        }
+
+        if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
+            // Card not in player's hand
+            throw new CardNotInHandException();
+        }
+
+        if (matchModel.getGameState() != GameState.PLAYING &&
+                matchModel.getGameState() != GameState.FINAL_ROUND &&
+                matchModel.getGameState() != GameState.EXTRA_ROUND){
+            // Not playing game state
+            throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
+
+        }
+
+        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+
+        player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
+
+        if (matchModel.getGameState() == GameState.EXTRA_ROUND){
+            endTurn();
         }
     }
 
@@ -274,19 +273,15 @@ public class MatchController implements Serializable {
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
-    public void drawResourceCard(int playerID){
-        try {
-            checkPlayerDrawExceptions(playerID);
+    public void drawResourceCard(int playerID) throws InvalidPlayerIDException, InvalidGameStateException,
+            NotPlayerTurnException, InvalidPlayerStateException, NotEnoughCardsException {
+        checkPlayerDrawExceptions(playerID);
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawResourceCard());
+        matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawResourceCard());
 
-            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
-            endTurn();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        endTurn();
     }
 
     /**

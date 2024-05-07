@@ -116,6 +116,14 @@ public class PlayerModel {
      * Getter
      * @return List of objective cards to choose from
      */
+    public List<ObjectiveCard> getObjectivesToChoose() {
+        return objectivesToChoose;
+    }
+
+    /**
+     * Getter
+     * @return List of objective cards to choose from
+     */
     public ObjectiveCard getSecretObjective() {
         return secretObjective;
     }
@@ -124,7 +132,10 @@ public class PlayerModel {
      * Sets the player's secret objective card
      * @param cardID ID of the card to set as the secret objective
      */
-    public void setSecretObjective(int cardID) {
+    public void setSecretObjective(int cardID) throws InvalidObjectiveCardException {
+        if (!objectivesToChoose.contains(GameResources.getObjectiveCardByID(cardID))) {
+            throw new InvalidObjectiveCardException();
+        }
         secretObjective = GameResources.getObjectiveCardByID(cardID);
     }
 
@@ -277,53 +288,50 @@ public class PlayerModel {
      * @param card Golden card to place in the player's playArea
      * @param pos Card's position to add to the player's playArea
      */
-    public void placeCard(PlaceableCard card, Position pos, CardSideType chosenSide) throws CardNotPlacedException {
-        try {
-            if (playArea.containsKey(pos)){
-                throw new PositionAlreadyTakenException();
-            }
+    public void placeCard(PlaceableCard card, Position pos, CardSideType chosenSide)
+            throws CardNotPlacedException, PositionAlreadyTakenException, MissingResourcesException,
+            NoAdjacentCardsException, PlacingOnInvalidCornerException {
 
-            if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
-                throw new MissingResourcesException();
-            }
-
-            ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
-
-            // Set chosen side
-            card.setCurrSideType(chosenSide);
-
-            // Remove resources of covered corners
-            for (CardCorner corner : adjacentCorners){
-                if (corner.getResource() != null){
-                    numOfResourcesArr[corner.getResource().getValue()]--;
-                }
-            }
-
-            // Add resources on placed card's corners
-            for (ResourceType resource : card.getCurrSide().getResources()){
-                numOfResourcesArr[resource.getValue()]++;
-            }
-
-            // Add card points
-            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSideType());
-
-            // Set card priority
-            card.setPriority(currMaxPriority);
-
-            currMaxPriority++;
-
-            // Add card to playArea
-            playArea.put(pos, card);
-
-            // Remove card from hand
-            hand.remove(card);
-
-            state = PlayerState.DRAWING;
+        if (playArea.containsKey(pos)){
+            throw new PositionAlreadyTakenException();
         }
-        catch (PositionAlreadyTakenException | PlacingOnInvalidCornerException | MissingResourcesException | NoAdjacentCardsException e){
-//            sender.placeCard(false);
-            System.out.println(e.getMessage());
+
+        if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
+            throw new MissingResourcesException();
         }
+
+        ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
+
+        // Set chosen side
+        card.setCurrSideType(chosenSide);
+
+        // Remove resources of covered corners
+        for (CardCorner corner : adjacentCorners){
+            if (corner.getResource() != null){
+                numOfResourcesArr[corner.getResource().getValue()]--;
+            }
+        }
+
+        // Add resources on placed card's corners
+        for (ResourceType resource : card.getCurrSide().getResources()){
+            numOfResourcesArr[resource.getValue()]++;
+        }
+
+        // Add card points
+        currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSideType());
+
+        // Set card priority
+        card.setPriority(currMaxPriority);
+
+        currMaxPriority++;
+
+        // Add card to playArea
+        playArea.put(pos, card);
+
+        // Remove card from hand
+        hand.remove(card);
+
+        state = PlayerState.DRAWING;
     }
 
     /**

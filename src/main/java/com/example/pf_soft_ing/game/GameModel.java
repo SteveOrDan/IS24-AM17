@@ -48,13 +48,13 @@ public class GameModel {
      * @param matchID ID of the match
      * @return MatchController with the given ID
      */
-    public MatchController getMatchByID(int matchID) throws InvalidMatchID {
+    public MatchController getMatchByID(int matchID) throws InvalidMatchIDException {
         for (MatchController match : matches) {
             if (match.getMatchModel().getMatchID() == matchID) {
                 return match;
             }
         }
-        throw new InvalidMatchID();
+        throw new InvalidMatchIDException();
     }
 
     /**
@@ -62,11 +62,11 @@ public class GameModel {
      * @param playerID ID of the host player
      * @param numberOfPlayers Maximum number of players in the match
      * @param nickname Nickname of the host player
-     * @throws InvalidNumOfPlayers If the number of players is not between 2 and 4
+     * @throws InvalidNumOfPlayersException If the number of players is not between 2 and 4
      */
-    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayers, InvalidPlayerStateException, GameIsFullException {
+    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayersException, InvalidPlayerStateException, GameIsFullException {
         if (numberOfPlayers > 4 || numberOfPlayers < 2){
-            throw new InvalidNumOfPlayers();
+            throw new InvalidNumOfPlayersException();
         }
 
         PlayerModel player = IDToPlayers.get(playerID);
@@ -104,9 +104,9 @@ public class GameModel {
      * The player will be marked as "ready" only after choosing a nickname
      * @param playerID ID of the player
      * @param matchID ID of the match
-     * @throws InvalidMatchID If the match ID is invalid
+     * @throws InvalidMatchIDException If the match ID is invalid
      */
-    public MatchController selectMatch(int playerID, int matchID) throws InvalidMatchID, GameIsFullException {
+    public MatchController selectMatch(int playerID, int matchID) throws InvalidMatchIDException, GameIsFullException {
         PlayerModel player = IDToPlayers.get(playerID);
 
         getMatchByID(matchID).getMatchModel().addCurrPlayer(player);
@@ -121,19 +121,15 @@ public class GameModel {
      * Allows a player to choose a nickname for a match and marks the player as "ready"
      * @param playerID ID of the player
      * @param nickname Nickname of the player
-     * @throws InvalidMatchID If the match ID doesn't exists
+     * @throws InvalidMatchIDException If the match ID doesn't exists
      * @throws NicknameAlreadyExistsException If the nickname is already taken by another player in the same match
      */
-    public void chooseNickname(int playerID, String nickname) throws InvalidMatchID, NicknameAlreadyExistsException {
+    public void chooseNickname(int playerID, String nickname) throws InvalidMatchIDException, NicknameAlreadyExistsException {
         int matchID = IDToPlayers.get(playerID).getMatchID();
 
         MatchModel matchModel = getMatchByID(matchID).getMatchModel();
 
-        for (String otherNickname : matchModel.getNicknames()) {
-            if (otherNickname.equals(nickname)) {
-                throw new NicknameAlreadyExistsException();
-            }
-        }
+        matchModel.checkNickname(nickname);
 
         IDToPlayers.get(playerID).setNickname(nickname);
 

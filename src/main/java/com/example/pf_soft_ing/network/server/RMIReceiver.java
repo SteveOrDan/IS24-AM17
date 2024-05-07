@@ -41,7 +41,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
             IDToPlayer.get(playerID).getSender().createMatchResult(matchController.getMatchModel().getMatchID(), nickname);
         }
-        catch (InvalidNumOfPlayers | InvalidPlayerStateException | GameIsFullException e) {
+        catch (InvalidNumOfPlayersException | InvalidPlayerStateException | GameIsFullException e) {
             IDToPlayer.get(playerID).getSender().sendError(e.getMessage());
         }
     }
@@ -54,7 +54,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
             IDToPlayer.get(playerID).getSender().selectMatchResult(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
         }
-        catch (InvalidMatchID | GameIsFullException e) {
+        catch (InvalidMatchIDException | GameIsFullException e) {
             IDToPlayer.get(playerID).getSender().sendError(e.getMessage());
         }
     }
@@ -99,7 +99,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
                     }
                 }
             }
-        } catch (InvalidMatchID | NicknameAlreadyExistsException e) {
+        } catch (InvalidMatchIDException | NicknameAlreadyExistsException e) {
             IDToPlayer.get(playerID).getSender().sendError(e.getMessage());
         }
     }
