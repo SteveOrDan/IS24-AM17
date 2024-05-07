@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.player;
 
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.ResourceType;
@@ -108,7 +109,6 @@ public class PlayerModel {
      */
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
         objectivesToChoose = objectives;
-//        sender.setObjectivesToChoose(objectives);
     }
 
     /**
@@ -129,7 +129,6 @@ public class PlayerModel {
                 throw new InvalidIndexException();
             }
             secretObjective = objectivesToChoose.get(index);
-//            sender.setSecretObjective(secretObjective);
         }
         catch (InvalidIndexException e){
             System.out.println(e.getMessage());
@@ -151,7 +150,6 @@ public class PlayerModel {
 
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
-//        sender.setStarterCard(sCard);
     }
 
     /**
@@ -184,7 +182,6 @@ public class PlayerModel {
      */
     public void setCurrScore(int score){
         currScore = score;
-//        sender.setCurrScore(score);
     }
 
     /**
@@ -201,7 +198,6 @@ public class PlayerModel {
      */
     public void setToken(Token token){
         this.token = token;
-//        sender.setToken(token);
     }
 
     /**
@@ -223,7 +219,6 @@ public class PlayerModel {
         else{
             firstPlayerToken = null;
         }
-//        sender.setFirstPlayerToken(firstPlayerToken);
     }
 
     /**
@@ -240,7 +235,6 @@ public class PlayerModel {
      */
     public void setState(PlayerState state){
         this.state = state;
-//        encoder.setState(state);
     }
 
     /**
@@ -256,14 +250,13 @@ public class PlayerModel {
      * Adds resources on the card's side
      * No requirements are needed for positioning this card
      */
-    public void placeStarterCard(Side chosenSide){
+    public void placeStarterCard(CardSideType chosenSide){
         if (playArea.containsKey(new Position(0,0))){
             System.out.println(new StarterCardAlreadyPlacedException().getMessage());
-//            sender.placeStarterCard(false);
             return;
         }
 
-        for (ResourceType resource : starterCard.getResources(chosenSide)){
+        for (ResourceType resource : starterCard.getResources(starterCard.getCurrSide())){
             numOfResourcesArr[resource.getValue()]++;
         }
 
@@ -271,7 +264,7 @@ public class PlayerModel {
 
         currMaxPriority++;
 
-        starterCard.setChosenSide(chosenSide);
+        starterCard.setCurrSideType(chosenSide);
 
         playArea.put(new Position(0,0), starterCard);
 
@@ -291,13 +284,13 @@ public class PlayerModel {
      * @param card Golden card to place in the player's playArea
      * @param pos Card's position to add to the player's playArea
      */
-    public void placeCard(PlaceableCard card, Position pos, Side chosenSide) throws CardNotPlacedException {
+    public void placeCard(PlaceableCard card, Position pos, CardSideType chosenSide) throws CardNotPlacedException {
         try {
             if (playArea.containsKey(pos)){
                 throw new PositionAlreadyTakenException();
             }
 
-            if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
+            if(!card.hasEnoughRequiredResources(numOfResourcesArr, card.getCurrSide())){
                 throw new MissingResourcesException();
             }
 
@@ -311,12 +304,12 @@ public class PlayerModel {
             }
 
             // Add resources on placed card's corners
-            for (ResourceType resource : chosenSide.getResources()){
+            for (ResourceType resource : card.getCurrSide().getResources()){
                 numOfResourcesArr[resource.getValue()]++;
             }
 
             // Add card points
-            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, chosenSide);
+            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSide());
 
             // Set card priority
             card.setPriority(currMaxPriority);
@@ -330,9 +323,7 @@ public class PlayerModel {
             hand.remove(card);
 
             // Set chosen side
-            card.setChosenSide(chosenSide);
-
-//            sender.placeCard(true);
+            card.setCurrSideType(chosenSide);
 
             state = PlayerState.DRAWING;
         }
@@ -358,16 +349,16 @@ public class PlayerModel {
             PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
 
             if (TRCard != null){
-                add(TRCard.getChosenSide().getBLCorner());
+                add(TRCard.getCurrSide().getBLCorner());
             }
             if (BRCard != null){
-                add(BRCard.getChosenSide().getTLCorner());
+                add(BRCard.getCurrSide().getTLCorner());
             }
             if (BLCard != null){
-                add(BLCard.getChosenSide().getTRCorner());
+                add(BLCard.getCurrSide().getTRCorner());
             }
             if (TLCard != null){
-                add(TLCard.getChosenSide().getBRCorner());
+                add(TLCard.getCurrSide().getBRCorner());
             }
         }};
 

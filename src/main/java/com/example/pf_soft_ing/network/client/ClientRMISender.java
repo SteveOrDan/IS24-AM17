@@ -1,7 +1,7 @@
 package com.example.pf_soft_ing.network.client;
 
-import com.example.pf_soft_ing.network.messages.answers.ErrorMessage;
-import com.example.pf_soft_ing.network.messages.requests.*;
+import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.server.RMIReceiverInterface;
 
 import java.io.BufferedReader;
@@ -9,15 +9,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 
-public class ClientRMISender extends ClientSender {
+public class ClientRMISender implements ClientSender {
 
     private final RMIReceiverInterface serverInterface;
-    private ClientRMIInterface client;
+    private final ClientRMIInterface client;
     private int playerID;
     private BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 
-    public ClientRMISender(RMIReceiverInterface serverInterface) {
+    public ClientRMISender(RMIReceiverInterface serverInterface, ClientRMIInterface client) {
         this.serverInterface = serverInterface;
+        this.client = client;
     }
 
     @Override
@@ -75,11 +76,6 @@ public class ClientRMISender extends ClientSender {
     }
 
     @Override
-    public void setClient(ClientRMIInterface client) {
-        this.client = client;
-    }
-
-    @Override
     public void getMatches() {
         try {
             playerID = serverInterface.getMatches(client);
@@ -115,7 +111,7 @@ public class ClientRMISender extends ClientSender {
     }
 
     @Override
-    public void placeStarterCard(int cardID, String side) {
+    public void placeStarterCard(int cardID, CardSideType side) {
 
     }
 
@@ -125,7 +121,7 @@ public class ClientRMISender extends ClientSender {
     }
 
     @Override
-    public void placeCard(int id, int side, int pos) {
+    public void placeCard(int cardID, CardSideType side, Position pos) {
 
     }
 

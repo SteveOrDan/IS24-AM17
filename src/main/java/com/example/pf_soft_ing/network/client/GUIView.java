@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -35,8 +37,12 @@ public class GUIView implements View {
 
     private final List<Integer> playerHand = new ArrayList<>();
 
-    private String starterCardSide;
+    private int matchID;
+
+    private CardSideType starterCardSide;
     private int starterCardID;
+
+    private String connectionType;
 
     private int selectedCardID = -1;
     private double lastPlacedCardX;
@@ -127,6 +133,29 @@ public class GUIView implements View {
         connectionChoice.setLayoutX(0);
         connectionChoice.setLayoutY(0);
 
+        // Create buttons for connection type choice
+        Button socketButton = new Button("Socket");
+        socketButton.setPrefSize(200, 100);
+        socketButton.setLayoutX((stageWidth - 200) * 0.5 - 150);
+        socketButton.setLayoutY((stageHeight - 350) * 0.5);
+
+
+        Button rmiButton = new Button("RMI");
+        rmiButton.setPrefSize(200, 100);
+        rmiButton.setLayoutX((stageWidth - 200) * 0.5 + 150);
+        rmiButton.setLayoutY((stageHeight - 350) * 0.5);
+
+        socketButton.setOnAction((_) -> {
+            connectionType = "socket";
+            socketButton.setEffect(new ColorAdjust(0.7, 0.2, 0, 0));
+            rmiButton.setEffect(new ColorAdjust(0, 0, 0, 0));
+        });
+        rmiButton.setOnAction((_) -> {
+            connectionType = "rmi";
+            rmiButton.setEffect(new ColorAdjust(0.7, 0.2, 0, 0));
+            socketButton.setEffect(new ColorAdjust(0, 0, 0, 0));
+        });
+
         // Create text field for IP
         TextField IPField = new TextField();
         IPField.setPrefSize(200, 50);
@@ -138,11 +167,14 @@ public class GUIView implements View {
         Button confirmIP = new Button("Confirm");
         confirmIP.setPrefSize(200, 50);
         confirmIP.setLayoutX((stageWidth - 200) * 0.5);
-        confirmIP.setLayoutY((stageHeight + 50) * 0.5);
+        confirmIP.setLayoutY((stageHeight + 75) * 0.5);
+        confirmIP.setDefaultButton(true);
         confirmIP.setOnAction((_) -> tryConnect(IPField.getText()));
 
         connectionChoice.getChildren().add(IPField);
         connectionChoice.getChildren().add(confirmIP);
+        connectionChoice.getChildren().add(socketButton);
+        connectionChoice.getChildren().add(rmiButton);
 
         root.getChildren().add(connectionChoice);
     }
@@ -153,22 +185,20 @@ public class GUIView implements View {
         try {
             int portNumber = Integer.parseInt(port);
 
-            try {
+            if (connectionType.equals("socket")){
                 sender = ClientMain.startSocket(ip, portNumber, this);
                 connected = true;
             }
-            catch (Exception e) {
-                try {
-                    sender = ClientMain.startRMI(ip, portNumber, this);
-                    connected = true;
-                }
-                catch (Exception ex) {
-                    errorMessage = "Invalid port number!";
-                }
+            else if (connectionType.equals("rmi")){
+                sender = ClientMain.startRMI(ip, portNumber, this);
+                connected = true;
+            }
+            else {
+                errorMessage = "Please choose a connection type!";
             }
         }
         catch (Exception e) {
-            errorMessage = "Please enter a port NUMBER!";
+            errorMessage = "Please enter a valid port number!";
         }
 
         if (connected) {
@@ -308,6 +338,7 @@ public class GUIView implements View {
         confirmMatch.setPrefSize(150, 50);
         confirmMatch.setLayoutX((stageWidth - 150) * 0.5);
         confirmMatch.setLayoutY(300);
+        confirmMatch.setDefaultButton(true);
         confirmMatch.setOnAction((_) -> {
             int numOfPlayers = playersField.getText().isEmpty() ? 0 : Integer.parseInt(playersField.getText());
             String nickname = nameField.getText();
@@ -322,7 +353,7 @@ public class GUIView implements View {
         root.getChildren().add(createPane);
     }
 
-    private void openSelectNickWindow(int matchID, List<String> players){
+    private void openSelectNickWindow(List<String> players){
         root.getChildren().clear();
 
         AnchorPane joinPane = new AnchorPane();
@@ -337,10 +368,11 @@ public class GUIView implements View {
         nameField.setLayoutY(100);
 
         // Create confirm button
-        Button confirmNick = new Button("+");
-        confirmNick.setPrefSize(50, 50);
-        confirmNick.setLayoutX((stageWidth + 200) * 0.5 + 200);
+        Button confirmNick = new Button("Join");
+        confirmNick.setPrefSize(150, 50);
+        confirmNick.setLayoutX((stageWidth + 200) * 0.5 + 100);
         confirmNick.setLayoutY(100);
+        confirmNick.setDefaultButton(true);
         confirmNick.setOnAction((_) -> { // event
             sender.chooseNickname(nameField.getText());
         });
@@ -373,7 +405,7 @@ public class GUIView implements View {
         root.getChildren().add(joinPane);
     }
 
-    private void selectNickname(int matchID, String nick){
+    private void selectNickname(String nick){
         root.getChildren().clear();
 
         AnchorPane anchorPane = new AnchorPane();
@@ -500,35 +532,35 @@ public class GUIView implements View {
         Rectangle paneRect = new Rectangle();
         paneRect.setWidth(stageWidth);
         paneRect.setHeight(stageHeight);
-        paneRect.setFill(Color.rgb(0, 0, 0, 0.2));
+        paneRect.setFill(Color.rgb(0, 0, 0, 0.3));
+
+        // Create white background anchor pane
+        AnchorPane backgroundPane = new AnchorPane();
+        backgroundPane.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
+        backgroundPane.setLayoutX(stageWidth * 0.25);
+        backgroundPane.setLayoutY(stageHeight * 0.25);
+        backgroundPane.setStyle("-fx-background-color: white;");
+        backgroundPane.setOpacity(0.9);
 
         // Render starter card
-        Pane starterCardPane = createCardPane(starterCardID, "front", (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5, 1);
-        starterCardSide = "front";
+        Pane starterCardPane = createCardPane(starterCardID, CardSideType.FRONT, (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5 - 100, 1);
+        starterCardSide = CardSideType.FRONT;
 
         // Render a button to flip the card
         Button flipButton = new Button("Flip");
         flipButton.setPrefSize(100, 50);
         flipButton.setLayoutX((stageWidth - 100) * 0.5);
-        flipButton.setLayoutY((stageHeight + cardHeight) * 0.5);
+        flipButton.setLayoutY((stageHeight + cardHeight) * 0.5 - 75);
         flipButton.setOnAction((_) -> {
             // Flip the card
-            String newSide = "back";
-            if (starterCardSide.equals("back")){
-                newSide = "front";
-            }
-
-            Pane newPane = createCardPane(starterCardID, newSide, starterCardPane.getLayoutX(), starterCardPane.getLayoutY(), 1);
-            tempChoicePane.getChildren().add(newPane);
-
-            tempChoicePane.getChildren().remove(starterCardPane);
+            flipStarterCard(starterCardPane);
         });
 
         // Render a button to place the starter card
         Button placeButton = new Button("Place");
         placeButton.setPrefSize(100, 50);
         placeButton.setLayoutX((stageWidth - 100) * 0.5);
-        placeButton.setLayoutY((stageHeight + cardHeight) * 0.5 + 60);
+        placeButton.setLayoutY((stageHeight + cardHeight) * 0.5);
         placeButton.setOnAction((_) -> {
             // Send the choice to the server
             sender.placeStarterCard(starterCardID, starterCardSide);
@@ -536,11 +568,26 @@ public class GUIView implements View {
 
         // Add all elements to the root
         tempChoicePane.getChildren().add(paneRect);
+        tempChoicePane.getChildren().add(backgroundPane);
         tempChoicePane.getChildren().add(starterCardPane);
         tempChoicePane.getChildren().add(flipButton);
         tempChoicePane.getChildren().add(placeButton);
 
         root.getChildren().add(tempChoicePane);
+    }
+
+    private void flipStarterCard(Pane starterCardPane){
+        if (starterCardSide.equals(CardSideType.BACK)){
+            starterCardSide = CardSideType.FRONT;
+        }
+        else {
+            starterCardSide = CardSideType.BACK;
+        }
+
+        Pane newPane = createCardPane(starterCardID, starterCardSide, starterCardPane.getLayoutX(), starterCardPane.getLayoutY(), 1);
+        tempChoicePane.getChildren().add(newPane);
+
+        tempChoicePane.getChildren().remove(starterCardPane);
     }
 
     private void drawBoard(){
@@ -562,13 +609,13 @@ public class GUIView implements View {
         double resourceCardsY = stageHeight - (2 * cardHeight) - 2 * defaultElementsOffset;
         double goldenCardsY = stageHeight - cardHeight - defaultElementsOffset;
 
-        Pane resDeckPane = createCardPane(resDeckCardID, "back", defaultElementsOffset, resourceCardsY, 1);
-        Pane resVisible1Pane = createCardPane(resVisibleCard1ID, "front", 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
-        Pane resVisible2Pane = createCardPane(resVisibleCard2ID, "front", 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
+        Pane resDeckPane = createCardPane(resDeckCardID, CardSideType.BACK, defaultElementsOffset, resourceCardsY, 1);
+        Pane resVisible1Pane = createCardPane(resVisibleCard1ID, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
+        Pane resVisible2Pane = createCardPane(resVisibleCard2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
 
-        Pane goldDeckPane = createCardPane(goldDeckCardID, "back", defaultElementsOffset, goldenCardsY, 1);
-        Pane goldVisible1Pane = createCardPane(goldVisibleCard1ID, "front", 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
-        Pane goldVisible2Pane = createCardPane(goldVisibleCard2ID, "front", 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
+        Pane goldDeckPane = createCardPane(goldDeckCardID, CardSideType.BACK, defaultElementsOffset, goldenCardsY, 1);
+        Pane goldVisible1Pane = createCardPane(goldVisibleCard1ID, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
+        Pane goldVisible2Pane = createCardPane(goldVisibleCard2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
 
         // Add draw buttons to cards
         addDrawButtonToCard(resDeckPane, resDeckCardID, "deck");
@@ -603,8 +650,8 @@ public class GUIView implements View {
     }
 
     private void renderCommonObjectives(int objective1ID, int objective2ID){
-        Pane objective1Pane = createCardPane(objective1ID, "front", 200, 100, 1);
-        Pane objective2Pane = createCardPane(objective2ID, "front", 200, 300, 1);
+        Pane objective1Pane = createCardPane(objective1ID, CardSideType.FRONT, 200, 100, 1);
+        Pane objective2Pane = createCardPane(objective2ID, CardSideType.FRONT, 200, 300, 1);
 
         root.getChildren().add(objective1Pane);
         root.getChildren().add(objective2Pane);
@@ -616,9 +663,17 @@ public class GUIView implements View {
         paneRect.setHeight(stageHeight);
         paneRect.setFill(Color.rgb(0, 0, 0, 0.2));
 
+        // Create white background anchor pane
+        AnchorPane backgroundPane = new AnchorPane();
+        backgroundPane.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
+        backgroundPane.setLayoutX(stageWidth * 0.25);
+        backgroundPane.setLayoutY(stageHeight * 0.25);
+        backgroundPane.setStyle("-fx-background-color: white;");
+        backgroundPane.setOpacity(0.9);
+
         // Create secret objective panes
-        Pane secretObjective1Pane = createCardPane(secretObjective1ID, "front", 200, 500, 1);
-        Pane secretObjective2Pane = createCardPane(secretObjective2ID, "front", 200, 700, 1);
+        Pane secretObjective1Pane = createCardPane(secretObjective1ID, CardSideType.FRONT, stageWidth * 0.5 - cardWidth - 50, (stageHeight - cardHeight) * 0.5, 1);
+        Pane secretObjective2Pane = createCardPane(secretObjective2ID, CardSideType.FRONT, stageWidth * 0.5 + 50, (stageHeight - cardHeight) * 0.5, 1);
 
         // Create buttons to select secret objectives
         Button secretObjective1Button = new Button();
@@ -639,6 +694,7 @@ public class GUIView implements View {
         secretObjective2Pane.getChildren().add(secretObjective2Button);
 
         tempChoicePane.getChildren().add(paneRect);
+        tempChoicePane.getChildren().add(backgroundPane);
         tempChoicePane.getChildren().add(secretObjective1Pane);
         tempChoicePane.getChildren().add(secretObjective2Pane);
     }
@@ -655,16 +711,16 @@ public class GUIView implements View {
             if (playerHand.size() < 3){
                 // Add card to hand and render it in the right spot
                 playerHand.add(cardID);
-                Pane drawnCard = createCardPane(cardID, "front", lastPlacedCardX, lastPlacedCardY, 1);
+                Pane drawnCard = createCardPane(cardID, CardSideType.FRONT, lastPlacedCardX, lastPlacedCardY, 1);
                 addSelectButtonToCard(drawnCard, cardID);
                 playerHandPane.getChildren().add(drawnCard);
 
                 // Draw new card and render it on common cards' place
                 double newCardScale = 0.8;
-                String newCardSide = "front";
+                CardSideType newCardSide = CardSideType.FRONT;
                 if (commonCardType.equals("deck")){
                     newCardScale = 1;
-                    newCardSide = "back";
+                    newCardSide = CardSideType.BACK;
                 }
 
                 Random rng = new Random();
@@ -685,7 +741,7 @@ public class GUIView implements View {
         cardPane.getChildren().add(drawButton);
     }
 
-    private Pane createCardPane(int cardID, String side, double xPos, double yPos, double scale){
+    private Pane createCardPane(int cardID, CardSideType side, double xPos, double yPos, double scale){
         // Create Pane for card
         Pane cardPane = new Pane();
 
@@ -738,7 +794,7 @@ public class GUIView implements View {
             blButton.setOnAction((_) -> {
                 if (playerHand.size() == 3 && selectedCardID >= 0){
                     // Place the card
-                    placeCard(selectedCardID, "front", blPos);
+                    placeCard(selectedCardID, CardSideType.FRONT, blPos);
 
                     // Remove the button
                     cardPane.getChildren().remove(blButton);
@@ -768,7 +824,7 @@ public class GUIView implements View {
             brButton.setOnAction((_) -> {
                 if (playerHand.size() == 3 && selectedCardID >= 0){
                     // Place the card
-                    placeCard(selectedCardID, "front", brPos);
+                    placeCard(selectedCardID, CardSideType.FRONT, brPos);
 
                     // Remove the button
                     cardPane.getChildren().remove(brButton);
@@ -798,7 +854,7 @@ public class GUIView implements View {
             tlButton.setOnAction((_) -> {
                 if (playerHand.size() == 3 && selectedCardID >= 0){
                     // Place the card
-                    placeCard(selectedCardID, "front", tlPos);
+                    placeCard(selectedCardID, CardSideType.FRONT, tlPos);
 
                     // Remove the button
                     cardPane.getChildren().remove(tlButton);
@@ -828,7 +884,7 @@ public class GUIView implements View {
             trButton.setOnAction((_) -> {
                 if (playerHand.size() == 3 && selectedCardID >= 0){
                     // Place the card
-                    placeCard(selectedCardID, "front", trPos);
+                    placeCard(selectedCardID, CardSideType.FRONT, trPos);
 
                     // Remove the button
                     cardPane.getChildren().remove(trButton);
@@ -913,7 +969,7 @@ public class GUIView implements View {
         return new Position(mapPos.getX() + gridRows / 2, gridColumns / 2 - mapPos.getY());
     }
 
-    private void placeCard(int ID, String side, Position pos){
+    private void placeCard(int ID, CardSideType side, Position pos){
         if (pos.getX() <= -gridColumns / 2 || pos.getX() >= gridColumns / 2 ||
                 pos.getY() <= -gridRows / 2 || pos.getY() >= gridRows / 2){
             updateGridDimension();
@@ -981,7 +1037,7 @@ public class GUIView implements View {
         validPosToButtonPane.clear();
 
         for (Position p : playArea.keySet()){
-            placeCard(playArea.get(p), "front", p);
+            placeCard(playArea.get(p), CardSideType.FRONT, p);
         }
     }
 
@@ -996,9 +1052,9 @@ public class GUIView implements View {
         // Create panes for each card
         double cardsYPos = (playerHandHeight - cardHeight) * 0.5;
 
-        Pane card1Pane = createCardPane(card1ID, "front", 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
-        Pane card2Pane = createCardPane(card2ID, "front", 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
-        Pane card3Pane = createCardPane(card3ID, "front", 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
+        Pane card1Pane = createCardPane(card1ID, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
+        Pane card2Pane = createCardPane(card2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
+        Pane card3Pane = createCardPane(card3ID, CardSideType.FRONT, 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
 
         // Add select buttons to cards
         addSelectButtonToCard(card1Pane, card1ID);
@@ -1142,20 +1198,24 @@ public class GUIView implements View {
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
+        this.matchID = matchID;
+
         // Create window for waiting for other players
-        Platform.runLater(() -> selectNickname(matchID, hostNickname));
+        Platform.runLater(() -> selectNickname(hostNickname));
     }
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
+        this.matchID = matchID;
+
         // Create window for choosing nickname
-        Platform.runLater(() -> openSelectNickWindow(matchID, nicknames));
+        Platform.runLater(() -> openSelectNickWindow(nicknames));
     }
 
     @Override
     public void chooseNickname(String nickname) {
         // Create window for waiting for other players
-        Platform.runLater(() -> selectNickname(0, nickname));
+        Platform.runLater(() -> selectNickname(nickname));
     }
 
     @Override
@@ -1198,7 +1258,7 @@ public class GUIView implements View {
 
             // Place secret objective in player hand
             double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
-            Pane secretObjectivePane = createCardPane(secretObjectiveID, "front", defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+            Pane secretObjectivePane = createCardPane(secretObjectiveID, CardSideType.FRONT, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
 
             playerHandPane.getChildren().add(secretObjectivePane);
         });

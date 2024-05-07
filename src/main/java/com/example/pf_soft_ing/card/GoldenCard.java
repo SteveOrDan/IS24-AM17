@@ -36,6 +36,22 @@ public class GoldenCard extends PlaceableCard{
     }
 
     /**
+     * Getter
+     * @return Resource that gives points when placed
+     */
+    public ResourceType getPointPerResourceRes() {
+        return pointPerResourceRes;
+    }
+
+    /**
+     * Getter
+     * @return Map of required resources to place the card
+     */
+    public HashMap<ResourceType, Integer> getRequiredResources() {
+        return requiredResources;
+    }
+
+    /**
      * Checks if the player has enough resources to place the card
      * @param numOfResourcesArr Array containing the number of resources of the player per type
      * @return True if the player has enough resources to place the card

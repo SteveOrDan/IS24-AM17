@@ -1,9 +1,8 @@
 package com.example.pf_soft_ing.card;
 
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
-import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 
-import java.io.Serializable;
 import java.util.List;
 
 public abstract class PlaceableCard {
@@ -18,7 +17,7 @@ public abstract class PlaceableCard {
 
     private int priority;
 
-    private Side chosenSide = null;
+    private CardSideType currSide = CardSideType.FRONT;
     public final Side front;
     public final Side back;
 
@@ -63,21 +62,24 @@ public abstract class PlaceableCard {
      * Getter
      * @return the chosen side of the card for the placement in the play area
      */
-    public Side getChosenSide() throws CardNotPlacedException{
-        if (chosenSide != null) {
-            return chosenSide;
-        }
-        else {
-            throw new CardNotPlacedException();
-        }
+    public CardSideType getCurrSideType() {
+        return currSide;
+    }
+
+    /**
+     * Returns the correct side of the card based on the chosen side
+     * @return Current side of the card
+     */
+    public Side getCurrSide(){
+        return currSide == CardSideType.FRONT ? front : back;
     }
 
     /**
      * Setter
-     * @param chosenSide New chosen side of the card
+     * @param newSide New side of the card
      */
-    public void setChosenSide(Side chosenSide) {
-        this.chosenSide = chosenSide;
+    public void setCurrSideType(CardSideType newSide) {
+        this.currSide = newSide;
     }
 
     /**
@@ -108,5 +110,5 @@ public abstract class PlaceableCard {
 
     public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide);
 
-    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side choesenSide);
+    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side chosenSide);
 }

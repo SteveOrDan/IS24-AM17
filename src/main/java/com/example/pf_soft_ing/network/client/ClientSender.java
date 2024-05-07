@@ -1,21 +1,22 @@
 package com.example.pf_soft_ing.network.client;
 
-public abstract class ClientSender {
+import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 
-    public abstract void startInputReading();
+public interface ClientSender {
 
-    public abstract void setClient(ClientRMIInterface client);
+    void startInputReading();
 
-    public abstract void getMatches();
-    public abstract void createMatch(int numberOfPlayers, String nickname);
-    public abstract void selectMatch(int matchID);
-    public abstract void chooseNickname(String nickname);
+    void getMatches();
+    void createMatch(int numberOfPlayers, String nickname);
+    void selectMatch(int matchID);
+    void chooseNickname(String nickname);
 
-    public abstract void placeStarterCard(int cardID, String side);
-    public abstract void chooseSecretObjective(int cardID);
-    public abstract void placeCard(int cardID, int side, int pos);
-    public abstract void drawResourceCard(int playerID);
-    public abstract void drawVisibleResourceCard(int playerID, int index);
-    public abstract void drawGoldenCard(int playerID);
-    public abstract void drawVisibleGoldenCard(int playerID, int index);
+    void placeStarterCard(int cardID, CardSideType side);
+    void chooseSecretObjective(int cardID);
+    void placeCard(int cardID, CardSideType side, Position pos);
+    void drawResourceCard(int playerID);
+    void drawVisibleResourceCard(int playerID, int index);
+    void drawGoldenCard(int playerID);
+    void drawVisibleGoldenCard(int playerID, int index);
 }

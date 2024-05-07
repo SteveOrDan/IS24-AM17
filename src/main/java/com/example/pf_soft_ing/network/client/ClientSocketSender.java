@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.ErrorMessage;
 import com.example.pf_soft_ing.network.messages.requests.*;
@@ -8,7 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-public class ClientSocketSender extends ClientSender {
+public class ClientSocketSender implements ClientSender {
 
     private final ObjectOutputStream out;
     private final BufferedReader stdIn;
@@ -91,11 +93,6 @@ public class ClientSocketSender extends ClientSender {
     }
 
     @Override
-    public void setClient(ClientRMIInterface client) {
-
-    }
-
-    @Override
     public void getMatches() {
         sendMessage(new GetMatchesMsg());
     }
@@ -116,18 +113,18 @@ public class ClientSocketSender extends ClientSender {
     }
 
     @Override
-    public void placeStarterCard(int cardID, String side) {
-
+    public void placeStarterCard(int cardID, CardSideType side) {
+        sendMessage(new PlaceStarterCardMsg(cardID, side));
     }
 
     @Override
     public void chooseSecretObjective(int cardID) {
-
+        sendMessage(new ChooseSecretObjMsg(cardID));
     }
 
     @Override
-    public void placeCard(int id, int side, int pos) {
-
+    public void placeCard(int cardID, CardSideType side, Position pos) {
+        sendMessage(new PlaceCardMsg(cardID, side, pos));
     }
 
     @Override

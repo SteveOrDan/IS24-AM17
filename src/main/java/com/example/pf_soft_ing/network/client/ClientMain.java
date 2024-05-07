@@ -60,11 +60,10 @@ public class ClientMain {
         Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
         RMIReceiverInterface serverInterface = (RMIReceiverInterface) registry.lookup("RMIReceiver");
 
-        ClientSender clientSender = new ClientRMISender(serverInterface);
-        clientSender.startInputReading();
-
         ClientRMIReceiver clientReceiver = new ClientRMIReceiver(view);
-        clientSender.setClient(clientReceiver.getClient());
+
+        ClientSender clientSender = new ClientRMISender(serverInterface, clientReceiver.getClient());
+        clientSender.startInputReading();
 
         return clientSender;
     }

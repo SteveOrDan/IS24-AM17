@@ -3,6 +3,7 @@ package com.example.pf_soft_ing.game;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.player.PlayerModel;
@@ -136,7 +137,7 @@ public class MatchController implements Serializable {
      * @param cardID ID of the card
      * @param pos Position to place the card
      */
-    public void placeCard(int playerID, int cardID, Position pos, Side chosenSide) {
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
         try {
             if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
                 // Invalid player ID
@@ -316,39 +317,6 @@ public class MatchController implements Serializable {
             System.out.println(e.getMessage());
         }
     }
-//
-//    /**
-//     * Flip a card in the player's hand
-//     * Handles exceptions for invalid player ID, invalid card ID, card not in player's hand
-//     * @param playerID ID of the player
-//     * @param cardID ID of the card
-//     */
-//    public void flipCard(int playerID, int cardID){
-//        try {
-//            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-//                // Invalid player ID
-//                throw new InvalidPlayerIDException();
-//            }
-//
-//            if (!IDPlaceableCardMap.containsKey(cardID)){
-//                // Invalid card ID
-//                throw new InvalidCardIDException();
-//            }
-//
-//            List<PlaceableCard> hand = matchModel.getIDToPlayerMap().get(playerID).getHand();
-//
-//            if (!hand.contains(IDPlaceableCardMap.get(cardID))){
-//                // Card not in player's hand
-//                throw new CardNotInHandException();
-//            }
-//
-//            hand.get(hand.indexOf(IDPlaceableCardMap.get(cardID))).flipCard();
-//            //System.out.println("Card flipped");
-//        }
-//        catch (Exception e) {
-//            System.out.println(e.getMessage());
-//        }
-//    }
 
     /**
      * End the game set up and set the game state to "playing"

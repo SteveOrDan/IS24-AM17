@@ -17,9 +17,6 @@ import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.Test;
 
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -339,7 +336,7 @@ class MatchControllerTest {
         Side chosenSide = null;
 
         try {
-            chosenSide = player.getPlayArea().get(pos).getChosenSide();
+            chosenSide = player.getPlayArea().get(pos).getCurrSide();
         }
         catch (CardNotPlacedException e){
             System.out.println(e.getMessage());
