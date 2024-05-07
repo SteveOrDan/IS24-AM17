@@ -1,8 +1,7 @@
 package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
-import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
+import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
@@ -10,7 +9,6 @@ import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
-import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
@@ -86,9 +84,14 @@ class MatchControllerTest {
             player.placeStarterCard(CardSideType.FRONT);
 
             // Choose token
-            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+            player.setToken(TokenColors.getColorFromInt(i % 4));
 
-            matchController.fillPlayerHand(i);
+            try {
+                matchController.fillPlayerHand(i);
+            }
+            catch (InvalidGameStateException | NotEnoughCardsException | InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
         }
 
 
@@ -97,7 +100,12 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            matchController.setObjectivesToChoose(i);
+            try {
+                matchController.setObjectivesToChoose(i);
+            }
+            catch (InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
@@ -175,9 +183,14 @@ class MatchControllerTest {
             assertEquals(player.getPlayArea().get(new Position(0, 0)), starterCard);
 
             // Choose token
-            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+            player.setToken(TokenColors.getColorFromInt(i % 4));
 
-            matchController.fillPlayerHand(i);
+            try {
+                matchController.fillPlayerHand(i);
+            }
+            catch (InvalidGameStateException | NotEnoughCardsException | InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
 
             assertEquals(3, player.getHand().size());
         }
@@ -189,7 +202,12 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            matchController.setObjectivesToChoose(i);
+            try {
+                matchController.setObjectivesToChoose(i);
+            }
+            catch (InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
@@ -600,11 +618,21 @@ class MatchControllerTest {
 
         matchController.getMatchModel().setGameState(GameState.PREGAME);
         matchController.drawStarterCard(-1); // Invalid game state
-        matchController.fillPlayerHand(-1); // Invalid game state
+        try {
+            matchController.fillPlayerHand(-1); // Invalid game state
+        }
+        catch (InvalidGameStateException | InvalidPlayerIDException | NotEnoughCardsException e) {
+            System.out.println(e.getMessage());
+        }
 
         matchController.getMatchModel().setGameState(GameState.SET_UP);
         matchController.drawStarterCard(-1); // Invalid id
-        matchController.fillPlayerHand(-1); // Invalid id
+        try {
+            matchController.fillPlayerHand(-1); // Invalid id
+        }
+        catch (InvalidGameStateException | InvalidPlayerIDException | NotEnoughCardsException e) {
+            System.out.println(e.getMessage());
+        }
 
         // Foreach player...
         for (Integer i : matchController.getIDToPlayerMap().keySet()) {
@@ -629,9 +657,14 @@ class MatchControllerTest {
             assertEquals(player.getPlayArea().get(new Position(0, 0)), starterCard);
 
             // Choose token
-            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+            player.setToken(TokenColors.getColorFromInt(i % 4));
 
-            matchController.fillPlayerHand(i);
+            try {
+                matchController.fillPlayerHand(i);
+            }
+            catch (InvalidGameStateException | InvalidPlayerIDException | NotEnoughCardsException e) {
+                System.out.println(e.getMessage());
+            }
 
             assertEquals(3, player.getHand().size());
         }
@@ -641,11 +674,21 @@ class MatchControllerTest {
 
         assertEquals(2, matchController.getMatchModel().getObjectiveCardsDeck().getCommonObjectives().size());
 
-        matchController.setObjectivesToChoose(-1); // Invalid id
+        try {
+            matchController.setObjectivesToChoose(-1); // Invalid id
+        }
+        catch (InvalidPlayerIDException e) {
+            System.out.println(e.getMessage());
+        }
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            matchController.setObjectivesToChoose(i);
+            try {
+                matchController.setObjectivesToChoose(i);
+            }
+            catch (InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
@@ -726,13 +769,12 @@ class MatchControllerTest {
         // Foreach player...
         for (Integer i : matchController.getIDToPlayerMap().keySet()) {
             PlayerModel player = matchController.getIDToPlayerMap().get(i);
-            PlaceableCard starterCard = null;
 
             // Set starter card
             matchController.drawStarterCard(i);
 
             try {
-                starterCard = player.getStarterCard();
+                player.getStarterCard();
             } catch (StarterCardNotSetException e) {
                 System.out.println(e.getMessage());
             }
@@ -740,9 +782,14 @@ class MatchControllerTest {
             player.placeStarterCard(CardSideType.FRONT);
 
             // Choose token
-            player.setToken(new Token(TokenColors.getColorFromInt(i % 4)));
+            player.setToken(TokenColors.getColorFromInt(i % 4));
 
-            matchController.fillPlayerHand(i);
+            try {
+                matchController.fillPlayerHand(i);
+            }
+            catch (InvalidGameStateException | InvalidPlayerIDException | NotEnoughCardsException e) {
+                System.out.println(e.getMessage());
+            }
         }
 
         // Set common objectives
@@ -750,7 +797,12 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            matchController.setObjectivesToChoose(i);
+            try {
+                matchController.setObjectivesToChoose(i);
+            }
+            catch (InvalidPlayerIDException e) {
+                System.out.println(e.getMessage());
+            }
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 

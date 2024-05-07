@@ -27,4 +27,6 @@ public interface View {
 
     void errorMessage(String errorMessage);
     void showNewPlayer(String nicknames);
+
+    void showPlayerTurn(int playerID);
 }

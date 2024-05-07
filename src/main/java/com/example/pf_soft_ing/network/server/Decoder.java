@@ -6,6 +6,8 @@ import com.example.pf_soft_ing.network.messages.requests.*;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
+import com.example.pf_soft_ing.player.Token;
+import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.List;
 import java.util.Map;
@@ -62,6 +64,8 @@ public class Decoder {
                         PlaceableCard resDeckCardID = matchController.getMatchModel().getResourceCardsDeck().getDeck().getFirst();
                         PlaceableCard goldDeckCardID = matchController.getMatchModel().getGoldenCardsDeck().getDeck().getFirst();
 
+                        matchController.setCommonObjectives();
+
                         for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
                             PlaceableCard starterCard = matchController.getMatchModel().drawStarterCard();
 
@@ -81,8 +85,42 @@ public class Decoder {
                 }
             }
             case PlaceStarterCardMsg castedMsg -> {
-                // TODO: Check if the way of implementing current card side usage is correct
                 matchController.getIDToPlayerMap().get(playerID).placeStarterCard(castedMsg.getSide());
+
+                try {
+                    List<Integer> hand = matchController.fillPlayerHand(playerID); // return cards
+                    TokenColors color = matchController.setPlayerToken(playerID); // ret token color
+                    List<Integer> commonObjectives = matchController.getCommonObjectivesID(); // ret common objectives
+                    List<Integer> objToChoose = matchController.setObjectivesToChoose(playerID); // ret secret objectives
+
+                    sender.sendMissingSetup(hand.getFirst(), hand.get(1), hand.get(2), color, commonObjectives.getFirst(), commonObjectives.get(1), objToChoose.getFirst(), objToChoose.get(1));
+                }
+                catch (InvalidPlayerIDException | InvalidGameStateException | NotEnoughCardsException e) {
+                    sender.sendError(e.getMessage());
+                }
+            }
+            case ChooseSecretObjMsg castedMsg -> {
+                try{
+                    // Set secret objective
+                    matchController.getIDToPlayerMap().get(playerID).setSecretObjective(castedMsg.getCardID());
+
+                    // Mark the player as ready (set up completed)
+                    matchController.setPlayerEndedSetUp(playerID);
+
+                    // If all players are ready, start the turn order phase
+                    if (matchController.checkForTurnOrderPhase()) {
+                        matchController.startTurnOrderPhase();
+
+                        int currPlayerID = matchController.getCurrPlayerID();
+
+                        for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
+                            gameController.getPlayerSender(ID).sendPlayerTurn(currPlayerID);
+                        }
+                    }
+                }
+                catch (InvalidPlayerIDException e) {
+                    sender.sendError(e.getMessage());
+                }
             }
             case null, default -> System.out.println("Invalid message type");
         }

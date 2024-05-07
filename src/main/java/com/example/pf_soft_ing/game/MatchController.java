@@ -8,6 +8,7 @@ import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
+import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -97,23 +98,44 @@ public class MatchController implements Serializable {
      * Set the objectives to choose for the player
      * @param playerID ID of the player
      */
-    public void setObjectivesToChoose(int playerID){
-        try {
-            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
-
-            ArrayList<ObjectiveCard> objectives = new ArrayList<>();
-            objectives.add(matchModel.drawObjectiveCard());
-            objectives.add(matchModel.drawObjectiveCard());
-
-            player.setObjectivesToChoose(objectives);
-        } catch (InvalidPlayerIDException e) {
-            System.out.println(e.getMessage());
+    public List<Integer> setObjectivesToChoose(int playerID) throws InvalidPlayerIDException {
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+            // Invalid player ID
+            throw new InvalidPlayerIDException();
         }
+
+        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+
+        List<ObjectiveCard> objectives = new ArrayList<>();
+        objectives.add(matchModel.drawObjectiveCard());
+        objectives.add(matchModel.drawObjectiveCard());
+
+        player.setObjectivesToChoose(objectives);
+
+        return List.of(objectives.get(0).getID(), objectives.get(1).getID());
+    }
+
+    public TokenColors setPlayerToken(int playerID) throws InvalidPlayerIDException {
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+            // Invalid player ID
+            throw new InvalidPlayerIDException();
+        }
+
+        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+
+        TokenColors color = matchModel.getTokenColor();
+
+        player.setToken(color);
+
+        return color;
+    }
+
+    public List<Integer> getCommonObjectivesID(){
+        List<Integer> commonObjectivesID = new ArrayList<>();
+        for (ObjectiveCard objectiveCard : matchModel.getObjectiveCardsDeck().getCommonObjectives()){
+            commonObjectivesID.add(objectiveCard.getID());
+        }
+        return commonObjectivesID;
     }
 
     /**
@@ -185,26 +207,66 @@ public class MatchController implements Serializable {
      * Handles exceptions for invalid game state, invalid player ID
      * @param playerID ID of the player
      */
-    public void fillPlayerHand(int playerID){
-        try {
-            if (matchModel.getGameState() != GameState.SET_UP){
-                // Not in game set up
-                throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
-            }
-
-            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
-
-            player.drawCard(matchModel.drawResourceCard());
-            player.drawCard(matchModel.drawResourceCard());
-            player.drawCard(matchModel.drawGoldenCard());
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+    public List<Integer> fillPlayerHand(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotEnoughCardsException {
+        if (matchModel.getGameState() != GameState.SET_UP){
+            // Not in game set up
+            throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
         }
+
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+            // Invalid player ID
+            throw new InvalidPlayerIDException();
+        }
+
+        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+
+        PlaceableCard resCard1 = matchModel.drawResourceCard();
+        PlaceableCard resCard2 = matchModel.drawResourceCard();
+        PlaceableCard goldCard = matchModel.drawGoldenCard();
+
+        player.drawCard(resCard1);
+        player.drawCard(resCard2);
+        player.drawCard(goldCard);
+
+        List<Integer> cardIDs = new ArrayList<>();
+        cardIDs.add(resCard1.getID());
+        cardIDs.add(resCard2.getID());
+        cardIDs.add(goldCard.getID());
+
+        return cardIDs;
+    }
+
+    /**
+     * Changes the state of the player to "completed set up"
+     * @param playerID ID of the player
+     * @throws InvalidPlayerIDException if the player ID is invalid
+     */
+    public void setPlayerEndedSetUp(int playerID) throws InvalidPlayerIDException {
+        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+            // Invalid player ID
+            throw new InvalidPlayerIDException();
+        }
+
+        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.COMPLETED_SETUP);
+    }
+
+    /**
+     * Check if all players have completed the set-up
+     * @return true if all players have completed the set-up, false otherwise
+     */
+    public boolean checkForTurnOrderPhase(){
+        return matchModel.checkForTurnOrderPhase();
+    }
+
+    /**
+     * Start the turn order phase
+     */
+    public void startTurnOrderPhase(){
+        matchModel.startTurnOrderPhase();
+    }
+
+    public int getCurrPlayerID(){
+        return matchModel.getCurrPlayerID();
     }
 
     /**

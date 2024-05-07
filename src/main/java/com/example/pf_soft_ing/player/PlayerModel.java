@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.player;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.ResourceType;
@@ -121,18 +122,10 @@ public class PlayerModel {
 
     /**
      * Sets the player's secret objective card
-     * @param index Index of the objective card in the list of objectives to choose from
+     * @param cardID ID of the card to set as the secret objective
      */
-    public void setSecretObjective(int index) {
-        try{
-            if (index < 0 || index >= objectivesToChoose.size()){
-                throw new InvalidIndexException();
-            }
-            secretObjective = objectivesToChoose.get(index);
-        }
-        catch (InvalidIndexException e){
-            System.out.println(e.getMessage());
-        }
+    public void setSecretObjective(int cardID) {
+        secretObjective = GameResources.getObjectiveCardByID(cardID);
     }
 
     /**
@@ -194,10 +187,10 @@ public class PlayerModel {
 
     /**
      * Setter
-     * @param token Player's new token
+     * @param tokenColor Player's token color
      */
-    public void setToken(Token token){
-        this.token = token;
+    public void setToken(TokenColors tokenColor){
+        this.token = new Token(tokenColor);
     }
 
     /**

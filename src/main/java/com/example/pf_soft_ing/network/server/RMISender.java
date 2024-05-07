@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
+import com.example.pf_soft_ing.player.TokenColors;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -70,18 +71,11 @@ public class RMISender implements Sender {
         }
     }
 
-    /**
-     * Method to place starter card
-     * @param placed boolean
-     */
     @Override
-    public void placeStarterCard(boolean placed){
-        try {
-            client.placeStarterCard(placed);
-        }
-        catch (RemoteException e) {
-            throw new RuntimeException(e);
-        }
+    public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
+                                 int commonObjectiveCardID1, int commonObjectiveCardID2,
+                                 int secretObjectiveCardID1, int secretObjectiveCardID2) {
+
     }
 
     /**
@@ -105,5 +99,10 @@ public class RMISender implements Sender {
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
         }
+    }
+
+    @Override
+    public void sendPlayerTurn(int playerID) {
+
     }
 }

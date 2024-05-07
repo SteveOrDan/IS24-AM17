@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.network.server;
 
+import com.example.pf_soft_ing.player.TokenColors;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,11 +27,9 @@ public interface Sender {
                                        int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                        int starterCardID);
 
-    /**
-     * Method to place starter card
-     * @param placed boolean
-     */
-    void placeStarterCard(boolean placed);
+    void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
+                          int commonObjectiveCardID1, int commonObjectiveCardID2,
+                          int secretObjectiveCardID1, int secretObjectiveCardID2);
 
     /**
      * Method to place a card
@@ -38,4 +38,6 @@ public interface Sender {
     void placeCard(boolean placed);
 
     void sendNewPlayer(String nickname);
+
+    void sendPlayerTurn(int playerID);
 }

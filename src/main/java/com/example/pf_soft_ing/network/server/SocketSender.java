@@ -66,13 +66,9 @@ public class SocketSender implements Sender {
         sendMessage(new GameStartMsg(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
     }
 
-    /**
-     * Method to place starter card
-     * @param placed boolean
-     */
     @Override
-    public void placeStarterCard(boolean placed){
-//        SendMessage(STR."9 \{placed}");
+    public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        sendMessage(new MissingSetupMsg(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2));
     }
 
     /**
@@ -87,6 +83,11 @@ public class SocketSender implements Sender {
     @Override
     public void sendNewPlayer(String nickname) {
 
+    }
+
+    @Override
+    public void sendPlayerTurn(int playerID) {
+        sendMessage(new PlayerTurnMsg(playerID));
     }
 
 }

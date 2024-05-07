@@ -4,6 +4,7 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
 import com.example.pf_soft_ing.game.*;
+import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.corner.CardCorner;
@@ -17,6 +18,8 @@ import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,12 +53,19 @@ class PlayerModelTest {
     PlayerModel playerModel;
 
     public void createPlayerModel(){
-        //playerModel = new PlayerModel(34);
+        try {
+            playerModel = new PlayerModel(34, new SocketSender(new ObjectOutputStream(System.out)));
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @DisplayName("Test for placing a starter card in the player area")
     @Test
     void placeStarterCard() {
+        createPlayerModel();
+
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard(CardSideType.FRONT);
 
@@ -70,6 +80,7 @@ class PlayerModelTest {
     @DisplayName("Test for placing a card in a valid position")
     @Test
     void placeCardInValidPos() {
+        createPlayerModel();
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard(CardSideType.FRONT);
@@ -91,6 +102,7 @@ class PlayerModelTest {
     @DisplayName("Test for placing a card in an invalid position")
     @Test
     void placeCardInInvalidPos() {
+        createPlayerModel();
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard(CardSideType.FRONT);
@@ -121,6 +133,7 @@ class PlayerModelTest {
     @DisplayName("Test for the top right to bottom left diagonal objective card")
     @Test
     void checkTRBLDiagonalObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -178,6 +191,7 @@ class PlayerModelTest {
     @DisplayName("Test for the top left to bottom right diagonal objective card")
     @Test
     void checkTLBRDiagonalObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -236,6 +250,7 @@ class PlayerModelTest {
     @DisplayName("Different diagonal cases from top right to bottom left")
     @Test
     void checkTRBLDiagonalCases(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -335,6 +350,7 @@ class PlayerModelTest {
     @DisplayName("Different diagonal cases from top left to bottom right")
     @Test
     void checkTLBRDiagonal(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -434,6 +450,7 @@ class PlayerModelTest {
     @DisplayName("Test for the top right L shape objective card")
     @Test
     void checkTRLShapeObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -475,6 +492,7 @@ class PlayerModelTest {
     @DisplayName("Test for the top left L shape objective card")
     @Test
     void checkTLLShapeObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -516,6 +534,7 @@ class PlayerModelTest {
     @DisplayName("Test for the bottom right L shape objective card")
     @Test
     void checkBRLShapeObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
@@ -557,6 +576,7 @@ class PlayerModelTest {
     @DisplayName("Test for the bottom left L shape objective card")
     @Test
     void checkBLLShapeObjective(){
+        createPlayerModel();
         GameResources.initializeAllDecks();
         //Initialize the decks
         List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());

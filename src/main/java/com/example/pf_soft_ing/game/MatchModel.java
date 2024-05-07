@@ -11,6 +11,7 @@ import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
 import com.example.pf_soft_ing.player.PlayerState;
+import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.*;
 
@@ -34,10 +35,29 @@ public class MatchModel {
 
     private GameState gameState = GameState.PREGAME;
 
+    private List<TokenColors> tokenColors = new ArrayList<>(List.of(TokenColors.values()));
+
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
 
         this.matchID = matchID;
+    }
+
+    /**
+     * Method to get a random token color
+     * @return Token color
+     */
+    public TokenColors getTokenColor(){
+        Random rand = new Random();
+        int n = rand.nextInt(tokenColors.size());
+
+        while (tokenColors.get(n) == TokenColors.BLACK){
+            n = rand.nextInt(tokenColors.size());
+        }
+
+        TokenColors tokenColor = tokenColors.get(n);
+        tokenColors.remove(n);
+        return tokenColor;
     }
 
     /**
@@ -425,5 +445,24 @@ public class MatchModel {
 
             i++;
         }
+    }
+
+    public boolean checkForTurnOrderPhase() {
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getState() != PlayerState.COMPLETED_SETUP){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void startTurnOrderPhase() {
+        for (PlayerModel player : IDToPlayerMap.values()){
+            player.setState(PlayerState.WAITING);
+        }
+
+        setRandomFirstPlayer();
+
+        calculateOrderOfPlayers();
     }
 }

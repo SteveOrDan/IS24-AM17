@@ -65,6 +65,14 @@ public class ClientSocketReceiver {
                     castedMsg.getStarterCardID()
             );
 
+            case MissingSetupMsg castedMsg -> view.setMissingSetUp(
+                    castedMsg.getResourceCardID1(), castedMsg.getResourceCardID2(), castedMsg.getGoldenCardID(),
+                    castedMsg.getTokenColor(), castedMsg.getCommonObjectiveCardID1(), castedMsg.getCommonObjectiveCardID2(),
+                    castedMsg.getSecretObjectiveCardID1(), castedMsg.getSecretObjectiveCardID2()
+            );
+
+            case PlayerTurnMsg castedMsg -> view.showPlayerTurn(castedMsg.getPlayerID());
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

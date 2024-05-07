@@ -242,7 +242,7 @@ public class GameResources {
         }
 
         for (ObjectiveCard card : objectiveDeck) {
-            IDToObjectiveCardMap.put(card.getId(), card);
+            IDToObjectiveCardMap.put(card.getID(), card);
         }
     }
 

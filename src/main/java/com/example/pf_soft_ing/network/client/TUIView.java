@@ -80,4 +80,9 @@ public class TUIView implements View {
         System.out.println("New player joined: " + nicknames);
         System.out.println("Wait for players to join...");
     }
+
+    @Override
+    public void showPlayerTurn(int playerID) {
+
+    }
 }

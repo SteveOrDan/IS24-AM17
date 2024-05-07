@@ -6,6 +6,7 @@ public enum PlayerState {
     PRE_GAME,
     PLACING_STARTER,
     CHOOSING_OBJECTIVE,
+    COMPLETED_SETUP,
     WAITING,
     PLACING,
     DRAWING

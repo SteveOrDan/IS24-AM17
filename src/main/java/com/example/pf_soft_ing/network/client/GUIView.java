@@ -1240,10 +1240,16 @@ public class GUIView implements View {
     }
 
     @Override
-    public void setMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
+    public void setMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
+                                int commonObjectiveCardID1, int commonObjectiveCardID2,
+                                int secretObjectiveCardID1, int secretObjectiveCardID2) {
         Platform.runLater(() -> {
             // Clear temp choice pane and place starter card before proceeding
             tempChoicePane.getChildren().clear();
+
+            playerHand.add(resourceCardID1);
+            playerHand.add(resourceCardID2);
+            playerHand.add(goldenCardID);
 
             placeCard(starterCardID, starterCardSide, new Position(0, 0));
 
@@ -1271,6 +1277,11 @@ public class GUIView implements View {
 
     @Override
     public void showNewPlayer(String nicknames) {
+
+    }
+
+    @Override
+    public void showPlayerTurn(int playerID) {
 
     }
 }
