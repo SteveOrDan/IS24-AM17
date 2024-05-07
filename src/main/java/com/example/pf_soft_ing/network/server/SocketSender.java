@@ -83,4 +83,10 @@ public class SocketSender implements Sender {
     public void placeCard(boolean placed){
 //        SendMessage(STR."10 \{placed}");
     }
+
+    @Override
+    public void sendNewPlayer(String nickname) {
+
+    }
+
 }

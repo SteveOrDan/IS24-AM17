@@ -50,7 +50,7 @@ public class ClientRMISender implements ClientSender {
                         client.sendError("Error: CreateMatch takes exactly 2 arguments (num of players, nickname)");
                     }
                     else {
-                        createMatch(Integer.parseInt(parts[1]), parts[2]);
+                        serverInterface.createMatch(playerID, Integer.parseInt(parts[1]), parts[2]);
                     }
                     break;
 
@@ -59,7 +59,16 @@ public class ClientRMISender implements ClientSender {
                         client.sendError("Error: SelectMatch takes exactly 1 argument (match ID)");
                     }
                     else {
-                        selectMatch(Integer.parseInt(parts[1]));
+                        serverInterface.selectMatch(playerID, Integer.parseInt(parts[1]));
+                    }
+                    break;
+
+                case "ChooseNickname":
+                    if (parts.length != 2) {
+                        client.sendError("Error: ChooseNickname takes exactly 1 argument (nickname)");
+                    }
+                    else {
+                        serverInterface.chooseNickname(playerID, parts[1]);
                     }
                     break;
 
@@ -67,7 +76,7 @@ public class ClientRMISender implements ClientSender {
                     System.exit(0);
 
                 default:
-                    client.sendError("Error: " + command + " is not a valid command");
+                    client.sendError("Error: " + command + " is not a valid command. Please try again.");
             }
         }
         catch (RemoteException e) {
@@ -107,7 +116,12 @@ public class ClientRMISender implements ClientSender {
 
     @Override
     public void chooseNickname(String nickname) {
-
+        try {
+            serverInterface.chooseNickname(playerID, nickname);
+        }
+        catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override

@@ -10,7 +10,8 @@ public class TUIView implements View {
     @Override
     public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
-            System.out.println("No matches available");
+            System.out.println("No matches available.");
+            System.out.println("To create a new match type CreateMatch, number of players and nickname.");
             return;
         }
 
@@ -19,27 +20,32 @@ public class TUIView implements View {
             System.out.println("\tMatch with ID " + entry.getKey() + " and players:");
             System.out.println("\t\t- " + entry.getValue());
         }
+        System.out.println("To create a new match type CreateMatch, number of players and nickname.");
+        System.out.println("To join a match type SelectMatch and MatchID.");
     }
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
+        System.out.println("Wait for players to join...");
     }
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
-        System.out.println("Match selected with ID: " + matchID + " and players:");
-
-        int i = 1;
-        for (String nickname : nicknames) {
-            if (nickname == null){
-                System.out.println("\t- Player " + i);
-                i++;
-            }
-            else{
-                System.out.println("\t- " + nickname);
-            }
-        }
+//        System.out.println("Match selected with ID: " + matchID + " and players:");
+//
+//        int i = 1;
+//        for (String nickname : nicknames) {
+//            if (nickname == null){
+//                System.out.println("\t- Player " + i);
+//                i++;
+//            }
+//            else{
+//                System.out.println("\t- " + nickname);
+//            }
+//        }
+        System.out.println("Match selected with ID: " + matchID);
+        System.out.println("Type ChooseNickname and the nickname");
     }
 
     @Override
@@ -51,7 +57,7 @@ public class TUIView implements View {
     public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
-
+        System.out.println("Game started.");
     }
 
     @Override
@@ -67,5 +73,11 @@ public class TUIView implements View {
     @Override
     public void errorMessage(String message) {
         System.out.println(message);
+    }
+
+    @Override
+    public void showNewPlayer(String nicknames) {
+        System.out.println("New player joined: " + nicknames);
+        System.out.println("Wait for players to join...");
     }
 }

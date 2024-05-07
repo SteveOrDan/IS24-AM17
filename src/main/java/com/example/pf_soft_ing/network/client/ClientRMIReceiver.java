@@ -116,4 +116,19 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     public void createMatchResult(int matchID, String hostNickname) throws RemoteException {
         view.createMatch(matchID, hostNickname);
     }
+
+    @Override
+    public void chooseNicknameResult(String nickname) throws RemoteException {
+        view.chooseNickname(nickname);
+    }
+
+    @Override
+    public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException {
+        view.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+    }
+
+    @Override
+    public void showNewPlayer(String nickname) throws RemoteException {
+        view.showNewPlayer(nickname);
+    }
 }

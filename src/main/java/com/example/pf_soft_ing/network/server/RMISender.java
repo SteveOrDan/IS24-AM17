@@ -52,20 +52,29 @@ public class RMISender implements Sender {
 
     @Override
     public void chooseNicknameResult(String nickname) {
-
+        try {
+            client.chooseNicknameResult(nickname);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Nickname is not avaiable");
+        }
     }
 
     @Override
     public void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
-
+        try {
+            client.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Game not started");
+        }
     }
 
     /**
      * Method to place starter card
      * @param placed boolean
      */
+    @Override
     public void placeStarterCard(boolean placed){
         try {
             client.placeStarterCard(placed);
@@ -79,12 +88,22 @@ public class RMISender implements Sender {
      * Method to place a card
      * @param placed boolean
      */
+    @Override
     public void placeCard(boolean placed){
         try {
             client.placeCard(placed);
         }
         catch (RemoteException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void sendNewPlayer(String nickname) {
+        try {
+            client.showNewPlayer(nickname);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
         }
     }
 }

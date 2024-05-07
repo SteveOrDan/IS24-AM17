@@ -47,4 +47,11 @@ public interface ClientRMIInterface extends Remote {
     void selectMatchResult(int matchID, List<String> nicknames) throws RemoteException;
 
     void createMatchResult(int matchID, String hostNickname) throws RemoteException;
+
+    void chooseNicknameResult(String hostNickname) throws RemoteException;
+    void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                   int starterCardID) throws RemoteException;
+
+    void showNewPlayer(String nickname) throws RemoteException;
 }

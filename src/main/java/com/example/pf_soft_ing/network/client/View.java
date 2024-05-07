@@ -26,4 +26,5 @@ public interface View {
     void confirmSecretObjective(int secretObjectiveCardID);
 
     void errorMessage(String errorMessage);
+    void showNewPlayer(String nicknames);
 }

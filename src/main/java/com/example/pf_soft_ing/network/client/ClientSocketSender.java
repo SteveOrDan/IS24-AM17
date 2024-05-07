@@ -36,30 +36,30 @@ public class ClientSocketSender implements ClientSender {
         return switch (command) {
             case "GetMatches" -> {
                 if (parts.length != 1) {
-                    yield new ErrorMessage("Error: GetMatches does not take any arguments");
+                    yield new ErrorMessage("Error: GetMatches does not take any arguments. Please try again.");
                 }
                 yield new GetMatchesMsg();
             }
             case "CreateMatch" -> {
                 if (parts.length != 3) {
-                    yield new ErrorMessage("Error: CreateMatch takes exactly 2 arguments (num of players, nickname)");
+                    yield new ErrorMessage("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
                 }
                 yield new CreateMatchMsg(Integer.parseInt(parts[1]), parts[2]);
             }
             case "SelectMatch" -> {
                 if (parts.length != 2) {
-                    yield new ErrorMessage("Error: SelectMatch takes exactly 1 argument (match ID)");
+                    yield new ErrorMessage("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
                 }
                 yield new SelectMatchMsg(Integer.parseInt(parts[1]));
             }
             case "ChooseNickname" -> {
                 if (parts.length != 2) {
-                    yield new ErrorMessage("Error: ChooseNickname takes exactly 1 argument (nickname)");
+                    yield new ErrorMessage("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
                 }
                 yield new ChooseNicknameMsg(parts[1]);
             }
             case "exit", "quit" -> new CloseConnectionMsg();
-            default -> new ErrorMessage("Error: " + command + " is not a valid command");
+            default -> new ErrorMessage("Error: " + command + " is not a valid command. Please, try again");
         };
     }
 

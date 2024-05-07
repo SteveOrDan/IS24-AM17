@@ -36,4 +36,6 @@ public interface Sender {
      * @param placed boolean
      */
     void placeCard(boolean placed);
+
+    void sendNewPlayer(String nickname);
 }

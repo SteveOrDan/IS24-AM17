@@ -1268,4 +1268,9 @@ public class GUIView implements View {
     public void errorMessage(String errorMessage) {
         Platform.runLater(() -> showError(errorMessage));
     }
+
+    @Override
+    public void showNewPlayer(String nicknames) {
+
+    }
 }
