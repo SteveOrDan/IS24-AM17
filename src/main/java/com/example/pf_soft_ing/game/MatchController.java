@@ -87,7 +87,7 @@ public class MatchController implements Serializable {
     }
 
     /**
-     * Set the visible cards for the game
+     * Set the common objective cards for the game
      */
     public void setCommonObjectives(){
         matchModel.getObjectiveCardsDeck().setCommonObjectives();

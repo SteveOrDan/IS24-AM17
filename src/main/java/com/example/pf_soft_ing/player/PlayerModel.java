@@ -290,11 +290,14 @@ public class PlayerModel {
                 throw new PositionAlreadyTakenException();
             }
 
-            if(!card.hasEnoughRequiredResources(numOfResourcesArr, card.getCurrSide())){
+            if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
                 throw new MissingResourcesException();
             }
 
             ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
+
+            // Set chosen side
+            card.setCurrSideType(chosenSide);
 
             // Remove resources of covered corners
             for (CardCorner corner : adjacentCorners){
@@ -309,7 +312,7 @@ public class PlayerModel {
             }
 
             // Add card points
-            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSide());
+            currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSideType());
 
             // Set card priority
             card.setPriority(currMaxPriority);
@@ -321,9 +324,6 @@ public class PlayerModel {
 
             // Remove card from hand
             hand.remove(card);
-
-            // Set chosen side
-            card.setCurrSideType(chosenSide);
 
             state = PlayerState.DRAWING;
         }

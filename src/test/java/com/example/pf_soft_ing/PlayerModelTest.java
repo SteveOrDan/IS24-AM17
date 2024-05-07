@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.CardNotPlacedException;
 import com.example.pf_soft_ing.exceptions.StarterCardNotSetException;
 import com.example.pf_soft_ing.game.*;
@@ -56,7 +57,7 @@ class PlayerModelTest {
     @Test
     void placeStarterCard() {
         playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard(starterFront1);
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         assertEquals(0, playerModel.getCurrScore());
         assertEquals(1, playerModel.getNumOfResourcesArr()[ResourceType.INSECT.getValue()]);
@@ -71,13 +72,13 @@ class PlayerModelTest {
     void placeCardInValidPos() {
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard(starterFront1);
+        playerModel.placeStarterCard(CardSideType.FRONT);
         assertEquals(0, playerModel.getCurrScore());
 
         //Now place a card in a valid position
         Position pos = new Position(1,1);
         try {
-            playerModel.placeCard(normalCard, pos, normalFront);
+            playerModel.placeCard(normalCard, pos, CardSideType.FRONT);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -92,7 +93,7 @@ class PlayerModelTest {
     void placeCardInInvalidPos() {
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard(starterFront1);
+        playerModel.placeStarterCard(CardSideType.FRONT);
         assertEquals(0, playerModel.getCurrScore());
 
         //Now place a card in a valid position
@@ -101,9 +102,9 @@ class PlayerModelTest {
         Position pos3 = new Position(-1,-1);
 
         try {
-            playerModel.placeCard(normalCard, pos1, normalFront);
-            playerModel.placeCard(normalCard, pos2, normalFront);
-            playerModel.placeCard(normalCard, pos3, normalFront);
+            playerModel.placeCard(normalCard, pos1, CardSideType.FRONT);
+            playerModel.placeCard(normalCard, pos2, CardSideType.FRONT);
+            playerModel.placeCard(normalCard, pos3, CardSideType.FRONT);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -134,11 +135,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 3 fungi resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
@@ -147,9 +144,9 @@ class PlayerModelTest {
 
         //Place the resource cards
         try {
-            playerModel.placeCard(resourceCard1, new Position(-1, 1), resourceCard1.getBack());
-            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
-            playerModel.placeCard(resourceCard3, new Position(-2, 0), resourceCard3.getBack());
+            playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK);
+            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
+            playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -160,9 +157,9 @@ class PlayerModelTest {
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
 
         try {
-            playerModel.placeCard(goldenCard1, new Position(1, -1), goldenCard1.getBack());
-            playerModel.placeCard(goldenCard2, new Position(2, 0), goldenCard2.getBack());
-            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
+            playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK);
+            playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK);
+            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -195,11 +192,8 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().front);
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
+
 
         //Use 3 plant resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
@@ -208,9 +202,9 @@ class PlayerModelTest {
 
         //Place the resource cards
         try {
-            playerModel.placeCard(resourceCard1, new Position(1, 1), resourceCard1.getBack());
-            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
-            playerModel.placeCard(resourceCard3, new Position(2, 0), resourceCard3.getBack());
+            playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK);
+            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
+            playerModel.placeCard(resourceCard3, new Position(2, 0), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -221,9 +215,9 @@ class PlayerModelTest {
         GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
 
         try {
-            playerModel.placeCard(goldenCard1, new Position(-1, -1), goldenCard1.getBack());
-            playerModel.placeCard(goldenCard2, new Position(-2, 0), goldenCard2.getBack());
-            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
+            playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK);
+            playerModel.placeCard(goldenCard2, new Position(-2, 0), CardSideType.BACK);
+            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -256,11 +250,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 6 fungi resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
@@ -272,10 +262,10 @@ class PlayerModelTest {
 
         //Place the resource cards
         try {
-            playerModel.placeCard(resourceCard1, new Position(-1, 1), resourceCard1.getBack());
-            playerModel.placeCard(resourceCard2, new Position(0, 2), resourceCard2.getBack());
-            playerModel.placeCard(resourceCard3, new Position(-2, 0), resourceCard3.getBack());
-            playerModel.placeCard(resourceCard4, new Position(1, 3), resourceCard4.getBack());
+            playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK);
+            playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK);
+            playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK);
+            playerModel.placeCard(resourceCard4, new Position(1, 3), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -289,10 +279,10 @@ class PlayerModelTest {
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(25);
 
         try {
-            playerModel.placeCard(goldenCard1, new Position(1, -1), goldenCard1.getBack());
-            playerModel.placeCard(goldenCard2, new Position(2, 0), goldenCard2.getBack());
-            playerModel.placeCard(goldenCard3, new Position(0, -2), goldenCard3.getBack());
-            playerModel.placeCard(goldenCard4, new Position(3, 1), goldenCard4.getBack());
+            playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK);
+            playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK);
+            playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK);
+            playerModel.placeCard(goldenCard4, new Position(3, 1), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -309,8 +299,8 @@ class PlayerModelTest {
 
         //Place a fifth card in the diagonal
         try {
-            playerModel.placeCard(resourceCard5, new Position(-3, -1), resourceCard5.getBack());
-            playerModel.placeCard(goldenCard5, new Position(4,2), goldenCard5.getBack());
+            playerModel.placeCard(resourceCard5, new Position(-3, -1), CardSideType.BACK);
+            playerModel.placeCard(goldenCard5, new Position(4,2), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -326,8 +316,8 @@ class PlayerModelTest {
 
         //Place a sixth card in the diagonal
         try {
-            playerModel.placeCard(resourceCard6, new Position(-4, -2), resourceCard6.getBack());
-            playerModel.placeCard(goldenCard6, new Position(5,3), goldenCard6.getBack());
+            playerModel.placeCard(resourceCard6, new Position(-4, -2), CardSideType.BACK);
+            playerModel.placeCard(goldenCard6, new Position(5,3), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -359,11 +349,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 6 plant resource cards and flip them
         ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
@@ -375,10 +361,10 @@ class PlayerModelTest {
 
         //Place the resource cards
         try {
-            playerModel.placeCard(resourceCard1, new Position(1, 1), resourceCard1.getBack());
-            playerModel.placeCard(resourceCard2, new Position(2, 0), resourceCard2.getBack());
-            playerModel.placeCard(resourceCard3, new Position(3, -1), resourceCard3.getBack());
-            playerModel.placeCard(resourceCard4, new Position(4, -2), resourceCard4.getBack());
+            playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK);
+            playerModel.placeCard(resourceCard2, new Position(2, 0), CardSideType.BACK);
+            playerModel.placeCard(resourceCard3, new Position(3, -1), CardSideType.BACK);
+            playerModel.placeCard(resourceCard4, new Position(4, -2), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -392,10 +378,10 @@ class PlayerModelTest {
         GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(35);
 
         try {
-            playerModel.placeCard(goldenCard1, new Position(-1, -1), goldenCard1.getBack());
-            playerModel.placeCard(goldenCard2, new Position(0, -2), goldenCard2.getBack());
-            playerModel.placeCard(goldenCard3, new Position(1, -3), goldenCard3.getBack());
-            playerModel.placeCard(goldenCard4, new Position(2, -4), goldenCard4.getBack());
+            playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK);
+            playerModel.placeCard(goldenCard2, new Position(0, -2), CardSideType.BACK);
+            playerModel.placeCard(goldenCard3, new Position(1, -3), CardSideType.BACK);
+            playerModel.placeCard(goldenCard4, new Position(2, -4), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -412,8 +398,8 @@ class PlayerModelTest {
 
         //Place a fifth card in the diagonal
         try {
-            playerModel.placeCard(resourceCard5, new Position(5, -3), resourceCard5.getBack());
-            playerModel.placeCard(goldenCard5, new Position(3,-5), goldenCard5.getBack());
+            playerModel.placeCard(resourceCard5, new Position(5, -3), CardSideType.BACK);
+            playerModel.placeCard(goldenCard5, new Position(3,-5), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -429,8 +415,8 @@ class PlayerModelTest {
 
         //Place a sixth card in the diagonal
         try {
-            playerModel.placeCard(resourceCard6, new Position(6, -4), resourceCard6.getBack());
-            playerModel.placeCard(goldenCard6, new Position(4,-6), goldenCard6.getBack());
+            playerModel.placeCard(resourceCard6, new Position(6, -4), CardSideType.BACK);
+            playerModel.placeCard(goldenCard6, new Position(4,-6), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -462,11 +448,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 fungi golden card and 2 animal resource cards and flip them
         PlaceableCard mainCard = goldenDeck.getFirst();
@@ -475,9 +457,9 @@ class PlayerModelTest {
 
         //Place the cards
         try {
-            playerModel.placeCard(card1, new Position(1, 1), card1.getBack());
-            playerModel.placeCard(mainCard, new Position(2,2), mainCard.getBack());
-            playerModel.placeCard(card2, new Position(1,-1), card2.getBack());
+            playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK);
+            playerModel.placeCard(mainCard, new Position(2,2), CardSideType.BACK);
+            playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -507,11 +489,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 animal golden card and 2 insect resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(20);
@@ -520,9 +498,9 @@ class PlayerModelTest {
 
         //Place the cards
         try {
-            playerModel.placeCard(card1, new Position(-1, 1), card1.getBack());
-            playerModel.placeCard(mainCard, new Position(-2,2), mainCard.getBack());
-            playerModel.placeCard(card2, new Position(-1,-1), card2.getBack());
+            playerModel.placeCard(card1, new Position(-1, 1), CardSideType.BACK);
+            playerModel.placeCard(mainCard, new Position(-2,2), CardSideType.BACK);
+            playerModel.placeCard(card2, new Position(-1,-1), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -552,11 +530,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 plant golden card and 2 fungi resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(10);
@@ -565,9 +539,9 @@ class PlayerModelTest {
 
         //Place the cards
         try {
-            playerModel.placeCard(card1, new Position(1, -1), card1.getBack());
-            playerModel.placeCard(mainCard, new Position(2,-2), mainCard.getBack());
-            playerModel.placeCard(card2, new Position(1,1), card2.getBack());
+            playerModel.placeCard(card1, new Position(1, -1), CardSideType.BACK);
+            playerModel.placeCard(mainCard, new Position(2,-2), CardSideType.BACK);
+            playerModel.placeCard(card2, new Position(1,1), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }
@@ -597,11 +571,7 @@ class PlayerModelTest {
         playerModel.setStarterCard(starterDeck.getFirst());
 
         //Place the starter card
-        try {
-            playerModel.placeStarterCard(playerModel.getStarterCard().getFront());
-        } catch (StarterCardNotSetException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 fungus golden card and 2 animal resource cards and flip them
         PlaceableCard mainCard = goldenDeck.get(30);
@@ -610,9 +580,9 @@ class PlayerModelTest {
 
         //Place the cards
         try {
-            playerModel.placeCard(card1, new Position(-1, -1), card1.getBack());
-            playerModel.placeCard(mainCard, new Position(-2,-2), mainCard.getBack());
-            playerModel.placeCard(card2, new Position(-1,1), card2.getBack());
+            playerModel.placeCard(card1, new Position(-1, -1), CardSideType.BACK);
+            playerModel.placeCard(mainCard, new Position(-2,-2), CardSideType.BACK);
+            playerModel.placeCard(card2, new Position(-1,1), CardSideType.BACK);
         } catch (CardNotPlacedException e) {
             System.out.println(e.getMessage());
         }

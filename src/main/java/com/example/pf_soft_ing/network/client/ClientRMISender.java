@@ -50,7 +50,7 @@ public class ClientRMISender implements ClientSender {
                         client.sendError("Error: CreateMatch takes exactly 2 arguments (num of players, nickname)");
                     }
                     else {
-                        serverInterface.createMatch(playerID, Integer.parseInt(parts[1]), parts[2]);
+                        createMatch(Integer.parseInt(parts[1]), parts[2]);
                     }
                     break;
 
@@ -59,7 +59,7 @@ public class ClientRMISender implements ClientSender {
                         client.sendError("Error: SelectMatch takes exactly 1 argument (match ID)");
                     }
                     else {
-                        serverInterface.selectMatch(playerID, Integer.parseInt(parts[1]));
+                        selectMatch(Integer.parseInt(parts[1]));
                     }
                     break;
 

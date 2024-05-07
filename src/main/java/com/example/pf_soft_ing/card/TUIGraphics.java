@@ -184,7 +184,7 @@ public class TUIGraphics {
 
         if (side.equals("front")) {
             if (card.getPoints() == 0) {
-                if (card.isPointPerResource) {
+                if (card.isPointPerResource()) {
                     ResourceType res = card.getPointPerResourceRes();
                     C = "1 " + res.getColor() + res + CC.RESET;
                 }

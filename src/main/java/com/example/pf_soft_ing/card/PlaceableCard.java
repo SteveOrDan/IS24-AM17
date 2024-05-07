@@ -7,19 +7,17 @@ import java.util.List;
 
 public abstract class PlaceableCard {
 
-    // Todo: set public attributes to private with due corrections
+    private String cardType;
 
-    public String cardType;
+    private final int ID;
 
-    public final int ID;
-
-    public final CardElementType elementType;
+    private final CardElementType elementType;
 
     private int priority;
 
     private CardSideType currSide = CardSideType.FRONT;
-    public final Side front;
-    public final Side back;
+    private final Side front;
+    private final Side back;
 
     public PlaceableCard(CardElementType element, int ID, Side front, Side back){
         this.priority = 0;
@@ -32,6 +30,10 @@ public abstract class PlaceableCard {
     @Override
     public String toString(){
         return "Placeable card";
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 
     /**
@@ -108,7 +110,7 @@ public abstract class PlaceableCard {
         return chosenSide.getResources();
     }
 
-    public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide);
+    public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr, CardSideType chosenSide);
 
-    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side chosenSide);
+    public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, CardSideType chosenSide);
 }

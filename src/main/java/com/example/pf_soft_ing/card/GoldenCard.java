@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.card;
 
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 
 import java.util.HashMap;
@@ -9,12 +10,12 @@ public class GoldenCard extends PlaceableCard{
     private static final int pointsPerResource = 1;
     private static final int pointsPerCoveredCorner = 2;
 
-    public final boolean isPointPerResource;
-    public final ResourceType pointPerResourceRes;
+    private final boolean isPointPerResource;
+    private final ResourceType pointPerResourceRes;
 
-    public final HashMap<ResourceType, Integer> requiredResources;
+    private final HashMap<ResourceType, Integer> requiredResources;
 
-    public final int points;
+    private final int points;
 
     public GoldenCard(CardElementType elementType, int id, Side front, Side back, int points, HashMap<ResourceType, Integer> requiredResources, boolean isPointPerResource, ResourceType pointPerResourceRes) {
         super(elementType, id, front, back);
@@ -24,7 +25,7 @@ public class GoldenCard extends PlaceableCard{
         this.isPointPerResource = isPointPerResource;
         this.pointPerResourceRes = pointPerResourceRes;
 
-        this.cardType = "GoldenCard";
+        setCardType("GoldenCard");
     }
 
     /**
@@ -52,13 +53,21 @@ public class GoldenCard extends PlaceableCard{
     }
 
     /**
+     * Getter
+     * @return True if the card gives points per resource
+     */
+    public boolean isPointPerResource() {
+        return isPointPerResource;
+    }
+
+    /**
      * Checks if the player has enough resources to place the card
      * @param numOfResourcesArr Array containing the number of resources of the player per type
      * @return True if the player has enough resources to place the card
      */
     @Override
-    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, Side chosenSide){
-        if (chosenSide.equals(front)) {
+    public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, CardSideType chosenSide){
+        if (chosenSide.equals(CardSideType.FRONT)) {
             for (ResourceType res : requiredResources.keySet()) {
                 if (numOfResourcesArr[res.getValue()] < requiredResources.get(res)) {
                     return false;
@@ -75,8 +84,8 @@ public class GoldenCard extends PlaceableCard{
      * @return Points given by the card placement
      */
     @Override
-    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, Side currSide){
-        if (currSide.equals(front)) {
+    public int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, CardSideType currSide){
+        if (currSide.equals(CardSideType.FRONT)) {
             if (points == 0) {
                 if (isPointPerResource) {
                     return numOfResourcesArr[pointPerResourceRes.getValue()] * pointsPerResource;
