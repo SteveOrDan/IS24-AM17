@@ -2024,3 +2024,187 @@ sequenceDiagram
     Note left of C: Client: Update view
 
 ```
+
+New Start socket connection sequence diagram
+
+```mermaid
+sequenceDiagram
+    title Start socket connection sequence diagram
+
+    participant C as ClientMain
+    participant Cn as Client Receiver / Client Sender
+    participant D as Decoder / Sender
+    participant G as GameController
+    participant M as MatchController
+    participant S as ServerMain
+
+    Note right of S: Server: Server starts and creates Game Controller
+    
+    S->>D : Decoder.setGameController(gameController) 
+
+    Note left of C: Client: Client
+    C->>S  : socket(hostName, portNumber)
+    S->>D : executor.submit(SocketReceiver(socket, GameController))
+
+    Note right of G: Server: Creates PlayerID
+
+    Note left of C: Client: If there is a failure thow exception
+
+    C->>Cn: getMatches()
+
+    Cn-->>D: getMatches()
+    D->>G: getMatches()
+    
+    G->>D : sendMatches(matches, playerID)
+    D-->>Cn : sendMatches(matches, playerID)
+
+    Note left of Cn: Client: Update view
+    Note left of Cn: Client: Ask "new match or join"
+    Note left of Cn: Client: Input validation
+
+    alt Create game
+
+        Cn-->>D: createMatch(numbersOfPlayers, nickname)
+
+        D->>G: createMatch(playerID, numbersOfPlayers, nickname)
+
+        Note right of G: Server: Creates a new match with hostNickname
+
+        alt Success
+        G->>D: createMatchResult(matchID, hostNickname)
+        D-->>Cn: createMatchResult(matchID, hostNickname)
+        else Failure
+        G->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+    
+    end
+
+
+    else SelectMatch
+
+        Cn-->>D: selectMatch(matchID)
+        D->>G : selectMatch(matchID)
+        Note right of G: Server: Searches match with matchID and select MatchController
+
+        alt Success
+        G->>D: selectMatchResult(matchID, nicknames)
+        D->>Cn: selectMatchResult(matchID, nicknames)
+        else Failure
+        G->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+    end
+
+    end
+
+    Note left of Cn: Client: Update view
+    Note left of Cn: Client: Ask "nickname"
+
+    Cn-->>D: chooseNickname(nickname)
+
+    D->>M: chooseNickname(nickname)
+    Note right of M: Server: Check nicknames
+    
+    
+    alt Success
+        
+        M->>D: chooseNickname(nickname)
+        D-->>Cn : chooseNickname(nickname)
+    else Failure
+        M->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+        Note left of Cn: Client Back to: Ask "nickname"
+    end
+    
+    Note right of M: Server: Wait for all players
+```
+
+New Start RMI connection sequence diagram
+
+```mermaid
+sequenceDiagram
+    title Start RMI connection sequence diagram
+
+    participant C as ClientMain
+    participant Cn as Client Receiver / Client Sender
+    participant D as Receiver/ Sender
+    participant G as GameController
+    participant M as MatchController
+    participant S as ServerMain
+
+    Note right of S: Server: Server starts and creates Game Controller
+    
+    S->>D : new RMIServer(gameController)
+
+    Note left of C: Client: Client starts 
+
+
+    Note left of C: Client: If there is a failure thow exception
+
+    C->>Cn: getMatches(client)
+
+    Cn-->>D: getMatches(client)
+
+    D->>G: getMatches()
+    Note right of G: Server: Creates PlayerID
+    G->>D : sendMatches(matches, playerID) 
+    D-->>Cn : sendMatches(matches, playerID)
+
+    Note left of Cn: Client: Update view
+    Note left of Cn: Client: Ask "new match or join"
+    Note left of Cn: Client: Input validation
+
+    alt Create game
+
+        Cn-->>D: createMatch(numberOfPlayers, nickname)
+
+        D->>G: createMatch(playerID, numbersOfPlayers, nickname)
+
+        Note right of G: Server: Creates a new match with hostNickname
+
+        alt Success
+        G->>D: createMatchResult(matchID, hostNickname)
+        D-->>Cn: createMatchResult(matchID, hostNickname)
+        else Failure
+        G->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+    
+    end
+
+
+    else SelectMatch
+
+        Cn-->>D: selectMatch(matchID)
+        D->>G : selectMatch(matchID)
+        Note right of G: Server: Searches match with matchID and select MatchController
+
+        alt Success
+        G->>D: selectMatchResult(matchID, nicknames)
+        D->>Cn: selectMatchResult(matchID, nicknames)
+        else Failure
+        G->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+    end
+
+    end
+
+    Note left of Cn: Client: Update view
+    Note left of Cn: Client: Ask "nickname"
+
+    Cn-->>D: chooseNickname(nickname)
+
+    D->>M: chooseNickname(nickname)
+    Note right of M: Server: Check nicknames
+    
+    
+    alt Success
+        
+        M->>D: chooseNicknameResult(nickname)
+        D-->>Cn : chooseNicknameResult(nickname)
+    else Failure
+        M->>D: sendError(errorMsg)
+        D-->>Cn: sendError(String errorMsg)
+        Note left of Cn: Client Back to: Ask "nickname"
+    end
+    
+    Note right of M: Server: Wait for all players
+```
