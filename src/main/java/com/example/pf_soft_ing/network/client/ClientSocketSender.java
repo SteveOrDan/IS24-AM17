@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 
 public class ClientSocketSender implements ClientSender {
 
+    private int playerID;
     private final ObjectOutputStream out;
     private final BufferedReader stdIn;
 
@@ -64,6 +65,11 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
+    }
+
+    @Override
     public void startInputReading() {
         new Thread(() -> {
             while (true) {
@@ -113,8 +119,8 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(int cardID, CardSideType side) {
-        sendMessage(new PlaceStarterCardMsg(cardID, side));
+    public void placeStarterCard(CardSideType side) {
+        sendMessage(new PlaceStarterCardMsg(side));
     }
 
     @Override

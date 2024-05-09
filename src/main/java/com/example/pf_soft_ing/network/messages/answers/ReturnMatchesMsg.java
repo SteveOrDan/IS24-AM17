@@ -9,8 +9,11 @@ public class ReturnMatchesMsg extends Message {
 
     private final Map<Integer, List<String>> matches;
 
-    public ReturnMatchesMsg(Map<Integer, List<String>> matches) {
+    private final int playerID;
+
+    public ReturnMatchesMsg(Map<Integer, List<String>> matches, int playerID) {
         this.matches = matches;
+        this.playerID = playerID;
     }
 
     /**
@@ -18,6 +21,13 @@ public class ReturnMatchesMsg extends Message {
      */
     public Map<Integer, List<String>> getMatches() {
         return matches;
+    }
+
+    /**
+     * @return playerID
+     */
+    public int getPlayerID() {
+        return playerID;
     }
 
     @Override

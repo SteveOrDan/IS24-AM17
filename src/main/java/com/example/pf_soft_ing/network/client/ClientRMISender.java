@@ -21,6 +21,10 @@ public class ClientRMISender implements ClientSender {
         this.client = client;
     }
 
+    public void setPlayerID(int playerID) {
+        this.playerID = playerID;
+    }
+
     @Override
     public void startInputReading() {
         new Thread(() -> {
@@ -87,7 +91,7 @@ public class ClientRMISender implements ClientSender {
     @Override
     public void getMatches() {
         try {
-            playerID = serverInterface.getMatches(client);
+            serverInterface.getMatches(client);
         }
         catch (RemoteException e) {
             System.out.println("Connection to server lost");
@@ -125,13 +129,21 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(int cardID, CardSideType side) {
-
+    public void placeStarterCard(CardSideType side) {
+        try {
+            serverInterface.placeStarterCard(playerID, side);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void chooseSecretObjective(int cardID) {
-
+        try {
+            serverInterface.chooseSecretObj(playerID, cardID);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override

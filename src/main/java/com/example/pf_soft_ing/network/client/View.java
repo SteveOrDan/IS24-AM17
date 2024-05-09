@@ -7,6 +7,8 @@ import java.util.Map;
 
 public interface View {
 
+    void setSender(ClientSender sender);
+
     void showMatches(Map<Integer, List<String>> matches);
 
     void createMatch(int matchID, String hostNickname);
@@ -29,4 +31,6 @@ public interface View {
     void showNewPlayer(String nicknames);
 
     void showPlayerTurn(int playerID);
+
+    void setID(int playerID);
 }

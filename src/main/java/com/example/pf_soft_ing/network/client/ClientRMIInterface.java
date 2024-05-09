@@ -10,7 +10,7 @@ import java.util.Map;
 
 public interface ClientRMIInterface extends Remote {
     // server su client
-    void showMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException;
+    void showMatches(Map<Integer, List<String>> matchesNicknames, int playerID) throws RemoteException;
 
     void failedMatch(Map<Integer, List<String>> matchesNicknames) throws RemoteException;
 
@@ -19,8 +19,6 @@ public interface ClientRMIInterface extends Remote {
     void addNickname(Integer playerID, String nickname, Map<Integer, String> opponents) throws RemoteException;
 
     void failedNickname(List<String> nicknames) throws RemoteException;
-
-    void sendID(int id) throws RemoteException;
 
     void setState(PlayerState state) throws RemoteException;
 
@@ -52,6 +50,8 @@ public interface ClientRMIInterface extends Remote {
     void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
+
+    void sendPlayerTurn(int playerID) throws RemoteException;
 
     void showNewPlayer(String nickname) throws RemoteException;
 }

@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.exceptions.*;
 
@@ -19,11 +20,11 @@ public class GameController {
     }
 
     /**
-     * Getter
-     * @return Map of match IDs with the corresponding nicknames
+     * Sender
+     * @send Map of match IDs with the corresponding nicknames to client
      */
-    public Map<Integer, List<String>> getMatches() {
-        return gameModel.getMatches();
+    public void getMatches(int playerID) {
+        gameModel.getIDToPlayers().get(playerID).getSender().sendMatches(gameModel.getMatches(), playerID);
     }
 
     /**
@@ -33,9 +34,16 @@ public class GameController {
      * @param nickname Nickname of the host player
      * @throws InvalidNumOfPlayersException If the number of players is not between 2 and 4
      */
-    public MatchController createMatch(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayersException, InvalidPlayerStateException, GameIsFullException {
+    public void createMatch(int playerID, int numberOfPlayers, String nickname) {
         // Creates a new match in the game model
-        return gameModel.createGame(playerID, numberOfPlayers, nickname);
+        try {
+            MatchController matchController = gameModel.createGame(playerID, numberOfPlayers, nickname);
+            gameModel.getIDToPlayers().get(playerID).getSender().createMatchResult(matchController.getMatchModel().getMatchID(), nickname);
+            //TODO synchronize on matchController
+        }
+        catch (InvalidNumOfPlayersException | InvalidPlayerStateException | GameIsFullException e) {
+            gameModel.getIDToPlayers().get(playerID).getSender().sendError(e.getMessage());
+        }
     }
 
     /**
@@ -45,9 +53,16 @@ public class GameController {
      * @param matchID ID of the match
      * @throws InvalidMatchIDException If the match ID is invalid
      */
-    public MatchController selectMatch(int playerID, int matchID) throws InvalidMatchIDException, GameIsFullException {
+    public void selectMatch(int playerID, int matchID) {
         // The player occupies a slot in the match (without a nickname)
-        return gameModel.selectMatch(playerID, matchID);
+        try {
+        MatchController matchController = gameModel.selectMatch(playerID, matchID);
+        gameModel.getIDToPlayers().get(playerID).getSender().selectMatchResult(matchController.getMatchModel().getMatchID(), matchController.getMatchModel().getNicknames());
+        //TODO synchronize on matchController
+        }
+        catch (InvalidMatchIDException | GameIsFullException e) {
+            gameModel.getIDToPlayers().get(playerID).getSender().sendError(e.getMessage());
+        }
     }
 
     /**
@@ -57,9 +72,40 @@ public class GameController {
      * @throws InvalidMatchIDException If the match ID doesn't exists
      * @throws NicknameAlreadyExistsException If the nickname is already taken by another player in the same match
      */
-    public void chooseNickname(int playerID, String nickname) throws InvalidMatchIDException, NicknameAlreadyExistsException {
+    public void chooseNickname(int playerID, String nickname, MatchController matchController) {
         // The player chooses a nickname for the match and is completely added to the match
-        gameModel.chooseNickname(playerID, nickname);
+        try {
+            gameModel.chooseNickname(playerID, nickname);
+
+            // if match reached max players, start the game ; else send the nickname to the player
+//                    MatchController matchController = gameController.getMatchWithPlayer(playerID);
+
+            if (checkForGameStart(matchController)) {
+                getGameModel().startGame(matchController);
+
+                List<PlaceableCard> visibleResCards = matchController.getVisibleResourceCards();
+                List<PlaceableCard> visibleGoldCards = matchController.getVisibleGoldenCards();
+
+                PlaceableCard resDeckCardID = matchController.getMatchModel().getResourceCardsDeck().getDeck().getFirst();
+                PlaceableCard goldDeckCardID = matchController.getMatchModel().getGoldenCardsDeck().getDeck().getFirst();
+
+                matchController.setCommonObjectives();
+
+                for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
+                    PlaceableCard starterCard = matchController.getMatchModel().drawStarterCard();
+
+                    matchController.getIDToPlayerMap().get(ID).setStarterCard(starterCard);
+
+                    getPlayerSender(ID).sendGameStart(resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                            goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(),
+                            starterCard.getID());
+                }
+            } else {
+                gameModel.getIDToPlayers().get(playerID).getSender().chooseNicknameResult(nickname);
+            }
+        }catch (InvalidMatchIDException | NicknameAlreadyExistsException e) {
+            gameModel.getIDToPlayers().get(playerID).getSender().sendError(e.getMessage());
+        }
     }
 
     /**

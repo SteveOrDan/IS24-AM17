@@ -49,7 +49,11 @@ public class ClientSocketReceiver {
 
     private void decodeMessage(Message message){
         switch (message) {
-            case ReturnMatchesMsg castedMsg -> view.showMatches(castedMsg.getMatches());
+
+            case ReturnMatchesMsg castedMsg -> {
+                view.setID(castedMsg.getPlayerID());
+                view.showMatches(castedMsg.getMatches());
+            }
 
             case MatchCreatedMsg castedMsg -> view.createMatch(castedMsg.getMatchID(), castedMsg.getHostNickname());
 

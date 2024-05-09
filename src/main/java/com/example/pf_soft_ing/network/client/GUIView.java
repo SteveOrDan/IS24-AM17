@@ -102,6 +102,16 @@ public class GUIView implements View {
         launchApp();
     }
 
+    @Override
+    public void setSender(ClientSender sender) {
+
+    }
+
+    @Override
+    public void setID(int playerID) {
+        sender.setPlayerID(playerID);
+    }
+
     private void launchApp(){
         stage.setTitle("Codex naturalis");
         root = new Group();
@@ -563,7 +573,7 @@ public class GUIView implements View {
         placeButton.setLayoutY((stageHeight + cardHeight) * 0.5);
         placeButton.setOnAction((_) -> {
             // Send the choice to the server
-            sender.placeStarterCard(starterCardID, starterCardSide);
+            sender.placeStarterCard(starterCardSide);
         });
 
         // Add all elements to the root

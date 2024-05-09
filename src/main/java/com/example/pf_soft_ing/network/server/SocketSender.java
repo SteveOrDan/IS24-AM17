@@ -40,8 +40,8 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendMatches(Map<Integer, List<String>> matches) {
-        sendMessage(new ReturnMatchesMsg(matches));
+    public void sendMatches(Map<Integer, List<String>> matches, int playerID) {
+        sendMessage(new ReturnMatchesMsg(matches, playerID));
     }
 
     @Override

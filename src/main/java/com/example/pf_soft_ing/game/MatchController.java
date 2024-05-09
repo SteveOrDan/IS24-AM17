@@ -4,8 +4,8 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
+import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -18,6 +18,10 @@ import java.util.List;
 public class MatchController implements Serializable {
 
     private final MatchModel matchModel;
+
+    private Sender getPlayerSender(int playerID){
+        return matchModel.getIDToPlayerMap().get(playerID).getSender();
+    }
 
     public MatchController(int maxPlayers, int matchID){
         matchModel = new MatchModel(maxPlayers, matchID);
@@ -85,6 +89,58 @@ public class MatchController implements Serializable {
      */
     public List<PlaceableCard> getVisibleGoldenCards(){
         return matchModel.getVisibleGoldenCards();
+    }
+
+    /**
+     * Setter
+     * Set the starter card's side
+     * @param playerID ID of the player
+     * @param side Side of the starter card
+     */
+    public void placeStarterCardForPlayer(int playerID, CardSideType side){
+        getIDToPlayerMap().get(playerID).placeStarterCard(side);
+
+        try {
+            List<Integer> hand = fillPlayerHand(playerID); // return cards
+            TokenColors color = setPlayerToken(playerID); // ret token color
+            List<Integer> commonObjectives = getCommonObjectivesID(); // ret common objectives
+            List<Integer> objToChoose = setObjectivesToChoose(playerID); // ret secret objectives
+
+            getPlayerSender(playerID).sendMissingSetup(hand.getFirst(), hand.get(1), hand.get(2), color, commonObjectives.getFirst(), commonObjectives.get(1), objToChoose.getFirst(), objToChoose.get(1));
+        }
+        catch (InvalidPlayerIDException | InvalidGameStateException | NotEnoughCardsException e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
+    }
+
+    /**
+     * Setter
+     * Set secret objective
+     * @param playerID ID of the player
+     * @param cardID ID of the secret objective card choose
+     */
+    public void setSecretObjectiveForPlayer(int playerID, int cardID){
+        try{
+            // Set secret objective
+            getIDToPlayerMap().get(playerID).setSecretObjective(cardID);
+
+            // Mark the player as ready (set up completed)
+            setPlayerEndedSetUp(playerID);
+
+            // If all players are ready, start the turn order phase
+            if (checkForTurnOrderPhase()) {
+                startTurnOrderPhase();
+
+                int currPlayerID = getCurrPlayerID();
+
+                for (Integer ID : getIDToPlayerMap().keySet()) {
+                    getPlayerSender(ID).sendPlayerTurn(currPlayerID);
+                }
+            }
+        }
+        catch (InvalidPlayerIDException | InvalidObjectiveCardException e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
     }
 
     /**

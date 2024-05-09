@@ -15,7 +15,8 @@ public interface Sender {
     /**
      * Method to return all the matches
      */
-    void sendMatches(Map<Integer, List<String>> matches);
+
+    void sendMatches(Map<Integer, List<String>> matches, int playerID);
 
     void createMatchResult(int matchID, String hostNickname);
 

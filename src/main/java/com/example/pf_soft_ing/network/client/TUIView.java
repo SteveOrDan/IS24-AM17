@@ -7,6 +7,17 @@ import java.util.Map;
 
 public class TUIView implements View {
 
+    private ClientSender sender;
+
+    public void setSender(ClientSender sender) {
+        this.sender = sender;
+    }
+
+    @Override
+    public void setID(int playerID) {
+        sender.setPlayerID(playerID);
+    }
+
     @Override
     public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
@@ -32,18 +43,6 @@ public class TUIView implements View {
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
-//        System.out.println("Match selected with ID: " + matchID + " and players:");
-//
-//        int i = 1;
-//        for (String nickname : nicknames) {
-//            if (nickname == null){
-//                System.out.println("\t- Player " + i);
-//                i++;
-//            }
-//            else{
-//                System.out.println("\t- " + nickname);
-//            }
-//        }
         System.out.println("Match selected with ID: " + matchID);
         System.out.println("Type ChooseNickname and the nickname");
     }

@@ -36,11 +36,15 @@ public class TUIApp {
                 }
 
                 if (connectionType.equals("1")) {
-                    sender = ClientMain.startSocket(ip[0], portNumber, new TUIView());
+                    View view = new TUIView();
+                    sender = ClientMain.startSocket(ip[0], portNumber, view);
+                    view.setSender(sender);
                     connected = true;
                 }
                 else {
-                    sender = ClientMain.startRMI(ip[0], portNumber, new TUIView());
+                    View view = new TUIView();
+                    sender = ClientMain.startRMI(ip[0], portNumber, view);
+                    view.setSender(sender);
                     connected = true;
                 }
             }

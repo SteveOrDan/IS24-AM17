@@ -23,7 +23,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void showMatches(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
+    public void showMatches(Map<Integer, List<String>> matchesNicknames, int playerID) throws RemoteException {
+        view.setID(playerID);
         view.showMatches(matchesNicknames);
     }
 
@@ -45,11 +46,6 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void failedNickname(List<String> nicknames) throws RemoteException {
 //        view.failedNickname(nicknames);
-    }
-
-    @Override
-    public void sendID(int id) throws RemoteException {
-
     }
 
     @Override
@@ -125,6 +121,11 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException {
         view.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+    }
+
+    @Override
+    public void sendPlayerTurn(int playerID) throws RemoteException {
+        view.showPlayerTurn(playerID);
     }
 
     @Override

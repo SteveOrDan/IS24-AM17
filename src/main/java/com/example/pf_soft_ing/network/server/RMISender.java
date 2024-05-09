@@ -15,6 +15,7 @@ public class RMISender implements Sender {
         this.client = client;
     }
 
+
     @Override
     public void sendError(String errorMsg) {
         try {
@@ -25,9 +26,9 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendMatches(Map<Integer, List<String>> matches) {
+    public void sendMatches(Map<Integer, List<String>> matches, int playerID) {
         try {
-            client.showMatches(matches);
+            client.showMatches(matches, playerID);
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
         }
@@ -103,6 +104,10 @@ public class RMISender implements Sender {
 
     @Override
     public void sendPlayerTurn(int playerID) {
-
+        try {
+            client.sendPlayerTurn(playerID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
+        }
     }
 }
