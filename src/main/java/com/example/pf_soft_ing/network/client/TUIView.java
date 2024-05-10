@@ -57,6 +57,7 @@ public class TUIView implements View {
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         System.out.println("Game started.");
+        
     }
 
     @Override

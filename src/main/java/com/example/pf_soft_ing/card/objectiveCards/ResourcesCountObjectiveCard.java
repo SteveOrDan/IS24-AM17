@@ -27,4 +27,5 @@ public class ResourcesCountObjectiveCard extends ObjectiveCard {
     public int calculateObjectivePoints(HashMap<Position, PlaceableCard> playArea, int[] numOfResourcesArr) {
         return points * (numOfResourcesArr[resourceType.getValue()] / requiredResourceCount);
     }
+
 }

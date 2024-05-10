@@ -886,7 +886,7 @@
         "cornerType": "HiddenCorner"
       },
       "BRCorner": {
-        "resourceType": "ANIMAL",
+        "resourceType": "INSECT",
         "cornerType": "ResourceCorner"
       },
       "TLCorner": {
@@ -914,7 +914,7 @@
         "cornerType": "HiddenCorner"
       },
       "TRCorner": {
-        "resourceType": "ANIMAL",
+        "resourceType": "INSECT",
         "cornerType": "ResourceCorner"
       }
     }
