@@ -24,7 +24,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
     @Override
     public void getMatches(ClientRMIInterface client) throws RemoteException {
-        PlayerModel playerModel = gameController.getGameModel().createPlayer(new RMISender(client));
+        PlayerModel playerModel = gameController.createPlayer(new RMISender(client));
         IDToPlayer.put(playerModel.getID(), playerModel);
 
         gameController.getMatches(playerModel.getID());
@@ -34,8 +34,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     public void createMatch(int playerID, int numberOfPlayers, String nickname) throws RemoteException {
         gameController.createMatch(playerID, numberOfPlayers, nickname);
         try {
-            playerIDToMatch.put(playerID, gameController.getGameModel().getMatchByID(gameController.getGameModel().getIDToPlayers().get(playerID).getMatchID()));
-        } catch (InvalidMatchIDException e) {
+            playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
+        }
+        catch (InvalidMatchIDException | InvalidPlayerIDException e) {
             System.out.println("Already notified client, failed match selection");
         }
     }
@@ -44,8 +45,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     public void selectMatch(int playerID, int matchID) throws RemoteException {
         gameController.selectMatch(playerID, matchID);
         try {
-            playerIDToMatch.put(playerID, gameController.getGameModel().getMatchByID(gameController.getGameModel().getIDToPlayers().get(playerID).getMatchID()));
-        } catch (InvalidMatchIDException e) {
+            playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
+        }
+        catch (InvalidMatchIDException | InvalidPlayerIDException e) {
             System.out.println("Already notified client, failed match selection");
         }
     }

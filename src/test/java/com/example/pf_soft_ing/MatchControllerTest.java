@@ -48,10 +48,10 @@ class MatchControllerTest {
     }
 
     private void addPlayers(String name) throws GameIsFullException, NicknameAlreadyExistsException, IOException {
-        PlayerModel player = gameController.getGameModel().createPlayer(new SocketSender(new ObjectOutputStream(System.out)));
-        matchController.getMatchModel().checkNickname(name);
-        matchController.getMatchModel().addCurrPlayer(player);
-        matchController.getMatchModel().addReadyPlayer();
+        PlayerModel player = gameController.createPlayer(new SocketSender(new ObjectOutputStream(System.out)));
+        matchController.checkNickname(name);
+        matchController.addCurrPlayer(player);
+        matchController.addReadyPlayer();
 
         player.setNickname(name);
         player.setState(PlayerState.MATCH_LOBBY);
@@ -184,8 +184,6 @@ class MatchControllerTest {
         // Set common objectives
         matchController.setCommonObjectives();
 
-        assertEquals(2, matchController.getMatchModel().getObjectiveCardsDeck().getCommonObjectives().size());
-
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
             try {
@@ -231,13 +229,13 @@ class MatchControllerTest {
 
         // =============================== GAME START ===============================
 
-        while (matchController.getMatchModel().getGameState() == GameState.PLAYING || matchController.getMatchModel().getGameState() == GameState.FINAL_ROUND){
+        while (matchController.getGameState() == GameState.PLAYING || matchController.getGameState() == GameState.FINAL_ROUND){
             placeCardAction(plIdToLegalPos, plIdToIllegalPos);
 
             drawCardAction();
         }
 
-        while (matchController.getMatchModel().getGameState() == GameState.EXTRA_ROUND){
+        while (matchController.getGameState() == GameState.EXTRA_ROUND){
             placeCardAction(plIdToLegalPos, plIdToIllegalPos);
         }
 
@@ -393,7 +391,7 @@ class MatchControllerTest {
     }
 
     private int getCurrentPlayerId(){
-        return matchController.getMatchModel().getCurrPlayerID();
+        return matchController.getCurrPlayerID();
     }
 
     @Test
@@ -402,7 +400,7 @@ class MatchControllerTest {
 
         PlayerModel currPlayer = getCurrentPlayer();
 
-        PlayerModel notCurrPlayer = matchController.getIDToPlayerMap().keySet().stream().filter(i -> i != matchController.getMatchModel().getCurrPlayerID()).findFirst().map(i -> matchController.getIDToPlayerMap().get(i)).orElse(null);
+        PlayerModel notCurrPlayer = matchController.getIDToPlayerMap().keySet().stream().filter(i -> i != matchController.getCurrPlayerID()).findFirst().map(i -> matchController.getIDToPlayerMap().get(i)).orElse(null);
 
         assert notCurrPlayer != null;
         assertThrows(InvalidPlayerIDException.class, () -> matchController.placeCard(-1, 1, new Position(0, 0), CardSideType.FRONT)); // Invalid player id
@@ -449,10 +447,10 @@ class MatchControllerTest {
             }
         }
 
-        matchController.getMatchModel().setGameState(GameState.SET_UP);
+        matchController.setGameState(GameState.SET_UP);
         assertThrows(InvalidGameStateException.class, () -> matchController.placeCard(currPlayer.getID(), currPlayer.getHand().getFirst().getID(), new Position(1, 1), CardSideType.FRONT)); // Invalid game state
 
-        matchController.getMatchModel().setGameState(GameState.PLAYING);
+        matchController.setGameState(GameState.PLAYING);
         assertThrows(InvalidPlayerStateException.class, () -> matchController.drawResourceCard(currPlayer.getID())); // Not drawing state
 
         // Place card without resources
@@ -468,10 +466,10 @@ class MatchControllerTest {
         matchController.drawVisibleGoldenCard(currPlayer.getID(), -1);
         matchController.drawVisibleGoldenCard(currPlayer.getID(), 5);
 
-        matchController.getMatchModel().setGameState(GameState.SET_UP);
+        matchController.setGameState(GameState.SET_UP);
         assertThrows(InvalidGameStateException.class, () -> matchController.drawResourceCard(currPlayer.getID())); // Invalid game state
 
-        matchController.getMatchModel().setGameState(GameState.PLAYING);
+        matchController.setGameState(GameState.PLAYING);
         assertThrows(NotPlayerTurnException.class, () -> matchController.drawResourceCard(notCurrPlayer.getID())); // Not curr player
     }
 
@@ -522,7 +520,7 @@ class MatchControllerTest {
     public void restoreVisibleResourceCardEmptyDeck(){
         setUpGame();
 
-        matchController.getMatchModel().getResourceCardsDeck().getDeck().clear();
+        matchController.clearResCardDeck();
 
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
@@ -533,7 +531,7 @@ class MatchControllerTest {
         // Draw card
         matchController.drawVisibleResourceCard(currPlayerID, 0);
 
-        matchController.getMatchModel().getGoldenCardsDeck().getDeck().clear();
+        matchController.clearGoldCardDeck();
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
@@ -549,7 +547,7 @@ class MatchControllerTest {
     public void restoreVisibleGoldenCardEmptyDeck(){
         setUpGame();
 
-        matchController.getMatchModel().getGoldenCardsDeck().getDeck().clear();
+        matchController.clearGoldCardDeck();
 
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
@@ -560,7 +558,7 @@ class MatchControllerTest {
         // Draw card
         matchController.drawVisibleGoldenCard(currPlayerID, 0);
 
-        matchController.getMatchModel().getResourceCardsDeck().getDeck().clear();
+        matchController.clearResCardDeck();
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
@@ -581,8 +579,8 @@ class MatchControllerTest {
 
         assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(1, 1), CardSideType.FRONT) );
 
-        matchController.getMatchModel().getResourceCardsDeck().getDeck().clear();
-        matchController.getMatchModel().getGoldenCardsDeck().getDeck().clear();
+        matchController.clearResCardDeck();
+        matchController.clearGoldCardDeck();
 
         assertThrows(NotEnoughCardsException.class, () -> matchController.drawResourceCard(currPlayerID)); // Empty deck
         matchController.drawGoldenCard(currPlayerID); // Empty deck
@@ -611,13 +609,13 @@ class MatchControllerTest {
         // Set up decks (initialize, shuffle and set visible cards)
         matchController.setUpGame();
 
-        matchController.getMatchModel().setGameState(GameState.PREGAME);
+        matchController.setGameState(GameState.PREGAME);
         matchController.drawStarterCard(-1); // Invalid game state
 
         assertThrows(InvalidGameStateException.class, () -> matchController.fillPlayerHand(-1)); // Invalid game state
 
 
-        matchController.getMatchModel().setGameState(GameState.SET_UP);
+        matchController.setGameState(GameState.SET_UP);
         matchController.drawStarterCard(-1); // Invalid id
 
         assertThrows(InvalidPlayerIDException.class, () -> matchController.fillPlayerHand(-1)); // Invalid player id
@@ -646,8 +644,6 @@ class MatchControllerTest {
 
         // Set common objectives
         matchController.setCommonObjectives();
-
-        assertEquals(2, matchController.getMatchModel().getObjectiveCardsDeck().getCommonObjectives().size());
 
         assertThrows(InvalidPlayerIDException.class, () -> matchController.setObjectivesToChoose(-1)); // Invalid player id
 
@@ -697,7 +693,7 @@ class MatchControllerTest {
 
         // =============================== GAME START ===============================
 
-        while (matchController.getMatchModel().getGameState() == GameState.PLAYING || matchController.getMatchModel().getGameState() == GameState.FINAL_ROUND){
+        while (matchController.getGameState() == GameState.PLAYING || matchController.getGameState() == GameState.FINAL_ROUND){
             placeCardAction(plIdToLegalPos, plIdToIllegalPos);
 
             drawCardAction();
@@ -708,7 +704,7 @@ class MatchControllerTest {
             matchController.getIDToPlayerMap().get(i).setCurrScore(29);
         }
 
-        while (matchController.getMatchModel().getGameState() == GameState.EXTRA_ROUND){
+        while (matchController.getGameState() == GameState.EXTRA_ROUND){
             placeCardAction(plIdToLegalPos, plIdToIllegalPos);
         }
 

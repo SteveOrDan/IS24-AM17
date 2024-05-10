@@ -1,15 +1,9 @@
 package com.example.pf_soft_ing.network.server;
 
-import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.requests.*;
-import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.player.TokenColors;
-
-import java.util.List;
-import java.util.Map;
 
 public class Decoder {
 
@@ -26,20 +20,10 @@ public class Decoder {
                 gameController.getMatches(playerID);
             }
             case CreateMatchMsg castedMsg -> {
-                gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
-                try {
-                    matchController = gameController.getGameModel().getMatchByID(gameController.getGameModel().getIDToPlayers().get(playerID).getMatchID());
-                } catch (InvalidMatchIDException e) {
-                    System.out.println("Already notified client, failed match creation");
-                }
+                matchController = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
             }
             case SelectMatchMsg castedMsg -> {
-                gameController.selectMatch(playerID, castedMsg.getMatchID());
-                try {
-                    matchController = gameController.getGameModel().getMatchByID(gameController.getGameModel().getIDToPlayers().get(playerID).getMatchID());
-                } catch (InvalidMatchIDException e) {
-                    System.out.println("Already notified client, failed match selection");
-                }
+                matchController = gameController.selectMatch(playerID, castedMsg.getMatchID());
             }
             case ChooseNicknameMsg castedMsg -> {
                 gameController.chooseNickname(playerID, castedMsg.getNickname(), matchController);

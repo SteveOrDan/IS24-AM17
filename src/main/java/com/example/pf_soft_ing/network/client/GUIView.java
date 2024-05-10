@@ -107,11 +107,6 @@ public class GUIView implements View {
 
     }
 
-    @Override
-    public void setID(int playerID) {
-        sender.setPlayerID(playerID);
-    }
-
     private void launchApp(){
         stage.setTitle("Codex naturalis");
         root = new Group();
@@ -1293,5 +1288,10 @@ public class GUIView implements View {
     @Override
     public void showPlayerTurn(int playerID) {
 
+    }
+
+    @Override
+    public void setID(int playerID) {
+        sender.setPlayerID(playerID);
     }
 }

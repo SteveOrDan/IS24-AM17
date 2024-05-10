@@ -17,7 +17,7 @@ public class SocketReceiver implements Runnable {
         try {
             in = new ObjectInputStream(socket.getInputStream());
 
-            playerID = gameController.getGameModel().createPlayer(new SocketSender(new ObjectOutputStream(socket.getOutputStream()))).getID();
+            playerID = gameController.createPlayer(new SocketSender(new ObjectOutputStream(socket.getOutputStream()))).getID();
         }
         catch (IOException e) {
             throw new RuntimeException(e);

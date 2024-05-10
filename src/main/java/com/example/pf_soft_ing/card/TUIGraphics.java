@@ -23,8 +23,7 @@ public class TUIGraphics {
 
         GameResources.initializeAllDecks();
 
-        for (int i = 0; i<=101 ; i++){
-
+        for (int i = 0; i <= 101 ; i++){
             System.out.println("CardID:" + i);
             tuiGraphics.printCard(i, "front");
             tuiGraphics.printCard(i, "back");
@@ -50,6 +49,7 @@ public class TUIGraphics {
         System.out.println("║     ║           ║     ║");
         System.out.println("╚═════╩═══════════╩═════╝");
     }
+
     public void printStarCardRef() {
         System.out.println("┌─────┬───────────┬─────┐");
         System.out.println("│     │           │     │");
@@ -59,8 +59,10 @@ public class TUIGraphics {
         System.out.println("│     │           │     │");
         System.out.println("└─────┴───────────┴─────┘");
     }
-    public void printStarterCard(StarterCard card, String side){
+
+    public void printStarterCard(PlaceableCard card, String side){
         String A1, A2, A3, B1, B2, B3, D1, D2, D3, E1, E2, E3, F1, F2, F3;
+
         int resourcesCorners;
 
         Side cardSide;
@@ -192,7 +194,6 @@ public class TUIGraphics {
         System.out.println(E3 + "───────────" + F3);
     }
 
-
     public void printCard(int cardID, String side){
         if (cardID < 86) {
             PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
@@ -202,6 +203,7 @@ public class TUIGraphics {
             printObjectiveCard(card);
         }
     }
+
     public void printPlaceableCard(PlaceableCard card, String side) {
 //        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
 
@@ -464,16 +466,17 @@ public class TUIGraphics {
             size += requiredResources.get(res);
         }
 
-        if(side.equals("front")){
-
+        if (side.equals("front")) {
             if (size == 3) {
+                G += " ";
+
                 for (ResourceType res : requiredResources.keySet()) {
                     for (int i = 0; i < requiredResources.get(res); i++) {
                         G += res.getColor() + res + CC.RESET;
                     }
                 }
 
-                G += "  ";
+                G += " ";
             }
             if (size == 4) {
 
@@ -495,16 +498,9 @@ public class TUIGraphics {
                     }
                 }
             }
-        }else {
-            if (size == 3) {
-                G += "     ";
-            }
-            if (size == 4) {
-                G += "     ";
-            }
-            if (size == 5) {
-                G += "     ";
-            }
+        }
+        else {
+            G = "     ";
         }
 
         System.out.println(A1 + "═══════════" + B1);
@@ -512,7 +508,7 @@ public class TUIGraphics {
         System.out.println(A3 + "           " + B3);
         System.out.println("║           " + D + "           ║");
         System.out.println(E1 + "           " + F1);
-        System.out.println(E2 + "    " + G + "  " + F2);
+        System.out.println(E2 + "   " + G + "   " + F2);
         System.out.println(E3 + "═══════════" + F3);
     }
 
@@ -598,6 +594,7 @@ public class TUIGraphics {
             System.out.println("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
         }
     }
+
     public void printTrinityCard(TrinityObjectiveCard card) {
         System.out.println("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
         System.out.println("┃               "+ card.getPoints()+ "       ┃");

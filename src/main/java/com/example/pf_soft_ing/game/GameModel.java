@@ -28,8 +28,8 @@ public class GameModel {
         Map<Integer, List<String>> allMatches = new HashMap<>();
 
         for (MatchController match : matches){
-            List<String> nicknames = new ArrayList<>(match.getMatchModel().getNicknames());
-            allMatches.put(match.getMatchModel().getMatchID(), nicknames);
+            List<String> nicknames = new ArrayList<>(match.getNicknames());
+            allMatches.put(match.getMatchID(), nicknames);
         }
 
         return allMatches;
@@ -50,7 +50,7 @@ public class GameModel {
      */
     public MatchController getMatchByID(int matchID) throws InvalidMatchIDException {
         for (MatchController match : matches) {
-            if (match.getMatchModel().getMatchID() == matchID) {
+            if (match.getMatchID() == matchID) {
                 return match;
             }
         }
@@ -64,7 +64,7 @@ public class GameModel {
      * @param nickname Nickname of the host player
      * @throws InvalidNumOfPlayersException If the number of players is not between 2 and 4
      */
-    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayersException, InvalidPlayerStateException, GameIsFullException {
+    public MatchController createGame(int playerID, int numberOfPlayers, String nickname) throws InvalidNumOfPlayersException, InvalidPlayerStateException {
         if (numberOfPlayers > 4 || numberOfPlayers < 2){
             throw new InvalidNumOfPlayersException();
         }
@@ -76,7 +76,7 @@ public class GameModel {
         }
 
         List<Integer> matchIDs = new ArrayList<>();
-        matches.forEach(match -> matchIDs.add(match.getMatchModel().getMatchID()));
+        matches.forEach(match -> matchIDs.add(match.getMatchID()));
 
         Random rng = new Random();
         int newID = rng.nextInt(1000);
@@ -87,8 +87,7 @@ public class GameModel {
 
         MatchController match = new MatchController(numberOfPlayers, newID);
 
-        match.getMatchModel().addCurrPlayer(player);
-        match.getMatchModel().addReadyPlayer();
+        match.addHost(player);
 
         player.setNickname(nickname);
         player.setState(PlayerState.MATCH_LOBBY);
@@ -109,7 +108,7 @@ public class GameModel {
     public MatchController selectMatch(int playerID, int matchID) throws InvalidMatchIDException, GameIsFullException {
         PlayerModel player = IDToPlayers.get(playerID);
 
-        getMatchByID(matchID).getMatchModel().addCurrPlayer(player);
+        getMatchByID(matchID).addCurrPlayer(player);
 
         player.setState(PlayerState.MATCH_LOBBY);
         player.setMatchID(matchID);
@@ -127,7 +126,7 @@ public class GameModel {
     public void chooseNickname(int playerID, String nickname) throws InvalidMatchIDException, NicknameAlreadyExistsException {
         int matchID = IDToPlayers.get(playerID).getMatchID();
 
-        MatchModel matchModel = getMatchByID(matchID).getMatchModel();
+        MatchController matchModel = getMatchByID(matchID);
 
         matchModel.checkNickname(nickname);
 

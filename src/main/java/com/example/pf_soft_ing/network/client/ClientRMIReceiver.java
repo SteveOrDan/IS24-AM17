@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.network.client;
 
-import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 

@@ -183,6 +183,13 @@ public class MatchModel {
         this.gameState = gameState;
     }
 
+    public void addHost(PlayerModel playerModel){
+        IDToPlayerMap.put(playerModel.getID(), playerModel);
+
+        currPlayers++;
+        playersReady++;
+    }
+
     /**
      * Increase by one the number of players ready in the match
      */

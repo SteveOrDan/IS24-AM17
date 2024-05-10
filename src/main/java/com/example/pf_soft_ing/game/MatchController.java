@@ -35,12 +35,28 @@ public class MatchController implements Serializable {
         return matchModel.getIDToPlayerMap();
     }
 
-    /**
-     * Getter
-     * @return GameModel object
-     */
-    public MatchModel getMatchModel() {
-        return matchModel;
+//    /**
+//     * Getter
+//     * @return GameModel object
+//     */
+//    public MatchModel getMatchModel() {
+//        return matchModel;
+//    }
+
+    public int getMatchID(){
+        return matchModel.getMatchID();
+    }
+
+    public List<String> getNicknames() {
+        return matchModel.getNicknames();
+    }
+
+    public void addHost(PlayerModel host){
+        matchModel.addHost(host);
+    }
+
+    public boolean checkForGameStart() {
+        return matchModel.getPlayersReady() == matchModel.getMaxPlayers();
     }
 
     /**
@@ -89,6 +105,14 @@ public class MatchController implements Serializable {
      */
     public List<PlaceableCard> getVisibleGoldenCards(){
         return matchModel.getVisibleGoldenCards();
+    }
+
+    public PlaceableCard checkFirstResDeckCard() {
+        return matchModel.getResourceCardsDeck().getDeck().getFirst();
+    }
+
+    public PlaceableCard checkFirstGoldDeckCard() {
+        return matchModel.getGoldenCardsDeck().getDeck().getFirst();
     }
 
     /**
@@ -324,6 +348,10 @@ public class MatchController implements Serializable {
         return matchModel.getCurrPlayerID();
     }
 
+    public PlaceableCard drawStarterCard() {
+        return matchModel.drawStarterCard();
+    }
+
     /**
      * Draw a resource card from the deck and add to the player's hand
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
@@ -469,5 +497,33 @@ public class MatchController implements Serializable {
             // Not in drawing state
             throw new InvalidPlayerStateException(matchModel.getIDToPlayerMap().get(playerID).getState().toString(), PlayerState.DRAWING.toString());
         }
+    }
+
+    public void checkNickname(String nickname) throws NicknameAlreadyExistsException {
+        matchModel.checkNickname(nickname);
+    }
+
+    public void addReadyPlayer() {
+        matchModel.addReadyPlayer();
+    }
+
+    public void addCurrPlayer(PlayerModel player) throws GameIsFullException {
+        matchModel.addCurrPlayer(player);
+    }
+
+    public GameState getGameState() {
+        return matchModel.getGameState();
+    }
+
+    public void setGameState(GameState gameState) {
+        matchModel.setGameState(gameState);
+    }
+
+    public void clearResCardDeck() {
+        matchModel.getResourceCardsDeck().getDeck().clear();
+    }
+
+    public void clearGoldCardDeck() {
+        matchModel.getGoldenCardsDeck().getDeck().clear();
     }
 }
