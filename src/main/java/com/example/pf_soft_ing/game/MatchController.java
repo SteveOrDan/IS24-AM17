@@ -177,6 +177,7 @@ public class MatchController implements Serializable {
     /**
      * Set the objectives to choose for the player
      * @param playerID ID of the player
+     * @return List of objective card IDs to choose from
      */
     public List<Integer> setObjectivesToChoose(int playerID) throws InvalidPlayerIDException {
         if (!matchModel.getIDToPlayerMap().containsKey(playerID)){

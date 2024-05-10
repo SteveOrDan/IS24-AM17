@@ -31,10 +31,10 @@ import java.util.Map;
 
 public class GameResources {
 
-    private final static String resourceCardsFilename = "JsonFiles/CardsData/ResourceCards.json";
-    private final static String goldenCardsFilename = "JsonFiles/CardsData/GoldenCards.json";
-    private final static String starterCardsFilename = "JsonFiles/CardsData/StarterCards.json";
-    private final static String objectiveCardsFilename = "JsonFiles/CardsData/ObjectiveCards.json";
+    private final static String resourceCardsFilename = "src/main/resources/JsonFiles/CardsData/ResourceCards.json";
+    private final static String goldenCardsFilename = "src/main/resources/JsonFiles/CardsData/GoldenCards.json";
+    private final static String starterCardsFilename = "src/main/resources/JsonFiles/CardsData/StarterCards.json";
+    private final static String objectiveCardsFilename = "src/main/resources/JsonFiles/CardsData/ObjectiveCards.json";
 
     private static List<PlaceableCard> resourcesDeck;
     private static List<PlaceableCard> goldenDeck;
@@ -46,7 +46,7 @@ public class GameResources {
 
     public static CardCorner deserializeCorner() {
         try {
-            JsonReader cornerReader = new JsonReader(new FileReader("JsonFiles/Exports/Corner.json"));
+            JsonReader cornerReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Corner.json"));
             CornerDeserializer cornerDeserializer = new CornerDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(CardCorner.class, cornerDeserializer)
@@ -61,7 +61,7 @@ public class GameResources {
 
     public static Side deserializeFront() {
         try {
-            JsonReader frontReader = new JsonReader(new FileReader("JsonFiles/Exports/Front.json"));
+            JsonReader frontReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Front.json"));
             FrontDeserializer frontDeserializer = new FrontDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Front.class, frontDeserializer)
@@ -76,7 +76,7 @@ public class GameResources {
 
     public static Side deserializeBack() {
         try {
-            JsonReader backReader = new JsonReader(new FileReader("JsonFiles/Exports/Back.json"));
+            JsonReader backReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Back.json"));
             BackDeserializer backDeserializer = new BackDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Back.class, backDeserializer)
@@ -91,7 +91,7 @@ public class GameResources {
 
     public static PlaceableCard deserializeResourceCard() {
         try {
-            JsonReader resourceCardReader = new JsonReader(new FileReader("JsonFiles/Exports/ResourceCard.json"));
+            JsonReader resourceCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/ResourceCard.json"));
             ResourceCardDeserializer resourceCardDeserializer = new ResourceCardDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(PlaceableCard.class, resourceCardDeserializer)
@@ -106,7 +106,7 @@ public class GameResources {
 
     public static PlaceableCard deserializeGoldenCard() {
         try {
-            JsonReader goldenCardReader = new JsonReader(new FileReader("JsonFiles/Exports/GoldenCard.json"));
+            JsonReader goldenCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/GoldenCard.json"));
             GoldenCardDeserializer goldenCardDeserializer = new GoldenCardDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(PlaceableCard.class, goldenCardDeserializer)
@@ -121,7 +121,7 @@ public class GameResources {
 
     public static PlaceableCard deserializeStarterCard() {
         try {
-            JsonReader starterCardReader = new JsonReader(new FileReader("JsonFiles/Exports/StarterCard.json"));
+            JsonReader starterCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/StarterCard.json"));
             StarterCardDeserializer starterCardDeserializer = new StarterCardDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(PlaceableCard.class, starterCardDeserializer)
@@ -136,7 +136,7 @@ public class GameResources {
 
     public static ObjectiveCard deserializeObjectiveCard() {
         try {
-            JsonReader objectiveCardReader = new JsonReader(new FileReader("JsonFiles/Exports/ObjectiveCard.json"));
+            JsonReader objectiveCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/ObjectiveCard.json"));
             ObjectiveCardDeserializer objectiveCardDeserializer = new ObjectiveCardDeserializer();
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(ObjectiveCard.class, objectiveCardDeserializer)

@@ -432,6 +432,7 @@ public class GUIView implements View {
     private void drawGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                int starterCardID){
+        GameResources.initializeAllDecks();
         root.getChildren().clear();
 
         // Create player field
@@ -686,6 +687,7 @@ public class GUIView implements View {
         secretObjective1Button.setLayoutX(0);
         secretObjective1Button.setLayoutY(0);
         secretObjective1Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective1ID));
+        secretObjective1Button.setOpacity(0.1);
 
         // Create button to confirm choice
         Button secretObjective2Button = new Button();
@@ -693,6 +695,7 @@ public class GUIView implements View {
         secretObjective2Button.setLayoutX(0);
         secretObjective2Button.setLayoutY(0);
         secretObjective2Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective2ID));
+        secretObjective2Button.setOpacity(0.1);
 
         // Add everything to the root
         secretObjective1Pane.getChildren().add(secretObjective1Button);
@@ -755,9 +758,9 @@ public class GUIView implements View {
         cardPane.setLayoutY(yPos);
 
         // Create Image
-        String cardName = side + "Card" + cardID + ".png";
+        String cardName = "/cards/" + side.toString().toLowerCase() + "/card" + cardID + ".png";
 
-        Image cardImg = new Image(cardName);
+        Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
         ImageView cardImgV = new ImageView(cardImg);
 
         cardImgV.setFitHeight(cardHeight * scale);
@@ -988,7 +991,7 @@ public class GUIView implements View {
         playerHand.remove(Integer.valueOf(ID));
 
         // Create Image
-        String cardName = side + "Card" + ID + ".png";
+        String cardName = "/cards/" + side.toString().toLowerCase() + "/card" + ID + ".png";
 
         if (!playArea.containsKey(pos)){
             playArea.put(pos, ID);
@@ -1000,7 +1003,7 @@ public class GUIView implements View {
         Pane cardPane = new Pane();
         cardPane.setPrefSize(gridCellWidth, gridCellHeight);
 
-        Image cardImg = new Image(cardName);
+        Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
         ImageView cardImgV = new ImageView(cardImg);
 
         cardImgV.setFitHeight(cardHeight);
@@ -1082,8 +1085,6 @@ public class GUIView implements View {
         playerHandPane.getChildren().add(card1Pane);
         playerHandPane.getChildren().add(card2Pane);
         playerHandPane.getChildren().add(card3Pane);
-
-        root.getChildren().add(playerHandPane);
     }
 
     private void addSelectButtonToCard(Pane cardPane, int cardID){

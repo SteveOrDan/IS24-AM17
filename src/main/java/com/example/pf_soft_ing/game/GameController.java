@@ -35,11 +35,10 @@ public class GameController {
             MatchController matchController = gameModel.createGame(playerID, numberOfPlayers, nickname);
             getPlayerSender(playerID).createMatchResult(matchController.getMatchID(), nickname);
             return matchController;
-            //TODO synchronize on matchController
         }
         catch (InvalidNumOfPlayersException | InvalidPlayerStateException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
-            return null;
+            return null; // It's OK -> the match is supposed to stay null if create match fails
         }
     }
 
@@ -55,7 +54,6 @@ public class GameController {
         MatchController matchController = gameModel.selectMatch(playerID, matchID);
         getPlayerSender(playerID).selectMatchResult(matchController.getMatchID(), matchController.getNicknames());
         return matchController;
-        //TODO synchronize on matchController
         }
         catch (InvalidMatchIDException | GameIsFullException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -74,7 +72,6 @@ public class GameController {
             gameModel.chooseNickname(playerID, nickname);
 
             // if match reached max players, start the game ; else send the nickname to the player
-//                    MatchController matchController = gameController.getMatchWithPlayer(playerID);
 
             if (matchController.checkForGameStart()) {
                 gameModel.startGame(matchController);

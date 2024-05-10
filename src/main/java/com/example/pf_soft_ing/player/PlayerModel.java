@@ -8,7 +8,6 @@ import com.example.pf_soft_ing.card.ResourceType;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.exceptions.*;
 
 import java.util.ArrayList;
@@ -110,14 +109,6 @@ public class PlayerModel {
      */
     public void setObjectivesToChoose(List<ObjectiveCard> objectives){
         objectivesToChoose = objectives;
-    }
-
-    /**
-     * Getter
-     * @return List of objective cards to choose from
-     */
-    public List<ObjectiveCard> getObjectivesToChoose() {
-        return objectivesToChoose;
     }
 
     /**
@@ -342,7 +333,7 @@ public class PlayerModel {
      * @throws NoAdjacentCardsException If there are no adjacent cards to the reference card
      * @throws PlacingOnInvalidCornerException If a corner is hidden
      */
-    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException, CardNotPlacedException {
+    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
             PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
             PlaceableCard BRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() - 1));

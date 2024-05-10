@@ -26,12 +26,16 @@ public class GameModel {
      */
     public Map<Integer, List<String>> getMatches(){
         Map<Integer, List<String>> allMatches = new HashMap<>();
+        List<MatchController> matchesCopy;
 
-        for (MatchController match : matches){
+        synchronized (matches){
+            matchesCopy = new ArrayList<>(matches);
+        }
+
+        for (MatchController match : matchesCopy){
             List<String> nicknames = new ArrayList<>(match.getNicknames());
             allMatches.put(match.getMatchID(), nicknames);
         }
-
         return allMatches;
     }
 
@@ -49,7 +53,13 @@ public class GameModel {
      * @return MatchController with the given ID
      */
     public MatchController getMatchByID(int matchID) throws InvalidMatchIDException {
-        for (MatchController match : matches) {
+        List<MatchController> matchesCopy;
+
+        synchronized (matches){
+            matchesCopy = new ArrayList<>(matches);
+        }
+
+        for (MatchController match : matchesCopy) {
             if (match.getMatchID() == matchID) {
                 return match;
             }
@@ -76,26 +86,28 @@ public class GameModel {
         }
 
         List<Integer> matchIDs = new ArrayList<>();
-        matches.forEach(match -> matchIDs.add(match.getMatchID()));
 
-        Random rng = new Random();
-        int newID = rng.nextInt(1000);
+        synchronized (matches) {
+            matches.forEach(match -> matchIDs.add(match.getMatchID()));
+            Random rng = new Random();
+            int newID = rng.nextInt(1000);
 
-        while(matchIDs.contains(newID)){
-            newID = rng.nextInt(1000);
+            while(matchIDs.contains(newID)){
+                newID = rng.nextInt(1000);
+            }
+
+            MatchController match = new MatchController(numberOfPlayers, newID);
+
+            match.addHost(player);
+
+            player.setNickname(nickname);
+            player.setState(PlayerState.MATCH_LOBBY);
+            player.setMatchID(newID);
+
+            matches.add(match);
+
+            return match;
         }
-
-        MatchController match = new MatchController(numberOfPlayers, newID);
-
-        match.addHost(player);
-
-        player.setNickname(nickname);
-        player.setState(PlayerState.MATCH_LOBBY);
-        player.setMatchID(newID);
-
-        matches.add(match);
-
-        return match;
     }
 
     /**

@@ -92,9 +92,9 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
+            List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
-            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(matchController.getIDToPlayerMap().get(i).getObjectivesToChoose().getFirst().getID()));
+            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst()));
         }
 
         // Set first player
@@ -186,14 +186,9 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            try {
-                matchController.setObjectivesToChoose(i);
-            }
-            catch (InvalidPlayerIDException e) {
-                System.out.println(e.getMessage());
-            }
+            List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
-            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(matchController.getIDToPlayerMap().get(i).getObjectivesToChoose().getFirst().getID()));
+            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst()));
 
             assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());
         }
@@ -649,10 +644,10 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
+            List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
             assertThrows(InvalidObjectiveCardException.class, () -> matchController.getIDToPlayerMap().get(i).setSecretObjective(-3)); // Wrong objective card id
-            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(matchController.getIDToPlayerMap().get(i).getObjectivesToChoose().getFirst().getID())); // Correct
+            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst())); // Correct
 
             assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());
         }
@@ -750,11 +745,11 @@ class MatchControllerTest {
 
         // Set objectives to choose
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
-            assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
+            List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
             int randIndex = Math.random() < 0.5 ? 0 : 1;
 
-            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(matchController.getIDToPlayerMap().get(i).getObjectivesToChoose().getFirst().getID()));
+            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst()));
         }
 
         // Set first player
