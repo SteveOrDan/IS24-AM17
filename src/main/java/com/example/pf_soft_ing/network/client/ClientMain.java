@@ -6,8 +6,10 @@ import com.example.pf_soft_ing.network.server.RMIReceiverInterface;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.UnexpectedException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
