@@ -1,13 +1,13 @@
 package com.example.pf_soft_ing.card;
 
 public enum ResourceType {
-    ANIMAL(0, "A", CC.BLUE),
-    PLANT(1, "P", CC.GREEN),
-    FUNGI(2, "F", CC.RED),
-    INSECT(3, "I", CC.PURPLE),
-    QUILL(4, "Q", CC.YELLOW),
-    INKWELL(5, "K", CC.YELLOW),
-    MANUSCRIPT(6, "M", CC.YELLOW);
+    ANIMAL(0, "A", CC.BLUE, CC.BLUE_BG),
+    PLANT(1, "P", CC.GREEN, CC.GREEN_BG),
+    FUNGI(2, "F", CC.RED, CC.RED_BG),
+    INSECT(3, "I", CC.PURPLE, CC.PURPLE_BG),
+    QUILL(4, "Q", CC.YELLOW, CC.YELLOW_BG),
+    INKWELL(5, "K", CC.YELLOW, CC.YELLOW_BG),
+    MANUSCRIPT(6, "M", CC.YELLOW, CC.YELLOW_BG);
 
     /**
      * index for playerModel resource array
@@ -21,15 +21,18 @@ public enum ResourceType {
 
     private final String color;
 
+    private final String bgColor;
+
     /**
      * Constructor for ResourceType enum
      * @param value Initialize value as resource arr index
      * @param str Initialize value as TUI string output
      */
-    ResourceType(int value, String str, String color){
+    ResourceType(int value, String str, String color, String bgColor){
         this.value = value;
         this.str = str;
         this.color = color;
+        this.bgColor = bgColor;
     }
 
     /**
@@ -48,10 +51,17 @@ public enum ResourceType {
     }
 
     /**
-     * @return Emoji value to display in TUI
+     * @return Color value to display in TUI
      */
     public String getColor() {
         return color;
+    }
+
+    /**
+     * @return Bg color to display in TUI
+     */
+    public String getBgColor() {
+        return bgColor;
     }
 
     /**

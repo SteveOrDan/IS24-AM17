@@ -915,11 +915,14 @@ public class GUIView implements View {
         }
     }
 
-    private void updateIlLegalPositions(Position pos){
+    // TODO: Fix currSide. Adapt to card placed side
+    private void updateIlLegalPositions(Position pos, CardSideType sideType){
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
 
-        Side currSide = GameResources.getPlaceableCardByID(playArea.get(pos)).getFront();
+        PlaceableCard card = GameResources.getPlaceableCardByID(playArea.get(pos));
+
+        Side currSide = sideType == CardSideType.FRONT ? card.getFront() : card.getBack();
 
         if (currSide.getBLCorner().isAvailable()){
             newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
@@ -1000,7 +1003,7 @@ public class GUIView implements View {
             playArea.put(pos, ID);
         }
 
-        updateIlLegalPositions(pos);
+        updateIlLegalPositions(pos, side);
 
         // Create Pane for card
         Pane cardPane = new Pane();
@@ -1290,7 +1293,22 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showPlayerTurn(int playerID, String playerNickname) {
+    public void showFirstPlayerTurn(int playerID, String playerNickname) {
+
+    }
+
+    @Override
+    public void placeCard() {
+
+    }
+
+    @Override
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
+
+    }
+
+    @Override
+    public void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
 
     }
 

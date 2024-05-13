@@ -69,6 +69,16 @@ public abstract class PlaceableCard {
     }
 
     /**
+     * Getter
+     * @param sideType Type of the side to return
+     * @return The side based on the parameter
+     */
+    public Side getSideFromType(CardSideType sideType) {
+        return sideType.equals(CardSideType.FRONT) ? front : back;
+    }
+
+    // TODO: Remove this method
+    /**
      * Returns the correct side of the card based on the chosen side
      * @return Current side of the card
      */

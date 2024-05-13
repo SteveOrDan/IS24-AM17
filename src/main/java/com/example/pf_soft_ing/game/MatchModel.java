@@ -470,6 +470,8 @@ public class MatchModel {
             player.setState(PlayerState.WAITING);
         }
 
+        setGameState(GameState.PLAYING);
+
         setRandomFirstPlayer();
 
         calculateOrderOfPlayers();

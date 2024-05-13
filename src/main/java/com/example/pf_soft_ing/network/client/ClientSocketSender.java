@@ -69,21 +69,21 @@ public class ClientSocketSender implements ClientSender {
 
     @Override
     public void drawResourceCard(int playerID) {
-
+        sendMessage(new DrawCardMsg(playerID, false, false, -1));
     }
 
     @Override
     public void drawVisibleResourceCard(int playerID, int index) {
-
+        sendMessage(new DrawCardMsg(playerID, false, true, index));
     }
 
     @Override
     public void drawGoldenCard(int playerID) {
-
+        sendMessage(new DrawCardMsg(playerID, true, false, -1));
     }
 
     @Override
     public void drawVisibleGoldenCard(int playerID, int index) {
-
+        sendMessage(new DrawCardMsg(playerID, true, true, index));
     }
 }

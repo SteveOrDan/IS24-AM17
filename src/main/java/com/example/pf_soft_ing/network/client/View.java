@@ -26,9 +26,17 @@ public interface View {
     void confirmSecretObjective();
 
     void errorMessage(String errorMessage);
+
     void showNewPlayer(String nicknames);
 
-    void showPlayerTurn(int playerID, String playerNickname);
+    void showFirstPlayerTurn(int playerID, String playerNickname);
+
+    void placeCard();
+
+    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname);
+
+    void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                        int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     void setID(int playerID);
 }

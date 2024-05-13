@@ -2,9 +2,6 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
-import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.player.PlayerState;
-import com.example.pf_soft_ing.player.Token;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
@@ -77,18 +74,27 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void placeCard(boolean placed){
+    public void placeCard(){
+        sendMessage(new ConfirmPlaceCardMsg());
+    }
+
+    @Override
+    public void sendFirstPlayer(int playerID, String playerNickname) {
 
     }
 
     @Override
-    public void sendNewPlayer(String nickname) {
-
+    public void sendFirstPlayerTurn(int playerID, String playerNickname) {
+        sendMessage(new FirstPlayerTurnMsg(playerID, playerNickname));
     }
 
     @Override
-    public void sendPlayerTurn(int playerID, String playerNickname) {
-        sendMessage(new PlayerTurnMsg(playerID, playerNickname));
-    }
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+                                      int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                      int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
 
+        sendMessage(new NewPlayerTurnMsg(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
+                resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
+    }
 }

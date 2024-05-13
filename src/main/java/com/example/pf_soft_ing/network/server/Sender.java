@@ -7,14 +7,7 @@ import java.util.Map;
 
 public interface Sender {
 
-    /**
-     * Method to requestError to the Player
-     */
     void sendError(String errorMsg);
-
-    /**
-     * Method to return all the matches
-     */
 
     void sendMatches(Map<Integer, List<String>> matches, int playerID);
 
@@ -34,13 +27,13 @@ public interface Sender {
 
     void confirmSecretObjective();
 
-    /**
-     * Method to place a card
-     * @param placed boolean
-     */
-    void placeCard(boolean placed);
+    void placeCard();
 
-    void sendNewPlayer(String nickname);
+    void sendFirstPlayer(int playerID, String playerNickname);
 
-    void sendPlayerTurn(int playerID, String playerNickname);
+    void sendFirstPlayerTurn(int playerID, String playerNickname);
+
+    void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 }

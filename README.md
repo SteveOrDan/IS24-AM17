@@ -1653,6 +1653,7 @@ sequenceDiagram
     Note right of G: Server: Wait for all players
 
 ```
+
 Start RMI connection sequence diagram
 
 ```mermaid
@@ -1754,8 +1755,6 @@ sequenceDiagram
     Note right of G: Server: Wait for all players
 
 ```
-
-
 
 Sequence diagram for game setup
 

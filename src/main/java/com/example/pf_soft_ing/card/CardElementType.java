@@ -1,11 +1,11 @@
 package com.example.pf_soft_ing.card;
 
 public enum CardElementType {
-    STARTER("S", CC.YELLOW),
-    ANIMAL("A", CC.BLUE),
-    PLANT("P", CC.GREEN),
-    FUNGI("F", CC.RED),
-    INSECT("I", CC.PURPLE);
+    STARTER("S", CC.YELLOW, CC.YELLOW_BG),
+    ANIMAL("A", CC.BLUE, CC.BLUE_BG),
+    PLANT("P", CC.GREEN, CC.GREEN_BG),
+    FUNGI("F", CC.RED, CC.RED_BG),
+    INSECT("I", CC.PURPLE, CC.PURPLE_BG);
 
     /**
      * string value for TUI output
@@ -14,9 +14,12 @@ public enum CardElementType {
 
     private final String color;
 
-    CardElementType(String str, String color){
+    private final String bgColor;
+
+    CardElementType(String str, String color, String bgColor){
         this.str = str;
         this.color = color;
+        this.bgColor = bgColor;
     }
 
     @Override
@@ -29,6 +32,13 @@ public enum CardElementType {
      */
     public String getColor() {
         return color;
+    }
+
+    /**
+     * @return Background color value to display in TUI
+     */
+    public String getBgColor() {
+        return bgColor;
     }
 
     public static CardElementType cardElementTypeFromString(String cardElementType) {

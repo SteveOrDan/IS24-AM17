@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.player;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.card.Position;
@@ -251,7 +252,7 @@ public class PlayerModel {
             return;
         }
 
-        for (ResourceType resource : starterCard.getResources(starterCard.getCurrSide())){
+        for (ResourceType resource : starterCard.getResources(starterCard.getSideFromType(chosenSide))){
             numOfResourcesArr[resource.getValue()]++;
         }
 
@@ -291,7 +292,7 @@ public class PlayerModel {
             throw new MissingResourcesException();
         }
 
-        ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
+        ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos, chosenSide);
 
         // Set chosen side
         card.setCurrSideType(chosenSide);
@@ -304,7 +305,7 @@ public class PlayerModel {
         }
 
         // Add resources on placed card's corners
-        for (ResourceType resource : card.getCurrSide().getResources()){
+        for (ResourceType resource : card.getSideFromType(chosenSide).getResources()){
             numOfResourcesArr[resource.getValue()]++;
         }
 
@@ -333,24 +334,28 @@ public class PlayerModel {
      * @throws NoAdjacentCardsException If there are no adjacent cards to the reference card
      * @throws PlacingOnInvalidCornerException If a corner is hidden
      */
-    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
+    private ArrayList<CardCorner> getAdjacentCorners(Position pos, CardSideType chosenSide) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
             PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
             PlaceableCard BRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() - 1));
             PlaceableCard BLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() - 1));
             PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
 
-            if (TRCard != null){
-                add(TRCard.getCurrSide().getBLCorner());
+            if (TRCard != null) {
+                Side currSide = chosenSide == CardSideType.FRONT ? TRCard.getFront() : TRCard.getBack();
+                add(currSide.getBLCorner());
             }
-            if (BRCard != null){
-                add(BRCard.getCurrSide().getTLCorner());
+            if (BRCard != null) {
+                Side currSide = chosenSide == CardSideType.FRONT ? BRCard.getFront() : BRCard.getBack();
+                add(currSide.getTLCorner());
             }
-            if (BLCard != null){
-                add(BLCard.getCurrSide().getTRCorner());
+            if (BLCard != null) {
+                Side currSide = chosenSide == CardSideType.FRONT ? BLCard.getFront() : BLCard.getBack();
+                add(currSide.getTRCorner());
             }
-            if (TLCard != null){
-                add(TLCard.getCurrSide().getBRCorner());
+            if (TLCard != null) {
+                Side currSide = chosenSide == CardSideType.FRONT ? TLCard.getFront() : TLCard.getBack();
+                add(currSide.getBRCorner());
             }
         }};
 

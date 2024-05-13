@@ -15,25 +15,37 @@ public class Decoder {
         System.out.println("Received msg from player " + playerID);
 
         switch (message) {
-            case GetMatchesMsg ignored -> {
-                gameController.getMatches(playerID);
-            }
-            case CreateMatchMsg castedMsg -> {
-                matchController = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
-            }
-            case SelectMatchMsg castedMsg -> {
-                matchController = gameController.selectMatch(playerID, castedMsg.getMatchID());
-            }
-            case ChooseNicknameMsg castedMsg -> {
-                gameController.chooseNickname(playerID, castedMsg.getNickname(), matchController);
-            }
+            case GetMatchesMsg ignored -> gameController.getMatches(playerID);
 
-            case PlaceStarterCardMsg castedMsg -> {
-                matchController.placeStarterCardForPlayer(playerID, castedMsg.getSide());
-            }
+            case CreateMatchMsg castedMsg -> matchController = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
 
-            case ChooseSecretObjMsg castedMsg -> {
-                matchController.setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
+            case SelectMatchMsg castedMsg -> matchController = gameController.selectMatch(playerID, castedMsg.getMatchID());
+
+            case ChooseNicknameMsg castedMsg -> gameController.chooseNickname(playerID, castedMsg.getNickname(), matchController);
+
+            case PlaceStarterCardMsg castedMsg -> matchController.placeStarterCardForPlayer(playerID, castedMsg.getSide());
+
+            case ChooseSecretObjMsg castedMsg -> matchController.setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
+
+            case PlaceCardMsg castedMsg -> matchController.placeCard(playerID, castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
+
+            case DrawCardMsg castedMsg -> {
+                if (castedMsg.isGolden()) {
+                    if (castedMsg.isVisible()) {
+                        matchController.drawVisibleGoldenCard(playerID, castedMsg.getIndex());
+                    }
+                    else {
+                        matchController.drawGoldenCard(playerID);
+                    }
+                }
+                else {
+                    if (castedMsg.isVisible()) {
+                        matchController.drawVisibleResourceCard(playerID, castedMsg.getIndex());
+                    }
+                    else {
+                        matchController.drawResourceCard(playerID);
+                    }
+                }
             }
 
             case null, default -> System.out.println("Invalid message type");

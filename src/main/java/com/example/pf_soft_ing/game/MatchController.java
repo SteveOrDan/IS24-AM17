@@ -158,7 +158,7 @@ public class MatchController implements Serializable {
                 int currPlayerID = getCurrPlayerID();
 
                 for (Integer ID : getIDToPlayerMap().keySet()) {
-                    getPlayerSender(ID).sendPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname());
+                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname());
                 }
             }
             else {
@@ -243,45 +243,51 @@ public class MatchController implements Serializable {
      * @param cardID ID of the card
      * @param pos Position to place the card
      */
-    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide)
-            throws InvalidPlayerIDException, NotPlayerTurnException, InvalidCardIDException,
-            CardNotInHandException, InvalidGameStateException, NoAdjacentCardsException,
-            PositionAlreadyTakenException, MissingResourcesException, PlacingOnInvalidCornerException {
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
+        try {
+            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+                // Invalid player ID
+                throw new InvalidPlayerIDException();
+            }
 
-        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-            // Invalid player ID
-            throw new InvalidPlayerIDException();
+            if (matchModel.getCurrPlayerID() != playerID){
+                // Not player's turn
+                throw new NotPlayerTurnException();
+            }
+
+            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
+                // Invalid card ID
+                throw new InvalidCardIDException();
+            }
+
+            if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
+                // Card not in player's hand
+                throw new CardNotInHandException();
+            }
+
+            if (matchModel.getGameState() != GameState.PLAYING &&
+                    matchModel.getGameState() != GameState.FINAL_ROUND &&
+                    matchModel.getGameState() != GameState.EXTRA_ROUND){
+                // Not playing game state
+                throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
+
+            }
+
+            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+
+            player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
+
+            if (matchModel.getGameState() == GameState.EXTRA_ROUND){
+                endTurn();
+            }
+            else {
+                matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.DRAWING);
+
+                getPlayerSender(playerID).placeCard();
+            }
         }
-
-        if (matchModel.getCurrPlayerID() != playerID){
-            // Not player's turn
-            throw new NotPlayerTurnException();
-        }
-
-        if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
-            // Invalid card ID
-            throw new InvalidCardIDException();
-        }
-
-        if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
-            // Card not in player's hand
-            throw new CardNotInHandException();
-        }
-
-        if (matchModel.getGameState() != GameState.PLAYING &&
-                matchModel.getGameState() != GameState.FINAL_ROUND &&
-                matchModel.getGameState() != GameState.EXTRA_ROUND){
-            // Not playing game state
-            throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
-
-        }
-
-        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
-
-        player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
-
-        if (matchModel.getGameState() == GameState.EXTRA_ROUND){
-            endTurn();
+        catch (Exception e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
 
@@ -361,15 +367,36 @@ public class MatchController implements Serializable {
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
-    public void drawResourceCard(int playerID) throws InvalidPlayerIDException, InvalidGameStateException,
-            NotPlayerTurnException, InvalidPlayerStateException, NotEnoughCardsException {
-        checkPlayerDrawExceptions(playerID);
+    public void drawResourceCard(int playerID) {
+        try {
+            checkPlayerDrawExceptions(playerID);
 
-        matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawResourceCard());
+            PlaceableCard drawnCard = matchModel.drawResourceCard();
 
-        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-        endTurn();
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+
+            endTurn();
+
+            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
+
+            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+            for (Integer _ : getIDToPlayerMap().keySet()) {
+                getPlayerSender(playerID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
+        } catch (Exception e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
     }
 
     /**
@@ -382,16 +409,34 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawVisibleResourceCard(index));
+            PlaceableCard drawnCard = matchModel.drawVisibleResourceCard(index);
+
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
             matchModel.restoreVisibleResourceCard();
 
             matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
+
+            String newPlayerNickname = matchModel.getIDToPlayerMap().get(matchModel.getCurrPlayerID()).getNickname();
+
+            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+            for (Integer _ : getIDToPlayerMap().keySet()) {
+                getPlayerSender(playerID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
 
@@ -400,16 +445,37 @@ public class MatchController implements Serializable {
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
-    public void drawGoldenCard(int playerID) throws InvalidPlayerIDException, InvalidGameStateException,
-            NotPlayerTurnException, InvalidPlayerStateException, NotEnoughCardsException {
+    public void drawGoldenCard(int playerID) {
+        try {
+            checkPlayerDrawExceptions(playerID);
 
-        checkPlayerDrawExceptions(playerID);
+            PlaceableCard drawnCard = matchModel.drawGoldenCard();
 
-        matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawGoldenCard());
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
-        endTurn();
+            endTurn();
+
+            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
+
+            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+            for (Integer _ : getIDToPlayerMap().keySet()) {
+                getPlayerSender(playerID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
+        }
+        catch (Exception e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
     }
 
     /**
@@ -422,16 +488,34 @@ public class MatchController implements Serializable {
         try {
             checkPlayerDrawExceptions(playerID);
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawVisibleGoldenCard(index));
+            PlaceableCard drawnCard = matchModel.drawVisibleGoldenCard(index);
+
+            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
             matchModel.restoreVisibleGoldenCard();
 
             matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             endTurn();
+
+            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
+
+            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+            for (Integer _ : getIDToPlayerMap().keySet()) {
+                getPlayerSender(playerID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
 

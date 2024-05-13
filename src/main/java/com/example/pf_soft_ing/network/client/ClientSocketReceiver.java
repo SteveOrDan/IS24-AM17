@@ -77,7 +77,17 @@ public class ClientSocketReceiver {
 
             case ConfirmSecretObjectiveMsg ignored -> view.confirmSecretObjective();
 
-            case PlayerTurnMsg castedMsg -> view.showPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname());
+            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname());
+
+            case ConfirmPlaceCardMsg ignored -> view.placeCard();
+
+            case NewPlayerTurnMsg castedMsg -> {
+                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
+                view.updateDrawArea(
+                        castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
+                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
+                );
+            }
 
             case null, default -> System.out.println("Invalid message type");
         }

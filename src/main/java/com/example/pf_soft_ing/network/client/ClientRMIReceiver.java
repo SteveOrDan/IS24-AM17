@@ -88,12 +88,12 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void placeStarterCard(boolean placed) throws RemoteException {
+    public void placeStarterCard() throws RemoteException {
 
     }
 
     @Override
-    public void placeCard(boolean placed) throws RemoteException {
+    public void placeCard() throws RemoteException {
 
     }
 
@@ -124,7 +124,7 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
 
     @Override
     public void sendPlayerTurn(int playerID, String playerNickname) throws RemoteException {
-        view.showPlayerTurn(playerID, playerNickname);
+        view.showFirstPlayerTurn(playerID, playerNickname);
     }
 
     @Override

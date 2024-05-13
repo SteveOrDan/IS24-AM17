@@ -1,6 +1,5 @@
 package com.example.pf_soft_ing.network.client;
 
-import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -36,9 +35,9 @@ public interface ClientRMIInterface extends Remote {
 
     void setStarterCard(int id) throws RemoteException;
 
-    void placeStarterCard(boolean placed) throws RemoteException;
+    void placeStarterCard() throws RemoteException;
 
-    void placeCard(boolean placed) throws RemoteException;
+    void placeCard() throws RemoteException;
 
     void sendError(String errorMsg) throws RemoteException;
 

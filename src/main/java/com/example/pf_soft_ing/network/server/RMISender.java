@@ -90,14 +90,15 @@ public class RMISender implements Sender {
 
     }
 
-    /**
-     * Method to place a card
-     * @param placed boolean
-     */
     @Override
-    public void placeCard(boolean placed){
+    public void sendFirstPlayer(int playerID, String playerNickname) {
+
+    }
+
+    @Override
+    public void placeCard(){
         try {
-            client.placeCard(placed);
+            client.placeCard();
         }
         catch (RemoteException e) {
             throw new RuntimeException(e);
@@ -105,9 +106,9 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendNewPlayer(String nickname) {
+    public void sendFirstPlayerTurn(int playerID, String playerNickname) {
         try {
-            client.showNewPlayer(nickname);
+            client.sendPlayerTurn(playerID, playerNickname);
         }
         catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
@@ -115,12 +116,7 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendPlayerTurn(int playerID, String playerNickname) {
-        try {
-            client.sendPlayerTurn(playerID, playerNickname);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
-        }
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int playerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+
     }
 }
