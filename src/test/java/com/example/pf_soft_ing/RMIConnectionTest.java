@@ -25,7 +25,6 @@ public class RMIConnectionTest {
         } catch (IOException | NotBoundException e) {
             fail();
         }
-        view.setSender(sender);
 
         sender.getMatches();
         return sender;

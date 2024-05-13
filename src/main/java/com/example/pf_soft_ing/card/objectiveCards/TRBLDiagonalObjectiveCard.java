@@ -13,7 +13,7 @@ public class TRBLDiagonalObjectiveCard extends DiagonalObjectiveCard{
     public TRBLDiagonalObjectiveCard(int id, CardElementType elementType) {
         super(id, elementType);
 
-        this.objectiveType = "TRBLDiagonalObjectiveCard";
+        setObjectiveType("TRBLDiagonalObjectiveCard");
     }
 
     @Override

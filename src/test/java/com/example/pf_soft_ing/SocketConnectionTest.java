@@ -1,11 +1,9 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.app.TUIApp;
 import com.example.pf_soft_ing.network.client.ClientMain;
 import com.example.pf_soft_ing.network.client.ClientSender;
 import com.example.pf_soft_ing.network.client.TUIView;
 import com.example.pf_soft_ing.network.client.View;
-import com.example.pf_soft_ing.network.server.ServerMain;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -26,7 +24,6 @@ public class SocketConnectionTest {
         } catch (IOException e) {
             fail();
         }
-        view.setSender(sender);
 
         sender.getMatches();
         return sender;

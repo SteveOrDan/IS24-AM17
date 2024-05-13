@@ -6,6 +6,7 @@ module com.example.pf_soft_ing {
     requires com.google.gson;
     requires java.rmi;
     requires java.desktop;
+    requires java.smartcardio;
 
     exports com.example.pf_soft_ing.card;
     opens com.example.pf_soft_ing.card to javafx.fxml;

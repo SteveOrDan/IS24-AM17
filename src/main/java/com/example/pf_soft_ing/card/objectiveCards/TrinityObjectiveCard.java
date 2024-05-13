@@ -13,7 +13,7 @@ public class TrinityObjectiveCard extends ObjectiveCard{
     public TrinityObjectiveCard(int id) {
         super(id, points);
 
-        this.objectiveType = "TrinityObjectiveCard";
+        setObjectiveType("TrinityObjectiveCard");
     }
 
     @Override

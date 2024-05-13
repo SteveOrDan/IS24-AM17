@@ -69,10 +69,13 @@ public class GameController {
     public void chooseNickname(int playerID, String nickname, MatchController matchController) {
         // The player chooses a nickname for the match and is completely added to the match
         try {
+            if (nickname == null || nickname.isEmpty() || nickname.isBlank()) {
+                throw new InvalidNicknameException();
+            }
+
             gameModel.chooseNickname(playerID, nickname);
 
             // if match reached max players, start the game ; else send the nickname to the player
-
             if (matchController.checkForGameStart()) {
                 gameModel.startGame(matchController);
 
@@ -98,15 +101,26 @@ public class GameController {
                 getPlayerSender(playerID).chooseNicknameResult(nickname);
             }
         }
-        catch (InvalidMatchIDException | NicknameAlreadyExistsException e) {
+        catch (InvalidMatchIDException | NicknameAlreadyExistsException | InvalidNicknameException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
 
+    /**
+     * Creates a new player in the game model
+     * @param sender Sender of the player
+     * @return PlayerModel created with a give sender
+     */
     public PlayerModel createPlayer(Sender sender){
         return gameModel.createPlayer(sender);
     }
 
+    /**
+     * Getter
+     * @param playerID ID of the player
+     * @return Match ID of the player with the given ID
+     * @throws InvalidPlayerIDException if the player ID is invalid
+     */
     public int getMatchIDWithPlayer(int playerID) throws InvalidPlayerIDException {
         return gameModel.getIDToPlayers().get(playerID).getMatchID();
     }
@@ -119,15 +133,4 @@ public class GameController {
     public Sender getPlayerSender(int playerID) {
         return gameModel.getIDToPlayers().get(playerID).getSender();
     }
-
-// Broadcast Area === KEEP OUT!!!! ===
-//    public List<Sender> getAllOtherSenders(int playerID){
-//        for (PlayerModel player : gameModel.getIDToPlayers().values()){
-//
-//        }
-//    }
-//
-//    public List<Sender> getOpponentSenders(int matchID, int playerID){
-//
-//    }
 }

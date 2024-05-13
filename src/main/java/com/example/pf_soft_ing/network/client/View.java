@@ -7,8 +7,6 @@ import java.util.Map;
 
 public interface View {
 
-    void setSender(ClientSender sender);
-
     void showMatches(Map<Integer, List<String>> matches);
 
     void createMatch(int matchID, String hostNickname);
@@ -25,12 +23,12 @@ public interface View {
                          TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2,
                          int secretObjectiveCardID1, int secretObjectiveCardID2);
 
-    void confirmSecretObjective(int secretObjectiveCardID);
+    void confirmSecretObjective();
 
     void errorMessage(String errorMessage);
     void showNewPlayer(String nicknames);
 
-    void showPlayerTurn(int playerID);
+    void showPlayerTurn(int playerID, String playerNickname);
 
     void setID(int playerID);
 }

@@ -14,7 +14,7 @@ public class BLLShapeObjectiveCard extends LShapeObjectiveCard {
     public BLLShapeObjectiveCard(int id, CardElementType mainElementType, CardElementType secondaryElementType) {
         super(id, mainElementType, secondaryElementType);
 
-        this.objectiveType = "BLLShapeObjectiveCard";
+        setObjectiveType("BLLShapeObjectiveCard");
     }
 
     @Override

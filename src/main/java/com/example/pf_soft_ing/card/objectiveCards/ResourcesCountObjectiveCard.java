@@ -10,9 +10,9 @@ public class ResourcesCountObjectiveCard extends ObjectiveCard {
 
     private static final int points = 2;
 
-    public final ResourceType resourceType;
+    private final ResourceType resourceType;
 
-    public final int requiredResourceCount;
+    private final int requiredResourceCount;
 
     public ResourcesCountObjectiveCard(int id, ResourceType resourceType, int requiredResourceCount) {
         super(id, points);
@@ -20,7 +20,15 @@ public class ResourcesCountObjectiveCard extends ObjectiveCard {
         this.resourceType = resourceType;
         this.requiredResourceCount = requiredResourceCount;
 
-        this.objectiveType = "ResourcesCountObjectiveCard";
+        setObjectiveType("ResourcesCountObjectiveCard");
+    }
+
+    /**
+     * Getter
+     * @return Resource type of the objective card
+     */
+    public ResourceType getResourceType() {
+        return resourceType;
     }
 
     @Override

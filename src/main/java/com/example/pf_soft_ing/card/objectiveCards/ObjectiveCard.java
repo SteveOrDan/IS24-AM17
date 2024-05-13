@@ -7,9 +7,9 @@ import java.util.HashMap;
 
 public abstract class ObjectiveCard {
 
-    public final int id;
-    public final int points;
-    public String objectiveType;
+    private final int id;
+    private final int points;
+    private String objectiveType;
 
     public ObjectiveCard(int id, int points) {
         this.id = id;
@@ -22,6 +22,14 @@ public abstract class ObjectiveCard {
 
     public int getPoints() {
         return points;
+    }
+
+    public String getObjectiveType() {
+        return objectiveType;
+    }
+
+    public void setObjectiveType(String objectiveType) {
+        this.objectiveType = objectiveType;
     }
 
     /**

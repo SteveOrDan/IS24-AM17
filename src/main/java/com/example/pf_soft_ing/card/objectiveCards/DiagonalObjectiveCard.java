@@ -10,12 +10,19 @@ import java.util.HashMap;
 public abstract class DiagonalObjectiveCard extends ObjectiveCard {
 
     private static final int points = 2;
-    public final CardElementType elementType;
+    private final CardElementType elementType;
 
     public DiagonalObjectiveCard(int id, CardElementType elementType) {
         super(id, points);
 
         this.elementType = elementType;
+    }
+
+    /**
+     * @return CardElementType of the diagonal shape type objective card
+     */
+    public CardElementType getElementType() {
+        return elementType;
     }
 
     /**

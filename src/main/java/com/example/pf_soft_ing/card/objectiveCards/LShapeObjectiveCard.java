@@ -11,14 +11,30 @@ public abstract class LShapeObjectiveCard extends ObjectiveCard {
 
     private static final int points = 3;
 
-    public final CardElementType mainElementType;
-    public final CardElementType secondaryElementType;
+    private final CardElementType mainElementType;
+    private final CardElementType secondaryElementType;
 
     public LShapeObjectiveCard(int id, CardElementType mainElementType, CardElementType secondaryElementType) {
         super(id, points);
 
         this.mainElementType = mainElementType;
         this.secondaryElementType = secondaryElementType;
+    }
+
+    /**
+     * Getter
+     * @return Main element type of the objective card
+     */
+    public CardElementType getMainElementType() {
+        return mainElementType;
+    }
+
+    /**
+     * Getter
+     * @return Secondary element type of the objective card
+     */
+    public CardElementType getSecondaryElementType() {
+        return secondaryElementType;
     }
 
     /**

@@ -1,11 +1,16 @@
 package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.*;
+import com.example.pf_soft_ing.card.objectiveCards.*;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.player.TokenColors;
+import javafx.scene.paint.Color;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,12 +19,150 @@ import java.util.Map;
 public class TUIView implements View {
 
     private ClientSender sender;
+    private BufferedReader stdIn;
 
-    Map<Integer, List<String>> cardIDToCardFrontTUILines;
-    Map<Integer, List<String>> cardIDToCardBackTUILines;
+    private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
+    private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
 
-    public void setSender(ClientSender sender) {
-        this.sender = sender;
+    private CardSideType starterSide;
+    private int starterCardID;
+
+    private int secretObjectiveCardID1;
+    private int secretObjectiveCardID2;
+
+    private int secretObjectiveCardID;
+
+    public void start(String[] args) {
+        System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".");
+
+        stdIn = new BufferedReader(new InputStreamReader(System.in));
+        boolean connected = false;
+        int portNumber = 0;
+
+        while (!connected){
+            System.out.println("Choose connection type:\n\t-'1' for Socket;\n\t-'2' for RMI;");
+
+            try {
+                String connectionType = stdIn.readLine();
+                while (!connectionType.equals("1") && !connectionType.equals("2")) {
+                    System.out.println("Please insert a valid choice (either 1 or 2).");
+                    connectionType = stdIn.readLine();
+                }
+                System.out.println("Enter the port number:");
+                boolean hasPort = false;
+
+                while (!hasPort) {
+                    try {
+                        portNumber = Integer.parseInt(stdIn.readLine());
+                        hasPort = true;
+                    }
+                    catch (Exception e) {
+                        System.out.println("Please insert a valid number.");
+                    }
+                }
+
+                if (connectionType.equals("1")) {
+                    sender = ClientMain.startSocket(args[0], portNumber, this);
+                }
+                else {
+                    sender = ClientMain.startRMI(args[0], portNumber, this);
+                }
+                connected = true;
+            }
+            catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        sender.getMatches();
+
+        startInputReading();
+    }
+
+    private void startInputReading() {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    String userInput = stdIn.readLine();
+
+                    if (userInput != null) {
+                        interpretInput(userInput);
+                    }
+                }
+                catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }).start();
+    }
+
+    private void interpretInput(String userInput) {
+        String[] parts = userInput.split(" ");
+        String command = parts[0];
+
+        switch (command) {
+            case "GetMatches" -> {
+                if (parts.length != 1) {
+                    System.out.println("Error: GetMatches does not take any arguments. Please try again.");
+                    break;
+                }
+                sender.getMatches();
+            }
+            case "CreateMatch" -> {
+                if (parts.length != 3) {
+                    System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
+                    break;
+                }
+                sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
+            }
+            case "SelectMatch" -> {
+                if (parts.length != 2) {
+                    System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
+                    break;
+                }
+                sender.selectMatch(Integer.parseInt(parts[1]));
+            }
+            case "ChooseNickname" -> {
+                if (parts.length != 2) {
+                    System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
+                    break;
+                }
+                sender.chooseNickname(parts[1]);
+            }
+            case "FlipStarterCard" -> {
+                if (parts.length != 1) {
+                    System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
+                    break;
+                }
+                flipStarterCard();
+            }
+            case "PlaceStarterCard" -> {
+                if (parts.length != 1) {
+                    System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
+                    break;
+                }
+                sender.placeStarterCard(starterSide);
+            }
+            case "ChooseSecretObjective" -> {
+                if (parts.length != 2) {
+                    System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
+                    break;
+                }
+
+                try {
+                    int choice = Integer.parseInt(parts[1]);
+
+                    secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
+
+                    sender.chooseSecretObjective(secretObjectiveCardID);
+                }
+                catch (Exception e) {
+                    System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                }
+            }
+            case "exit", "quit" -> System.err.println("Disconnecting...");
+            default -> System.out.println("Error: " + command + " is not a valid command. Please, try again");
+        }
     }
 
     @Override
@@ -47,7 +190,7 @@ public class TUIView implements View {
     @Override
     public void createMatch(int matchID, String hostNickname) {
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
-        System.out.println("Wait for players to join...");
+        System.out.println("Waiting for players to join...");
     }
 
     @Override
@@ -67,13 +210,14 @@ public class TUIView implements View {
                           int starterCardID) {
         System.out.println("Game started.");
 
+        GameResources.initializeAllDecks();
+
         // Print 4 visible cards, 2 deck top card and starter card
         printDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
 
         // Create and print starter card
-        createStarterCardLines(starterCardID, CardSideType.FRONT);
-        createStarterCardLines(starterCardID, CardSideType.BACK);
+        printStarterCardChoice(starterCardID);
 
         System.out.println("To view the other side of the starter card type: FlipStarterCard");
         System.out.println("To place the starter card on the current side type: PlaceStarterCard");
@@ -81,12 +225,31 @@ public class TUIView implements View {
 
     @Override
     public void setMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        // Create player hand
+        printPlayerHand(resourceCardID1, resourceCardID2, goldenCardID, TokenColors.getColorFromToken(tokenColor));
 
+        // Create common objectives
+        printCommonObjectives(commonObjectiveCardID1, commonObjectiveCardID2);
+
+        // Render secret objective choice
+        printSecretObjectiveChoice(secretObjectiveCardID1, secretObjectiveCardID2);
     }
 
     @Override
-    public void confirmSecretObjective(int secretObjectiveCardID) {
+    public void confirmSecretObjective() {
+        int otherSecretObjectiveCardID = secretObjectiveCardID == secretObjectiveCardID1 ? secretObjectiveCardID2 : secretObjectiveCardID1;
 
+        cardIDToCardFrontTUILines.remove(otherSecretObjectiveCardID);
+
+        System.out.println("Secret objective chosen:");
+
+        List<String> secretObjectiveCardFront = cardIDToCardFrontTUILines.get(secretObjectiveCardID);
+
+        for (String s : secretObjectiveCardFront) {
+            System.out.println(s);
+        }
+
+        System.out.println("Waiting for other players to end their setup.");
     }
 
     @Override
@@ -97,12 +260,14 @@ public class TUIView implements View {
     @Override
     public void showNewPlayer(String nicknames) {
         System.out.println("New player joined: " + nicknames);
-        System.out.println("Wait for players to join...");
+        System.out.println("Waiting for players to join...");
     }
 
     @Override
-    public void showPlayerTurn(int playerID) {
+    public void showPlayerTurn(int playerID, String playerNickname) {
+        System.out.println("It's " + playerNickname + "'s turn.");
 
+        System.out.println("To place a card type: PlaceCard <cardID> <position>");
     }
 
     private void printDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
@@ -130,6 +295,121 @@ public class TUIView implements View {
         createGoldCardLines(visibleGoldCardID2, CardSideType.BACK);
 
         // Print TUI lines for cards in the draw area
+        List<String> resDeckCard = cardIDToCardBackTUILines.get(resDeckCardID);
+        List<String> visibleResCard1 = cardIDToCardFrontTUILines.get(visibleResCardID1);
+        List<String> visibleResCard2 = cardIDToCardFrontTUILines.get(visibleResCardID2);
+
+        System.out.println("Resource cards:");
+        for (int i = 0; i < resDeckCard.size(); i++) {
+            System.out.println(resDeckCard.get(i) + "   " + visibleResCard1.get(i) + "   " + visibleResCard2.get(i));
+        }
+
+        List<String> goldDeckCard = cardIDToCardBackTUILines.get(goldDeckCardID);
+        List<String> visibleGoldCard1 = cardIDToCardFrontTUILines.get(visibleGoldCardID1);
+        List<String> visibleGoldCard2 = cardIDToCardFrontTUILines.get(visibleGoldCardID2);
+
+        System.out.println("Golden cards:");
+        for (int i = 0; i < goldDeckCard.size(); i++) {
+            System.out.println(goldDeckCard.get(i) + "   " + visibleGoldCard1.get(i) + "   " + visibleGoldCard2.get(i));
+        }
+    }
+
+    private void printStarterCardChoice(int starterCardID) {
+        this.starterCardID = starterCardID;
+        starterSide = CardSideType.FRONT;
+
+        createStarterCardLines(starterCardID, CardSideType.FRONT);
+        createStarterCardLines(starterCardID, CardSideType.BACK);
+
+        List<String> starterCardFront = cardIDToCardFrontTUILines.get(starterCardID);
+
+        System.out.println("Starter card:");
+        for (String s : starterCardFront) {
+            System.out.println(s);
+        }
+    }
+
+    private void flipStarterCard() {
+        List<String> starterCard;
+
+        if (starterSide.equals(CardSideType.FRONT)) {
+            starterSide = CardSideType.BACK;
+
+            starterCard = cardIDToCardBackTUILines.get(starterCardID);
+        }
+        else {
+            starterSide = CardSideType.FRONT;
+
+            starterCard = cardIDToCardFrontTUILines.get(starterCardID);
+        }
+
+        System.out.println("Current starter card side:");
+        for (String s : starterCard) {
+            System.out.println(s);
+        }
+
+        System.out.println("To place the starter card on the current side: PlaceStarterCard");
+    }
+
+    private void printPlayerHand(int resourceCardID1, int resourceCardID2, int goldenCardID, Color colorFromToken) {
+        System.out.println("Player hand:");
+
+        createResCardLines(resourceCardID1, CardSideType.FRONT);
+        createResCardLines(resourceCardID1, CardSideType.BACK);
+
+        createResCardLines(resourceCardID2, CardSideType.FRONT);
+        createResCardLines(resourceCardID2, CardSideType.BACK);
+
+        createGoldCardLines(goldenCardID, CardSideType.FRONT);
+        createGoldCardLines(goldenCardID, CardSideType.BACK);
+
+        List<String> resCard1Front = cardIDToCardFrontTUILines.get(resourceCardID1);
+        List<String> resCard2Front = cardIDToCardFrontTUILines.get(resourceCardID2);
+        List<String> goldCardFront = cardIDToCardFrontTUILines.get(goldenCardID);
+
+        System.out.println("Color: " + colorFromToken.toString());
+
+        System.out.println("Your hand:");
+        for (int i = 0; i < resCard1Front.size(); i++) {
+            System.out.println(resCard1Front.get(i) + "   " + resCard2Front.get(i) + "   " + goldCardFront.get(i));
+        }
+    }
+
+    private void printCommonObjectives(int commonObjectiveCardID1, int commonObjectiveCardID2) {
+        createObjectiveCardLines(commonObjectiveCardID1);
+
+        createObjectiveCardLines(commonObjectiveCardID2);
+
+        List<String> commonObjectiveCard1Front = cardIDToCardFrontTUILines.get(commonObjectiveCardID1);
+        List<String> commonObjectiveCard2Front = cardIDToCardFrontTUILines.get(commonObjectiveCardID2);
+
+        System.out.println("Common objectives:");
+        for (int i = 0; i < commonObjectiveCard1Front.size(); i++) {
+            System.out.println(commonObjectiveCard1Front.get(i) + "   " + commonObjectiveCard2Front.get(i));
+        }
+    }
+
+    private void printSecretObjectiveChoice(int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        this.secretObjectiveCardID1 = secretObjectiveCardID1;
+        this.secretObjectiveCardID2 = secretObjectiveCardID2;
+
+        createObjectiveCardLines(secretObjectiveCardID1);
+        createObjectiveCardLines(secretObjectiveCardID2);
+
+        List<String> secretObjectiveCard1Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID1);
+        List<String> secretObjectiveCard2Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID2);
+
+        System.out.println("Objective 1:");
+        for (String s : secretObjectiveCard1Front) {
+            System.out.println(s);
+        }
+
+        System.out.println("Objective 2:");
+        for (String s : secretObjectiveCard2Front) {
+            System.out.println(s);
+        }
+
+        System.out.println("To choose one of the objectives type: ChooseSecretObjective <1 or 2>.");
     }
 
     private void createResCardLines(int cardID, CardSideType sideType) {
@@ -488,8 +768,8 @@ public class TUIView implements View {
             }
 
             if (permanentRes.size() == 1) {
-                D1 = cardSide.getResources().getFirst().toString();
-                D2 = " ";
+                D1 = " ";
+                D2 = cardSide.getResources().getFirst().toString();
                 D3 = " ";
             }
             else if (permanentRes.size() == 2) {
@@ -525,5 +805,172 @@ public class TUIView implements View {
         else {
             cardIDToCardBackTUILines.put(cardID, lines);
         }
+    }
+
+    private void createObjectiveCardLines(int cardID) {
+        ObjectiveCard card = GameResources.getObjectiveCardByID(cardID);
+
+        switch (card){
+            case BLLShapeObjectiveCard castedCard -> createBLLShapeObjectiveCardLines(castedCard);
+
+            case BRLShapeObjectiveCard castedCard -> createBRLShapeObjectiveCardLines(castedCard);
+
+            case ResourcesCountObjectiveCard castedCard -> createResourcesCountObjectiveCardLines(castedCard);
+
+            case TLBRDiagonalObjectiveCard castedCard -> createTLBRDiagonalObjectiveCardLines(castedCard);
+
+            case TLLShapeObjectiveCard castedCard -> createTLLShapeObjectiveCardLines(castedCard);
+
+            case TRBLDiagonalObjectiveCard castedCard -> createTRBLDiagonalObjectiveCardLines(castedCard);
+
+            case TrinityObjectiveCard castedCard -> createTrinityObjectiveCardLines(castedCard);
+
+            case TRLShapeObjectiveCard castedCard -> createTRLShapeObjectiveCardLines(castedCard);
+
+            default -> throw new IllegalStateException("Unexpected value: " + card);
+        }
+    }
+
+    private void createBLLShapeObjectiveCardLines(BLLShapeObjectiveCard card) {
+        String mainColor = card.getMainElementType().getColor();
+        String secColor = card.getSecondaryElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints() + "       ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃           " + mainColor + "   " + CC.RESET + "         ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createBRLShapeObjectiveCardLines(BRLShapeObjectiveCard card) {
+        String mainColor = card.getMainElementType().getColor();
+        String secColor = card.getSecondaryElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃                 " + mainColor + "   " + CC.RESET + "   ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createResourcesCountObjectiveCardLines(ResourcesCountObjectiveCard card) {
+        List<String> lines = new ArrayList<>();
+
+        if (card.getID() >= 94 && card.getID() <= 97) {
+            String color = card.getResourceType().getColor();
+
+            lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+            lines.add("┃               " + card.getPoints() + "       ┃");
+            lines.add("┃                       ┃");
+            lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
+            lines.add("┃           " + color + "   " + CC.RESET + "   " + color + "   " + CC.RESET + "   ┃");
+            lines.add("┃                       ┃");
+            lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        }
+        else {
+            String resType = card.getResourceType().toString();
+
+            lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+            lines.add("┃               "+ card.getPoints()+ "       ┃");
+            lines.add("┃                       ┃");
+            lines.add("┃              " + resType + "  "  + resType + "     ┃");
+            lines.add("┃                       ┃");
+            lines.add("┃                       ┃");
+            lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        }
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createTLBRDiagonalObjectiveCardLines(TLBRDiagonalObjectiveCard card) {
+        String color = card.getElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
+        lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
+        lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createTLLShapeObjectiveCardLines(TLLShapeObjectiveCard card) {
+        String mainColor = card.getMainElementType().getColor();
+        String secColor = card.getSecondaryElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃           " + mainColor + "   " + CC.RESET + "         ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createTRBLDiagonalObjectiveCardLines(TRBLDiagonalObjectiveCard card) {
+        String color = card.getElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
+        lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
+        lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createTrinityObjectiveCardLines(TrinityObjectiveCard card) {
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃                       ┃");
+        lines.add("┃            " + CC.YELLOW + "Q  K  M" + CC.RESET + "    ┃");
+        lines.add("┃                       ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createTRLShapeObjectiveCardLines(TRLShapeObjectiveCard card) {
+        String mainColor = card.getMainElementType().getColor();
+        String secColor = card.getSecondaryElementType().getColor();
+
+        List<String> lines = new ArrayList<>();
+
+        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
+        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃                 " + mainColor + "   " + CC.RESET + "   ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
+        lines.add("┃                       ┃");
+        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+
+        cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 }

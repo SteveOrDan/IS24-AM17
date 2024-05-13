@@ -42,6 +42,8 @@ public class GUIView implements View {
     private CardSideType starterCardSide;
     private int starterCardID;
 
+    private int secretObjectiveCardID;
+
     private String connectionType;
 
     private int selectedCardID = -1;
@@ -100,11 +102,6 @@ public class GUIView implements View {
         this.ip = ip;
 
         launchApp();
-    }
-
-    @Override
-    public void setSender(ClientSender sender) {
-
     }
 
     private void launchApp(){
@@ -686,7 +683,10 @@ public class GUIView implements View {
         secretObjective1Button.setPrefSize(cardWidth, cardHeight);
         secretObjective1Button.setLayoutX(0);
         secretObjective1Button.setLayoutY(0);
-        secretObjective1Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective1ID));
+        secretObjective1Button.setOnAction((_) -> {
+            secretObjectiveCardID = secretObjective1ID;
+            sender.chooseSecretObjective(secretObjectiveCardID);
+        });
         secretObjective1Button.setOpacity(0.1);
 
         // Create button to confirm choice
@@ -694,7 +694,10 @@ public class GUIView implements View {
         secretObjective2Button.setPrefSize(cardWidth, cardHeight);
         secretObjective2Button.setLayoutX(0);
         secretObjective2Button.setLayoutY(0);
-        secretObjective2Button.setOnAction((_) -> sender.chooseSecretObjective(secretObjective2ID));
+        secretObjective2Button.setOnAction((_) -> {
+            secretObjectiveCardID = secretObjective2ID;
+            sender.chooseSecretObjective(secretObjectiveCardID);
+        });
         secretObjective2Button.setOpacity(0.1);
 
         // Add everything to the root
@@ -1264,13 +1267,13 @@ public class GUIView implements View {
     }
 
     @Override
-    public void confirmSecretObjective(int secretObjectiveID) {
+    public void confirmSecretObjective() {
         Platform.runLater(() -> {
             tempChoicePane.getChildren().clear();
 
             // Place secret objective in player hand
             double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
-            Pane secretObjectivePane = createCardPane(secretObjectiveID, CardSideType.FRONT, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+            Pane secretObjectivePane = createCardPane(secretObjectiveCardID, CardSideType.FRONT, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
 
             playerHandPane.getChildren().add(secretObjectivePane);
         });
@@ -1287,7 +1290,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showPlayerTurn(int playerID) {
+    public void showPlayerTurn(int playerID, String playerNickname) {
 
     }
 

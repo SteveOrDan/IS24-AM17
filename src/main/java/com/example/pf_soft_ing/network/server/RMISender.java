@@ -20,7 +20,8 @@ public class RMISender implements Sender {
     public void sendError(String errorMsg) {
         try {
             client.sendError(errorMsg);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
         }
     }
@@ -29,7 +30,8 @@ public class RMISender implements Sender {
     public void sendMatches(Map<Integer, List<String>> matches, int playerID) {
         try {
             client.showMatches(matches, playerID);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
         }
     }
@@ -38,7 +40,8 @@ public class RMISender implements Sender {
     public void createMatchResult(int matchID, String hostNickname) {
         try {
             client.createMatchResult(matchID, hostNickname);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
         }
     }
@@ -47,7 +50,8 @@ public class RMISender implements Sender {
     public void selectMatchResult(int matchID, List<String> nicknames) {
         try {
             client.selectMatchResult(matchID, nicknames);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
         }
     }
@@ -56,7 +60,8 @@ public class RMISender implements Sender {
     public void chooseNicknameResult(String nickname) {
         try {
             client.chooseNicknameResult(nickname);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Nickname is not avaiable");
         }
     }
@@ -67,7 +72,8 @@ public class RMISender implements Sender {
                               int starterCardID) {
         try {
             client.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Game not started");
         }
     }
@@ -76,6 +82,11 @@ public class RMISender implements Sender {
     public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                                  int commonObjectiveCardID1, int commonObjectiveCardID2,
                                  int secretObjectiveCardID1, int secretObjectiveCardID2) {
+
+    }
+
+    @Override
+    public void confirmSecretObjective() {
 
     }
 
@@ -97,16 +108,18 @@ public class RMISender implements Sender {
     public void sendNewPlayer(String nickname) {
         try {
             client.showNewPlayer(nickname);
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
         }
     }
 
     @Override
-    public void sendPlayerTurn(int playerID) {
+    public void sendPlayerTurn(int playerID, String playerNickname) {
         try {
-            client.sendPlayerTurn(playerID);
-        } catch (RemoteException e) {
+            client.sendPlayerTurn(playerID, playerNickname);
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
         }
     }

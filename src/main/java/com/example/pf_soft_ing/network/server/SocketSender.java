@@ -71,13 +71,14 @@ public class SocketSender implements Sender {
         sendMessage(new MissingSetupMsg(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2));
     }
 
-    /**
-     * Method to place a card
-     * @param placed boolean
-     */
+    @Override
+    public void confirmSecretObjective() {
+        sendMessage(new ConfirmSecretObjectiveMsg());
+    }
+
     @Override
     public void placeCard(boolean placed){
-//        SendMessage(STR."10 \{placed}");
+
     }
 
     @Override
@@ -86,8 +87,8 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendPlayerTurn(int playerID) {
-        sendMessage(new PlayerTurnMsg(playerID));
+    public void sendPlayerTurn(int playerID, String playerNickname) {
+        sendMessage(new PlayerTurnMsg(playerID, playerNickname));
     }
 
 }

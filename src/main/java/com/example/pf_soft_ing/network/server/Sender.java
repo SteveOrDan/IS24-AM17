@@ -32,6 +32,8 @@ public interface Sender {
                           int commonObjectiveCardID1, int commonObjectiveCardID2,
                           int secretObjectiveCardID1, int secretObjectiveCardID2);
 
+    void confirmSecretObjective();
+
     /**
      * Method to place a card
      * @param placed boolean
@@ -40,5 +42,5 @@ public interface Sender {
 
     void sendNewPlayer(String nickname);
 
-    void sendPlayerTurn(int playerID);
+    void sendPlayerTurn(int playerID, String playerNickname);
 }

@@ -158,8 +158,11 @@ public class MatchController implements Serializable {
                 int currPlayerID = getCurrPlayerID();
 
                 for (Integer ID : getIDToPlayerMap().keySet()) {
-                    getPlayerSender(ID).sendPlayerTurn(currPlayerID);
+                    getPlayerSender(ID).sendPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname());
                 }
+            }
+            else {
+                getPlayerSender(playerID).confirmSecretObjective();
             }
         }
         catch (InvalidPlayerIDException | InvalidObjectiveCardException e) {

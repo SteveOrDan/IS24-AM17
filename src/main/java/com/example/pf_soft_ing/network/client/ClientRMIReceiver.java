@@ -123,8 +123,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendPlayerTurn(int playerID) throws RemoteException {
-        view.showPlayerTurn(playerID);
+    public void sendPlayerTurn(int playerID, String playerNickname) throws RemoteException {
+        view.showPlayerTurn(playerID, playerNickname);
     }
 
     @Override

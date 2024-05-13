@@ -75,7 +75,9 @@ public class ClientSocketReceiver {
                     castedMsg.getSecretObjectiveCardID1(), castedMsg.getSecretObjectiveCardID2()
             );
 
-            case PlayerTurnMsg castedMsg -> view.showPlayerTurn(castedMsg.getPlayerID());
+            case ConfirmSecretObjectiveMsg ignored -> view.confirmSecretObjective();
+
+            case PlayerTurnMsg castedMsg -> view.showPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname());
 
             case null, default -> System.out.println("Invalid message type");
         }

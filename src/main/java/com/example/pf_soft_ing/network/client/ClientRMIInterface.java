@@ -51,7 +51,7 @@ public interface ClientRMIInterface extends Remote {
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
 
-    void sendPlayerTurn(int playerID) throws RemoteException;
+    void sendPlayerTurn(int playerID, String playerNickname) throws RemoteException;
 
     void showNewPlayer(String nickname) throws RemoteException;
 }

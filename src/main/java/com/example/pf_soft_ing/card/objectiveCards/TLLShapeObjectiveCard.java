@@ -14,7 +14,7 @@ public class TLLShapeObjectiveCard extends LShapeObjectiveCard {
     public TLLShapeObjectiveCard(int id, CardElementType mainElementType, CardElementType secondaryElementType) {
         super(id, mainElementType, secondaryElementType);
 
-        this.objectiveType = "TLLShapeObjectiveCard";
+        setObjectiveType("TLLShapeObjectiveCard");
     }
 
     @Override

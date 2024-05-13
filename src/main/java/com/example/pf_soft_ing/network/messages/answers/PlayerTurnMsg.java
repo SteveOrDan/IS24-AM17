@@ -6,12 +6,19 @@ public class PlayerTurnMsg extends Message {
 
     private final int playerID;
 
-    public PlayerTurnMsg(int playerID){
+    private final String playerNickname;
+
+    public PlayerTurnMsg(int playerID, String playerNickname){
         this.playerID = playerID;
+        this.playerNickname = playerNickname;
     }
 
     public int getPlayerID(){
         return playerID;
+    }
+
+    public String getPlayerNickname(){
+        return playerNickname;
     }
 
     @Override

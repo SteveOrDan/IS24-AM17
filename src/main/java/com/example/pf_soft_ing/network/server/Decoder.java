@@ -12,7 +12,6 @@ public class Decoder {
     private static MatchController matchController;
 
     public static void decode(Message message, int playerID) {
-        Sender sender = gameController.getPlayerSender(playerID);
         System.out.println("Received msg from player " + playerID);
 
         switch (message) {
@@ -36,7 +35,6 @@ public class Decoder {
             case ChooseSecretObjMsg castedMsg -> {
                 matchController.setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
             }
-
 
             case null, default -> System.out.println("Invalid message type");
         }
