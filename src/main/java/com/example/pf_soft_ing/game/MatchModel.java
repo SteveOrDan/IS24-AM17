@@ -61,6 +61,7 @@ public class MatchModel {
         return tokenColor;
     }
 
+    // TODO: get rid of getIDToPlayerMap() and create the necessary methods
     /**
      * Getter
      * @return Map of player IDs to player models

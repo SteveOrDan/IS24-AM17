@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.card.GoldenCard;
+import com.example.pf_soft_ing.card.ResourceCard;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.game.GameController;
@@ -304,7 +306,7 @@ class MatchControllerTest {
                         matchController.drawResourceCard(currPlayerID);
                     } catch (Exception e) {
                         System.out.println(e.getMessage());
-                    };
+                    }
                     break;
                 case 2:
                     // Draw visible golden
@@ -312,7 +314,11 @@ class MatchControllerTest {
                     break;
                 case 3:
                     // Draw deck golden
-                    matchController.drawGoldenCard(currPlayerID);
+                    try {
+                        matchController.drawGoldenCard(currPlayerID);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
             }
 
@@ -390,7 +396,7 @@ class MatchControllerTest {
     }
 
     @Test
-    public void testPlaceAndDrawExceptions(){
+    void testPlaceAndDrawExceptions(){
         setUpGame();
 
         PlayerModel currPlayer = getCurrentPlayer();
@@ -469,7 +475,7 @@ class MatchControllerTest {
     }
 
     @Test
-    public void testPlaceAndDraw(){
+    void testPlaceAndDraw(){
         setUpGame();
 
         PlayerModel currPlayer = getCurrentPlayer();
@@ -490,7 +496,8 @@ class MatchControllerTest {
         PlayerModel finalCurrPlayer1 = currPlayer;
         assertDoesNotThrow(() -> matchController.placeCard(finalCurrPlayerID1, finalCurrPlayer1.getHand().getFirst().getID(), new Position(1, 1), CardSideType.BACK));
         // Draw card
-        matchController.drawGoldenCard(currPlayerID);
+        int finalCurrPlayerID5 = currPlayerID;
+        assertDoesNotThrow(() -> matchController.drawGoldenCard(finalCurrPlayerID5));
 
         currPlayer = getCurrentPlayer();
         currPlayerID = getCurrentPlayerId();
@@ -512,77 +519,63 @@ class MatchControllerTest {
     }
 
     @Test
-    public void restoreVisibleResourceCardEmptyDeck(){
+    void restoreVisibleResourceCardEmptyDeck(){
         setUpGame();
 
-        matchController.clearResCardDeck();
+        clearResCardDeck();
 
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
         // Place card
-        int finalCurrPlayerID = currPlayerID;
-        PlayerModel finalCurrPlayer = currPlayer;
-        assertDoesNotThrow(() -> matchController.placeCard(finalCurrPlayerID, finalCurrPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
-        // Draw card
-        matchController.drawVisibleResourceCard(currPlayerID, 0);
-
-        matchController.clearGoldCardDeck();
-
-        currPlayer = getCurrentPlayer();
-        currPlayerID = getCurrentPlayerId();
-        // Place card
-        int finalCurrPlayerID1 = currPlayerID;
-        PlayerModel finalCurrPlayer1 = currPlayer;
-        assertDoesNotThrow(() -> matchController.placeCard(finalCurrPlayerID1, finalCurrPlayer1.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
         // Draw card
         matchController.drawVisibleResourceCard(currPlayerID, 0);
     }
 
     @Test
-    public void restoreVisibleGoldenCardEmptyDeck(){
+    void restoreVisibleGoldenCardEmptyDeck(){
         setUpGame();
 
-        matchController.clearGoldCardDeck();
+        clearGoldCardDeck();
 
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
         // Place card
-        int finalCurrPlayerID = currPlayerID;
-        PlayerModel finalCurrPlayer = currPlayer;
-        assertDoesNotThrow(() -> matchController.placeCard(finalCurrPlayerID, finalCurrPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
-        // Draw card
-        matchController.drawVisibleGoldenCard(currPlayerID, 0);
-
-        matchController.clearResCardDeck();
-
-        currPlayer = getCurrentPlayer();
-        currPlayerID = getCurrentPlayerId();
-        // Place card
-        int finalCurrPlayerID1 = currPlayerID;
-        PlayerModel finalCurrPlayer1 = currPlayer;
-        assertDoesNotThrow(() -> matchController.placeCard(finalCurrPlayerID1, finalCurrPlayer1.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
+        assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK));
         // Draw card
         matchController.drawVisibleGoldenCard(currPlayerID, 0);
     }
 
     @Test
-    public void emptyDeckDraw(){
+    void emptyResDeckDraw(){
         setUpGame();
+
+        clearResCardDeck();
 
         PlayerModel currPlayer = getCurrentPlayer();
         int currPlayerID = getCurrentPlayerId();
 
-        assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(1, 1), CardSideType.FRONT) );
+        assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK) );
 
-        matchController.clearResCardDeck();
-        matchController.clearGoldCardDeck();
-
-        assertThrows(NotEnoughCardsException.class, () -> matchController.drawResourceCard(currPlayerID)); // Empty deck
-        matchController.drawGoldenCard(currPlayerID); // Empty deck
+        assertThrows(NotEnoughCardsException.class, () -> matchController.drawResourceCard(currPlayerID)); // Empty resource deck
     }
 
     @Test
-    public void testPosition(){
+    void emptyGoldDeckDraw(){
+        setUpGame();
+
+        clearGoldCardDeck();
+
+        PlayerModel currPlayer = getCurrentPlayer();
+        int currPlayerID = getCurrentPlayerId();
+
+        assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, currPlayer.getHand().getFirst().getID(), new Position(-1, 1), CardSideType.BACK) );
+
+        assertThrows(NotEnoughCardsException.class, () -> matchController.drawGoldenCard(currPlayerID)); // Empty golden deck
+    }
+
+    @Test
+    void testPosition(){
         Position pos1 = new Position(0, 0);
         Position pos2 = new Position(0, 0);
 
@@ -591,7 +584,7 @@ class MatchControllerTest {
     }
 
     @Test
-    public void setUpGameWithErrors(){
+    void setUpGameWithErrors(){
         // region Game setup
         // Add players
         for (int i = 1 ; i <= 4; i++){
@@ -672,7 +665,7 @@ class MatchControllerTest {
     }
 
     @Test
-    public void testMaxPointsGame(){
+    void testMaxPointsGame(){
         setUpGame();
 
         // region Game simulation
@@ -708,7 +701,7 @@ class MatchControllerTest {
         // endregion
     }
 
-    public void setUpGame(){
+    private void setUpGame(){
         // region Game setup
         // Add players
         for (int i = 1 ; i <= 4; i++){
@@ -747,9 +740,7 @@ class MatchControllerTest {
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
             List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
-            int randIndex = Math.random() < 0.5 ? 0 : 1;
-
-            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst()));
+            assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(Math.random() < 0.5 ? objectivesID.getFirst() : objectivesID.getLast()));
         }
 
         // Set first player
@@ -759,5 +750,42 @@ class MatchControllerTest {
 
         matchController.endGameSetUp();
         // endregion
+    }
+    private void clearResCardDeck(){
+        for (int i = 0; i < (38 - numOfPlayers * 2); i++){
+            PlayerModel currPlayer = getCurrentPlayer();
+            int currPlayerID = getCurrentPlayerId();
+            int cardID = currPlayer.getHand().stream().filter(card -> card instanceof ResourceCard).findFirst().map(PlaceableCard::getID).orElse(0);
+
+            // Place a resource card
+            int finalI = i;
+            assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, cardID, new Position((finalI / numOfPlayers) + 1, (finalI / numOfPlayers) + 1), CardSideType.BACK));
+
+            // Draw a resource card
+            try {
+                matchController.drawResourceCard(currPlayerID);
+            }catch (Exception e){
+                break;
+            }
+        }
+    }
+
+    private void clearGoldCardDeck(){
+        for (int i = 0; i < (38 - numOfPlayers); i++){
+            PlayerModel currPlayer = getCurrentPlayer();
+            int currPlayerID = getCurrentPlayerId();
+            int cardID = currPlayer.getHand().stream().filter(card -> card instanceof GoldenCard).findFirst().map(PlaceableCard::getID).orElse(0);
+
+            // Place a golden card
+            int finalI = i;
+            assertDoesNotThrow(() -> matchController.placeCard(currPlayerID, cardID, new Position((finalI / numOfPlayers) + 1, -(finalI / numOfPlayers) - 1), CardSideType.BACK));
+
+            // Draw a golden card
+            try {
+                matchController.drawGoldenCard(currPlayerID);
+            }catch (Exception e){
+                break;
+            }
+        }
     }
 }

@@ -280,7 +280,7 @@ public class PlayerModel {
      * @param pos Card's position to add to the player's playArea
      */
     public void placeCard(PlaceableCard card, Position pos, CardSideType chosenSide)
-            throws CardNotPlacedException, PositionAlreadyTakenException, MissingResourcesException,
+            throws  PositionAlreadyTakenException, MissingResourcesException,
             NoAdjacentCardsException, PlacingOnInvalidCornerException {
 
         if (playArea.containsKey(pos)){

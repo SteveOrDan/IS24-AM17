@@ -72,8 +72,8 @@ public class UsableCardsDeck {
     }
 
     /**
-     * The method returns one of the cards in the visibleCards list based on the ID passed as a parameter
-     * @param index index of visible card in the array (either 0 or 1)
+     * The method returns one of the cards in the visibleCards list based on the index passed as a parameter
+     * @param index of visible card in the array (either 0 or 1)
      * @return the card that has been drawn
      */
     public PlaceableCard drawVisibleCard(int index) throws InvalidVisibleCardIndexException{

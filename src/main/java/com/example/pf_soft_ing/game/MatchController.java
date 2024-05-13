@@ -245,7 +245,7 @@ public class MatchController implements Serializable {
      */
     public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide)
             throws InvalidPlayerIDException, NotPlayerTurnException, InvalidCardIDException,
-            CardNotInHandException, InvalidGameStateException, CardNotPlacedException, NoAdjacentCardsException,
+            CardNotInHandException, InvalidGameStateException, NoAdjacentCardsException,
             PositionAlreadyTakenException, MissingResourcesException, PlacingOnInvalidCornerException {
 
         if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
@@ -400,19 +400,16 @@ public class MatchController implements Serializable {
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
-    public void drawGoldenCard(int playerID){
-        try {
-            checkPlayerDrawExceptions(playerID);
+    public void drawGoldenCard(int playerID) throws InvalidPlayerIDException, InvalidGameStateException,
+            NotPlayerTurnException, InvalidPlayerStateException, NotEnoughCardsException {
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawGoldenCard());
+        checkPlayerDrawExceptions(playerID);
 
-            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+        matchModel.getIDToPlayerMap().get(playerID).drawCard(matchModel.drawGoldenCard());
 
-            endTurn();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
+
+        endTurn();
     }
 
     /**
@@ -456,7 +453,6 @@ public class MatchController implements Serializable {
             }
 
             matchModel.getIDToPlayerMap().get(playerID).setStarterCard(matchModel.drawStarterCard());
-            //System.out.println("DrawStarterCard invoked");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
@@ -521,13 +517,5 @@ public class MatchController implements Serializable {
 
     public void setGameState(GameState gameState) {
         matchModel.setGameState(gameState);
-    }
-
-    public void clearResCardDeck() {
-        matchModel.getResourceCardsDeck().getDeck().clear();
-    }
-
-    public void clearGoldCardDeck() {
-        matchModel.getGoldenCardsDeck().getDeck().clear();
     }
 }

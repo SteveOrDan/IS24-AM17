@@ -5,21 +5,22 @@ import com.example.pf_soft_ing.card.objectiveCards.*;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
+import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
+import javafx.geometry.Pos;
 import javafx.scene.paint.Color;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TUIView implements View {
 
     private ClientSender sender;
     private BufferedReader stdIn;
+
+    private int playerID;
 
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
     private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
@@ -32,7 +33,21 @@ public class TUIView implements View {
 
     private int secretObjectiveCardID;
 
+    private PlayerState playerState;
+
+    private final List<Position> legalPosList = new ArrayList<>();
+    private final List<Position> illegalPosList = new ArrayList<>();
+    private final Map<Position, Integer> playArea = new HashMap<>();
+
+    private final Map<Integer, Position> posIDToValidPos = new HashMap<>();
+
+    private final Map<Integer, CardSideType> playerHand = new HashMap<>();
+
+    private final Map<PlayerState, List<String>> stateToCommands = new HashMap<>();
+
     public void start(String[] args) {
+        createStateToCommandsMap();
+        playerState = PlayerState.MAIN_MENU;
         System.out.println("Welcome.\nThis is the application to play \"Codex Naturalis\".");
 
         stdIn = new BufferedReader(new InputStreamReader(System.in));
@@ -100,74 +115,96 @@ public class TUIView implements View {
         String[] parts = userInput.split(" ");
         String command = parts[0];
 
-        switch (command) {
-            case "GetMatches" -> {
-                if (parts.length != 1) {
-                    System.out.println("Error: GetMatches does not take any arguments. Please try again.");
-                    break;
-                }
-                sender.getMatches();
-            }
-            case "CreateMatch" -> {
-                if (parts.length != 3) {
-                    System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
-                    break;
-                }
-                sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
-            }
-            case "SelectMatch" -> {
-                if (parts.length != 2) {
-                    System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
-                    break;
-                }
-                sender.selectMatch(Integer.parseInt(parts[1]));
-            }
-            case "ChooseNickname" -> {
-                if (parts.length != 2) {
-                    System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
-                    break;
-                }
-                sender.chooseNickname(parts[1]);
-            }
-            case "FlipStarterCard" -> {
-                if (parts.length != 1) {
-                    System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
-                    break;
-                }
-                flipStarterCard();
-            }
-            case "PlaceStarterCard" -> {
-                if (parts.length != 1) {
-                    System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
-                    break;
-                }
-                sender.placeStarterCard(starterSide);
-            }
-            case "ChooseSecretObjective" -> {
-                if (parts.length != 2) {
-                    System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
-                    break;
-                }
+        List<String> legalCommands = stateToCommands.get(playerState);
+        if (legalCommands.contains(command)) {
+            switch (command) {
+                // TODO: add refresh command
 
-                try {
-                    int choice = Integer.parseInt(parts[1]);
-
-                    secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
-
-                    sender.chooseSecretObjective(secretObjectiveCardID);
+                case "CreateMatch" -> {
+                    if (parts.length != 3) {
+                        System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
+                        break;
+                    }
+                    sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
                 }
-                catch (Exception e) {
-                    System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                case "SelectMatch" -> {
+                    if (parts.length != 2) {
+                        System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
+                        break;
+                    }
+                    sender.selectMatch(Integer.parseInt(parts[1]));
+                }
+                case "ChooseNickname" -> {
+                    if (parts.length != 2) {
+                        System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
+                        break;
+                    }
+                    sender.chooseNickname(parts[1]);
+                }
+                case "FlipStarterCard" -> {
+                    if (parts.length != 1) {
+                        System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
+                        break;
+                    }
+                    flipStarterCard();
+                }
+                case "PlaceStarterCard" -> {
+                    if (parts.length != 1) {
+                        System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
+                        break;
+                    }
+                    sender.placeStarterCard(starterSide);
+                }
+                case "ChooseSecretObjective" -> {
+                    if (parts.length != 2) {
+                        System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
+                        break;
+                    }
+
+                    try {
+                        int choice = Integer.parseInt(parts[1]);
+
+                        secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
+
+                        sender.chooseSecretObjective(secretObjectiveCardID);
+                    }
+                    catch (Exception e) {
+                        System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                    }
+                }
+                case "FlipCard" -> {
+                    if (parts.length != 2) {
+                        System.out.println("Error: FlipCard takes exactly 1 argument (card ID). Please, try again");
+                        break;
+                    }
+                    playerHand.compute(Integer.parseInt(parts[1]), (_, side) -> side == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
+                }
+                case "PlaceCard" -> {
+                    if (parts.length != 3) {
+                        System.out.println("Error: PlaceCard takes exactly 1 argument (card ID). Please, try again");
+                        break;
+                    }
+                    int cardID = Integer.parseInt(parts[1]);
+                    Position pos = posIDToValidPos.get(Integer.parseInt(parts[2]));
+                    sender.placeCard(cardID, playerHand.get(cardID), pos);
+                }
+                case "DrawCard" -> {
+
                 }
             }
-            case "exit", "quit" -> System.err.println("Disconnecting...");
-            default -> System.out.println("Error: " + command + " is not a valid command. Please, try again");
+        }
+        else if (command.equals("exit") || command.equals("quit")) {
+            System.err.println("Disconnecting...");
+        }
+        else {
+            System.out.println("Error: " + command + " is not a valid command. Please, try again");
         }
     }
 
     @Override
     public void setID(int playerID) {
         sender.setPlayerID(playerID);
+        this.playerID = playerID;
     }
 
     @Override
@@ -189,18 +226,21 @@ public class TUIView implements View {
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
+        playerState = PlayerState.MATCH_LOBBY;
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
         System.out.println("Waiting for players to join...");
     }
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
+        playerState = PlayerState.CHOOSING_NICKNAME;
         System.out.println("Match selected with ID: " + matchID);
         System.out.println("To choose the nickname type: ChooseNickname <nickname>");
     }
 
     @Override
     public void chooseNickname(String nickname) {
+        playerState = PlayerState.MATCH_LOBBY;
         System.out.println("Joined match with nickname: " + nickname);
     }
 
@@ -208,6 +248,7 @@ public class TUIView implements View {
     public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
+        playerState = PlayerState.PLACING_STARTER;
         System.out.println("Game started.");
 
         GameResources.initializeAllDecks();
@@ -225,6 +266,13 @@ public class TUIView implements View {
 
     @Override
     public void setMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        playerState = PlayerState.CHOOSING_OBJECTIVE;
+
+        // Add cards to player hand
+        playerHand.put(resourceCardID1, CardSideType.FRONT);
+        playerHand.put(resourceCardID2, CardSideType.FRONT);
+        playerHand.put(goldenCardID, CardSideType.FRONT);
+
         // Create player hand
         printPlayerHand(resourceCardID1, resourceCardID2, goldenCardID, TokenColors.getColorFromToken(tokenColor));
 
@@ -237,6 +285,7 @@ public class TUIView implements View {
 
     @Override
     public void confirmSecretObjective() {
+        playerState = PlayerState.COMPLETED_SETUP;
         int otherSecretObjectiveCardID = secretObjectiveCardID == secretObjectiveCardID1 ? secretObjectiveCardID2 : secretObjectiveCardID1;
 
         cardIDToCardFrontTUILines.remove(otherSecretObjectiveCardID);
@@ -265,9 +314,15 @@ public class TUIView implements View {
 
     @Override
     public void showPlayerTurn(int playerID, String playerNickname) {
-        System.out.println("It's " + playerNickname + "'s turn.");
-
-        System.out.println("To place a card type: PlaceCard <cardID> <position>");
+        if (playerID == this.playerID) {
+            System.out.println("It's your turn.");
+            System.out.println("To flip a card type: FlipCard <cardID>");
+            System.out.println("To place a card type: PlaceCard <cardID>");
+        }
+        else {
+            System.out.println("It's " + playerNickname + "'s turn.");
+            System.out.println("While waiting you can flip a card in your hand by typing: FlipCard <cardID>");
+        }
     }
 
     private void printDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
@@ -410,6 +465,64 @@ public class TUIView implements View {
         }
 
         System.out.println("To choose one of the objectives type: ChooseSecretObjective <1 or 2>.");
+    }
+
+    private void updateIlLegalPositions(Position pos, CardSideType sideType){
+        ArrayList<Position> newLegalPos = new ArrayList<>();
+        ArrayList<Position> newIllegalPos = new ArrayList<>();
+
+        PlaceableCard card = GameResources.getPlaceableCardByID(playArea.get(pos));
+
+        Side currSide = sideType == CardSideType.FRONT ? card.getFront() : card.getBack();
+
+        if (currSide.getBLCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+        }
+
+        if (currSide.getBRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+        }
+
+        if (currSide.getTLCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+        }
+
+        if (currSide.getTRCorner().isAvailable()){
+            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+        else{
+            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+        }
+
+        for (Position p : newIllegalPos){
+            if (!illegalPosList.contains(p)){
+                illegalPosList.add(p);
+            }
+
+            legalPosList.remove(p);
+        }
+
+        for (Position p : newLegalPos){
+            if (!legalPosList.contains(p) && !illegalPosList.contains(p)){
+                legalPosList.add(p);
+            }
+        }
+
+        // Set the new card's position as illegal (a card just got placed)
+        legalPosList.remove(pos);
+
+        if (!illegalPosList.contains(pos)){
+            illegalPosList.add(pos);
+        }
     }
 
     private void createResCardLines(int cardID, CardSideType sideType) {
@@ -972,5 +1085,17 @@ public class TUIView implements View {
         lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
+    }
+
+    private void createStateToCommandsMap() {
+        stateToCommands.put(PlayerState.MAIN_MENU, new ArrayList<>(Arrays.asList("CreateMatch", "SelectMatch")));
+        stateToCommands.put(PlayerState.MATCH_LOBBY, new ArrayList<>());
+        stateToCommands.put(PlayerState.CHOOSING_NICKNAME, new ArrayList<>(List.of("ChooseNickname")));
+        stateToCommands.put(PlayerState.PLACING_STARTER, new ArrayList<>(Arrays.asList("FlipStarterCard", "PlaceStarterCard")));
+        stateToCommands.put(PlayerState.CHOOSING_OBJECTIVE, new ArrayList<>(List.of("ChooseSecretObjective")));
+        stateToCommands.put(PlayerState.COMPLETED_SETUP, new ArrayList<>());
+        stateToCommands.put(PlayerState.WAITING, new ArrayList<>(List.of("FlipCard")));
+        stateToCommands.put(PlayerState.PLACING, new ArrayList<>(Arrays.asList("FlipCard", "PlaceCard")));
+        stateToCommands.put(PlayerState.DRAWING, new ArrayList<>(Arrays.asList("FlipCard", "DrawCard")));
     }
 }
