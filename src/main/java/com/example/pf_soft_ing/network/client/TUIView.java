@@ -196,10 +196,11 @@ public class TUIView implements View {
                     }
 
                     playerHand.compute(Integer.parseInt(parts[1]), (_, side) -> side == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
+                    printPlayerHand();
                 }
                 case "pc" -> { // PlaceCard
                     if (parts.length != 3) {
-                        System.out.println("Error: PlaceCard takes exactly 1 argument (card ID). Please, try again");
+                        System.out.println("Error: PlaceCard takes exactly 2 arguments (card ID, position ID). Please, try again");
                         break;
                     }
 
