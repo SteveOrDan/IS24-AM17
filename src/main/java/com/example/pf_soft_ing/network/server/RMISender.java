@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -113,6 +114,11 @@ public class RMISender implements Sender {
 
     @Override
     public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int playerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+
+    }
+
+    @Override
+    public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
 
     }
 }

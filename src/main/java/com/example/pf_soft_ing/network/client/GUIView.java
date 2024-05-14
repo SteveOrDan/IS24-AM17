@@ -1316,4 +1316,9 @@ public class GUIView implements View {
     public void setID(int playerID) {
         sender.setPlayerID(playerID);
     }
+
+    @Override
+    public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
+
+    }
 }
