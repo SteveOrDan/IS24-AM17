@@ -52,4 +52,7 @@ public interface ClientRMIInterface extends Remote {
                    int starterCardID) throws RemoteException;
 
     void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
+    void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
+                          int commonObjectiveCardID1, int commonObjectiveCardID2,
+                          int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException;
 }

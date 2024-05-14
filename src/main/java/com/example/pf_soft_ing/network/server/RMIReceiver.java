@@ -31,7 +31,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void createMatch(int playerID, int numberOfPlayers, String nickname) throws RemoteException {
+    public void createMatch(int playerID, int numberOfPlayers, String nickname) throws RemoteException{
         gameController.createMatch(playerID, numberOfPlayers, nickname);
         try {
             playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));

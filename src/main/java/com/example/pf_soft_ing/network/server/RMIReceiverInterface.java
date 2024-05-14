@@ -2,7 +2,6 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
 
 import java.rmi.Remote;
