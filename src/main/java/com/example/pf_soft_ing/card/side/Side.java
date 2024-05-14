@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Side {
+
     public String sideType;
     public final CardCorner BLCorner;
     public final CardCorner BRCorner;

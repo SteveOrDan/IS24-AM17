@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class StarterCardsDeck {
+
     private final List<PlaceableCard> deck;
 
     public StarterCardsDeck(List<PlaceableCard> deck) {

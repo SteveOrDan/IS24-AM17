@@ -24,10 +24,6 @@ public abstract class ObjectiveCard {
         return points;
     }
 
-    public String getObjectiveType() {
-        return objectiveType;
-    }
-
     public void setObjectiveType(String objectiveType) {
         this.objectiveType = objectiveType;
     }

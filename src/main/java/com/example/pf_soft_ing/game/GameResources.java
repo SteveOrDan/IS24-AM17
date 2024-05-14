@@ -302,12 +302,4 @@ public class GameResources {
     public static Map<Integer, PlaceableCard> getIDToPlaceableCardMap() {
         return IDToPlaceableCardMap;
     }
-
-    /**
-     * Getter
-     * @return Map of IDs to ObjectiveCards
-     */
-    public static Map<Integer, ObjectiveCard> getIDToObjectiveCardMap() {
-        return IDToObjectiveCardMap;
-    }
 }

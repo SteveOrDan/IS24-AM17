@@ -14,14 +14,6 @@ public class GameModel {
 
     /**
      * Getter
-     * @return List of match controllers
-     */
-    public List<MatchController> getMatchesList(){
-        return matches;
-    }
-
-    /**
-     * Getter
      * @return Map of match IDs with the corresponding nicknames
      */
     public Map<Integer, List<String>> getMatches(){

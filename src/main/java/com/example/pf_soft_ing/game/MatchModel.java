@@ -106,14 +106,6 @@ public class MatchModel {
 
     /**
      * Getter
-     * @return Number of current players in the match
-     */
-    public int getCurrPlayers() {
-        return currPlayers;
-    }
-
-    /**
-     * Getter
      * @return Number of players ready in the match
      */
     public int getPlayersReady() {

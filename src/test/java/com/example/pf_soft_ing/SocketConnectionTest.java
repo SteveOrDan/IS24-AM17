@@ -58,5 +58,4 @@ public class SocketConnectionTest {
         ClientSender sender = StartConnection();
         sender.createMatch(4, "Simo");
     }
-
 }

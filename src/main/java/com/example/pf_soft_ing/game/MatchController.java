@@ -283,7 +283,6 @@ public class MatchController implements Serializable {
                     matchModel.getGameState() != GameState.EXTRA_ROUND){
                 // Not playing game state
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
-
             }
 
             PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
@@ -412,7 +411,8 @@ public class MatchController implements Serializable {
                         resDeckCardID, visibleResCardID1, visibleResCardID2,
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }

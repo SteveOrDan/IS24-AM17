@@ -62,6 +62,14 @@ public abstract class PlaceableCard {
 
     /**
      * Getter
+     * @return Card's priority
+     */
+    public int getPriority(){
+        return priority;
+    }
+
+    /**
+     * Getter
      * @return the chosen side of the card for the placement in the play area
      */
     public CardSideType getCurrSideType() {

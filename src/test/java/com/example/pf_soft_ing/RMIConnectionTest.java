@@ -59,5 +59,4 @@ public class RMIConnectionTest {
         ClientSender sender = StartConnection();
         sender.createMatch(4, "Simo");
     }
-
 }
