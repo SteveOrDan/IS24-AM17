@@ -48,6 +48,10 @@ public class Decoder {
                 }
             }
 
+            case MatchMessageMsg castedMsg -> matchController.broadcastMessage(castedMsg.getMessage(), playerID);
+
+            case PrivateMessageMsg castedMsg -> matchController.privateMessage(castedMsg.getRecipientID(), castedMsg.getMessage(), playerID);
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

@@ -5,7 +5,6 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.requests.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
@@ -85,5 +84,15 @@ public class ClientSocketSender implements ClientSender {
     @Override
     public void drawVisibleGoldenCard(int playerID, int index) {
         sendMessage(new DrawCardMsg(playerID, true, true, index));
+    }
+
+    @Override
+    public void sendMatchMessage(String message) {
+        sendMessage(new MatchMessageMsg(message));
+    }
+
+    @Override
+    public void sendPrivateMessage(int recipientID, String message) {
+        sendMessage(new PrivateMessageMsg(recipientID, message));
     }
 }

@@ -90,6 +90,14 @@ public class ClientSocketReceiver {
 
             case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getChoosenSide());
 
+            case ConfirmPrivateMessageMsg castedMsg -> view.confirmPrivateMessage(castedMsg.getRecipientID(), castedMsg.getMessage(), castedMsg.getSenderID());
+
+            case ReceivingPrivateMessageMsg castedMsg -> view.receivingPrivateMessage(castedMsg.getMessage(), castedMsg.getSenderID());
+
+            case ReceivingMatchMessageMsg castedMsg -> view.receivingMatchMessage(castedMsg.getMessage(), castedMsg.getSenderID());
+
+            case RecipientNotFoundMsg castedMsg -> view.recipientNotFound(castedMsg.getRecipientID());
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

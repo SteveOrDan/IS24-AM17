@@ -99,4 +99,24 @@ public class SocketSender implements Sender {
     public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
         sendMessage(new OpponentPlaceCardMsg(playerID, cardID, pos, chosenSide));
     }
+
+    @Override
+    public void sendMatchMessage(String message, int senderID) {
+        sendMessage(new ReceivingMatchMessageMsg(message, senderID));
+    }
+
+    @Override
+    public void sendPrivateMessage(String message, int senderID) {
+        sendMessage(new ReceivingPrivateMessageMsg(message, senderID));
+    }
+
+    @Override
+    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
+        sendMessage(new ConfirmPrivateMessageMsg(recipientID, message, senderID));
+    }
+
+    @Override
+    public void recipientNotFound(int recipientID) {
+        sendMessage(new RecipientNotFoundMsg(recipientID));
+    }
 }

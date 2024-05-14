@@ -121,4 +121,24 @@ public class RMISender implements Sender {
     public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
 
     }
+
+    @Override
+    public void sendMatchMessage(String message, int senderID) {
+
+    }
+
+    @Override
+    public void sendPrivateMessage(String message, int senderID) {
+
+    }
+
+    @Override
+    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
+
+    }
+
+    @Override
+    public void recipientNotFound(int recipientID) {
+
+    }
 }

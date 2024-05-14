@@ -38,4 +38,12 @@ public interface Sender {
                                 int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
+
+    void sendMatchMessage(String message, int senderID);
+
+    void sendPrivateMessage(String message, int senderID);
+
+    void confirmPrivateMessage(int recipientID, String message, int senderID);
+
+    void recipientNotFound(int recipientID);
 }

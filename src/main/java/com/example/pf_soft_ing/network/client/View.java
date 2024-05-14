@@ -43,4 +43,13 @@ public interface View {
     void setID(int playerID);
 
     void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side);
+
+
+    void confirmPrivateMessage(int recipientID, String message, int senderID);
+
+    void receivingPrivateMessage(String message, int senderID);
+
+    void receivingMatchMessage(String message, int senderID);
+
+    void recipientNotFound(int recipientID);
 }

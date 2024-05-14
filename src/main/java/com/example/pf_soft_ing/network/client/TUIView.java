@@ -20,6 +20,8 @@ public class TUIView implements View {
 
     private int playerID;
 
+    private String nickname;
+
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
     private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
 
@@ -60,6 +62,10 @@ public class TUIView implements View {
     private Map<Integer, String> IDtoOpponentNickname = new HashMap<>();
 
     private Map<Integer, Map<Position, Integer>> IDtoOpponentPlayerArea = new HashMap<>();
+
+    private final List<MessageModel> matchChatList = new ArrayList<>();
+
+    private final Map<Integer, List<MessageModel>> opponentIDtoPrivateChatList = new HashMap<>();
 
     public void start(String[] args) {
         createStateToCommandsMap();
@@ -270,6 +276,67 @@ public class TUIView implements View {
                         System.out.println("Error: invalid nickname. Please, try again");
                     }
                 }
+                case "wmm" -> { // Write a message in the match chat
+                    if (parts.length <= 1) {
+                        System.out.println("Error: OpponentPlayArea takes at least 1 argument. Please, try again");
+                        break;
+                    }
+
+                    ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
+
+                    //Remove "wmm" from the message
+                    partsArray.remove("wmm");
+
+                    //convert che String[] in String
+                    String message = String.join(" ", partsArray);
+
+                    sender.sendMatchMessage(message);
+                }
+                case "wpm" -> { // Write a message in the private chat
+                    if (parts.length <= 2) {
+                        System.out.println("Error: OpponentPlayArea takes at least 2 argument (recipient nickname and message). Please, try again");
+                        break;
+                    }
+
+                    boolean opponentFound = false;
+                    // Search recipient ID
+                    for (Integer recipientID : IDtoOpponentNickname.keySet()){
+                        if (IDtoOpponentNickname.get(recipientID).equals(parts[1])){
+                            ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
+
+                            //Remove "wpm" from the message
+                            partsArray.remove("wpm");
+
+                            //Remove recipient nickname from the message
+                            partsArray.remove(IDtoOpponentNickname.get(recipientID));
+
+                            //convert che String[] in String
+                            String message = String.join(" ", partsArray);
+
+                            sender.sendPrivateMessage(recipientID, message);
+                            opponentFound = true;
+                        }
+                    }
+                    if (!opponentFound) {
+                        System.out.println("Error: invalid nickname. Please, try again");
+                    }
+                }
+                case "rmc" -> { // Print match chat
+                    if (parts.length != 1) {
+                        System.out.println("Error: ReadMatchChat does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    printMatchChat();
+                }
+                case "rpc" -> { // Print private chat
+                    if (parts.length != 2) {
+                        System.out.println("Error: ReadPrivateChat takes exactly 1 argument (opponent nickname). Please, try again");
+                        break;
+                    }
+
+                    printOpponentChat(parts[1]);
+                }
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
@@ -324,6 +391,7 @@ public class TUIView implements View {
         playerState = PlayerState.MATCH_LOBBY;
 
         System.out.println("Joined match with nickname: " + nickname);
+        this.nickname = nickname;
     }
 
     @Override
@@ -417,8 +485,16 @@ public class TUIView implements View {
 
     @Override
     public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+        System.out.println("Now you can use the chat.");
+        System.out.println("To send a message in the match chat type: wmm <message>");
+        System.out.println("To send a message in the private chat type: wpm <recipient nickname> <message>");
+        System.out.println("To read the match chat type: rmc");
+        System.out.println("To read the private chat type: rpc <opponent nickname>");
         this.IDtoOpponentNickname = IDtoOpponentNickname;
         this.IDtoOpponentPlayerArea = IDtoOpponentPlayArea;
+        for(Integer opponentID : IDtoOpponentNickname.keySet()){
+            opponentIDtoPrivateChatList.put(opponentID, new ArrayList<>());
+        }
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
             System.out.println("It's your turn.");
@@ -1385,18 +1461,99 @@ public class TUIView implements View {
                 new ArrayList<>(Arrays.asList("fsc", "psc")));
 
         stateToCommands.put(PlayerState.CHOOSING_OBJECTIVE,
-                new ArrayList<>(List.of("cso")));
+                new ArrayList<>(List.of("cso", "rmc")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>());
+                new ArrayList<>(List.of("rmc", "rpc", "wmm", "wpm")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh")));
+                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "wmm", "wpm")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "wmm", "wpm")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "wmm", "wpm")));
+    }
+
+    @Override
+    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
+        String senderNickname;
+        if (senderID == playerID){
+            senderNickname = "Me";
+        }
+        else {
+            senderNickname = IDtoOpponentNickname.get(senderID);
+        }
+        opponentIDtoPrivateChatList.get(recipientID).add(new MessageModel(senderNickname, message));
+        System.out.println("Message to " + IDtoOpponentNickname.get(recipientID) + " successfully delivered.");
+    }
+
+    @Override
+    public void receivingPrivateMessage(String message, int senderID) {
+        String senderNickname;
+        if (senderID == playerID){
+            senderNickname = "Me";
+        }
+        else {
+            senderNickname = IDtoOpponentNickname.get(senderID);
+        }
+        MessageModel newMessage = new MessageModel(senderNickname, message);
+        opponentIDtoPrivateChatList.get(senderID).add(newMessage);
+        System.out.println("New private message:");
+        System.out.println(newMessage.printMessage(nickname));
+    }
+
+    @Override
+    public void receivingMatchMessage(String message, int senderID) {
+        if (senderID == playerID){
+            matchChatList.add(new MessageModel("Me", message));
+            System.out.println("Message successfully delivered.");
+        }
+        else {
+            MessageModel newMessage = new MessageModel(IDtoOpponentNickname.get(senderID), message);
+            matchChatList.add(newMessage);
+            System.out.println("New match message:");
+            System.out.println(newMessage.printMessage(nickname));
+        }
+    }
+
+    @Override
+    public void recipientNotFound(int recipientID) {
+        System.out.println("Message delivery to " + IDtoOpponentNickname.get(recipientID) + " failed.");
+    }
+
+    private void printMatchChat() {
+        if (matchChatList.isEmpty()){
+            System.out.println("The match chat is empty. To write a match message type: wmm <message>.");
+        }
+        else {
+            System.out.println("This is the match chat:");
+            for (MessageModel messageModel : matchChatList){
+                System.out.println(messageModel.printMessage(nickname));
+            }
+        }
+    }
+
+    private void printOpponentChat(String opponent) {
+        boolean opponentFound = false;
+        for (Integer opponentID : IDtoOpponentNickname.keySet()) {
+            if (IDtoOpponentNickname.get(opponentID).equals(opponent)){
+                if (opponentIDtoPrivateChatList.get(opponentID).isEmpty()){
+                    System.out.println("The private chat with " + opponent + " is empty. To write a private message type: wpm <opponent nickname> <message>.");
+                }
+                else {
+                    System.out.println("This is the match chat:");
+                    for (MessageModel messageModel : opponentIDtoPrivateChatList.get(opponentID)){
+                        System.out.println(messageModel.printMessage(nickname));
+                    }
+                }
+                opponentFound = true;
+            }
+        }
+        if (!opponentFound){
+            System.out.println("Opponent not found.");
+        }
+
     }
 }

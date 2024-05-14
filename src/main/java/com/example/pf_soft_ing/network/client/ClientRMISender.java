@@ -105,4 +105,14 @@ public class ClientRMISender implements ClientSender {
     public void drawVisibleGoldenCard(int playerID, int index) {
 
     }
+
+    @Override
+    public void sendMatchMessage(String message) {
+
+    }
+
+    @Override
+    public void sendPrivateMessage(int recipientID, String message) {
+
+    }
 }

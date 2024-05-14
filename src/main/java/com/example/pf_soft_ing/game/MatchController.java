@@ -615,4 +615,24 @@ public class MatchController implements Serializable {
     public void setGameState(GameState gameState) {
         matchModel.setGameState(gameState);
     }
+
+    public void broadcastMessage(String message, int senderID) {
+        for (int broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).sendMatchMessage(message, senderID);
+        }
+    }
+
+    public void privateMessage(int recipientID, String message, int senderID) {
+        boolean recipientFound = false;
+        for (int privateID : getIDToPlayerMap().keySet()) {
+            if (recipientID == privateID) {
+                getPlayerSender(recipientID).sendPrivateMessage(message, senderID);
+                getPlayerSender(senderID).confirmPrivateMessage(recipientID, message, senderID);
+                recipientFound = true;
+            }
+        }
+        if (!recipientFound) {
+            getPlayerSender(senderID).recipientNotFound(recipientID);
+        }
+    }
 }

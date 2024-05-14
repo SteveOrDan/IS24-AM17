@@ -1321,4 +1321,24 @@ public class GUIView implements View {
     public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
 
     }
+
+    @Override
+    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
+
+    }
+
+    @Override
+    public void receivingPrivateMessage(String message, int senderID) {
+
+    }
+
+    @Override
+    public void receivingMatchMessage(String message, int senderID) {
+
+    }
+
+    @Override
+    public void recipientNotFound(int recipientID) {
+
+    }
 }
