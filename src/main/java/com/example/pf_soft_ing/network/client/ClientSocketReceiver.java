@@ -77,17 +77,18 @@ public class ClientSocketReceiver {
 
             case ConfirmSecretObjectiveMsg ignored -> view.confirmSecretObjective();
 
-            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname());
+            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname(), castedMsg.getIDtoOpponentNickname(), castedMsg.getIDtoOpponentPlayArea());
 
             case ConfirmPlaceCardMsg ignored -> view.placeCard();
 
             case NewPlayerTurnMsg castedMsg -> {
-                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
-                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
-                );
+                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
+                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
             }
+
+            case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getChoosenSide());
 
             case null, default -> System.out.println("Invalid message type");
         }

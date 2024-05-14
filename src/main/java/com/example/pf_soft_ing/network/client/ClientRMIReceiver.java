@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -123,12 +124,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendPlayerTurn(int playerID, String playerNickname) throws RemoteException {
-        view.showFirstPlayerTurn(playerID, playerNickname);
+    public void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) throws RemoteException {
+        view.showFirstPlayerTurn(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea);
     }
 
-    @Override
-    public void showNewPlayer(String nickname) throws RemoteException {
-        view.showNewPlayer(nickname);
-    }
 }

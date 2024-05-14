@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.List;
@@ -29,7 +31,7 @@ public interface View {
 
     void showNewPlayer(String nicknames);
 
-    void showFirstPlayerTurn(int playerID, String playerNickname);
+    void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void placeCard();
 
@@ -39,4 +41,6 @@ public interface View {
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     void setID(int playerID);
+
+    void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side);
 }

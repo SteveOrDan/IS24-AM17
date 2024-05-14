@@ -1293,7 +1293,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int playerID, String playerNickname) {
+    public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
 
     }
 

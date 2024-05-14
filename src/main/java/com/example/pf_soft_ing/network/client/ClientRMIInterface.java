@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.client;
 
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -50,7 +51,5 @@ public interface ClientRMIInterface extends Remote {
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
 
-    void sendPlayerTurn(int playerID, String playerNickname) throws RemoteException;
-
-    void showNewPlayer(String nickname) throws RemoteException;
+    void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
 }

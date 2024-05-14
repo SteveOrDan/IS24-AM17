@@ -57,6 +57,10 @@ public class TUIView implements View {
     private int placingCardID;
     private Position placingCardPos;
 
+    private Map<Integer, String> IDtoOpponentNickname = new HashMap<>();
+
+    private Map<Integer, Map<Position, Integer>> IDtoOpponentPlayerArea = new HashMap<>();
+
     public void start(String[] args) {
         createStateToCommandsMap();
         playerState = PlayerState.MAIN_MENU;
@@ -249,6 +253,23 @@ public class TUIView implements View {
 
                     printPlayerHand();
                 }
+                case "opa" -> { // PrintOpponentPlayArea
+                    if (parts.length != 2) {
+                        System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
+                        break;
+                    }
+
+                    boolean opponentFound = false;
+                    // Search opponent ID
+                    for (Integer opponentID : IDtoOpponentNickname.keySet()){
+                        if (IDtoOpponentNickname.get(opponentID).equals(parts[1])){
+                            printOpponentPlayArea(opponentID);
+                        }
+                    }
+                    if (!opponentFound) {
+                        System.out.println("Error: invalid nickname. Please, try again");
+                    }
+                }
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
@@ -395,7 +416,9 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int playerID, String playerNickname) {
+    public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+        this.IDtoOpponentNickname = IDtoOpponentNickname;
+        this.IDtoOpponentPlayerArea = IDtoOpponentPlayArea;
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
             System.out.println("It's your turn.");
@@ -437,10 +460,16 @@ public class TUIView implements View {
         printDrawArea();
 
         // Print available commands
-        System.out.println("To draw a resource card type: ddr");
-        System.out.println("To draw a visible resource card type: dvr <0 or 1>");
-        System.out.println("To draw a gold card type: ddg");
-        System.out.println("To draw a visible gold card type: dvg <0 or 1>");
+        System.out.println("To draw from resource deck, type: ddr");
+        System.out.println("To draw a visible resource card, type: dvr <0 or 1>");
+        System.out.println("To draw from gold deck, type: ddg");
+        System.out.println("To draw a visible gold card, type: dvg <0 or 1>");
+    }
+
+    @Override
+    public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
+        IDtoOpponentPlayerArea.get(playerId).put(pos, cardID);
+        GameResources.getPlaceableCardByID(cardID).setCurrSideType(side);
     }
 
     @Override
@@ -456,6 +485,7 @@ public class TUIView implements View {
             for (String s : cardIDToCardFrontTUILines.get(drawnCardID)) {
                 System.out.println(s);
             }
+            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + " turn.");
         }
         else {
             if (playerID == newPlayerID) {
@@ -480,6 +510,7 @@ public class TUIView implements View {
                 System.out.println("It's " + playerNickname + "'s turn.");
                 System.out.println("While waiting you can flip a card in your hand by typing: fc <cardID>");
                 System.out.println("To check your hand type: gh");
+                System.out.println("To check opponents play area: opa <opponentNickname>");
             }
         }
     }
@@ -692,6 +723,10 @@ public class TUIView implements View {
     }
 
     private void printPlayArea() {
+        // TODO: Implement
+    }
+
+    private void printOpponentPlayArea(int opponentID) {
         // TODO: Implement
     }
 

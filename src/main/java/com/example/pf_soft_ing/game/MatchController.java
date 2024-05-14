@@ -9,11 +9,13 @@ import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
+import javafx.geometry.Pos;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MatchController implements Serializable {
 
@@ -158,7 +160,19 @@ public class MatchController implements Serializable {
                 int currPlayerID = getCurrPlayerID();
 
                 for (Integer ID : getIDToPlayerMap().keySet()) {
-                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname());
+                    Map<Integer, String> IDtoOpponentNickname = new HashMap<>();
+                    Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea = new HashMap<>();
+                    Map<Position, Integer> playArea = new HashMap<>();
+                    for (PlayerModel player : getIDToPlayerMap().values()){
+                        if (player.getID() != ID) {
+                            IDtoOpponentNickname.put(player.getID(), player.getNickname());
+                            for (Position key : player.getPlayArea().keySet()) {
+                                playArea.put(key, player.getPlayArea().get(key).getID());
+                            }
+                            IDtoOpponentPlayArea.put(player.getID(), playArea);
+                        }
+                    }
+                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname(), IDtoOpponentNickname, IDtoOpponentPlayArea);
                 }
             }
             else {
@@ -284,6 +298,11 @@ public class MatchController implements Serializable {
                 matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.DRAWING);
 
                 getPlayerSender(playerID).placeCard();
+                for (Integer BroadcastID : getIDToPlayerMap().keySet()){
+                    if (BroadcastID != playerID) {
+                        getPlayerSender(BroadcastID).opponentPlaceCard(playerID, cardID, pos, chosenSide);
+                    }
+                }
             }
         }
         catch (Exception e) {

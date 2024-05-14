@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.server;
 
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -91,11 +92,6 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayer(int playerID, String playerNickname) {
-
-    }
-
-    @Override
     public void placeCard(){
         try {
             client.placeCard();
@@ -106,9 +102,9 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, String playerNickname) {
+    public void sendFirstPlayerTurn(int playerID, String playerNickname , Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         try {
-            client.sendPlayerTurn(playerID, playerNickname);
+            client.sendFirstPlayerTurn(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea);
         }
         catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
