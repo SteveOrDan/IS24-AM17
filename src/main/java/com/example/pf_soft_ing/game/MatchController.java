@@ -9,7 +9,6 @@ import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
-import javafx.geometry.Pos;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -20,8 +20,6 @@ public class TUIView implements View {
 
     private int playerID;
 
-    private String nickname;
-
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
     private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
 
@@ -391,7 +389,6 @@ public class TUIView implements View {
         playerState = PlayerState.MATCH_LOBBY;
 
         System.out.println("Joined match with nickname: " + nickname);
-        this.nickname = nickname;
     }
 
     @Override
