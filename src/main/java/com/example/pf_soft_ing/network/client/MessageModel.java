@@ -11,7 +11,7 @@ public class MessageModel {
         this.messageContents = messageContents;
     }
 
-    public String printMessage(String nickname){
+    public String printMessage(){
         return (senderNickname + ": " + messageContents);
     }
 }

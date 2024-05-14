@@ -1501,7 +1501,7 @@ public class TUIView implements View {
         MessageModel newMessage = new MessageModel(senderNickname, message);
         opponentIDtoPrivateChatList.get(senderID).add(newMessage);
         System.out.println("New private message:");
-        System.out.println(newMessage.printMessage(nickname));
+        System.out.println(newMessage.printMessage());
     }
 
     @Override
@@ -1514,7 +1514,7 @@ public class TUIView implements View {
             MessageModel newMessage = new MessageModel(IDtoOpponentNickname.get(senderID), message);
             matchChatList.add(newMessage);
             System.out.println("New match message:");
-            System.out.println(newMessage.printMessage(nickname));
+            System.out.println(newMessage.printMessage());
         }
     }
 
@@ -1530,7 +1530,7 @@ public class TUIView implements View {
         else {
             System.out.println("This is the match chat:");
             for (MessageModel messageModel : matchChatList){
-                System.out.println(messageModel.printMessage(nickname));
+                System.out.println(messageModel.printMessage());
             }
         }
     }
@@ -1545,7 +1545,7 @@ public class TUIView implements View {
                 else {
                     System.out.println("This is the match chat:");
                     for (MessageModel messageModel : opponentIDtoPrivateChatList.get(opponentID)){
-                        System.out.println(messageModel.printMessage(nickname));
+                        System.out.println(messageModel.printMessage());
                     }
                 }
                 opponentFound = true;
