@@ -83,12 +83,22 @@ public class ClientRMISender implements ClientSender {
 
     @Override
     public void placeCard(int cardID, CardSideType side, Position pos) {
-
+        try {
+            serverInterface.placeCard(playerID, cardID, side, pos);
+        }
+        catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void drawResourceCard(int playerID) {
-
+        try {
+            serverInterface.drawResourceCard(playerID);
+        }
+        catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override

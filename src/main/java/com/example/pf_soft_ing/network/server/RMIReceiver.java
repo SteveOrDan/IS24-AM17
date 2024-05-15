@@ -68,13 +68,13 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void placeCard(int playerID, int cardID, Position pos) throws RemoteException {
-
+    public void placeCard(int playerID, int cardID, CardSideType side, Position pos) throws RemoteException {
+        playerIDToMatch.get(playerID).placeCard(playerID, cardID, pos, side);
     }
 
     @Override
     public void drawResourceCard(int playerID) throws RemoteException {
-
+        playerIDToMatch.get(playerID).drawResourceCard(playerID);
     }
 
     @Override

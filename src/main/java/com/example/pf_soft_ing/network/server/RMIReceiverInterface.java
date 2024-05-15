@@ -21,7 +21,7 @@ public interface RMIReceiverInterface extends Remote {
 
     void chooseSecretObj(int playerID, int cardID) throws RemoteException;
 
-    void placeCard(int playerID, int cardID, Position pos) throws RemoteException;
+    void placeCard(int playerID, int cardID, CardSideType side, Position pos) throws RemoteException;
 
     void drawResourceCard(int playerID) throws RemoteException;
 

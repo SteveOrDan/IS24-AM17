@@ -195,6 +195,10 @@ public class TUIView implements View {
 
                         try {
                             int choice = Integer.parseInt(parts[1]);
+                            if (choice != 1 && choice != 2) {
+                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                                break;
+                            }
 
                             secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
 

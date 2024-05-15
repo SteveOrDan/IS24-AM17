@@ -100,7 +100,7 @@ public class RMISender implements Sender {
     @Override
     public void placeCard(){
         try {
-            client.placeCard();
+            client.placeCardResult();
         }
         catch (RemoteException e) {
             throw new RuntimeException(e);
@@ -113,18 +113,27 @@ public class RMISender implements Sender {
             client.sendFirstPlayerTurn(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea);
         }
         catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". New player's nickname not shown");
+            System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
         }
     }
 
     @Override
-    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int playerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
-
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+        try {
+            client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
+        }
     }
 
     @Override
     public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-
+        try {
+            client.opponentPlaceCard(playerID, cardID, pos, chosenSide);
+        }
+        catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Opponent's card not placed");
+        }
     }
 
     @Override
