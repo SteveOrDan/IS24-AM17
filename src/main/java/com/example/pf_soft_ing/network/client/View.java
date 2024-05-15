@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public interface View {
 
     void placeCard();
 
-    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname);
+    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState);
 
     void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
@@ -52,4 +53,6 @@ public interface View {
     void receivingMatchMessage(String message, int senderID);
 
     void recipientNotFound(int recipientID);
+
+    void showRanking(List<String> rankings);
 }

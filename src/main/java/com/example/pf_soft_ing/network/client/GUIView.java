@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 import javafx.application.Platform;
 import javafx.scene.Group;
@@ -105,7 +106,7 @@ public class GUIView implements View {
     }
 
     private void launchApp(){
-        stage.setTitle("Codex naturalis");
+        stage.setTitle("Codex Naturalis");
         root = new Group();
         stage.setScene(new Scene(root));
         stage.setWidth(1721);
@@ -1303,7 +1304,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState) {
 
     }
 
@@ -1339,6 +1340,11 @@ public class GUIView implements View {
 
     @Override
     public void recipientNotFound(int recipientID) {
+
+    }
+
+    @Override
+    public void showRanking(List<String> rankings) {
 
     }
 }

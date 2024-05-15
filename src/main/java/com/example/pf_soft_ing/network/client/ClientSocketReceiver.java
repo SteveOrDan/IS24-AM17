@@ -85,10 +85,10 @@ public class ClientSocketReceiver {
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
-                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
+                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname(), castedMsg.getGameState());
             }
 
-            case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getChoosenSide());
+            case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getChosenSide());
 
             case ConfirmPrivateMessageMsg castedMsg -> view.confirmPrivateMessage(castedMsg.getRecipientID(), castedMsg.getMessage(), castedMsg.getSenderID());
 
@@ -97,6 +97,8 @@ public class ClientSocketReceiver {
             case ReceivingMatchMessageMsg castedMsg -> view.receivingMatchMessage(castedMsg.getMessage(), castedMsg.getSenderID());
 
             case RecipientNotFoundMsg castedMsg -> view.recipientNotFound(castedMsg.getRecipientID());
+
+            case RankingMsg castedMsg -> view.showRanking(castedMsg.getRankings());
 
             case null, default -> System.out.println("Invalid message type");
         }

@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -88,11 +89,13 @@ public class SocketSender implements Sender {
     @Override
     public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                                       int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                      int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+                                      int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                      GameState gameState) {
 
         sendMessage(new NewPlayerTurnMsg(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
-                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                gameState));
     }
 
     @Override
@@ -118,5 +121,10 @@ public class SocketSender implements Sender {
     @Override
     public void recipientNotFound(int recipientID) {
         sendMessage(new RecipientNotFoundMsg(recipientID));
+    }
+
+    @Override
+    public void sendRanking(List<String> rankings) {
+        sendMessage(new RankingMsg(rankings));
     }
 }

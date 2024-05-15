@@ -293,8 +293,6 @@ public class MatchController implements Serializable {
                 endTurn();
             }
             else {
-                matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.DRAWING);
-
                 getPlayerSender(playerID).placeCard();
                 for (Integer BroadcastID : getIDToPlayerMap().keySet()){
                     if (BroadcastID != playerID) {
@@ -396,20 +394,11 @@ public class MatchController implements Serializable {
 
             endTurn();
 
-            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
-
-            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
-
-            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
-
-            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            if (matchModel.getGameState() != GameState.END_GAME) {
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            }
+            else {
+                broadcastRanking(matchModel.getRankings());
             }
         }
         catch (Exception e) {
@@ -435,20 +424,11 @@ public class MatchController implements Serializable {
 
             endTurn();
 
-            String newPlayerNickname = matchModel.getIDToPlayerMap().get(matchModel.getCurrPlayerID()).getNickname();
-
-            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
-
-            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
-
-            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            if (matchModel.getGameState() != GameState.END_GAME) {
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            }
+            else {
+                broadcastRanking(matchModel.getRankings());
             }
         }
         catch (Exception e) {
@@ -471,20 +451,11 @@ public class MatchController implements Serializable {
 
             endTurn();
 
-            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
-
-            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
-
-            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
-
-            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            if (matchModel.getGameState() != GameState.END_GAME) {
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            }
+            else {
+                broadcastRanking(matchModel.getRankings());
             }
         }
         catch (Exception e) {
@@ -510,20 +481,11 @@ public class MatchController implements Serializable {
 
             endTurn();
 
-            String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
-
-            int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-            int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-            int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
-
-            int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-            int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-            int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
-
-            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCard.getID(), playerID, matchModel.getCurrPlayerID(), newPlayerNickname,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            if (matchModel.getGameState() != GameState.END_GAME) {
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            }
+            else {
+                broadcastRanking(matchModel.getRankings());
             }
         }
         catch (Exception e) {
@@ -632,6 +594,42 @@ public class MatchController implements Serializable {
         }
         if (!recipientFound) {
             getPlayerSender(senderID).recipientNotFound(recipientID);
+        }
+    }
+
+    /**
+     * Broadcast the new player's turn to all players
+     * @param drawnCardID ID of the drawn card
+     * @param playerID ID of the player that drew the card
+     */
+    private void broadcastNewPlayerTurn(int drawnCardID, int playerID) {
+        int newPlayerID = matchModel.getCurrPlayerID();
+        String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
+
+        int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+        int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+        int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+        int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+        int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+        int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID, newPlayerNickname,
+                    resDeckCardID, visibleResCardID1, visibleResCardID2,
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                    matchModel.getGameState());
+
+        }
+    }
+
+    /**
+     * Broadcast the ranking of the players to all players
+     * @param rankings
+     */
+    private void broadcastRanking(List<String> rankings) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).sendRanking(rankings);
         }
     }
 }

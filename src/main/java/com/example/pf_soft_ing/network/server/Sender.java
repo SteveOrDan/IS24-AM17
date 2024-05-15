@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.List;
@@ -34,8 +35,9 @@ public interface Sender {
     void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
-                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
+                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                           GameState gameState);
 
     void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
 
@@ -46,4 +48,6 @@ public interface Sender {
     void confirmPrivateMessage(int recipientID, String message, int senderID);
 
     void recipientNotFound(int recipientID);
+
+    void sendRanking(List<String> rankings);
 }

@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -64,7 +65,7 @@ public class RMISender implements Sender {
             client.chooseNicknameResult(nickname);
         }
         catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Nickname is not avaiable");
+            System.out.println("Error: " + e.getMessage() + ". Nickname is not available");
         }
     }
 
@@ -118,9 +119,15 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+                                  int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                  int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                  GameState gameState) {
         try {
-            client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
+                    resDeckCardID, visibleResCardID1, visibleResCardID2,
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                    gameState);
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
         }
@@ -153,6 +160,11 @@ public class RMISender implements Sender {
 
     @Override
     public void recipientNotFound(int recipientID) {
+
+    }
+
+    @Override
+    public void sendRanking(List<String> rankings) {
 
     }
 }

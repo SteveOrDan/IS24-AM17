@@ -38,6 +38,8 @@ public class MatchModel {
 
     private List<TokenColors> tokenColors = new ArrayList<>(List.of(TokenColors.values()));
 
+    private List<String> rankings = new ArrayList<>();
+
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
 
@@ -249,6 +251,14 @@ public class MatchModel {
     }
 
     /**
+     * Getter
+     * @return List of player rankings
+     */
+    public List<String> getRankings() {
+        return rankings;
+    }
+
+    /**
      * Method to draw the first resource card of the deck
      * @return First resource card of the deck
      */
@@ -425,7 +435,7 @@ public class MatchModel {
     public void determineRanking() {
         List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
 
-        for (PlayerModel player : IDToPlayerMap.values()){
+        for (PlayerModel player : IDToPlayerMap.values()) {
             player.calculateObjectivePoints(player.getSecretObjective());
             player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().getFirst());
             player.calculateObjectivePoints(objectiveCardsDeck.getCommonObjectives().get(1));
@@ -433,18 +443,8 @@ public class MatchModel {
 
         players.sort(new PlayerRanker());
 
-        int pos = 1;
-        int i = 0;
-
-        for (PlayerModel p : players){
-            System.out.println("Number " + pos + " Player is " + p.getNickname());
-
-            if (i != players.size() - 1 && (p.getCurrScore() != players.get(i + 1).getCurrScore() ||
-                    p.getNumOfCompletedObjectives() != players.get(i + 1).getNumOfCompletedObjectives())) {
-                pos++;
-            }
-
-            i++;
+        for (PlayerModel player : players) {
+            rankings.add(player.getNickname());
         }
     }
 
@@ -469,6 +469,11 @@ public class MatchModel {
         calculateOrderOfPlayers();
     }
 
+    /**
+     * Method to check if the nickname is already taken by another player
+     * @param nickname
+     * @throws NicknameAlreadyExistsException
+     */
     public void checkNickname(String nickname) throws NicknameAlreadyExistsException {
         for (String otherNickname : getNicknames()) {
             if (otherNickname.equals(nickname)) {

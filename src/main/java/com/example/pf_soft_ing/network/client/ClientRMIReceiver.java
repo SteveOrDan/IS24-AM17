@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -135,9 +136,12 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+    public void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+                                 int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                 int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                 GameState gameState) {
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname);
+        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname, gameState);
     }
 
     @Override

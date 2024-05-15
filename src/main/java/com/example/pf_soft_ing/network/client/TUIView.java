@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.objectiveCards.*;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
@@ -75,7 +76,7 @@ public class TUIView implements View {
         int portNumber = 0;
 
         while (!connected){
-            System.out.println("Choose connection type:\n\t-'1' for Socket;\n\t-'2' for RMI;");
+            System.out.println("Choose connection, type:\n\t-'1' for Socket;\n\t-'2' for RMI;");
 
             try {
                 String connectionType = stdIn.readLine();
@@ -217,7 +218,8 @@ public class TUIView implements View {
                         try {
                             playerHand.compute(Integer.parseInt(parts[1]), (_, side) -> side == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
                             printPlayerHand();
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                         }
                     }
@@ -232,7 +234,8 @@ public class TUIView implements View {
                             placingCardPos = posIDToValidPos.get(Integer.parseInt(parts[2]));
 
                             sender.placeCard(placingCardID, playerHand.get(placingCardID), placingCardPos);
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
                         }
 
@@ -253,7 +256,8 @@ public class TUIView implements View {
 
                         try {
                             sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                         }
                     }
@@ -272,7 +276,8 @@ public class TUIView implements View {
                         }
                         try {
                             sender.drawVisibleGoldenCard(playerID, Integer.parseInt(parts[1]));
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                         }
                     }
@@ -382,7 +387,7 @@ public class TUIView implements View {
     public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
             System.out.println("No matches available.");
-            System.out.println("To create a new match type: cm <players_num> <nickname>");
+            System.out.println("To create a new match, type: cm <players_num> <nickname>");
             return;
         }
 
@@ -391,8 +396,8 @@ public class TUIView implements View {
             System.out.println("\tMatch with ID " + entry.getKey() + " and players:");
             System.out.println("\t\t- " + entry.getValue());
         }
-        System.out.println("To create a new match type: cm <players_num> <nickname>");
-        System.out.println("To join a match type: sm <matchID>");
+        System.out.println("To create a new match, type: cm <players_num> <nickname>");
+        System.out.println("To join a match, type: sm <matchID>");
     }
 
     @Override
@@ -408,7 +413,7 @@ public class TUIView implements View {
         playerState = PlayerState.CHOOSING_NICKNAME;
 
         System.out.println("Match selected with ID: " + matchID);
-        System.out.println("To choose the nickname type: cn <nickname>");
+        System.out.println("To choose the nickname, type: cn <nickname>");
     }
 
     @Override
@@ -439,8 +444,8 @@ public class TUIView implements View {
         printStarterCardChoice(starterCardID);
 
         // Print available commands
-        System.out.println("To view the other side of the starter card type: fsc");
-        System.out.println("To place the starter card on the current side type: psc");
+        System.out.println("To view the other side of the starter card, type: fsc \n" +
+                "To place the starter card on the current side, type: psc");
     }
 
     @Override
@@ -501,22 +506,26 @@ public class TUIView implements View {
 
     @Override
     public void showNewPlayer(String nicknames) {
-        System.out.println("New player joined: " + nicknames);
-        System.out.println("Waiting for players to join...");
+        System.out.println("New player joined: " + nicknames + "\n" +
+                "Waiting for other players to join...");
     }
 
     @Override
     public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
-        System.out.println("Now you can use the chat.");
-        System.out.println("To send a message in the match chat type: wmm <message>");
-        System.out.println("To send a message in the private chat type: wpm <recipient nickname> <message>");
-        System.out.println("To read the match chat type: rmc");
-        System.out.println("To read the private chat type: rpc <opponent nickname>");
+        System.out.println("""
+                Now you can use the chat.
+                To send a message in the match chat, type: wmm <message>
+                To send a message in the private chat, type: wpm <recipient nickname> <message>
+                To read the match chat, type: rmc
+                To read the private chat, type: rpc <opponent nickname>""");
+
         this.IDtoOpponentNickname = IDtoOpponentNickname;
         this.IDtoOpponentPlayerArea = IDtoOpponentPlayArea;
+
         for(Integer opponentID : IDtoOpponentNickname.keySet()){
             opponentIDtoPrivateChatList.put(opponentID, new ArrayList<>());
         }
+
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
             System.out.println("It's your turn.");
@@ -528,16 +537,17 @@ public class TUIView implements View {
             printPlayArea();
 
             // Print available commands
-            System.out.println("To check your hand type: gh");
-            System.out.println("To flip a card type: fc <cardID>");
-            System.out.println("To place a card type: pc <cardID> <posID>");
+            System.out.println("""
+                    To check your hand, type: gh
+                    To flip a card, type: fc <cardID>
+                    To place a card, type: pc <cardID> <posID>""");
         }
         else {
             playerState = PlayerState.WAITING;
-            System.out.println("It's " + playerNickname + "'s turn.");
-            System.out.println("While waiting you can: ");
-            System.out.println("\t- Flip a card in your hand by typing: fc <cardID>");
-            System.out.println("\t- Check your hand by typing: gh");
+            System.out.println("It's " + playerNickname + "'s turn.\n" +
+                    "While waiting you can: \n" +
+                    "\t- Flip a card in your hand by typing: fc <cardID>\n" +
+                    "\t- Check your hand by typing: gh");
         }
     }
 
@@ -554,14 +564,18 @@ public class TUIView implements View {
         // Remove card from player hand
         playerHand.remove(placingCardID);
 
+        // Print play area
+        printPlayArea();
+
         // Print draw area
         printDrawArea();
 
         // Print available commands
-        System.out.println("To draw from resource deck, type: ddr");
-        System.out.println("To draw a visible resource card, type: dvr <0 or 1>");
-        System.out.println("To draw from gold deck, type: ddg");
-        System.out.println("To draw a visible gold card, type: dvg <0 or 1>");
+        System.out.println("""
+                To draw from resource deck, type: ddr
+                To draw a visible resource card, type: dvr <0 or 1>
+                To draw from gold deck, type: ddg
+                To draw a visible gold card, type: dvg <0 or 1>""");
     }
 
     @Override
@@ -571,7 +585,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState) {
         if (lastPlayerID == playerID) {
             playerState = PlayerState.WAITING;
             playerHand.put(drawnCardID, CardSideType.FRONT);
@@ -583,7 +597,7 @@ public class TUIView implements View {
             for (String s : cardIDToCardFrontTUILines.get(drawnCardID)) {
                 System.out.println(s);
             }
-            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + " turn.");
+            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.");
         }
         else {
             if (playerID == newPlayerID) {
@@ -598,18 +612,26 @@ public class TUIView implements View {
                 printPlayArea();
 
                 // Print available commands
-                System.out.println("To check your hand type: gh");
-                System.out.println("To flip a card type: fc <cardID>");
-                System.out.println("To place a card type: pc <cardID> <posID>");
+                System.out.println("""
+                        To check your hand, type: gh
+                        To flip a card, type: fc <cardID>
+                        To place a card, type: pc <cardID> <posID>""");
             }
             else {
                 playerState = PlayerState.WAITING;
 
-                System.out.println("It's " + playerNickname + "'s turn.");
-                System.out.println("While waiting you can flip a card in your hand by typing: fc <cardID>");
-                System.out.println("To check your hand type: gh");
-                System.out.println("To check opponents play area: opa <opponentNickname>");
+                // Print available commands
+                System.out.println("It's " + playerNickname + "'s turn.\n" +
+                        "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
+                        "To check your hand, type: gh\n" +
+                        "To check opponents play area: opa <opponentNickname>");
             }
+        }
+        if (gameState == GameState.FINAL_ROUND) {
+            System.out.println("This is the final round.");
+        }
+        else if (gameState == GameState.EXTRA_ROUND) {
+            System.out.println("This is the extra round.");
         }
     }
 
@@ -735,8 +757,8 @@ public class TUIView implements View {
             System.out.println(s);
         }
 
-        System.out.println("To view the other side of the starter card type: fsc");
-        System.out.println("To place the starter card on the current side type: psc");
+        System.out.println("To view the other side of the starter card, type: fsc\n" +
+                "To place the starter card on the current side, type: psc");
     }
 
     private void createPlayerHand(int resourceCardID1, int resourceCardID2, int goldenCardID) {
@@ -818,7 +840,7 @@ public class TUIView implements View {
             System.out.println(secretObjectiveCard1Front.get(i) + "   " + secretObjectiveCard2Front.get(i));
         }
 
-        System.out.println("To choose one of the secret objectives type: cso <1 or 2>.");
+        System.out.println("To choose one of the secret objectives, type: cso <1 or 2>.");
     }
 
     private void printPlayArea() {
@@ -1041,6 +1063,8 @@ public class TUIView implements View {
                 playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = (char) (i % 10 + 48);
             }
         }
+
+        System.out.println("Your play area:");
 
         // Print the play area
         for (char[] chars : playAreaArr) {
@@ -1778,9 +1802,20 @@ public class TUIView implements View {
         System.out.println("Message delivery to " + IDtoOpponentNickname.get(recipientID) + " failed.");
     }
 
+    @Override
+    public void showRanking(List<String> rankings) {
+        System.out.println("The final ranking is:");
+        int i = 1;
+
+        for (String player : rankings){
+            System.out.println(i + ") " + player);
+            i++;
+        }
+    }
+
     private void printMatchChat() {
         if (matchChatList.isEmpty()){
-            System.out.println("The match chat is empty. To write a match message type: wmm <message>.");
+            System.out.println("The match chat is empty. To write a match message, type: wmm <message>.");
         }
         else {
             System.out.println("This is the match chat:");

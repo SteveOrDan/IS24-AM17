@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.messages.answers;
 
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 
 public class NewPlayerTurnMsg extends Message {
@@ -18,9 +19,12 @@ public class NewPlayerTurnMsg extends Message {
     private final int visibleGoldCardID1;
     private final int visibleGoldCardID2;
 
+    private final GameState gameState;
+
     public NewPlayerTurnMsg(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
                             int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                            int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+                            int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                            GameState gameState) {
         this.drawnCardID = drawnCardID;
         this.lastPlayerID = lastPlayerID;
 
@@ -34,6 +38,8 @@ public class NewPlayerTurnMsg extends Message {
         this.goldDeckCardID = goldDeckCardID;
         this.visibleGoldCardID1 = visibleGoldCardID1;
         this.visibleGoldCardID2 = visibleGoldCardID2;
+
+        this.gameState = gameState;
     }
 
     public int getDrawnCardID() {
@@ -74,6 +80,10 @@ public class NewPlayerTurnMsg extends Message {
 
     public int getVisibleGoldCardID2() {
         return visibleGoldCardID2;
+    }
+
+    public GameState getGameState() {
+        return gameState;
     }
 
     @Override
