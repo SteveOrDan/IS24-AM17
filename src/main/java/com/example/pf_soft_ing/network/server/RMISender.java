@@ -95,7 +95,11 @@ public class RMISender implements Sender {
 
     @Override
     public void confirmSecretObjective() {
-
+        try {
+            client.confirmSecretObjective();
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Confirm secret objective not shown");
+        }
     }
 
     @Override
@@ -104,7 +108,7 @@ public class RMISender implements Sender {
             client.placeCardResult();
         }
         catch (RemoteException e) {
-            throw new RuntimeException(e);
+            System.out.println("Error: " + e.getMessage() + ". Place card not shown");
         }
     }
 
@@ -145,26 +149,46 @@ public class RMISender implements Sender {
 
     @Override
     public void sendMatchMessage(String message, int senderID) {
-
+        try {
+            client.sendMatchMessage(message, senderID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Match message not sent");
+        }
     }
 
     @Override
     public void sendPrivateMessage(String message, int senderID) {
-
+        try {
+            client.sendPrivateMessage(message, senderID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Private message not sent");
+        }
     }
 
     @Override
     public void confirmPrivateMessage(int recipientID, String message, int senderID) {
-
+        try {
+            client.confirmPrivateMessage(recipientID, message, senderID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Private message not confirmed");
+        }
     }
 
     @Override
     public void recipientNotFound(int recipientID) {
-
+        try {
+            client.recipientNotFound(recipientID);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Recipient not found");
+        }
     }
 
     @Override
     public void sendRanking(List<String> rankings) {
-
+        try {
+            client.showRanking(rankings);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
+        }
     }
 }

@@ -254,8 +254,14 @@ public class TUIView implements View {
                             break;
                         }
 
+
                         try {
-                            sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
+                            int choice = Integer.parseInt(parts[1]);
+                            if (choice != 0 && choice != 1) {
+                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
+                                break;
+                            }
+                            sender.drawVisibleResourceCard(playerID, choice);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -275,7 +281,12 @@ public class TUIView implements View {
                             break;
                         }
                         try {
-                            sender.drawVisibleGoldenCard(playerID, Integer.parseInt(parts[1]));
+                            int choice = Integer.parseInt(parts[1]);
+                            if (choice != 0 && choice != 1) {
+                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
+                                break;
+                            }
+                            sender.drawVisibleGoldenCard(playerID, choice);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -295,43 +306,44 @@ public class TUIView implements View {
                             break;
                         }
 
-                    boolean opponentFound = false;
-                    // Search opponent ID
-                    for (Integer opponentID : IDtoOpponentNickname.keySet()){
-                        if (IDtoOpponentNickname.get(opponentID).equals(parts[1])){
-                            printOpponentPlayArea(opponentID);
+                        boolean opponentFound = false;
+                        // Search opponent ID
+                        for (Integer opponentID : IDtoOpponentNickname.keySet()){
+                            if (IDtoOpponentNickname.get(opponentID).equals(parts[1])){
+                                printOpponentPlayArea(opponentID);
+                            }
                         }
+                        if (!opponentFound) {
+                           System.out.println("Error: invalid nickname. Please, try again");
+                        }
+
                     }
-                    if (!opponentFound) {
-                        System.out.println("Error: invalid nickname. Please, try again");
+                    case "wmm" -> { // Write a message in the match chat
+                        if (parts.length <= 1) {
+                           System.out.println("Error: Write a message in the match chat takes at least 1 argument. Please, try again");
+                            break;
+                        }
+
+                         ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
+
+                        //Remove "wmm" from the message
+                        partsArray.remove("wmm");
+
+                        //convert che String[] in String
+                        String message = String.join(" ", partsArray);
+
+                        sender.sendMatchMessage(message);
                     }
-                }
-                case "wmm" -> { // Write a message in the match chat
-                    if (parts.length <= 1) {
-                        System.out.println("Error: OpponentPlayArea takes at least 1 argument. Please, try again");
-                        break;
-                    }
+                    case "wpm" -> { // Write a message in the private chat
+                        if (parts.length <= 2) {
+                            System.out.println("Error: Write a message in the private chat takes at least 2 argument (recipient nickname and message). Please, try again");
+                            break;
+                        }
 
-                    ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
-
-                    //Remove "wmm" from the message
-                    partsArray.remove("wmm");
-
-                    //convert che String[] in String
-                    String message = String.join(" ", partsArray);
-
-                    sender.sendMatchMessage(message);
-                }
-                case "wpm" -> { // Write a message in the private chat
-                    if (parts.length <= 2) {
-                        System.out.println("Error: OpponentPlayArea takes at least 2 argument (recipient nickname and message). Please, try again");
-                        break;
-                    }
-
-                    boolean opponentFound = false;
-                    // Search recipient ID
-                    for (Integer recipientID : IDtoOpponentNickname.keySet()){
-                        if (IDtoOpponentNickname.get(recipientID).equals(parts[1])){
+                        boolean opponentFound = false;
+                        // Search recipient ID
+                        for (Integer recipientID : IDtoOpponentNickname.keySet()){
+                            if (IDtoOpponentNickname.get(recipientID).equals(parts[1])){
                             ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
 
                             //Remove "wpm" from the message
@@ -345,36 +357,36 @@ public class TUIView implements View {
 
                             sender.sendPrivateMessage(recipientID, message);
                             opponentFound = true;
+                            }
+                        }
+                        if (!opponentFound) {
+                          System.out.println("Error: invalid nickname. Please, try again");
                         }
                     }
-                    if (!opponentFound) {
-                        System.out.println("Error: invalid nickname. Please, try again");
-                    }
-                }
-                case "rmc" -> { // Print match chat
-                    if (parts.length != 1) {
-                        System.out.println("Error: ReadMatchChat does not take any arguments. Please, try again");
-                        break;
-                    }
+                    case "rmc" -> { // Print match chat
+                       if (parts.length != 1) {
+                           System.out.println("Error: ReadMatchChat does not take any arguments. Please, try again");
+                           break;
+                       }
 
-                    printMatchChat();
-                }
-                case "rpc" -> { // Print private chat
-                    if (parts.length != 2) {
-                        System.out.println("Error: ReadPrivateChat takes exactly 1 argument (opponent nickname). Please, try again");
-                        break;
+                      printMatchChat();
                     }
+                    case "rpc" -> { // Print private chat
+                        if (parts.length != 2) {
+                            System.out.println("Error: ReadPrivateChat takes exactly 1 argument (opponent nickname). Please, try again");
+                            break;
+                        }
 
-                    printOpponentChat(parts[1]);
+                        printOpponentChat(parts[1]);
+                    }
                 }
             }
-        }
-        else if (command.equals("exit") || command.equals("quit")) {
-            System.err.println("Disconnecting...");
-        }
-        else {
-            System.out.println("Error: " + command + " is not a valid command. Please, try again");
-        }
+            else if (command.equals("exit") || command.equals("quit")) {
+                System.err.println("Disconnecting...");
+            }
+            else {
+                System.out.println("Error: " + command + " is not a valid command. Please, try again");
+            }
     }
 
     @Override
@@ -597,7 +609,13 @@ public class TUIView implements View {
             for (String s : cardIDToCardFrontTUILines.get(drawnCardID)) {
                 System.out.println(s);
             }
-            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.");
+
+            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.\n" +
+                    "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
+                    "To check your hand, type: gh\n" +
+                    "To check opponents play area: opa <opponentNickname>");
+
+
         }
         else {
             if (playerID == newPlayerID) {
@@ -621,7 +639,7 @@ public class TUIView implements View {
                 playerState = PlayerState.WAITING;
 
                 // Print available commands
-                System.out.println("It's " + playerNickname + "'s turn.\n" +
+                System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.\n" +
                         "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
                         "To check your hand, type: gh\n" +
                         "To check opponents play area: opa <opponentNickname>");

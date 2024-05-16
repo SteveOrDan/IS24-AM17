@@ -79,16 +79,26 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
     @Override
     public void drawVisibleResourceCard(int playerID, int index) throws RemoteException {
-
+        playerIDToMatch.get(playerID).drawVisibleResourceCard(playerID, index);
     }
 
     @Override
     public void drawGoldenCard(int playerID) throws RemoteException {
-
+        playerIDToMatch.get(playerID).drawGoldenCard(playerID);
     }
 
     @Override
     public void drawVisibleGoldenCard(int playerID, int index) throws RemoteException {
+        playerIDToMatch.get(playerID).drawVisibleGoldenCard(playerID, index);
+    }
 
+    @Override
+    public void sendPrivateMessage(int playerID, int recipientID, String message) throws RemoteException {
+        playerIDToMatch.get(recipientID).privateMessage(recipientID, message, playerID);
+    }
+
+    @Override
+    public void sendMatchMessage(int playerID, String message) throws RemoteException {
+        playerIDToMatch.get(playerID).broadcastMessage(message, playerID);
     }
 }

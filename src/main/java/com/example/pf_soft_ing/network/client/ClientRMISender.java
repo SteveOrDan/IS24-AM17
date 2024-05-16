@@ -103,26 +103,46 @@ public class ClientRMISender implements ClientSender {
 
     @Override
     public void drawVisibleResourceCard(int playerID, int index) {
-
+        try {
+            serverInterface.drawVisibleResourceCard(playerID, index);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void drawGoldenCard(int playerID) {
-
+        try {
+            serverInterface.drawGoldenCard(playerID);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void drawVisibleGoldenCard(int playerID, int index) {
-
+        try {
+            serverInterface.drawVisibleGoldenCard(playerID, index);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void sendMatchMessage(String message) {
-
+        try {
+            serverInterface.sendMatchMessage(playerID, message);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 
     @Override
     public void sendPrivateMessage(int recipientID, String message) {
-
+        try {
+            serverInterface.sendPrivateMessage(playerID, recipientID, message);
+        } catch (RemoteException e) {
+            System.out.println("Connection to server lost");
+        }
     }
 }

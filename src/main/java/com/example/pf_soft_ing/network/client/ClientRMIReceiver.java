@@ -31,66 +31,6 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void failedMatch(Map<Integer, List<String>> matchesNicknames) throws RemoteException {
-//        view.failedMatch(matchesNicknames);
-    }
-
-    @Override
-    public void joinMatch(int matchID, List<String> nicknames) throws RemoteException {
-//        view.joinMatch(matchID, nicknames);
-    }
-
-    @Override
-    public void addNickname(Integer playerID, String nickname, Map<Integer, String> opponents) {
-//        view.addNickname(playerID, nickname, opponents);
-    }
-
-    @Override
-    public void failedNickname(List<String> nicknames) throws RemoteException {
-//        view.failedNickname(nicknames);
-    }
-
-    @Override
-    public void setState(PlayerState state) throws RemoteException {
-
-    }
-
-    @Override
-    public void setCurrScore(int score) throws RemoteException {
-
-    }
-
-    @Override
-    public void setToken(TokenColors color) throws RemoteException {
-
-    }
-
-    @Override
-    public void setObjectivesToChoose(List<Integer> objectiveIDs) throws RemoteException {
-
-    }
-
-    @Override
-    public void setFirstPlayerToken(TokenColors color) throws RemoteException {
-
-    }
-
-    @Override
-    public void addCardToPlayerHand(int id) throws RemoteException {
-
-    }
-
-    @Override
-    public void setSecretObjective(int id) throws RemoteException {
-
-    }
-
-    @Override
-    public void setStarterCard(int id) throws RemoteException {
-
-    }
-
-    @Override
     public void placeStarterCard() throws RemoteException {
 
     }
@@ -147,6 +87,36 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException {
         view.opponentPlaceCard(playerID, cardID, pos, chosenSide);
+    }
+
+    @Override
+    public void showRanking(List<String> rankings)throws RemoteException {
+        view.showRanking(rankings);
+    }
+
+    @Override
+    public void confirmSecretObjective() throws RemoteException {
+        view.confirmSecretObjective();
+    }
+
+    @Override
+    public void sendMatchMessage(String message, int senderID)throws RemoteException {
+        view.receivingMatchMessage(message, senderID);
+    }
+
+    @Override
+    public void sendPrivateMessage(String message, int senderID) throws RemoteException {
+        view.receivingPrivateMessage(message, senderID);
+    }
+
+    @Override
+    public void confirmPrivateMessage(int recipientID, String message, int senderID) throws RemoteException {
+        view.confirmPrivateMessage(recipientID, message, senderID);
+    }
+
+    @Override
+    public void recipientNotFound(int recipientID) throws RemoteException {
+        view.recipientNotFound(recipientID);
     }
 
 

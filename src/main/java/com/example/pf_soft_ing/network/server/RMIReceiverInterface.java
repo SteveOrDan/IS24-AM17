@@ -30,4 +30,8 @@ public interface RMIReceiverInterface extends Remote {
     void drawGoldenCard(int playerID) throws RemoteException;
 
     void drawVisibleGoldenCard(int playerID, int index) throws RemoteException;
+
+    void sendPrivateMessage(int playerID, int recipientID, String message) throws RemoteException;
+
+    void sendMatchMessage(int playerID, String message) throws RemoteException;
 }
