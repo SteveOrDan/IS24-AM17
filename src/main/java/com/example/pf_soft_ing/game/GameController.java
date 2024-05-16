@@ -88,11 +88,15 @@ public class GameController {
                 matchController.setCommonObjectives();
 
                 for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
+                    String thisNickname = matchController.getIDToPlayerMap().get(ID).getNickname();
+                    List<String> otherNicknames = matchController.getNicknames();
+                    otherNicknames.remove(thisNickname);
+
                     PlaceableCard starterCard = matchController.drawStarterCard();
 
                     matchController.getIDToPlayerMap().get(ID).setStarterCard(starterCard);
 
-                    getPlayerSender(ID).sendGameStart(resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                    getPlayerSender(ID).sendGameStart(thisNickname, otherNicknames, resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
                             goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(),
                             starterCard.getID());
                 }
@@ -119,9 +123,8 @@ public class GameController {
      * Getter
      * @param playerID ID of the player
      * @return Match ID of the player with the given ID
-     * @throws InvalidPlayerIDException if the player ID is invalid
      */
-    public int getMatchIDWithPlayer(int playerID) throws InvalidPlayerIDException {
+    public int getMatchIDWithPlayer(int playerID) {
         return gameModel.getIDToPlayers().get(playerID).getMatchID();
     }
 

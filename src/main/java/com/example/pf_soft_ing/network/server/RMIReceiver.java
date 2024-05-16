@@ -36,7 +36,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         try {
             playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
         }
-        catch (InvalidMatchIDException | InvalidPlayerIDException e) {
+        catch (InvalidMatchIDException e) {
             System.out.println("Already notified client, failed match selection");
         }
     }
@@ -47,7 +47,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         try {
             playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
         }
-        catch (InvalidMatchIDException | InvalidPlayerIDException e) {
+        catch (InvalidMatchIDException e) {
             System.out.println("Already notified client, failed match selection");
         }
     }
@@ -93,12 +93,8 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void sendPrivateMessage(int playerID, int recipientID, String message) throws RemoteException {
-        playerIDToMatch.get(recipientID).privateMessage(recipientID, message, playerID);
-    }
-
-    @Override
-    public void sendMatchMessage(int playerID, String message) throws RemoteException {
-        playerIDToMatch.get(playerID).broadcastMessage(message, playerID);
+    public void sendChatMessage(String recipientNickname, String message) throws RemoteException {
+        // TODO: Either change String or find player ID
+        // playerIDToMatch.get(recipientID).privateMessage(recipientID, message, playerID);
     }
 }

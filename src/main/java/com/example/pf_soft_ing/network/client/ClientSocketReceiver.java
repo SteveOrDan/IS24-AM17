@@ -64,6 +64,7 @@ public class ClientSocketReceiver {
             case ErrorMessage castedMsg -> view.errorMessage(castedMsg.getMessage());
 
             case GameStartMsg castedMsg -> view.startGame(
+                    castedMsg.getNickname(), castedMsg.getOtherNicknames(),
                     castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                     castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2(),
                     castedMsg.getStarterCardID()
@@ -85,18 +86,21 @@ public class ClientSocketReceiver {
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
-                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname(), castedMsg.getGameState());
+                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
             }
 
-            case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getChosenSide());
+            case NewPlayerTurnNewStateMsg castedMsg -> {
+                view.updateDrawArea(
+                        castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
+                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
+                view.showNewPlayerTurnNewState(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname(), castedMsg.getGameState());
+            }
 
-            case ConfirmPrivateMessageMsg castedMsg -> view.confirmPrivateMessage(castedMsg.getRecipientID(), castedMsg.getMessage(), castedMsg.getSenderID());
+            case NewPlayerExtraTurnMsg castedMsg -> {
+                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
+            }
 
-            case ReceivingPrivateMessageMsg castedMsg -> view.receivingPrivateMessage(castedMsg.getMessage(), castedMsg.getSenderID());
-
-            case ReceivingMatchMessageMsg castedMsg -> view.receivingMatchMessage(castedMsg.getMessage(), castedMsg.getSenderID());
-
-            case RecipientNotFoundMsg castedMsg -> view.recipientNotFound(castedMsg.getRecipientID());
+            case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());
 
             case RankingMsg castedMsg -> view.showRanking(castedMsg.getRankings());
 

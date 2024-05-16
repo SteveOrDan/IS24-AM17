@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MatchControllerTest {
 
-    static int numOfPlayers = 4;
-    MatchController matchController = new MatchController(numOfPlayers, 1);
+    private final static int numOfPlayers = 4;
+    private final MatchController matchController = new MatchController(numOfPlayers, 1);
 
-    GameController gameController = new GameController();
+    private final GameController gameController = new GameController();
 
     @Test
     void checkResources(){

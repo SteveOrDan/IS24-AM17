@@ -17,7 +17,7 @@ public class GUIApp extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) {
         new GUIView(stage, ip);
     }
 }

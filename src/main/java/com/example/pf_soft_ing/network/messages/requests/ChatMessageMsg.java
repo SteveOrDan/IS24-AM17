@@ -2,13 +2,13 @@ package com.example.pf_soft_ing.network.messages.requests;
 
 import com.example.pf_soft_ing.network.messages.Message;
 
-public class PrivateMessageMsg extends Message {
+public class ChatMessageMsg extends Message {
 
-    private final int recipientID;
+    private final String recipient;
     private final String message;
 
-    public PrivateMessageMsg(int recipientID, String message) {
-        this.recipientID = recipientID;
+    public ChatMessageMsg(String recipient, String message) {
+        this.recipient = recipient;
         this.message = message;
     }
 
@@ -16,8 +16,8 @@ public class PrivateMessageMsg extends Message {
         return message;
     }
 
-    public int getRecipientID() {
-        return recipientID;
+    public String getRecipient() {
+        return recipient;
     }
 
     @Override

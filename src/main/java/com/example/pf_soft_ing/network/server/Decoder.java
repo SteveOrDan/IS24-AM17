@@ -48,9 +48,7 @@ public class Decoder {
                 }
             }
 
-            case MatchMessageMsg castedMsg -> matchController.broadcastMessage(castedMsg.getMessage(), playerID);
-
-            case PrivateMessageMsg castedMsg -> matchController.privateMessage(castedMsg.getRecipientID(), castedMsg.getMessage(), playerID);
+            case ChatMessageMsg castedMsg -> matchController.chatMessage(playerID, castedMsg.getRecipient(), castedMsg.getMessage());
 
             case null, default -> System.out.println("Invalid message type");
         }

@@ -36,14 +36,6 @@ public class MatchController implements Serializable {
         return matchModel.getIDToPlayerMap();
     }
 
-//    /**
-//     * Getter
-//     * @return GameModel object
-//     */
-//    public MatchModel getMatchModel() {
-//        return matchModel;
-//    }
-
     public int getMatchID(){
         return matchModel.getMatchID();
     }
@@ -291,14 +283,11 @@ public class MatchController implements Serializable {
 
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
+
+                // Send new player turn
             }
             else {
-                getPlayerSender(playerID).placeCard();
-                for (Integer BroadcastID : getIDToPlayerMap().keySet()){
-                    if (BroadcastID != playerID) {
-                        getPlayerSender(BroadcastID).opponentPlaceCard(playerID, cardID, pos, chosenSide);
-                    }
-                }
+                getPlayerSender(playerID).placeCard(playerID, cardID, pos, chosenSide);
             }
         }
         catch (Exception e) {
@@ -577,23 +566,35 @@ public class MatchController implements Serializable {
         matchModel.setGameState(gameState);
     }
 
-    public void broadcastMessage(String message, int senderID) {
-        for (int broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendMatchMessage(message, senderID);
-        }
-    }
+    public void chatMessage(int senderID, String recipient, String message) {
+        try {
+            String senderNickname = matchModel.getIDToPlayerMap().get(senderID).getNickname();
+            System.out.println(senderNickname + " sent a message to " + recipient + ": " + message);
 
-    public void privateMessage(int recipientID, String message, int senderID) {
-        boolean recipientFound = false;
-        for (int privateID : getIDToPlayerMap().keySet()) {
-            if (recipientID == privateID) {
-                getPlayerSender(recipientID).sendPrivateMessage(message, senderID);
-                getPlayerSender(senderID).confirmPrivateMessage(recipientID, message, senderID);
-                recipientFound = true;
+            if (recipient.equals("all")) {
+                for (int broadcastID : getIDToPlayerMap().keySet()) {
+                    getPlayerSender(broadcastID).sendChatMessage(senderNickname, recipient, message);
+                }
+            }
+            else {
+                int recipientID = -1;
+
+                for (int ID : getIDToPlayerMap().keySet()) {
+                    if (getIDToPlayerMap().get(ID).getNickname().equals(recipient)) {
+                        recipientID = ID;
+                        break;
+                    }
+                }
+
+                if (recipientID == -1) {
+                    throw new InvalidRecipientException();
+                }
+
+                getPlayerSender(recipientID).sendChatMessage(senderNickname, recipient, message);
             }
         }
-        if (!recipientFound) {
-            getPlayerSender(senderID).recipientNotFound(recipientID);
+        catch (Exception e) {
+            getPlayerSender(senderID).sendError(e.getMessage());
         }
     }
 
@@ -617,15 +618,13 @@ public class MatchController implements Serializable {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
             getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID, newPlayerNickname,
                     resDeckCardID, visibleResCardID1, visibleResCardID2,
-                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
-                    matchModel.getGameState());
-
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
         }
     }
 
     /**
      * Broadcast the ranking of the players to all players
-     * @param rankings
+     * @param rankings list of player nicknames in ranking order
      */
     private void broadcastRanking(List<String> rankings) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {

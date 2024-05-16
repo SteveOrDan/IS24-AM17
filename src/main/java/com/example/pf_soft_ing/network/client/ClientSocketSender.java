@@ -87,12 +87,7 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
-    public void sendMatchMessage(String message) {
-        sendMessage(new MatchMessageMsg(message));
-    }
-
-    @Override
-    public void sendPrivateMessage(int recipientID, String message) {
-        sendMessage(new PrivateMessageMsg(recipientID, message));
+    public void sendChatMessage(String recipient, String message) {
+        sendMessage(new ChatMessageMsg(recipient, message));
     }
 }

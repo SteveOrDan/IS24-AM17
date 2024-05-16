@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Back extends Side{
 
-    public List<ResourceType> permanentResources;
+    public final List<ResourceType> permanentResources;
 
     public Back(CardCorner BLCorner, CardCorner BRCorner, CardCorner TLCorner, CardCorner TRCorner, List<ResourceType> permanentResources) {
         super(BLCorner, BRCorner, TLCorner, TRCorner);

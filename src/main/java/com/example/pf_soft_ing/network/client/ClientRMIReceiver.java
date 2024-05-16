@@ -2,8 +2,6 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.game.GameState;
-import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.rmi.RemoteException;
@@ -36,7 +34,7 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void placeCardResult() throws RemoteException {
+    public void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException {
         view.placeCard();
     }
 
@@ -61,8 +59,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException {
-        view.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+    public void startGame(String nickname, List<String> otherNicknames, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException {
+        view.startGame(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
     }
 
     @Override
@@ -78,10 +76,9 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                                  int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                 int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                                 GameState gameState) {
+                                 int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname, gameState);
+        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname);
     }
 
     @Override
@@ -100,24 +97,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendMatchMessage(String message, int senderID)throws RemoteException {
-        view.receivingMatchMessage(message, senderID);
+    public void sendChatMessage(String senderNickname, String recipientNickname, String message)throws RemoteException {
+        view.receiveChatMessage(senderNickname, recipientNickname, message);
     }
-
-    @Override
-    public void sendPrivateMessage(String message, int senderID) throws RemoteException {
-        view.receivingPrivateMessage(message, senderID);
-    }
-
-    @Override
-    public void confirmPrivateMessage(int recipientID, String message, int senderID) throws RemoteException {
-        view.confirmPrivateMessage(recipientID, message, senderID);
-    }
-
-    @Override
-    public void recipientNotFound(int recipientID) throws RemoteException {
-        view.recipientNotFound(recipientID);
-    }
-
 
 }

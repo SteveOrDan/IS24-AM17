@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MatchModelTest {
 
-    MatchModel matchModel = new MatchModel(4, 0);
+    private final MatchModel matchModel = new MatchModel(4, 0);
 
     @Test
     void initializeDecks() {

@@ -36,9 +36,9 @@ public class MatchModel {
 
     private GameState gameState = GameState.PREGAME;
 
-    private List<TokenColors> tokenColors = new ArrayList<>(List.of(TokenColors.values()));
+    private final List<TokenColors> tokenColors = new ArrayList<>(List.of(TokenColors.values()));
 
-    private List<String> rankings = new ArrayList<>();
+    private final List<String> rankings = new ArrayList<>();
 
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
@@ -471,10 +471,14 @@ public class MatchModel {
 
     /**
      * Method to check if the nickname is already taken by another player
-     * @param nickname
-     * @throws NicknameAlreadyExistsException
+     * @param nickname Nickname to check
+     * @throws NicknameAlreadyExistsException if the nickname is already taken or "all"
      */
     public void checkNickname(String nickname) throws NicknameAlreadyExistsException {
+        if (nickname.equals("all")){
+            throw new NicknameAlreadyExistsException();
+        }
+
         for (String otherNickname : getNicknames()) {
             if (otherNickname.equals(nickname)) {
                 throw new NicknameAlreadyExistsException();

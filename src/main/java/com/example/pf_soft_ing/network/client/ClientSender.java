@@ -19,6 +19,5 @@ public interface ClientSender {
     void drawGoldenCard(int playerID);
     void drawVisibleGoldenCard(int playerID, int index);
 
-    void sendMatchMessage(String message);
-    void sendPrivateMessage(int recipientID, String message);
+    void sendChatMessage(String recipient, String message);
 }

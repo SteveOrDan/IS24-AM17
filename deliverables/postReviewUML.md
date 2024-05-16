@@ -293,8 +293,8 @@ class PlayerModel{
     + calculateObjectivePoints(oCard : ObjectiveCard) void
     + flipStarterCard() void 
     + drawCard(card : PlaceableCard) void
-    
 }
+
 class PlayerState{
     <<enumeration>>
     PRE_GAME
@@ -489,6 +489,7 @@ class Token{
 
     + getColor() TokenColors
 }
+
 class TokenColors{
     <<enumeration>>
     RED

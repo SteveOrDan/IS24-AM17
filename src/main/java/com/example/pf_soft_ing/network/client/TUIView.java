@@ -20,6 +20,8 @@ public class TUIView implements View {
     private BufferedReader stdIn;
 
     private int playerID;
+    private String playerNickname;
+    private final List<String> otherNicknames = new ArrayList<>();
 
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
     private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
@@ -35,36 +37,33 @@ public class TUIView implements View {
     private int visibleGoldCardID1;
     private int visibleGoldCardID2;
 
-    private CardSideType starterSide;
-    private int starterCardID;
+    private PlaceableCard starterCard;
 
     private int secretObjectiveCardID1;
     private int secretObjectiveCardID2;
 
     private int secretObjectiveCardID;
 
+    private int priority;
+
     private PlayerState playerState;
 
     private final List<Position> legalPosList = new ArrayList<>();
     private final List<Position> illegalPosList = new ArrayList<>();
-    private final Map<Position, Integer> playArea = new HashMap<>();
+    private final Map<Position, PlaceableCard> playArea = new HashMap<>();
 
     private final Map<Integer, Position> posIDToValidPos = new HashMap<>();
 
-    private final Map<Integer, CardSideType> playerHand = new HashMap<>();
+    private final List<PlaceableCard> playerHand = new ArrayList<>();
 
     private final Map<PlayerState, List<String>> stateToCommands = new HashMap<>();
 
-    private int placingCardID;
+    private PlaceableCard placingCard;
     private Position placingCardPos;
 
-    private Map<Integer, String> IDtoOpponentNickname = new HashMap<>();
+    private final Map<Integer, Map<Position, PlaceableCard>> IDtoOpponentPlayerArea = new HashMap<>();
 
-    private Map<Integer, Map<Position, Integer>> IDtoOpponentPlayerArea = new HashMap<>();
-
-    private final List<MessageModel> matchChatList = new ArrayList<>();
-
-    private final Map<Integer, List<MessageModel>> opponentIDtoPrivateChatList = new HashMap<>();
+    private final List<String> chat = new ArrayList<>();
 
     public void start(String[] args) {
         createStateToCommandsMap();
@@ -149,7 +148,8 @@ public class TUIView implements View {
                         }
                         try {
                             sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                         }
                     }
@@ -160,7 +160,8 @@ public class TUIView implements View {
                         }
                         try {
                             sender.selectMatch(Integer.parseInt(parts[1]));
-                        } catch (NumberFormatException e){
+                        }
+                        catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                         }
                     }
@@ -186,7 +187,7 @@ public class TUIView implements View {
                             break;
                         }
 
-                        sender.placeStarterCard(starterSide);
+                        sender.placeStarterCard(starterCard.getCurrSideType());
                     }
                     case "cso" -> { // ChooseSecretObjective
                         if (parts.length != 2) {
@@ -216,7 +217,12 @@ public class TUIView implements View {
                         }
 
                         try {
-                            playerHand.compute(Integer.parseInt(parts[1]), (_, side) -> side == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
+                            for (PlaceableCard card : playerHand) {
+                                if (card.getID() == Integer.parseInt(parts[1])) {
+                                    card.setCurrSideType(card.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
+                                    break;
+                                }
+                            }
                             printPlayerHand();
                         }
                         catch (NumberFormatException e){
@@ -230,10 +236,10 @@ public class TUIView implements View {
                         }
 
                         try {
-                            placingCardID = Integer.parseInt(parts[1]);
+                            placingCard = GameResources.getPlaceableCardByID(Integer.parseInt(parts[1]));
                             placingCardPos = posIDToValidPos.get(Integer.parseInt(parts[2]));
 
-                            sender.placeCard(placingCardID, playerHand.get(placingCardID), placingCardPos);
+                            sender.placeCard(placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
@@ -254,14 +260,8 @@ public class TUIView implements View {
                             break;
                         }
 
-
                         try {
-                            int choice = Integer.parseInt(parts[1]);
-                            if (choice != 0 && choice != 1) {
-                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
-                                break;
-                            }
-                            sender.drawVisibleResourceCard(playerID, choice);
+                            sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -306,87 +306,26 @@ public class TUIView implements View {
                             break;
                         }
 
-                        boolean opponentFound = false;
-                        // Search opponent ID
-                        for (Integer opponentID : IDtoOpponentNickname.keySet()){
-                            if (IDtoOpponentNickname.get(opponentID).equals(parts[1])){
-                                printOpponentPlayArea(opponentID);
-                            }
-                        }
-                        if (!opponentFound) {
-                           System.out.println("Error: invalid nickname. Please, try again");
-                        }
-
+                    printOpponentPlayArea(parts[1]);
+                }
+                case "chat" -> { // Write a message in the chat
+                    if (parts.length < 3) {
+                        System.out.println("Error: OpponentPlayArea takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
+                        break;
                     }
-                    case "wmm" -> { // Write a message in the match chat
-                        if (parts.length <= 1) {
-                           System.out.println("Error: Write a message in the match chat takes at least 1 argument. Please, try again");
-                            break;
-                        }
 
-                         ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
+                    List<String> partsArray = new ArrayList<>(Arrays.asList(parts));
 
-                        //Remove "wmm" from the message
-                        partsArray.remove("wmm");
-
-                        //convert che String[] in String
-                        String message = String.join(" ", partsArray);
-
-                        sender.sendMatchMessage(message);
-                    }
-                    case "wpm" -> { // Write a message in the private chat
-                        if (parts.length <= 2) {
-                            System.out.println("Error: Write a message in the private chat takes at least 2 argument (recipient nickname and message). Please, try again");
-                            break;
-                        }
-
-                        boolean opponentFound = false;
-                        // Search recipient ID
-                        for (Integer recipientID : IDtoOpponentNickname.keySet()){
-                            if (IDtoOpponentNickname.get(recipientID).equals(parts[1])){
-                            ArrayList<String> partsArray = new ArrayList<>(Arrays.asList(parts));
-
-                            //Remove "wpm" from the message
-                            partsArray.remove("wpm");
-
-                            //Remove recipient nickname from the message
-                            partsArray.remove(IDtoOpponentNickname.get(recipientID));
-
-                            //convert che String[] in String
-                            String message = String.join(" ", partsArray);
-
-                            sender.sendPrivateMessage(recipientID, message);
-                            opponentFound = true;
-                            }
-                        }
-                        if (!opponentFound) {
-                          System.out.println("Error: invalid nickname. Please, try again");
-                        }
-                    }
-                    case "rmc" -> { // Print match chat
-                       if (parts.length != 1) {
-                           System.out.println("Error: ReadMatchChat does not take any arguments. Please, try again");
-                           break;
-                       }
-
-                      printMatchChat();
-                    }
-                    case "rpc" -> { // Print private chat
-                        if (parts.length != 2) {
-                            System.out.println("Error: ReadPrivateChat takes exactly 1 argument (opponent nickname). Please, try again");
-                            break;
-                        }
-
-                        printOpponentChat(parts[1]);
-                    }
+                    sender.sendChatMessage(partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
                 }
             }
-            else if (command.equals("exit") || command.equals("quit")) {
-                System.err.println("Disconnecting...");
-            }
-            else {
-                System.out.println("Error: " + command + " is not a valid command. Please, try again");
-            }
+        }
+        else if (command.equals("exit") || command.equals("quit")) {
+            System.err.println("Disconnecting...");
+        }
+        else {
+            System.out.println("Error: " + command + " is not a valid command. Please, try again");
+        }
     }
 
     @Override
@@ -436,10 +375,14 @@ public class TUIView implements View {
     }
 
     @Override
-    public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+    public void startGame(String nickname, List<String> otherNicknames,
+                          int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         System.out.println("Game started.");
+
+        playerNickname = nickname;
+        this.otherNicknames.addAll(otherNicknames);
 
         playerState = PlayerState.PLACING_STARTER;
 
@@ -465,9 +408,11 @@ public class TUIView implements View {
                                 int commonObjectiveCardID1, int commonObjectiveCardID2,
                                 int secretObjectiveCardID1, int secretObjectiveCardID2) {
         // Place the starter card in the play area and update all legal and illegal positions
-        playArea.put(new Position(0, 0), starterCardID);
+        starterCard.setPriority(priority);
+        playArea.put(new Position(0, 0), starterCard);
+        priority++;
 
-        updatePlacementPositions(new Position(0, 0), starterSide);
+        updatePlacementPositions(new Position(0, 0));
 
         // Set missing setup
         playerState = PlayerState.CHOOSING_OBJECTIVE;
@@ -531,13 +476,6 @@ public class TUIView implements View {
                 To read the match chat, type: rmc
                 To read the private chat, type: rpc <opponent nickname>""");
 
-        this.IDtoOpponentNickname = IDtoOpponentNickname;
-        this.IDtoOpponentPlayerArea = IDtoOpponentPlayArea;
-
-        for(Integer opponentID : IDtoOpponentNickname.keySet()){
-            opponentIDtoPrivateChatList.put(opponentID, new ArrayList<>());
-        }
-
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
             System.out.println("It's your turn.");
@@ -567,14 +505,22 @@ public class TUIView implements View {
     public void placeCard() {
         playerState = PlayerState.DRAWING;
 
+        placingCard.setPriority(priority);
+        priority++;
+
         // Add card to play area
-        playArea.put(placingCardPos, placingCardID);
+        playArea.put(placingCardPos, placingCard);
 
         // Update legal and illegal positions
-        updatePlacementPositions(placingCardPos, playerHand.get(placingCardID));
+        updatePlacementPositions(placingCardPos);
 
         // Remove card from player hand
-        playerHand.remove(placingCardID);
+        for (PlaceableCard card : playerHand) {
+            if (card.getID() == placingCard.getID()) {
+                playerHand.remove(card);
+                break;
+            }
+        }
 
         // Print play area
         printPlayArea();
@@ -592,15 +538,21 @@ public class TUIView implements View {
 
     @Override
     public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
-        IDtoOpponentPlayerArea.get(playerId).put(pos, cardID);
+        PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
+        opponentCard.setCurrSideType(side);
+
+        IDtoOpponentPlayerArea.get(playerId).put(pos, opponentCard);
         GameResources.getPlaceableCardByID(cardID).setCurrSideType(side);
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
         if (lastPlayerID == playerID) {
             playerState = PlayerState.WAITING;
-            playerHand.put(drawnCardID, CardSideType.FRONT);
+
+            PlaceableCard drawnCard = GameResources.getPlaceableCardByID(drawnCardID);
+
+            playerHand.add(drawnCard);
 
             System.out.println("You drew a new card (ID: " + drawnCardID + "):");
             createPlaceableCardLines(drawnCardID, CardSideType.FRONT);
@@ -609,13 +561,7 @@ public class TUIView implements View {
             for (String s : cardIDToCardFrontTUILines.get(drawnCardID)) {
                 System.out.println(s);
             }
-
-            System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.\n" +
-                    "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
-                    "To check your hand, type: gh\n" +
-                    "To check opponents play area: opa <opponentNickname>");
-
-
+            System.out.println("It's " + playerNickname + "'s turn.");
         }
         else {
             if (playerID == newPlayerID) {
@@ -639,17 +585,11 @@ public class TUIView implements View {
                 playerState = PlayerState.WAITING;
 
                 // Print available commands
-                System.out.println("It's " + IDtoOpponentNickname.get(newPlayerID) + "'s turn.\n" +
+                System.out.println("It's " + playerNickname + "'s turn.\n" +
                         "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
                         "To check your hand, type: gh\n" +
                         "To check opponents play area: opa <opponentNickname>");
             }
-        }
-        if (gameState == GameState.FINAL_ROUND) {
-            System.out.println("This is the final round.");
-        }
-        else if (gameState == GameState.EXTRA_ROUND) {
-            System.out.println("This is the extra round.");
         }
     }
 
@@ -742,8 +682,8 @@ public class TUIView implements View {
     }
 
     private void printStarterCardChoice(int starterCardID) {
-        this.starterCardID = starterCardID;
-        starterSide = CardSideType.FRONT;
+        starterCard = GameResources.getPlaceableCardByID(starterCardID);
+        starterCard.setCurrSideType(CardSideType.FRONT);
 
         createStarterCardLines(starterCardID, CardSideType.FRONT);
         createStarterCardLines(starterCardID, CardSideType.BACK);
@@ -757,21 +697,21 @@ public class TUIView implements View {
     }
 
     private void flipStarterCard() {
-        List<String> starterCard;
+        List<String> starterCardLines;
 
-        if (starterSide.equals(CardSideType.FRONT)) {
-            starterSide = CardSideType.BACK;
+        if (starterCard.getCurrSideType().equals(CardSideType.FRONT)) {
+            starterCard.setCurrSideType(CardSideType.BACK);
 
-            starterCard = cardIDToCardBackTUILines.get(starterCardID);
+            starterCardLines = cardIDToCardBackTUILines.get(starterCard.getID());
         }
         else {
-            starterSide = CardSideType.FRONT;
+            starterCard.setCurrSideType(CardSideType.FRONT);
 
-            starterCard = cardIDToCardFrontTUILines.get(starterCardID);
+            starterCardLines = cardIDToCardFrontTUILines.get(starterCard.getID());
         }
 
         System.out.println("Current starter card side:");
-        for (String s : starterCard) {
+        for (String s : starterCardLines) {
             System.out.println(s);
         }
 
@@ -780,9 +720,13 @@ public class TUIView implements View {
     }
 
     private void createPlayerHand(int resourceCardID1, int resourceCardID2, int goldenCardID) {
-        playerHand.put(resourceCardID1, CardSideType.FRONT);
-        playerHand.put(resourceCardID2, CardSideType.FRONT);
-        playerHand.put(goldenCardID, CardSideType.FRONT);
+        PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(resourceCardID1);
+        PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(resourceCardID2);
+        PlaceableCard goldenCard = GameResources.getPlaceableCardByID(goldenCardID);
+
+        playerHand.add(resourceCard1);
+        playerHand.add(resourceCard2);
+        playerHand.add(goldenCard);
 
         // Create player hand
         createResCardLines(resourceCardID1, CardSideType.FRONT);
@@ -799,14 +743,14 @@ public class TUIView implements View {
         List<List<String>> handToPrint = new ArrayList<>();
         StringBuilder cardIDs = new StringBuilder("Your hand:");
 
-        for (Map.Entry<Integer, CardSideType> entry : playerHand.entrySet()) {
-            cardIDs.append("\t").append(entry.getKey());
+        for (PlaceableCard card : playerHand) {
+            cardIDs.append("\t").append(card.getID());
 
-            if (entry.getValue().equals(CardSideType.FRONT)) {
-                handToPrint.add(cardIDToCardFrontTUILines.get(entry.getKey()));
+            if (card.getCurrSideType().equals(CardSideType.FRONT)) {
+                handToPrint.add(cardIDToCardFrontTUILines.get(card.getID()));
             }
             else {
-                handToPrint.add(cardIDToCardBackTUILines.get(entry.getKey()));
+                handToPrint.add(cardIDToCardBackTUILines.get(card.getID()));
             }
         }
 
@@ -861,10 +805,9 @@ public class TUIView implements View {
         System.out.println("To choose one of the secret objectives, type: cso <1 or 2>.");
     }
 
-    private void printPlayArea() {
+    private String[][] createPlayerArr(Map<Position, PlaceableCard> playArea) {
         if (playArea.isEmpty()) {
-            System.out.println("No cards in play area");
-            return;
+            return null;
         }
 
         // Get the max and min values of x and y
@@ -874,31 +817,27 @@ public class TUIView implements View {
         int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
 
         // +3 because of the starter card and the 1 extra space on each border (for the validPosIDs)
-        int[][] cardIDArr = new int[maxY - minY + 3][maxX - minX + 3];
-        char[][] playAreaArr = new char[3 * (maxY - minY + 3) + 2][3 * (maxX - minX + 3) + 2];
+        PlaceableCard[][] cardArr = new PlaceableCard[maxY - minY + 3][maxX - minX + 3];
+        String[][] playAreaArr = new String[3 * (maxY - minY + 3) + 2][3 * (maxX - minX + 3) + 2];
 
         // The position of the starter card is new Position(-minX + 1, maxY + 1);
         // And the array's Y is inverted, so the starter card's position in the array is [xPos - minX + 1][-yPos + maxY + 1]
 
-        for (int[] IDs : cardIDArr) {
-            Arrays.fill(IDs, -1);
-        }
-
         // Fill the array with elements from the playArea map
         for (Position pos : playArea.keySet()) {
-            cardIDArr[-pos.getY() + maxY + 1][pos.getX() - minX + 1] = playArea.get(pos);
+            cardArr[-pos.getY() + maxY + 1][pos.getX() - minX + 1] = playArea.get(pos);
         }
 
         // Fill array of characters to print
-        for (int y = 0; y < cardIDArr.length; y++) {
-            for (int x = 0; x < cardIDArr[y].length; x++) {
-                if (x > 0 && x < cardIDArr[y].length - 1 &&
-                        y > 0 && y < cardIDArr.length - 1) {
-                    PlaceableCard card = GameResources.getPlaceableCardByID(cardIDArr[y][x]);
+        for (int y = 0; y < cardArr.length; y++) {
+            for (int x = 0; x < cardArr[y].length; x++) {
+                if (x > 0 && x < cardArr[y].length - 1 &&
+                        y > 0 && y < cardArr.length - 1) {
+                    PlaceableCard card = cardArr[y][x];
 
                     if (card != null) {
                         // region Set permanent resources and constant card areas
-                        char PR1, PR2, PR3;
+                        String PR1, PR2, PR3;
 
                         Side currSide = card.getCurrSide();
 
@@ -919,149 +858,159 @@ public class TUIView implements View {
                             }
 
                             if (permanentRes.size() == 1) {
-                                PR1 = ' ';
-                                PR2 = currSide.getResources().getFirst().toString().charAt(0);
-                                PR3 = ' ';
+                                PR1 = " ";
+                                PR2 = currSide.getResources().getFirst().toString();
+                                PR3 = " ";
                             }
                             else if (permanentRes.size() == 2) {
-                                PR1 = currSide.getResources().getFirst().toString().charAt(0);
-                                PR2 = ' ';
-                                PR3 = currSide.getResources().get(1).toString().charAt(0);
+                                PR1 = currSide.getResources().getFirst().toString();
+                                PR2 = " ";
+                                PR3 = currSide.getResources().get(1).toString();
                             }
                             else { // size == 3
-                                PR1 = currSide.getResources().getFirst().toString().charAt(0);
-                                PR2 = currSide.getResources().get(1).toString().charAt(0);
-                                PR3 = currSide.getResources().get(2).toString().charAt(0);
+                                PR1 = currSide.getResources().getFirst().toString();
+                                PR2 = currSide.getResources().get(1).toString();
+                                PR3 = currSide.getResources().get(2).toString();
                             }
                         }
                         else {
-                            PR1 = ' ';
-                            PR2 = ' ';
-                            PR3 = ' ';
+                            PR1 = " ";
+                            PR2 = " ";
+                            PR3 = " ";
                         }
 
-                        playAreaArr[3 * y][3 * x + 2] = '─';
-                        playAreaArr[3 * y + 1][3 * x + 2] = ' ';
-                        playAreaArr[3 * y + 2][3 * x + 2] = PR2;
-                        playAreaArr[3 * y + 3][3 * x + 2] = ' ';
-                        playAreaArr[3 * y + 4][3 * x + 2] = '─';
+                        String cardColor = card.getElementType().getColor();
 
-                        playAreaArr[3 * y + 2][3 * x] = '│';
+                        playAreaArr[3 * y][3 * x + 2] = cardColor + "─" + CC.RESET;
+                        playAreaArr[3 * y + 1][3 * x + 2] = " ";
+                        playAreaArr[3 * y + 2][3 * x + 2] = PR2;
+                        playAreaArr[3 * y + 3][3 * x + 2] = " ";
+                        playAreaArr[3 * y + 4][3 * x + 2] = cardColor + "─" + CC.RESET;
+
+                        playAreaArr[3 * y + 2][3 * x] = cardColor + "│" + CC.RESET;
                         playAreaArr[3 * y + 2][3 * x + 1] = PR1;
                         playAreaArr[3 * y + 2][3 * x + 3] = PR3;
-                        playAreaArr[3 * y + 2][3 * x + 4] = '│';
+                        playAreaArr[3 * y + 2][3 * x + 4] = cardColor + "│" + CC.RESET;
                         // endregion
 
-                        PlaceableCard TLCard = GameResources.getPlaceableCardByID(cardIDArr[y - 1][x - 1]);
-                        PlaceableCard TRCard = GameResources.getPlaceableCardByID(cardIDArr[y - 1][x + 1]);
-                        PlaceableCard BLCard = GameResources.getPlaceableCardByID(cardIDArr[y + 1][x - 1]);
-                        PlaceableCard BRCard = GameResources.getPlaceableCardByID(cardIDArr[y + 1][x + 1]);
+                        PlaceableCard TLCard = cardArr[y - 1][x - 1];
+                        PlaceableCard TRCard = cardArr[y - 1][x + 1];
+                        PlaceableCard BLCard = cardArr[y + 1][x - 1];
+                        PlaceableCard BRCard = cardArr[y + 1][x + 1];
 
                         // Check if there is a card in the TL corner
-                        if (playAreaArr[3 * y][3 * x] == '\u0000') {
+                        if (playAreaArr[3 * y][3 * x] == null) {
                             if (TLCard != null) {
                                 if (TLCard.getPriority() > card.getPriority()){
-                                    playAreaArr[3 * y + 1][3 * x + 1] = '┘';
-                                    playAreaArr[3 * y + 1][3 * x] = '┬';
-                                    playAreaArr[3 * y][3 * x + 1] = '├';
+                                    String TLColor = TLCard.getElementType().getColor();
+
+                                    playAreaArr[3 * y + 1][3 * x + 1] = TLColor + "┘" + CC.RESET;
+                                    playAreaArr[3 * y + 1][3 * x] = TLColor + "┬" + CC.RESET;
+                                    playAreaArr[3 * y][3 * x + 1] = TLColor + "├" + CC.RESET;
                                     ResourceType TLRes = TLCard.getCurrSide().getBRCorner().getResource();
-                                    playAreaArr[3 * y][3 * x] = TLRes == null ? ' ' : TLRes.toString().charAt(0);
+                                    playAreaArr[3 * y][3 * x] = TLRes == null ? " " : TLRes.toString();
                                 }
                                 else {
-                                    playAreaArr[3 * y][3 * x] = '┌';
-                                    playAreaArr[3 * y][3 * x + 1] = '┴';
-                                    playAreaArr[3 * y + 1][3 * x] = '┤';
+                                    playAreaArr[3 * y][3 * x] = cardColor + "┌" + CC.RESET;
+                                    playAreaArr[3 * y][3 * x + 1] = cardColor + "┴" + CC.RESET;
+                                    playAreaArr[3 * y + 1][3 * x] = cardColor + "┤" + CC.RESET;
                                     ResourceType TLRes = card.getCurrSide().getTLCorner().getResource();
-                                    playAreaArr[3 * y + 1][3 * x + 1] = TLRes == null ? ' ' : TLRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 1][3 * x + 1] = TLRes == null ? " " : TLRes.toString();
                                 }
                             }
                             else {
-                                playAreaArr[3 * y][3 * x] = '┌';
-                                playAreaArr[3 * y][3 * x + 1] = '─';
-                                playAreaArr[3 * y + 1][3 * x] = '│';
+                                playAreaArr[3 * y][3 * x] = cardColor + "┌" + CC.RESET;
+                                playAreaArr[3 * y][3 * x + 1] = cardColor + "─" + CC.RESET;
+                                playAreaArr[3 * y + 1][3 * x] = cardColor + "│" + CC.RESET;
                                 ResourceType TLRes = card.getCurrSide().getTLCorner().getResource();
-                                playAreaArr[3 * y + 1][3 * x + 1] = TLRes == null ? ' ' : TLRes.toString().charAt(0);
+                                playAreaArr[3 * y + 1][3 * x + 1] = TLRes == null ? " " : TLRes.toString();
                             }
                         }
 
                         // Check if there is a card in the TR corner
-                        if (playAreaArr[3 * y][3 * x + 3] == '\u0000') {
+                        if (playAreaArr[3 * y][3 * x + 3] == null) {
                             if (TRCard != null) {
                                 if (TRCard.getPriority() > card.getPriority()){
-                                    playAreaArr[3 * y + 1][3 * x + 4] = '┬';
-                                    playAreaArr[3 * y + 1][3 * x + 3] = '└';
-                                    playAreaArr[3 * y][3 * x + 3] = '┤';
+                                    String TRColor = TRCard.getElementType().getColor();
+
+                                    playAreaArr[3 * y + 1][3 * x + 4] = TRColor + "┬" + CC.RESET;
+                                    playAreaArr[3 * y + 1][3 * x + 3] = TRColor + "└" + CC.RESET;
+                                    playAreaArr[3 * y][3 * x + 3] = TRColor + "┤" + CC.RESET;
                                     ResourceType TRRes = TRCard.getCurrSide().getBLCorner().getResource();
-                                    playAreaArr[3 * y][3 * x + 4] = TRRes == null ? ' ' : TRRes.toString().charAt(0);
+                                    playAreaArr[3 * y][3 * x + 4] = TRRes == null ? " " : TRRes.toString();
                                 }
                                 else {
-                                    playAreaArr[3 * y][3 * x + 3] = '┴';
-                                    playAreaArr[3 * y][3 * x + 4] = '┐';
-                                    playAreaArr[3 * y + 1][3 * x + 4] = '├';
+                                    playAreaArr[3 * y][3 * x + 3] = cardColor + "┴" + CC.RESET;
+                                    playAreaArr[3 * y][3 * x + 4] = cardColor + "┐" + CC.RESET;
+                                    playAreaArr[3 * y + 1][3 * x + 4] = cardColor + "├" + CC.RESET;
                                     ResourceType TRRes = card.getCurrSide().getTRCorner().getResource();
-                                    playAreaArr[3 * y + 1][3 * x + 3] = TRRes == null ? ' ' : TRRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 1][3 * x + 3] = TRRes == null ? " " : TRRes.toString();
                                 }
                             }
                             else {
-                                playAreaArr[3 * y][3 * x + 4] = '┐';
-                                playAreaArr[3 * y][3 * x + 3] = '─';
-                                playAreaArr[3 * y + 1][3 * x + 4] = '│';
+                                playAreaArr[3 * y][3 * x + 4] = cardColor + "┐" + CC.RESET;
+                                playAreaArr[3 * y][3 * x + 3] = cardColor + "─" + CC.RESET;
+                                playAreaArr[3 * y + 1][3 * x + 4] = cardColor + "│" + CC.RESET;
                                 ResourceType TRRes = card.getCurrSide().getTRCorner().getResource();
-                                playAreaArr[3 * y + 1][3 * x + 3] = TRRes == null ? ' ' : TRRes.toString().charAt(0);
+                                playAreaArr[3 * y + 1][3 * x + 3] = TRRes == null ? " " : TRRes.toString();
                             }
                         }
 
                         // Check if there is a card in the BL corner
-                        if (playAreaArr[3 * y + 3][3 * x] == '\u0000'){
+                        if (playAreaArr[3 * y + 3][3 * x] == null){
                             if (BLCard != null) {
                                 if (BLCard.getPriority() > card.getPriority()){
-                                    playAreaArr[3 * y + 3][3 * x] = '┴';
-                                    playAreaArr[3 * y + 4][3 * x + 1] = '├';
-                                    playAreaArr[3 * y + 3][3 * x + 1] = '┐';
+                                    String BLColor = BLCard.getElementType().getColor();
+
+                                    playAreaArr[3 * y + 3][3 * x] = BLColor + "┴" + CC.RESET;
+                                    playAreaArr[3 * y + 4][3 * x + 1] = BLColor + "├" + CC.RESET;
+                                    playAreaArr[3 * y + 3][3 * x + 1] = BLColor + "┐" + CC.RESET;
                                     ResourceType BLRes = BLCard.getCurrSide().getTRCorner().getResource();
-                                    playAreaArr[3 * y + 4][3 * x] = BLRes == null ? ' ' : BLRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 4][3 * x] = BLRes == null ? " " : BLRes.toString();
                                 }
                                 else {
-                                    playAreaArr[3 * y + 4][3 * x + 1] = '┬';
-                                    playAreaArr[3 * y + 3][3 * x] = '┤';
-                                    playAreaArr[3 * y + 4][3 * x] = '└';
+                                    playAreaArr[3 * y + 4][3 * x + 1] = cardColor + "┬" + CC.RESET;
+                                    playAreaArr[3 * y + 3][3 * x] = cardColor + "┤" + CC.RESET;
+                                    playAreaArr[3 * y + 4][3 * x] = cardColor + "└" + CC.RESET;
                                     ResourceType BLRes = card.getCurrSide().getBLCorner().getResource();
-                                    playAreaArr[3 * y + 3][3 * x + 1] = BLRes == null ? ' ' : BLRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 3][3 * x + 1] = BLRes == null ? " " : BLRes.toString();
                                 }
                             }
                             else {
-                                playAreaArr[3 * y + 4][3 * x + 1] = '─';
-                                playAreaArr[3 * y + 3][3 * x] = '│';
-                                playAreaArr[3 * y + 4][3 * x] = '└';
+                                playAreaArr[3 * y + 4][3 * x + 1] = cardColor + "─" + CC.RESET;
+                                playAreaArr[3 * y + 3][3 * x] = cardColor + "│" + CC.RESET;
+                                playAreaArr[3 * y + 4][3 * x] = cardColor + "└" + CC.RESET;
                                 ResourceType BLRes = card.getCurrSide().getBLCorner().getResource();
-                                playAreaArr[3 * y + 3][3 * x + 1] = BLRes == null ? ' ' : BLRes.toString().charAt(0);
+                                playAreaArr[3 * y + 3][3 * x + 1] = BLRes == null ? " " : BLRes.toString();
                             }
                         }
 
                         // Check if there is a card in the BR corner
-                        if (playAreaArr[3 * y + 3][3 * x + 3] == '\u0000'){
+                        if (playAreaArr[3 * y + 3][3 * x + 3] == null){
                             if (BRCard != null) {
                                 if (BRCard.getPriority() > card.getPriority()) {
-                                    playAreaArr[3 * y + 3][3 * x + 3] = '┌';
-                                    playAreaArr[3 * y + 3][3 * x + 4] = '┴';
-                                    playAreaArr[3 * y + 4][3 * x + 3] = '┤';
+                                    String BRColor = BRCard.getElementType().getColor();
+
+                                    playAreaArr[3 * y + 3][3 * x + 3] = BRColor + "┌" + CC.RESET;
+                                    playAreaArr[3 * y + 3][3 * x + 4] = BRColor + "┴" + CC.RESET;
+                                    playAreaArr[3 * y + 4][3 * x + 3] = BRColor + "┤" + CC.RESET;
                                     ResourceType BRRes = BRCard.getCurrSide().getTLCorner().getResource();
-                                    playAreaArr[3 * y + 4][3 * x + 4] = BRRes == null ? ' ' : BRRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 4][3 * x + 4] = BRRes == null ? " " : BRRes.toString();
                                 }
                                 else {
-                                    playAreaArr[3 * y + 4][3 * x + 4] = '┘';
-                                    playAreaArr[3 * y + 3][3 * x + 4] = '├';
-                                    playAreaArr[3 * y + 4][3 * x + 3] = '┬';
+                                    playAreaArr[3 * y + 4][3 * x + 4] = cardColor + "┘" + CC.RESET;
+                                    playAreaArr[3 * y + 3][3 * x + 4] = cardColor + "├" + CC.RESET;
+                                    playAreaArr[3 * y + 4][3 * x + 3] = cardColor + "┬" + CC.RESET;
                                     ResourceType BRRes = card.getCurrSide().getBRCorner().getResource();
-                                    playAreaArr[3 * y + 3][3 * x + 3] = BRRes == null ? ' ' : BRRes.toString().charAt(0);
+                                    playAreaArr[3 * y + 3][3 * x + 3] = BRRes == null ? " " : BRRes.toString();
                                 }
                             }
                             else {
-                                playAreaArr[3 * y + 4][3 * x + 4] = '┘';
-                                playAreaArr[3 * y + 3][3 * x + 4] = '│';
-                                playAreaArr[3 * y + 4][3 * x + 3] = '─';
+                                playAreaArr[3 * y + 4][3 * x + 4] = cardColor + "┘" + CC.RESET;
+                                playAreaArr[3 * y + 3][3 * x + 4] = cardColor + "│" + CC.RESET;
+                                playAreaArr[3 * y + 4][3 * x + 3] = cardColor + "─" + CC.RESET;
                                 ResourceType BRRes = card.getCurrSide().getBRCorner().getResource();
-                                playAreaArr[3 * y + 3][3 * x + 3] = BRRes == null ? ' ' : BRRes.toString().charAt(0);
+                                playAreaArr[3 * y + 3][3 * x + 3] = BRRes == null ? " " : BRRes.toString();
                             }
                         }
                     }
@@ -1069,47 +1018,58 @@ public class TUIView implements View {
             }
         }
 
+        return playAreaArr;
+    }
+
+    private void printPlayArea() {
+        String[][] playAreaArr = createPlayerArr(playArea);
+
+        if (playAreaArr == null) {
+            System.out.println("No cards in play area");
+            return;
+        }
+
+        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
+
         // Fill the validPosIDs
         for (int i : posIDToValidPos.keySet()) {
             Position pos = posIDToValidPos.get(i);
             Position arrPos = new Position(3 * (pos.getX() - minX + 1), 3 * (-pos.getY() + maxY + 1));
+
             if (i < 10) {
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = (char) (i + 48);
+                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = String.valueOf(i);
             }
             else {
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 1] = (char) (i / 10 + 48);
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = (char) (i % 10 + 48);
+                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 1] = String.valueOf(i / 10);
+                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = String.valueOf(i % 10);
             }
         }
 
         System.out.println("Your play area:");
 
         // Print the play area
-        for (char[] chars : playAreaArr) {
+        for (String[] strings : playAreaArr) {
             StringBuilder line = new StringBuilder();
 
-            for (char c : chars) {
-                if (c == '\u0000') {
-                    line.append(' ');
-                } else {
-                    line.append(c);
-                }
+            for (String s : strings) {
+                line.append(Objects.requireNonNullElse(s, " "));
             }
             System.out.println(line);
         }
     }
 
-    private void printOpponentPlayArea(int opponentID) {
-        // TODO: Implement
+    private void printOpponentPlayArea(String opponentNick) {
+        // TODO: Implement method
     }
 
-    private void updatePlacementPositions(Position pos, CardSideType sideType) {
+    private void updatePlacementPositions(Position pos) {
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
 
-        PlaceableCard card = GameResources.getPlaceableCardByID(playArea.get(pos));
+        PlaceableCard card = playArea.get(pos);
 
-        Side currSide = sideType == CardSideType.FRONT ? card.getFront() : card.getBack();
+        Side currSide = card.getCurrSide();
 
         if (currSide.getBLCorner().isAvailable()) {
             newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
@@ -1188,6 +1148,7 @@ public class TUIView implements View {
         String A1, A2, A3, B1, B2, B3, C, D, E1, E2, E3, F1, F2, F3;
 
         Side cardSide;
+        String cardColor = card.getElementType().getColor();
 
         if (sideType.equals(CardSideType.FRONT)){
             cardSide = card.getFront();
@@ -1200,26 +1161,26 @@ public class TUIView implements View {
             A1 = "┏━━━━━┳";
             String r = cardSide.getTLCorner().getResource() != null ?
                     cardSide.getTLCorner().getResource().getColor() + cardSide.getTLCorner().getResource().toString() + CC.RESET : " ";
-            A2 = "┃  " + r + "  ┃";
-            A3 = "┣━━━━━┛";
+            A2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
+            A3 = cardColor + "┣━━━━━┛" + CC.RESET;
         }
         else{
             A1 = "┏━━━━━━";
-            A2 = "┃      ";
-            A3 = "┃      ";
+            A2 = cardColor + "┃      " + CC.RESET;
+            A3 = cardColor + "┃      " + CC.RESET;
         }
 
         if (cardSide.getTRCorner().isAvailable()) {
             B1 = "┳━━━━━┓";
             String r = cardSide.getTRCorner().getResource() != null ?
                     cardSide.getTRCorner().getResource().getColor() + cardSide.getTRCorner().getResource().toString() + CC.RESET : " ";
-            B2 = "┃  " + r + "  ┃";
-            B3 = "┗━━━━━┫";
+            B2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
+            B3 = cardColor + "┗━━━━━┫" + CC.RESET;
         }
         else{
             B1 = "━━━━━━┓";
-            B2 = "      ┃";
-            B3 = "      ┃";
+            B2 = cardColor + "      ┃" + CC.RESET;
+            B3 = cardColor + "      ┃" + CC.RESET;
         }
 
         C = (sideType.equals(CardSideType.FRONT) && card.getPoints() != 0) ? String.valueOf(card.getPoints()) : " ";
@@ -1235,40 +1196,40 @@ public class TUIView implements View {
         }
 
         if (cardSide.getBLCorner().isAvailable()) {
-            E1 = "┣━━━━━┓";
+            E1 = cardColor + "┣━━━━━┓" + CC.RESET;
             String r = cardSide.getBLCorner().getResource() != null ?
                     cardSide.getBLCorner().getResource().getColor() + cardSide.getBLCorner().getResource().toString() + CC.RESET : " ";
-            E2 = "┃  " + r + "  ┃";
+            E2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
             E3 = "┗━━━━━┻";
         }
         else {
-            E1 = "┃      ";
-            E2 = "┃      ";
+            E1 = cardColor + "┃      " + CC.RESET;
+            E2 = cardColor + "┃      " + CC.RESET;
             E3 = "┗━━━━━━";
         }
 
         if (cardSide.getBRCorner().isAvailable()) {
-            F1 = "┏━━━━━┫";
+            F1 = cardColor + "┏━━━━━┫" + CC.RESET;
             String r = cardSide.getBRCorner().getResource() != null ?
                     cardSide.getBRCorner().getResource().getColor() + cardSide.getBRCorner().getResource().toString() + CC.RESET : " ";
-            F2 = "┃  " + r + "  ┃";
+            F2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
             F3 = "┻━━━━━┛";
         }
         else {
-            F1 = "      ┃";
-            F2 = "      ┃";
+            F1 = cardColor + "      ┃" + CC.RESET;
+            F2 = cardColor + "      ┃" + CC.RESET;
             F3 = "━━━━━━┛";
         }
 
         List<String> lines = new ArrayList<>();
 
-        lines.add(A1 + "━━━━━━━━━━━" + B1);
+        lines.add(cardColor + A1 + "━━━━━━━━━━━" + B1 + CC.RESET);
         lines.add(A2 + "     " + C + "     " + B2);
         lines.add(A3 + "           " + B3);
-        lines.add("┃           " + D + "           ┃");
+        lines.add(cardColor + "┃           " + CC.RESET + D + cardColor + "           ┃" + CC.RESET);
         lines.add(E1 + "           " + F1);
         lines.add(E2 + "           " + F2);
-        lines.add(E3 + "━━━━━━━━━━━" + F3);
+        lines.add(cardColor + E3 + "━━━━━━━━━━━" + F3 + CC.RESET);
 
         if (sideType.equals(CardSideType.FRONT)){
             cardIDToCardFrontTUILines.put(cardID, lines);
@@ -1286,6 +1247,7 @@ public class TUIView implements View {
         StringBuilder G;
 
         Side cardSide;
+        String cardColor = card.getElementType().getColor();
 
         if (sideType.equals(CardSideType.FRONT)){
             cardSide = card.getFront();
@@ -1298,12 +1260,12 @@ public class TUIView implements View {
             A1 = "╔═════╦";
             String r = cardSide.getTLCorner().getResource() != null ?
                     cardSide.getTLCorner().getResource().getColor() + cardSide.getTLCorner().getResource().toString() + CC.RESET : " ";
-            A2 = "║  " + r + "  ║";
+            A2 = cardColor + "║  " + r + cardColor + "  ║" + CC.RESET;
             A3 = "╠═════╝";
         }
         else{
             A1 = "╔══════";
-            A2 = "║      ";
+            A2 = cardColor + "║      " + CC.RESET;
             A3 = "║      ";
         }
 
@@ -1311,12 +1273,12 @@ public class TUIView implements View {
             B1 = "╦═════╗";
             String r = cardSide.getTRCorner().getResource() != null ?
                     cardSide.getTRCorner().getResource().getColor() + cardSide.getTRCorner().getResource().toString() + CC.RESET : " ";
-            B2 = "║  " + r + "  ║";
+            B2 = cardColor + "║  " + r + cardColor + "  ║" + CC.RESET;
             B3 = "╚═════╣";
         }
         else{
             B1 = "══════╗";
-            B2 = "      ║";
+            B2 = cardColor + "      ║" + CC.RESET;
             B3 = "      ║";
         }
 
@@ -1352,12 +1314,12 @@ public class TUIView implements View {
             E1 = "╠═════╗";
             String r = cardSide.getBLCorner().getResource() != null ?
                     cardSide.getBLCorner().getResource().getColor() + cardSide.getBLCorner().getResource().toString() + CC.RESET : " ";
-            E2 = "║  " + r + "  ║";
+            E2 = cardColor + "║  " + r + cardColor + "  ║" + CC.RESET;
             E3 = "╚═════╩";
         }
         else {
             E1 = "║      ";
-            E2 = "║      ";
+            E2 = cardColor + "║      " + CC.RESET;
             E3 = "╚══════";
         }
 
@@ -1365,12 +1327,12 @@ public class TUIView implements View {
             F1 = "╔═════╣";
             String r = cardSide.getBRCorner().getResource() != null ?
                     cardSide.getBRCorner().getResource().getColor() + cardSide.getBRCorner().getResource().toString() + CC.RESET : " ";
-            F2 = "║  " + r + "  ║";
+            F2 = cardColor + "║  " + r + cardColor + "  ║" + CC.RESET;
             F3 = "╩═════╝";
         }
         else {
             F1 = "      ║";
-            F2 = "      ║";
+            F2 = cardColor + "      ║" + CC.RESET;
             F3 = "══════╝";
         }
 
@@ -1421,13 +1383,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add(A1 + "═══════════" + B1);
+        lines.add(cardColor + A1 + "═══════════" + B1 + CC.RESET);
         lines.add(A2 + "    " + C + "    " + B2);
-        lines.add(A3 + "           " + B3);
-        lines.add("║           " + D + "           ║");
-        lines.add(E1 + "           " + F1);
+        lines.add(cardColor + A3 + "           " + B3 + CC.RESET);
+        lines.add(cardColor + "║           " + CC.RESET + D + cardColor + "           ║" + CC.RESET);
+        lines.add(cardColor + E1 + "           " + F1 + CC.RESET);
         lines.add(E2 + "   " + G + "   " + F2);
-        lines.add(E3 + "═══════════" + F3);
+        lines.add(cardColor + E3 + "═══════════" + F3 + CC.RESET);
 
         if (sideType.equals(CardSideType.FRONT)){
             cardIDToCardFrontTUILines.put(cardID, lines);
@@ -1758,66 +1720,41 @@ public class TUIView implements View {
                 new ArrayList<>(Arrays.asList("fsc", "psc")));
 
         stateToCommands.put(PlayerState.CHOOSING_OBJECTIVE,
-                new ArrayList<>(List.of("cso", "rmc")));
+                new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("rmc", "rpc", "wmm", "wpm")));
+                new ArrayList<>(List.of("rmc", "rpc", "chat")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "wmm", "wpm")));
+                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "wmm", "wpm")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "wmm", "wpm")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat")));
     }
 
     @Override
-    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
-        String senderNickname;
-        if (senderID == playerID){
-            senderNickname = "Me";
+    public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
+        if (senderNickname.equals(playerNickname)){
+            // Add message to chat list
+            chat.add(playerNickname + ": " + message);
         }
         else {
-            senderNickname = IDtoOpponentNickname.get(senderID);
-        }
-        opponentIDtoPrivateChatList.get(recipientID).add(new MessageModel(senderNickname, message));
-        System.out.println("Message to " + IDtoOpponentNickname.get(recipientID) + " successfully delivered.");
-    }
+            if (recipientNickname.equals(playerNickname)){
+                System.out.println("(private)" + senderNickname + ": " + message);
 
-    @Override
-    public void receivingPrivateMessage(String message, int senderID) {
-        String senderNickname;
-        if (senderID == playerID){
-            senderNickname = "Me";
-        }
-        else {
-            senderNickname = IDtoOpponentNickname.get(senderID);
-        }
-        MessageModel newMessage = new MessageModel(senderNickname, message);
-        opponentIDtoPrivateChatList.get(senderID).add(newMessage);
-        System.out.println("New private message:");
-        System.out.println(newMessage.printMessage());
-    }
+                // Add message to chat list
+                chat.add("(private)" + senderNickname + ": " + message);
+            }
+            else {
+                System.out.println(senderNickname + ": " + message);
 
-    @Override
-    public void receivingMatchMessage(String message, int senderID) {
-        if (senderID == playerID){
-            matchChatList.add(new MessageModel("Me", message));
-            System.out.println("Message successfully delivered.");
+                // Add message to chat list
+                chat.add(senderNickname + ": " + message);
+            }
         }
-        else {
-            MessageModel newMessage = new MessageModel(IDtoOpponentNickname.get(senderID), message);
-            matchChatList.add(newMessage);
-            System.out.println("New match message:");
-            System.out.println(newMessage.printMessage());
-        }
-    }
-
-    @Override
-    public void recipientNotFound(int recipientID) {
-        System.out.println("Message delivery to " + IDtoOpponentNickname.get(recipientID) + " failed.");
     }
 
     @Override
@@ -1831,37 +1768,65 @@ public class TUIView implements View {
         }
     }
 
-    private void printMatchChat() {
-        if (matchChatList.isEmpty()){
-            System.out.println("The match chat is empty. To write a match message, type: wmm <message>.");
+    @Override
+    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState) {
+        if (gameState == GameState.FINAL_ROUND) {
+            System.out.println("The game entered the final round state.");
         }
         else {
-            System.out.println("This is the match chat:");
-            for (MessageModel messageModel : matchChatList){
-                System.out.println(messageModel.printMessage());
-            }
+            System.out.println("The game entered the extra round state.");
         }
+
+        showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, newPlayerNickname);
     }
 
-    private void printOpponentChat(String opponent) {
-        boolean opponentFound = false;
-        for (Integer opponentID : IDtoOpponentNickname.keySet()) {
-            if (IDtoOpponentNickname.get(opponentID).equals(opponent)){
-                if (opponentIDtoPrivateChatList.get(opponentID).isEmpty()){
-                    System.out.println("The private chat with " + opponent + " is empty. To write a private message type: wpm <opponent nickname> <message>.");
-                }
-                else {
-                    System.out.println("This is the match chat:");
-                    for (MessageModel messageModel : opponentIDtoPrivateChatList.get(opponentID)){
-                        System.out.println(messageModel.printMessage());
-                    }
-                }
-                opponentFound = true;
+    @Override
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname) {
+        if (playerID == lastPlayerID){
+            playerState = PlayerState.WAITING;
+
+            placingCard.setPriority(priority);
+            priority++;
+
+            // Add card to play area
+            playArea.put(placingCardPos, placingCard);
+
+            // Update legal and illegal positions
+            updatePlacementPositions(placingCardPos);
+
+            // Remove card from player hand
+            playerHand.remove(placingCard.getID());
+
+            // Print play area
+            printPlayArea();
+        }
+        else {
+            if (playerID == newPlayerID) {
+                playerState = PlayerState.PLACING;
+
+                System.out.println("It's your turn.");
+
+                // Print player hand
+                printPlayerHand();
+
+                // Print play area
+                printPlayArea();
+
+                // Print available commands
+                System.out.println("""
+                        To check your hand, type: gh
+                        To flip a card, type: fc <cardID>
+                        To place a card, type: pc <cardID> <posID>""");
+            }
+            else {
+                playerState = PlayerState.WAITING;
+
+                // Print available commands
+                System.out.println("It's " + newPlayerNickname + "'s turn.\n" +
+                        "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
+                        "To check your hand, type: gh\n" +
+                        "To check opponents play area: opa <opponentNickname>");
             }
         }
-        if (!opponentFound){
-            System.out.println("Opponent not found.");
-        }
-
     }
 }

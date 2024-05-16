@@ -26,30 +26,30 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
 
-    CardCorner emptyCorner = new EmptyCorner();
-    CardCorner hiddenCorner = new HiddenCorner();
+    private final CardCorner emptyCorner = new EmptyCorner();
+    private final CardCorner hiddenCorner = new HiddenCorner();
 
-    CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
-    CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
-    CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
-    CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
-    CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
-    CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
-    CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
+    private final CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
+    private final CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
+    private final CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
+    private final CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
+    private final CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
+    private final CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
+    private final CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
 
-    Side starterFront1 = new Front(hiddenCorner, pCorner, iCorner, fCorner);
-    Side starerBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.FUNGI);}});
+    private final Side starterFront1 = new Front(hiddenCorner, pCorner, iCorner, fCorner);
+    private final Side starerBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.FUNGI);}});
 
-    PlaceableCard starterCard1 = new StarterCard(2, starterFront1, starerBack1);
+    private final PlaceableCard starterCard1 = new StarterCard(2, starterFront1, starerBack1);
 
-    int resourceCardPoints = 2;
+    private final int resourceCardPoints = 2;
 
-    Side normalFront = new Front(aCorner, kCorner, mCorner, qCorner);
-    Side normalBack = new Back(emptyCorner, emptyCorner, emptyCorner,emptyCorner, new ArrayList<>(){{add(ResourceType.ANIMAL);}});
+    private final Side normalFront = new Front(aCorner, kCorner, mCorner, qCorner);
+    private final Side normalBack = new Back(emptyCorner, emptyCorner, emptyCorner,emptyCorner, new ArrayList<>(){{add(ResourceType.ANIMAL);}});
 
-    ResourceCard normalCard = new ResourceCard(resourceCardPoints, CardElementType.ANIMAL, 3, normalFront, normalBack);
+    private final ResourceCard normalCard = new ResourceCard(resourceCardPoints, CardElementType.ANIMAL, 3, normalFront, normalBack);
 
-    PlayerModel playerModel;
+    private PlayerModel playerModel;
 
     public void createPlayerModel(){
         try {
@@ -411,7 +411,7 @@ class PlayerModelTest {
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
-        //Use 1 fungi golden card and 2 animal resource cards and flip them
+        //Use 1 fungus golden card and 2 animal resource cards and flip them
         PlaceableCard mainCard = goldenDeck.getFirst();
         PlaceableCard card1 = resourceDeck.get(20);
         PlaceableCard card2 = resourceDeck.get(21);

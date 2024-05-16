@@ -2,8 +2,6 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.game.GameState;
-import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.rmi.*;
@@ -16,7 +14,7 @@ public interface ClientRMIInterface extends Remote {
 
     void placeStarterCard() throws RemoteException;
 
-    void placeCardResult() throws RemoteException;
+    void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException;
 
     void sendError(String errorMsg) throws RemoteException;
 
@@ -25,19 +23,21 @@ public interface ClientRMIInterface extends Remote {
     void createMatchResult(int matchID, String hostNickname) throws RemoteException;
 
     void chooseNicknameResult(String hostNickname) throws RemoteException;
-    void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+
+    void startGame(String nickname, List<String> otherNicknames,
+                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
 
     void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
+
     void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                           int commonObjectiveCardID1, int commonObjectiveCardID2,
                           int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException;
 
     void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                          GameState gameState) throws RemoteException;
+                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
 
     void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException;
 
@@ -45,11 +45,5 @@ public interface ClientRMIInterface extends Remote {
 
     void confirmSecretObjective() throws RemoteException;
 
-    void sendMatchMessage(String message, int senderID) throws RemoteException;
-
-    void sendPrivateMessage(String message, int senderID) throws RemoteException;
-
-    void confirmPrivateMessage(int recipientID, String message, int senderID) throws RemoteException;
-
-    void recipientNotFound(int recipientID) throws RemoteException;
+    void sendChatMessage(String senderNickname, String recipientNickname, String message) throws RemoteException;
 }

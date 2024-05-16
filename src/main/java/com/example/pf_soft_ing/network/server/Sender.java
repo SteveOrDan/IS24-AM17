@@ -20,9 +20,10 @@ public interface Sender {
 
     void chooseNicknameResult(String nickname);
 
-    void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                       int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                                       int starterCardID);
+    void sendGameStart(String nickname, List<String> otherNicknames,
+                       int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                       int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                       int starterCardID);
 
     void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                           int commonObjectiveCardID1, int commonObjectiveCardID2,
@@ -30,24 +31,23 @@ public interface Sender {
 
     void confirmSecretObjective();
 
-    void placeCard();
+    void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
 
     void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                            int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                           GameState gameState);
+                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
-    void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
+    void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
+                                int newPlayerID, String newPlayerNickname);
 
-    void sendMatchMessage(String message, int senderID);
+    void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
+                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                   GameState gameState);
 
-    void sendPrivateMessage(String message, int senderID);
-
-    void confirmPrivateMessage(int recipientID, String message, int senderID);
-
-    void recipientNotFound(int recipientID);
+    void sendChatMessage(String sender, String recipient, String message);
 
     void sendRanking(List<String> rankings);
 }

@@ -18,7 +18,8 @@ public interface View {
 
     void chooseNickname(String nickname);
 
-    void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+    void startGame(String nickname, List<String> otherNicknames,
+                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID);
 
@@ -36,7 +37,7 @@ public interface View {
 
     void placeCard();
 
-    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState);
+    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname);
 
     void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
@@ -45,14 +46,11 @@ public interface View {
 
     void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side);
 
-
-    void confirmPrivateMessage(int recipientID, String message, int senderID);
-
-    void receivingPrivateMessage(String message, int senderID);
-
-    void receivingMatchMessage(String message, int senderID);
-
-    void recipientNotFound(int recipientID);
+    void receiveChatMessage(String senderNickname, String recipientNickname, String message);
 
     void showRanking(List<String> rankings);
+
+    void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState);
+
+    void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname);
 }

@@ -39,6 +39,9 @@ public class GUIView implements View {
     private final List<Integer> playerHand = new ArrayList<>();
 
     private int matchID;
+    private int playerID;
+    private String playerNickname;
+    private List<String> otherNicknames;
 
     private CardSideType starterCardSide;
     private int starterCardID;
@@ -431,6 +434,7 @@ public class GUIView implements View {
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                int starterCardID){
         GameResources.initializeAllDecks();
+
         root.getChildren().clear();
 
         // Create player field
@@ -1170,7 +1174,6 @@ public class GUIView implements View {
         root.getChildren().add(lineH);
     }
 
-    // TODO: Is zooming ok? (panel dimensions problem)
     void keyPressed(KeyEvent key){
         if (key.getCode() == KeyCode.CONTROL) {
             pressingCtrl = true;
@@ -1232,11 +1235,15 @@ public class GUIView implements View {
     }
 
     @Override
-    public void startGame(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+    public void startGame(String nickname, List<String> otherNicknames,
+                          int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         Platform.runLater(() -> drawGameStart(resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+
+        playerNickname = nickname;
+        this.otherNicknames = otherNicknames;
 
 //        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
 //            root.getChildren().clear();
@@ -1304,7 +1311,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname, GameState gameState) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
 
     }
 
@@ -1324,27 +1331,22 @@ public class GUIView implements View {
     }
 
     @Override
-    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
-
-    }
-
-    @Override
-    public void receivingPrivateMessage(String message, int senderID) {
-
-    }
-
-    @Override
-    public void receivingMatchMessage(String message, int senderID) {
-
-    }
-
-    @Override
-    public void recipientNotFound(int recipientID) {
+    public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
 
     }
 
     @Override
     public void showRanking(List<String> rankings) {
+
+    }
+
+    @Override
+    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState) {
+
+    }
+
+    @Override
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname) {
 
     }
 }

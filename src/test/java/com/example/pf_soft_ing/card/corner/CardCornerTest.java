@@ -7,15 +7,15 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class CardCornerTest {
-    CardCorner emptyCorner = new EmptyCorner();
-    CardCorner hiddenCorner = new HiddenCorner();
-    CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
-    CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
-    CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
-    CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
-    CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
-    CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
-    CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
+    private final CardCorner emptyCorner = new EmptyCorner();
+    private final CardCorner hiddenCorner = new HiddenCorner();
+    private final CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
+    private final CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
+    private final CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
+    private final CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
+    private final CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
+    private final CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
+    private final CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
 
     @DisplayName("Corner availability test")
     @Test

@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
+import com.example.pf_soft_ing.network.messages.requests.ChatMessageMsg;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
@@ -60,10 +61,11 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+    public void sendGameStart(String nickname, List<String> otherNicknames,
+                              int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
-        sendMessage(new GameStartMsg(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+        sendMessage(new GameStartMsg(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
     }
 
     @Override
@@ -77,8 +79,8 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void placeCard(){
-        sendMessage(new ConfirmPlaceCardMsg());
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide){
+        sendMessage(new ConfirmPlaceCardMsg(playerID, cardID, pos, chosenSide));
     }
 
     @Override
@@ -89,38 +91,34 @@ public class SocketSender implements Sender {
     @Override
     public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                                       int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                      int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                                      GameState gameState) {
+                                      int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
 
         sendMessage(new NewPlayerTurnMsg(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
+                resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
+    }
+
+    @Override
+    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
+                                       int newPlayerID, String newPlayerNickname) {
+        sendMessage(new NewPlayerExtraTurnMsg(cardID, lastPlayerID, pos, side,
+                newPlayerID, newPlayerNickname));
+    }
+
+    @Override
+    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
+                                          int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                          GameState gameState) {
+        sendMessage(new NewPlayerTurnNewStateMsg(drawnCardID, lastPlayerID, newPlayerID, newPlayerNickname,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
                 gameState));
     }
 
     @Override
-    public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-        sendMessage(new OpponentPlaceCardMsg(playerID, cardID, pos, chosenSide));
-    }
-
-    @Override
-    public void sendMatchMessage(String message, int senderID) {
-        sendMessage(new ReceivingMatchMessageMsg(message, senderID));
-    }
-
-    @Override
-    public void sendPrivateMessage(String message, int senderID) {
-        sendMessage(new ReceivingPrivateMessageMsg(message, senderID));
-    }
-
-    @Override
-    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
-        sendMessage(new ConfirmPrivateMessageMsg(recipientID, message, senderID));
-    }
-
-    @Override
-    public void recipientNotFound(int recipientID) {
-        sendMessage(new RecipientNotFoundMsg(recipientID));
+    public void sendChatMessage(String sender, String recipient, String message) {
+        sendMessage(new ReceiveChatMessageMsg(sender, recipient, message));
     }
 
     @Override

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class RMISender implements Sender {
 
-    ClientRMIInterface client;
+    private final ClientRMIInterface client;
 
     public RMISender(ClientRMIInterface client){
         this.client = client;
@@ -70,11 +70,12 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendGameStart(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+    public void sendGameStart(String nickname, List<String> otherNicknames,
+                              int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
         try {
-            client.startGame(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+            client.startGame(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
         }
         catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Game not started");
@@ -97,15 +98,16 @@ public class RMISender implements Sender {
     public void confirmSecretObjective() {
         try {
             client.confirmSecretObjective();
-        } catch (RemoteException e) {
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Confirm secret objective not shown");
         }
     }
 
     @Override
-    public void placeCard(){
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
         try {
-            client.placeCardResult();
+            client.placeCardResult(playerID, cardID, pos, chosenSide);
         }
         catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". Place card not shown");
@@ -125,70 +127,34 @@ public class RMISender implements Sender {
     @Override
     public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                  int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                                  GameState gameState) {
+                                  int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
         try {
             client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
                     resDeckCardID, visibleResCardID1, visibleResCardID2,
-                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
-                    gameState);
-        } catch (RemoteException e) {
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        }
+        catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
         }
     }
 
     @Override
-    public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-        try {
-            client.opponentPlaceCard(playerID, cardID, pos, chosenSide);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Opponent's card not placed");
-        }
+    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, String newPlayerNickname) {
+
     }
 
     @Override
-    public void sendMatchMessage(String message, int senderID) {
-        try {
-            client.sendMatchMessage(message, senderID);
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Match message not sent");
-        }
+    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) {
+
     }
 
     @Override
-    public void sendPrivateMessage(String message, int senderID) {
-        try {
-            client.sendPrivateMessage(message, senderID);
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Private message not sent");
-        }
-    }
+    public void sendChatMessage(String sender, String recipient, String message) {
 
-    @Override
-    public void confirmPrivateMessage(int recipientID, String message, int senderID) {
-        try {
-            client.confirmPrivateMessage(recipientID, message, senderID);
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Private message not confirmed");
-        }
-    }
-
-    @Override
-    public void recipientNotFound(int recipientID) {
-        try {
-            client.recipientNotFound(recipientID);
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Recipient not found");
-        }
     }
 
     @Override
     public void sendRanking(List<String> rankings) {
-        try {
-            client.showRanking(rankings);
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
-        }
+
     }
 }

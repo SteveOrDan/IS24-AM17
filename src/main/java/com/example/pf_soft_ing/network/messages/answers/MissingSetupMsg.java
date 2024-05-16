@@ -5,8 +5,8 @@ import com.example.pf_soft_ing.player.TokenColors;
 
 public class MissingSetupMsg extends Message {
 
-    int resourceCardID1, resourceCardID2, goldenCardID, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2;
-    TokenColors tokenColor;
+    private final int resourceCardID1, resourceCardID2, goldenCardID, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2;
+    private final TokenColors tokenColor;
 
     public MissingSetupMsg(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                            int commonObjectiveCardID1, int commonObjectiveCardID2,

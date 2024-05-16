@@ -23,82 +23,97 @@ public class ClientRMISender implements ClientSender {
 
     @Override
     public void getMatches() {
-        try {
-            serverInterface.getMatches(client);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.getMatches(client);
+            } catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void createMatch(int numberOfPlayers, String nickname) {
-        try {
-            serverInterface.createMatch(playerID, numberOfPlayers, nickname);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.createMatch(playerID, numberOfPlayers, nickname);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void selectMatch(int matchID) {
-        try {
-            serverInterface.selectMatch(playerID, matchID);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.selectMatch(playerID, matchID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void chooseNickname(String nickname) {
-        try {
-            serverInterface.chooseNickname(playerID, nickname);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.chooseNickname(playerID, nickname);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void placeStarterCard(CardSideType side) {
-        try {
-            serverInterface.placeStarterCard(playerID, side);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.placeStarterCard(playerID, side);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void chooseSecretObjective(int cardID) {
-        try {
-            serverInterface.chooseSecretObj(playerID, cardID);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.chooseSecretObj(playerID, cardID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void placeCard(int cardID, CardSideType side, Position pos) {
-        try {
-            serverInterface.placeCard(playerID, cardID, side, pos);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.placeCard(playerID, cardID, side, pos);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void drawResourceCard(int playerID) {
-        try {
-            serverInterface.drawResourceCard(playerID);
-        }
-        catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.drawResourceCard(playerID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
@@ -129,18 +144,9 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendMatchMessage(String message) {
+    public void sendChatMessage(String recipient, String message) {
         try {
-            serverInterface.sendMatchMessage(playerID, message);
-        } catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
-    }
-
-    @Override
-    public void sendPrivateMessage(int recipientID, String message) {
-        try {
-            serverInterface.sendPrivateMessage(playerID, recipientID, message);
+            serverInterface.sendChatMessage(recipient, message);
         } catch (RemoteException e) {
             System.out.println("Connection to server lost");
         }
