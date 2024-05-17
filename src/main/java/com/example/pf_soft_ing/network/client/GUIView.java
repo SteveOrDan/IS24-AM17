@@ -43,7 +43,7 @@ public class GUIView implements View {
     private int matchID;
     private int playerID;
     private String playerNickname;
-    private List<String> otherNicknames;
+    private Map<Integer, String> IDToNicknameMap;
     private TokenColors playerColor;
 
     private final Map<String, TokenColors> otherPlayersColors = new HashMap<>();
@@ -446,7 +446,7 @@ public class GUIView implements View {
         root.getChildren().add(anchorPane);
     }
 
-    private void drawGameStart(String nickname, List<String> otherNicknames,
+    private void drawGameStart(String nickname, Map<Integer, String> IDToNicknameMap,
                                int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                int starterCardID){
@@ -455,7 +455,7 @@ public class GUIView implements View {
         root.getChildren().clear();
 
         playerNickname = nickname;
-        this.otherNicknames = otherNicknames;
+        this.IDToNicknameMap = IDToNicknameMap;
 
         // Create player field
         setPlayArea();
@@ -632,7 +632,7 @@ public class GUIView implements View {
         playersSection.getChildren().add(playerPane);
 
         // Create all enemies' labels
-        for (String enemyNickname : otherNicknames) {
+        for (String enemyNickname : IDToNicknameMap.values()) {
             Pane enemyPane = new Pane();
             enemyPane.setPrefSize(200, 50);
             enemyPane.setLayoutX(50);
@@ -1440,11 +1440,11 @@ public class GUIView implements View {
     }
 
     @Override
-    public void startGame(String nickname, List<String> otherNicknames,
+    public void startGame(String nickname, Map<Integer, String> IDToNicknameMap,
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
-        Platform.runLater(() -> drawGameStart(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2,
+        Platform.runLater(() -> drawGameStart(nickname, IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
 
 //        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
@@ -1501,7 +1501,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
 
     }
 
@@ -1511,7 +1511,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
 
     }
 
@@ -1560,12 +1560,12 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState) {
+    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState) {
 
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID) {
 
     }
 }

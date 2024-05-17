@@ -64,7 +64,7 @@ public class ClientSocketReceiver {
             case ErrorMessage castedMsg -> view.errorMessage(castedMsg.getMessage());
 
             case GameStartMsg castedMsg -> view.startGame(
-                    castedMsg.getNickname(), castedMsg.getOtherNicknames(),
+                    castedMsg.getNickname(), castedMsg.getIDToNicknameMap(),
                     castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                     castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2(),
                     castedMsg.getStarterCardID()
@@ -78,7 +78,7 @@ public class ClientSocketReceiver {
 
             case ConfirmSecretObjectiveMsg ignored -> view.confirmSecretObjective();
 
-            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getPlayerNickname(), castedMsg.getIDtoOpponentNickname(), castedMsg.getIDtoOpponentPlayArea());
+            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
 
             case ConfirmPlaceCardMsg ignored -> view.placeCard();
 
@@ -86,18 +86,18 @@ public class ClientSocketReceiver {
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
-                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
+                view.showNewPlayerTurn(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID());
             }
 
             case NewPlayerTurnNewStateMsg castedMsg -> {
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2());
-                view.showNewPlayerTurnNewState(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname(), castedMsg.getGameState());
+                view.showNewPlayerTurnNewState(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getGameState());
             }
 
             case NewPlayerExtraTurnMsg castedMsg -> {
-                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getNewPlayerNickname());
+                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID());
             }
 
             case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());

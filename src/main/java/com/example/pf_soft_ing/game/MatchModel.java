@@ -485,4 +485,13 @@ public class MatchModel {
             }
         }
     }
+
+    public Map<Integer, String> getIDtoNicknameMap() {
+        Map<Integer, String> IDToNickname = new HashMap<>();
+
+        for (PlayerModel player : IDToPlayerMap.values()){
+            IDToNickname.put(player.getID(), player.getNickname());
+        }
+        return IDToNickname;
+    }
 }

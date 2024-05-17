@@ -9,7 +9,6 @@ public class NewPlayerTurnNewStateMsg extends Message {
     private final int lastPlayerID;
 
     private final int newPlayerID;
-    private final String newPlayerNickname;
 
     private final int resDeckCardID;
     private final int visibleResCardID1;
@@ -21,7 +20,7 @@ public class NewPlayerTurnNewStateMsg extends Message {
 
     private final GameState gameState;
 
-    public NewPlayerTurnNewStateMsg(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
+    public NewPlayerTurnNewStateMsg(int drawnCardID, int lastPlayerID, int newPlayerID,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                     GameState gameState) {
@@ -29,7 +28,6 @@ public class NewPlayerTurnNewStateMsg extends Message {
         this.lastPlayerID = lastPlayerID;
 
         this.newPlayerID = newPlayerID;
-        this.newPlayerNickname = newPlayerNickname;
 
         this.resDeckCardID = resDeckCardID;
         this.visibleResCardID1 = visibleResCardID1;
@@ -52,10 +50,6 @@ public class NewPlayerTurnNewStateMsg extends Message {
 
     public int getNewPlayerID() {
         return newPlayerID;
-    }
-
-    public String getNewPlayerNickname() {
-        return newPlayerNickname;
     }
 
     public int getResDeckCardID() {

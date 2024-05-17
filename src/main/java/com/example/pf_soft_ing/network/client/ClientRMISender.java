@@ -118,37 +118,49 @@ public class ClientRMISender implements ClientSender {
 
     @Override
     public void drawVisibleResourceCard(int playerID, int index) {
-        try {
-            serverInterface.drawVisibleResourceCard(playerID, index);
-        } catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.drawVisibleResourceCard(playerID, index);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void drawGoldenCard(int playerID) {
-        try {
-            serverInterface.drawGoldenCard(playerID);
-        } catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.drawGoldenCard(playerID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void drawVisibleGoldenCard(int playerID, int index) {
-        try {
-            serverInterface.drawVisibleGoldenCard(playerID, index);
-        } catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.drawVisibleGoldenCard(playerID, index);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 
     @Override
     public void sendChatMessage(String recipient, String message) {
-        try {
-            serverInterface.sendChatMessage(recipient, message);
-        } catch (RemoteException e) {
-            System.out.println("Connection to server lost");
-        }
+        new Thread(() -> {
+            try {
+                serverInterface.sendChatMessage(recipient, message);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        });
     }
 }

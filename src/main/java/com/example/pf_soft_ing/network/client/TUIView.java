@@ -21,7 +21,7 @@ public class TUIView implements View {
 
     private int playerID;
     private String playerNickname;
-    private final List<String> otherNicknames = new ArrayList<>();
+    private Map<Integer, String> IDToNicknameMap;
 
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
     private final Map<Integer, List<String>> cardIDToCardBackTUILines = new HashMap<>();
@@ -305,8 +305,7 @@ public class TUIView implements View {
                             System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
                             break;
                         }
-
-                    printOpponentPlayArea(parts[1]);
+                        printOpponentPlayArea(parts[1]);
                 }
                 case "chat" -> { // Write a message in the chat
                     if (parts.length < 3) {
@@ -317,6 +316,14 @@ public class TUIView implements View {
                     List<String> partsArray = new ArrayList<>(Arrays.asList(parts));
 
                     sender.sendChatMessage(partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
+                }
+                case "gmc" -> { // GetMatchChat
+                    if (parts.length != 1) {
+                        System.out.println("Error: GetMatchChat does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    printChat();
                 }
             }
         }
@@ -375,14 +382,17 @@ public class TUIView implements View {
     }
 
     @Override
-    public void startGame(String nickname, List<String> otherNicknames,
+    public void startGame(String nickname, Map<Integer, String> IDToNicknameMap,
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         System.out.println("Game started.");
 
         playerNickname = nickname;
-        this.otherNicknames.addAll(otherNicknames);
+        this.IDToNicknameMap = IDToNicknameMap;
+        for (int playerID : IDToNicknameMap.keySet()) {
+            this.IDtoOpponentPlayerArea.put(playerID, new HashMap<>());
+        }
 
         playerState = PlayerState.PLACING_STARTER;
 
@@ -468,7 +478,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         System.out.println("""
                 Now you can use the chat.
                 To send a message in the match chat, type: wmm <message>
@@ -494,6 +504,8 @@ public class TUIView implements View {
         }
         else {
             playerState = PlayerState.WAITING;
+            String playerNickname = IDToNicknameMap.get(playerID);
+
             System.out.println("It's " + playerNickname + "'s turn.\n" +
                     "While waiting you can: \n" +
                     "\t- Flip a card in your hand by typing: fc <cardID>\n" +
@@ -546,7 +558,9 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname) {
+    public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
+        String playerNickname = IDToNicknameMap.get(newPlayerID);
+
         if (lastPlayerID == playerID) {
             playerState = PlayerState.WAITING;
 
@@ -1059,8 +1073,45 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Prints the play area of the opponent with the given nickname.
+     * @param opponentNick The nickname of the opponent.
+     */
     private void printOpponentPlayArea(String opponentNick) {
-        // TODO: Implement method
+        // Check if the opponent nickname exists
+        if (!IDToNicknameMap.containsValue(opponentNick)) {
+            System.out.println("No opponent with nickname " + opponentNick + " found. Please, try again.");
+            return;
+        }
+
+        // Get the opponent's ID
+        int opponentID = -1;
+        for (int i : IDToNicknameMap.keySet()) {
+            if (IDToNicknameMap.get(i).equals(opponentNick)) {
+                opponentID = i;
+                break;
+            }
+        }
+        Map<Position, PlaceableCard> oppPlayArea = IDtoOpponentPlayerArea.get(opponentID);
+
+        String[][] playAreaArr = createPlayerArr(oppPlayArea);
+
+        if (playAreaArr == null) {
+            System.out.println("No cards in " + opponentNick + "'s play area");
+            return;
+        }
+
+        System.out.println(opponentNick + "'s play area:");
+
+        // Print the play area
+        for (String[] strings : playAreaArr) {
+            StringBuilder line = new StringBuilder();
+
+            for (String s : strings) {
+                line.append(Objects.requireNonNullElse(s, " "));
+            }
+            System.out.println(line);
+        }
     }
 
     private void updatePlacementPositions(Position pos) {
@@ -1115,10 +1166,7 @@ public class TUIView implements View {
 
         // Set the new card's position as illegal (a card just got placed)
         legalPosList.remove(pos);
-
-        if (!illegalPosList.contains(pos)) {
-            illegalPosList.add(pos);
-        }
+        illegalPosList.add(pos);
 
         // Update the posIDToValidPos map
         posIDToValidPos.clear();
@@ -1739,20 +1787,26 @@ public class TUIView implements View {
     public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
         if (senderNickname.equals(playerNickname)){
             // Add message to chat list
-            chat.add(playerNickname + ": " + message);
+            synchronized (chat) {
+                chat.add(playerNickname + ": " + message);
+            }
         }
         else {
             if (recipientNickname.equals(playerNickname)){
                 System.out.println("(private)" + senderNickname + ": " + message);
 
                 // Add message to chat list
-                chat.add("(private)" + senderNickname + ": " + message);
+                synchronized (chat) {
+                    chat.add("(private)" + senderNickname + ": " + message);
+                }
             }
             else {
                 System.out.println(senderNickname + ": " + message);
 
                 // Add message to chat list
-                chat.add(senderNickname + ": " + message);
+                synchronized (chat) {
+                    chat.add(senderNickname + ": " + message);
+                }
             }
         }
     }
@@ -1769,7 +1823,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState) {
+    public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState) {
         if (gameState == GameState.FINAL_ROUND) {
             System.out.println("The game entered the final round state.");
         }
@@ -1777,11 +1831,11 @@ public class TUIView implements View {
             System.out.println("The game entered the extra round state.");
         }
 
-        showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, newPlayerNickname);
+        showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID);
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID) {
         if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
 
@@ -1820,6 +1874,7 @@ public class TUIView implements View {
             }
             else {
                 playerState = PlayerState.WAITING;
+                String newPlayerNickname = IDToNicknameMap.get(newPlayerID);
 
                 // Print available commands
                 System.out.println("It's " + newPlayerNickname + "'s turn.\n" +
@@ -1827,6 +1882,21 @@ public class TUIView implements View {
                         "To check your hand, type: gh\n" +
                         "To check opponents play area: opa <opponentNickname>");
             }
+        }
+    }
+
+    /**
+     * Prints the chat.
+     */
+    private void printChat() {
+        List<String> chatCopy;
+
+        synchronized (chat) {
+            chatCopy = new ArrayList<>(chat);
+        }
+
+        for (String message : chatCopy) {
+            System.out.println(message);
         }
     }
 }

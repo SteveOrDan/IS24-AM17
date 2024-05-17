@@ -3,11 +3,12 @@ package com.example.pf_soft_ing.network.messages.answers;
 import com.example.pf_soft_ing.network.messages.Message;
 
 import java.util.List;
+import java.util.Map;
 
 public class GameStartMsg extends Message {
 
     private final String nickname;
-    private final List<String> otherNicknames;
+    private final Map<Integer, String> IDToNicknameMap;
 
     private final int resDeckCardID;
     private final int visibleResCardID1;
@@ -19,12 +20,12 @@ public class GameStartMsg extends Message {
 
     private final int starterCardID;
 
-    public GameStartMsg(String nickname, List<String> otherNicknames,
+    public GameStartMsg(String nickname, Map<Integer, String> IDToNicknameMap,
                         int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                         int starterCardID) {
         this.nickname = nickname;
-        this.otherNicknames = otherNicknames;
+        this.IDToNicknameMap = IDToNicknameMap;
 
         this.resDeckCardID = resDeckCardID;
         this.visibleResCardID1 = visibleResCardID1;
@@ -41,8 +42,8 @@ public class GameStartMsg extends Message {
         return nickname;
     }
 
-    public List<String> getOtherNicknames() {
-        return otherNicknames;
+    public Map<Integer, String> getIDToNicknameMap() {
+        return IDToNicknameMap;
     }
 
     public int getVisibleResCardID1() {

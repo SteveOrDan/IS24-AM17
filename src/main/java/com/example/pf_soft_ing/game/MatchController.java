@@ -10,6 +10,7 @@ import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,8 +32,12 @@ public class MatchController {
      * Getter
      * @return getIDToPlayerMap with keys as player IDs and values as PlayerModel objects
      */
-    public HashMap<Integer, PlayerModel> getIDToPlayerMap() {
+    public Map<Integer, PlayerModel> getIDToPlayerMap() {
         return matchModel.getIDToPlayerMap();
+    }
+
+    public Map<Integer, String> getIDToNicknameMap() {
+        return matchModel.getIDtoNicknameMap();
     }
 
     public int getMatchID(){
@@ -150,19 +155,18 @@ public class MatchController {
                 int currPlayerID = getCurrPlayerID();
 
                 for (Integer ID : getIDToPlayerMap().keySet()) {
-                    Map<Integer, String> IDtoOpponentNickname = new HashMap<>();
                     Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea = new HashMap<>();
                     Map<Position, Integer> playArea = new HashMap<>();
+
                     for (PlayerModel player : getIDToPlayerMap().values()){
                         if (player.getID() != ID) {
-                            IDtoOpponentNickname.put(player.getID(), player.getNickname());
                             for (Position key : player.getPlayArea().keySet()) {
                                 playArea.put(key, player.getPlayArea().get(key).getID());
                             }
                             IDtoOpponentPlayArea.put(player.getID(), playArea);
                         }
                     }
-                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, getIDToPlayerMap().get(currPlayerID).getNickname(), IDtoOpponentNickname, IDtoOpponentPlayArea);
+                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, IDtoOpponentPlayArea);
                 }
             }
             else {
@@ -604,7 +608,6 @@ public class MatchController {
      */
     private void broadcastNewPlayerTurn(int drawnCardID, int playerID) {
         int newPlayerID = matchModel.getCurrPlayerID();
-        String newPlayerNickname = matchModel.getIDToPlayerMap().get(playerID).getNickname();
 
         int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
         int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
@@ -615,7 +618,7 @@ public class MatchController {
         int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
 
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID, newPlayerNickname,
+            getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
                     resDeckCardID, visibleResCardID1, visibleResCardID2,
                     goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
         }

@@ -21,130 +21,160 @@ public class RMISender implements Sender {
 
     @Override
     public void sendError(String errorMsg) {
-        try {
-            client.sendError(errorMsg);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
-        }
+        new Thread(() -> {
+            try {
+                client.sendError(errorMsg);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+            }
+        });
     }
 
     @Override
     public void sendMatches(Map<Integer, List<String>> matches, int playerID) {
-        try {
-            client.showMatches(matches, playerID);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
-        }
+        new Thread(() -> {
+            try {
+                client.showMatches(matches, playerID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+            }
+        });
     }
 
     @Override
     public void createMatchResult(int matchID, String hostNickname) {
-        try {
-            client.createMatchResult(matchID, hostNickname);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
-        }
+        new Thread(() -> {
+            try {
+                client.createMatchResult(matchID, hostNickname);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+            }
+        });
     }
 
     @Override
     public void selectMatchResult(int matchID, List<String> nicknames) {
-        try {
-            client.selectMatchResult(matchID, nicknames);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
-        }
+        new Thread(() -> {
+            try {
+                client.selectMatchResult(matchID, nicknames);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
+            }
+        });
     }
 
     @Override
     public void chooseNicknameResult(String nickname) {
-        try {
-            client.chooseNicknameResult(nickname);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Nickname is not available");
-        }
+        new Thread(() -> {
+            try {
+                client.chooseNicknameResult(nickname);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Nickname is not available");
+            }
+        });
     }
 
     @Override
-    public void sendGameStart(String nickname, List<String> otherNicknames,
+    public void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname,
                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
-        try {
-            client.startGame(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Game not started");
-        }
+        new Thread(() -> {
+            try {
+                client.startGame(nickname, IDtoOpponentNickname,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                        starterCardID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Game not started");
+            }
+        });
     }
 
     @Override
     public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                                  int commonObjectiveCardID1, int commonObjectiveCardID2,
                                  int secretObjectiveCardID1, int secretObjectiveCardID2) {
-        try {
-            client.setMissingSetup(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Missing setup");
-        }
+        new Thread(() -> {
+            try {
+                client.setMissingSetup(resourceCardID1, resourceCardID2, goldenCardID, tokenColor,
+                        commonObjectiveCardID1, commonObjectiveCardID2,
+                        secretObjectiveCardID1, secretObjectiveCardID2);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Missing setup");
+            }
+        });
     }
 
     @Override
     public void confirmSecretObjective() {
-        try {
-            client.confirmSecretObjective();
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Confirm secret objective not shown");
-        }
+        new Thread(() -> {
+            try {
+                client.confirmSecretObjective();
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Secret objective not confirmed");
+            }
+        });
     }
 
     @Override
     public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-        try {
-            client.placeCardResult(playerID, cardID, pos, chosenSide);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". Place card not shown");
-        }
+        new Thread(() -> {
+            try {
+                client.placeCardResult(playerID, cardID, pos, chosenSide);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Place card not shown");
+            }
+        });
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, String playerNickname , Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
-        try {
-            client.sendFirstPlayerTurn(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
-        }
+    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+        new Thread(() -> {
+            try {
+                client.sendFirstPlayerTurn(playerID, IDtoOpponentPlayArea);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
+            }
+        });
     }
 
     @Override
-    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
-        try {
-            client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
-                    resDeckCardID, visibleResCardID1, visibleResCardID2,
-                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        }
-        catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
-        }
+        new Thread(() -> {
+            try {
+                client.setNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
+            }
+        });
     }
 
     @Override
-    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, String newPlayerNickname) {
+    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
 
     }
 
     @Override
-    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) {
+    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
+                                          int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                                          GameState gameState) {
 
     }
 

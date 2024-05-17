@@ -18,7 +18,7 @@ public interface View {
 
     void chooseNickname(String nickname);
 
-    void startGame(String nickname, List<String> otherNicknames,
+    void startGame(String nickname, Map<Integer, String> IDToNicknameMap,
                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID);
@@ -33,11 +33,11 @@ public interface View {
 
     void showNewPlayer(String nicknames);
 
-    void showFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
+    void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void placeCard();
 
-    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname);
+    void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID);
 
     void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
@@ -50,7 +50,7 @@ public interface View {
 
     void showRanking(List<String> rankings);
 
-    void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname, GameState gameState);
+    void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState);
 
-    void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID, String newPlayerNickname);
+    void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID);
 }

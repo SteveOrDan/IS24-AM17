@@ -59,13 +59,16 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void startGame(String nickname, List<String> otherNicknames, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException {
-        view.startGame(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+    public void startGame(String nickname, Map<Integer, String> IDtoNicknameMap,
+                          int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
+                          int starterCardID) throws RemoteException {
+        view.startGame(nickname, IDtoNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) throws RemoteException {
-        view.showFirstPlayerTurn(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea);
+    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) throws RemoteException {
+        view.showFirstPlayerTurn(playerID, IDtoOpponentPlayArea);
     }
 
     @Override
@@ -74,11 +77,11 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+    public void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                                  int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                  int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID, playerNickname);
+        view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID);
     }
 
     @Override

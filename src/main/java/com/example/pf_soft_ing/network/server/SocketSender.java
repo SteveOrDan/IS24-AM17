@@ -61,16 +61,23 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendGameStart(String nickname, List<String> otherNicknames,
+    public void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname,
                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
-        sendMessage(new GameStartMsg(nickname, otherNicknames, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+        sendMessage(new GameStartMsg(nickname, IDtoOpponentNickname,
+                resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                starterCardID));
     }
 
     @Override
-    public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) {
-        sendMessage(new MissingSetupMsg(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2));
+    public void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
+                                 int commonObjectiveCardID1, int commonObjectiveCardID2,
+                                 int secretObjectiveCardID1, int secretObjectiveCardID2) {
+        sendMessage(new MissingSetupMsg(resourceCardID1, resourceCardID2, goldenCardID, tokenColor,
+                commonObjectiveCardID1, commonObjectiveCardID2,
+                secretObjectiveCardID1, secretObjectiveCardID2));
     }
 
     @Override
@@ -84,33 +91,33 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) {
-        sendMessage(new FirstPlayerTurnMsg(playerID, playerNickname, IDtoOpponentNickname, IDtoOpponentPlayArea));
+    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) {
+        sendMessage(new FirstPlayerTurnMsg(playerID, IDtoOpponentPlayArea));
     }
 
     @Override
-    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+    public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                                       int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                       int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
 
-        sendMessage(new NewPlayerTurnMsg(drawnCardID, lastPlayerID, newPlayerID, playerNickname,
+        sendMessage(new NewPlayerTurnMsg(drawnCardID, lastPlayerID, newPlayerID,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
     }
 
     @Override
     public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
-                                       int newPlayerID, String newPlayerNickname) {
+                                       int newPlayerID) {
         sendMessage(new NewPlayerExtraTurnMsg(cardID, lastPlayerID, pos, side,
-                newPlayerID, newPlayerNickname));
+                newPlayerID));
     }
 
     @Override
-    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
+    public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
                                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                           GameState gameState) {
-        sendMessage(new NewPlayerTurnNewStateMsg(drawnCardID, lastPlayerID, newPlayerID, newPlayerNickname,
+        sendMessage(new NewPlayerTurnNewStateMsg(drawnCardID, lastPlayerID, newPlayerID,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
                 gameState));

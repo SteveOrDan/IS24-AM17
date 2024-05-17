@@ -20,7 +20,7 @@ public interface Sender {
 
     void chooseNicknameResult(String nickname);
 
-    void sendGameStart(String nickname, List<String> otherNicknames,
+    void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname,
                        int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                        int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                        int starterCardID);
@@ -33,16 +33,16 @@ public interface Sender {
 
     void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
 
-    void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
+    void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
-    void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+    void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                            int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                            int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
-                                int newPlayerID, String newPlayerNickname);
+                                int newPlayerID);
 
-    void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, String newPlayerNickname,
+    void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
                                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                    GameState gameState);

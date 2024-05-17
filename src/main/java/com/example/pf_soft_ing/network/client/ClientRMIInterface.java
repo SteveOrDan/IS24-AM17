@@ -24,18 +24,18 @@ public interface ClientRMIInterface extends Remote {
 
     void chooseNicknameResult(String hostNickname) throws RemoteException;
 
-    void startGame(String nickname, List<String> otherNicknames,
+    void startGame(String nickname, Map<Integer, String> IDtoNicknameMap,
                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
 
-    void sendFirstPlayerTurn(int playerID, String playerNickname, Map<Integer, String> IDtoOpponentNickname, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
+    void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
 
     void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                           int commonObjectiveCardID1, int commonObjectiveCardID2,
                           int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException;
 
-    void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, String playerNickname,
+    void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
 

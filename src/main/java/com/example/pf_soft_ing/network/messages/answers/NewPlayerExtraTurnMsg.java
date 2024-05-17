@@ -11,15 +11,13 @@ public class NewPlayerExtraTurnMsg extends Message {
     private final Position pos;
     private final CardSideType side;
     private final int newPlayerID;
-    private final String newPlayerNickname;
 
-    public NewPlayerExtraTurnMsg(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, String newPlayerNickname) {
+    public NewPlayerExtraTurnMsg(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
         this.cardID = cardID;
         this.lastPlayerID = lastPlayerID;
         this.pos = pos;
         this.side = side;
         this.newPlayerID = newPlayerID;
-        this.newPlayerNickname = newPlayerNickname;
     }
 
     public int getCardID() {
@@ -40,10 +38,6 @@ public class NewPlayerExtraTurnMsg extends Message {
 
     public int getNewPlayerID() {
         return newPlayerID;
-    }
-
-    public String getNewPlayerNickname() {
-        return newPlayerNickname;
     }
 
     @Override

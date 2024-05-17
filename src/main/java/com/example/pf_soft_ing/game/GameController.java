@@ -6,6 +6,7 @@ import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.util.List;
+import java.util.Map;
 
 public class GameController {
 
@@ -89,14 +90,13 @@ public class GameController {
 
                 for (Integer ID : matchController.getIDToPlayerMap().keySet()) {
                     String thisNickname = matchController.getIDToPlayerMap().get(ID).getNickname();
-                    List<String> otherNicknames = matchController.getNicknames();
-                    otherNicknames.remove(thisNickname);
 
                     PlaceableCard starterCard = matchController.drawStarterCard();
 
                     matchController.getIDToPlayerMap().get(ID).setStarterCard(starterCard);
 
-                    getPlayerSender(ID).sendGameStart(thisNickname, otherNicknames, resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                    getPlayerSender(ID).sendGameStart(thisNickname, matchController.getIDToNicknameMap(),
+                            resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
                             goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(),
                             starterCard.getID());
                 }
