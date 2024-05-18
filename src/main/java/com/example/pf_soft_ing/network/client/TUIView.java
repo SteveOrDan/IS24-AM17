@@ -139,7 +139,7 @@ public class TUIView implements View {
 
             if (legalCommands.contains(command)) {
                 switch (command) {
-                    // TODO: add refresh command
+                    case "rml" -> sender.getMatches(); // RefreshMatchesList
 
                     case "cm" -> { // CreateMatch
                         if (parts.length != 3) {
@@ -554,7 +554,6 @@ public class TUIView implements View {
         opponentCard.setCurrSideType(side);
 
         IDtoOpponentPlayerArea.get(playerId).put(pos, opponentCard);
-        GameResources.getPlaceableCardByID(cardID).setCurrSideType(side);
     }
 
     @Override
@@ -1756,7 +1755,7 @@ public class TUIView implements View {
 
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
-                new ArrayList<>(Arrays.asList("cm", "sm")));
+                new ArrayList<>(Arrays.asList("cm", "sm", "rml")));
 
         stateToCommands.put(PlayerState.MATCH_LOBBY,
                 new ArrayList<>());
@@ -1771,16 +1770,16 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("rmc", "rpc", "chat")));
+                new ArrayList<>(List.of("rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat")));
+                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat", "gmc")));
     }
 
     @Override
@@ -1835,7 +1834,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
         if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
 
@@ -1855,6 +1854,12 @@ public class TUIView implements View {
             printPlayArea();
         }
         else {
+            // Add card to opponent's play area
+            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
+            opponentCard.setCurrSideType(side);
+
+            IDtoOpponentPlayerArea.get(lastPlayerID).put(pos, opponentCard);
+
             if (playerID == newPlayerID) {
                 playerState = PlayerState.PLACING;
 

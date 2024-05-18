@@ -287,7 +287,13 @@ public class MatchController {
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
 
-                // Send new player turn
+                // Send new player 'extra' turn or ranking if game ended
+                if (matchModel.getGameState() == GameState.END_GAME){
+                    broadcastRanking(matchModel.getRankings());
+                }
+                else {
+                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide);
+                }
             }
             else {
                 getPlayerSender(playerID).placeCard(playerID, cardID, pos, chosenSide);
@@ -384,13 +390,15 @@ public class MatchController {
 
             matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
+            GameState oldGameState = matchModel.getGameState();
             endTurn();
+            GameState currGameState = matchModel.getGameState();
 
-            if (matchModel.getGameState() != GameState.END_GAME) {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            if (currGameState != oldGameState) {
+                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
             }
             else {
-                broadcastRanking(matchModel.getRankings());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
             }
         }
         catch (Exception e) {
@@ -414,13 +422,15 @@ public class MatchController {
 
             matchModel.restoreVisibleResourceCard();
 
+            GameState oldGameState = matchModel.getGameState();
             endTurn();
+            GameState currGameState = matchModel.getGameState();
 
-            if (matchModel.getGameState() != GameState.END_GAME) {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            if (currGameState != oldGameState) {
+                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
             }
             else {
-                broadcastRanking(matchModel.getRankings());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
             }
         }
         catch (Exception e) {
@@ -441,13 +451,15 @@ public class MatchController {
 
             matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
+            GameState oldGameState = matchModel.getGameState();
             endTurn();
+            GameState currGameState = matchModel.getGameState();
 
-            if (matchModel.getGameState() != GameState.END_GAME) {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            if (currGameState != oldGameState) {
+                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
             }
             else {
-                broadcastRanking(matchModel.getRankings());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
             }
         }
         catch (Exception e) {
@@ -471,13 +483,15 @@ public class MatchController {
 
             matchModel.restoreVisibleGoldenCard();
 
+            GameState oldGameState = matchModel.getGameState();
             endTurn();
+            GameState currGameState = matchModel.getGameState();
 
-            if (matchModel.getGameState() != GameState.END_GAME) {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
+            if (currGameState != oldGameState) {
+                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
             }
             else {
-                broadcastRanking(matchModel.getRankings());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
             }
         }
         catch (Exception e) {
@@ -621,6 +635,43 @@ public class MatchController {
             getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
                     resDeckCardID, visibleResCardID1, visibleResCardID2,
                     goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        }
+    }
+
+    /**
+     * Broadcast the new player's turn to all players
+     * @param drawnCardID ID of the drawn card
+     * @param playerID ID of the player that drew the card
+     */
+    private void broadcastNewPlayerTurnNewState(int drawnCardID, int playerID) {
+        int newPlayerID = matchModel.getCurrPlayerID();
+
+        int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
+        int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
+        int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+
+        int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+        int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
+        int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).sendNewPlayerTurnNewState(drawnCardID, playerID, newPlayerID,
+                    resDeckCardID, visibleResCardID1, visibleResCardID2,
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                    matchModel.getGameState());
+        }
+    }
+
+    /**
+     * Broadcast the new player's extra turn to all players
+     * @param playerID ID of the player that drew the card
+     * @param cardID ID of the drawn card
+     * @param pos Position to place the card
+     * @param side Side of the card
+     */
+    private void broadcastNewPlayerExtraTurn(int playerID, int cardID, Position pos, CardSideType side) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID());
         }
     }
 

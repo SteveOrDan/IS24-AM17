@@ -29,7 +29,7 @@ public class ClientRMISender implements ClientSender {
             } catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -41,7 +41,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -89,7 +89,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -101,7 +101,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -125,7 +125,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -137,7 +137,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -149,7 +149,7 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -161,6 +161,6 @@ public class ClientRMISender implements ClientSender {
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");
             }
-        });
+        }).start();
     }
 }

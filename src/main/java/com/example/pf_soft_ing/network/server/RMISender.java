@@ -28,7 +28,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -40,7 +40,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -52,7 +52,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Client is not reachable");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Nickname is not available");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Game not started");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Missing setup");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -122,7 +122,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Secret objective not confirmed");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -134,7 +134,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Place card not shown");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -146,7 +146,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
             }
-        });
+        }).start();
     }
 
     @Override
@@ -162,7 +162,7 @@ public class RMISender implements Sender {
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
             }
-        });
+        }).start();
     }
 
     @Override

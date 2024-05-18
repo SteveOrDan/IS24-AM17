@@ -1565,7 +1565,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, int newPlayerID) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
 
     }
 }

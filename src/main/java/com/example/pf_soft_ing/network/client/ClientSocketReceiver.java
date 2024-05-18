@@ -97,7 +97,7 @@ public class ClientSocketReceiver {
             }
 
             case NewPlayerExtraTurnMsg castedMsg -> {
-                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID());
+                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getNewPlayerID());
             }
 
             case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());
