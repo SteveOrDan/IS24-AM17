@@ -157,7 +157,7 @@ public class ClientRMISender implements ClientSender {
     public void sendChatMessage(String recipient, String message) {
         new Thread(() -> {
             try {
-                serverInterface.sendChatMessage(recipient, message);
+                serverInterface.sendChatMessage(playerID, recipient, message);
             }
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");

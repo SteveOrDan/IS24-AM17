@@ -31,5 +31,5 @@ public interface RMIReceiverInterface extends Remote {
 
     void drawVisibleGoldenCard(int playerID, int index) throws RemoteException;
 
-    void sendChatMessage(String recipientNickname, String message) throws RemoteException;
+    void sendChatMessage(int playerID, String recipientNickname, String message) throws RemoteException;
 }

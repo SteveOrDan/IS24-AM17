@@ -309,7 +309,7 @@ public class TUIView implements View {
                 }
                 case "chat" -> { // Write a message in the chat
                     if (parts.length < 3) {
-                        System.out.println("Error: OpponentPlayArea takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
+                        System.out.println("Error: Chat takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
                         break;
                     }
 
@@ -481,8 +481,8 @@ public class TUIView implements View {
     public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         System.out.println("""
                 Now you can use the chat.
-                To send a message in the match chat, type: wmm <message>
-                To send a message in the private chat, type: wpm <recipient nickname> <message>
+                To send a message in the match chat, type: gmc <message>
+                To send a message in the private chat, type: chat <recipient nickname> <message>
                 To read the match chat, type: rmc
                 To read the private chat, type: rpc <opponent nickname>""");
 
@@ -575,6 +575,9 @@ public class TUIView implements View {
                 System.out.println(s);
             }
             System.out.println("It's " + playerNickname + "'s turn.");
+            System.out.println("While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
+                    "To check your hand, type: gh\n" +
+                    "To check opponents play area: opa <opponentNickname>");
         }
         else {
             if (playerID == newPlayerID) {

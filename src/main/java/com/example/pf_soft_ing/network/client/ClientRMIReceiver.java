@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.rmi.RemoteException;
@@ -102,6 +103,17 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     @Override
     public void sendChatMessage(String senderNickname, String recipientNickname, String message)throws RemoteException {
         view.receiveChatMessage(senderNickname, recipientNickname, message);
+    }
+
+    @Override
+    public void setNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) throws RemoteException {
+        view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        view.showNewPlayerTurnNewState(drawnCardID, lastPlayerID, newPlayerID, gameState);
+    }
+
+    @Override
+    public void setNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) throws RemoteException {
+        view.showNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID);
     }
 
 }

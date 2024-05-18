@@ -93,8 +93,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void sendChatMessage(String recipientNickname, String message) throws RemoteException {
-        // TODO: Either change String or find player ID
-        // playerIDToMatch.get(recipientID).privateMessage(recipientID, message, playerID);
+    public void sendChatMessage(int playerID, String recipientNickname, String message) throws RemoteException {
+        playerIDToMatch.get(playerID).chatMessage(playerID, recipientNickname, message);
     }
 }

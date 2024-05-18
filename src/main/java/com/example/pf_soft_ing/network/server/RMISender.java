@@ -169,24 +169,49 @@ public class RMISender implements Sender {
 
     @Override
     public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
-
+        new Thread(() ->{
+            try {
+                client.setNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". New player's extra turn not shown");
+            }
+        }).start();
     }
 
     @Override
     public void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
                                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
-                                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
-                                          GameState gameState) {
-
+                                          int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) {
+        new Thread(() -> {
+            try {
+                client.setNewPlayerTurnNewState(drawnCardID, lastPlayerID, newPlayerID,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, gameState);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". New player's turn state not shown");
+            }
+        }).start();
     }
 
     @Override
     public void sendChatMessage(String sender, String recipient, String message) {
-
+        new Thread(() ->{
+            try {
+                client.sendChatMessage(sender, recipient, message);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Chat message not sent");
+            }
+        }).start();
     }
 
     @Override
     public void sendRanking(List<String> rankings) {
-
+        new Thread(() ->{
+            try {
+                client.showRanking(rankings);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
+            }
+        }).start();
     }
 }
