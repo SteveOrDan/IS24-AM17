@@ -292,7 +292,7 @@ public class PlayerModel {
             throw new MissingResourcesException();
         }
 
-        ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos, chosenSide);
+        ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
 
         // Set chosen side
         card.setCurrSideType(chosenSide);
@@ -334,7 +334,7 @@ public class PlayerModel {
      * @throws NoAdjacentCardsException If there are no adjacent cards to the reference card
      * @throws PlacingOnInvalidCornerException If a corner is hidden
      */
-    private ArrayList<CardCorner> getAdjacentCorners(Position pos, CardSideType chosenSide) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
+    private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
             PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
             PlaceableCard BRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() - 1));
@@ -342,19 +342,19 @@ public class PlayerModel {
             PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
 
             if (TRCard != null) {
-                Side currSide = chosenSide == CardSideType.FRONT ? TRCard.getFront() : TRCard.getBack();
+                Side currSide = TRCard.getCurrSide();
                 add(currSide.getBLCorner());
             }
             if (BRCard != null) {
-                Side currSide = chosenSide == CardSideType.FRONT ? BRCard.getFront() : BRCard.getBack();
+                Side currSide = BRCard.getCurrSide();
                 add(currSide.getTLCorner());
             }
             if (BLCard != null) {
-                Side currSide = chosenSide == CardSideType.FRONT ? BLCard.getFront() : BLCard.getBack();
+                Side currSide = BLCard.getCurrSide();
                 add(currSide.getTRCorner());
             }
             if (TLCard != null) {
-                Side currSide = chosenSide == CardSideType.FRONT ? TLCard.getFront() : TLCard.getBack();
+                Side currSide = TLCard.getCurrSide();
                 add(currSide.getBRCorner());
             }
         }};

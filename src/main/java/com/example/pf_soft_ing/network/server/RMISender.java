@@ -35,7 +35,9 @@ public class RMISender implements Sender {
     public void sendMatches(Map<Integer, List<String>> matches, int playerID) {
         new Thread(() -> {
             try {
+                System.out.println("Sever: Showing matches");
                 client.showMatches(matches, playerID);
+                System.out.println("Server: Matches shown");
             }
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Client is not reachable");

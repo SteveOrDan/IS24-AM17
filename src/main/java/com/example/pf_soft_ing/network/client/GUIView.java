@@ -34,19 +34,12 @@ public class GUIView implements View {
 
     private final List<Position> legalPosList = new ArrayList<>();
     private final List<Position> illegalPosList = new ArrayList<>();
-    private final Map<Position, PlaceableCard> playArea = new HashMap<>();
 
     private final Map<Position, Pane> validPosToButtonPane = new HashMap<>();
 
-    private final List<PlaceableCard> playerHand = new ArrayList<>();
+    private final PlayerViewModel player;
+    private final List<PlayerViewModel> opponents = new ArrayList<>();
 
-    private int matchID;
-    private int playerID;
-    private String playerNickname;
-    private Map<Integer, String> IDToNicknameMap;
-    private TokenColors playerColor;
-
-    private final Map<String, TokenColors> otherPlayersColors = new HashMap<>();
     private final List<Shape> playersCircles = new ArrayList<>();
     private final List<Shape> playersRectangles = new ArrayList<>();
 
@@ -64,8 +57,10 @@ public class GUIView implements View {
     private AnchorPane chatPane;
 
     private PlaceableCard selectedCard;
-    private double lastPlacedCardX;
-    private double lastPlacedCardY;
+    private Position cardPlacePosition;
+
+    private double placedCardXPosInHand;
+    private double placedCardYPosInHand;
     private double selectedCardX;
     private double selectedCardY;
     private Pane selectedCardPane;
@@ -120,6 +115,7 @@ public class GUIView implements View {
     public GUIView(Stage stage, String ip) {
         this.stage = stage;
         this.ip = ip;
+        player = new PlayerViewModel();
 
         launchApp();
     }
@@ -435,7 +431,7 @@ public class GUIView implements View {
         anchorPane.setLayoutX(0);
         anchorPane.setLayoutY(0);
 
-        Label waitingLabel = new Label("Waiting for other players...\nEntering match " + matchID + " with nick " + nick);
+        Label waitingLabel = new Label("Waiting for other players...\nEntering match " + player.getMatchID() + " with nick " + nick);
         waitingLabel.setPrefSize(stageWidth, stageHeight);
         waitingLabel.setLayoutX(50);
         waitingLabel.setLayoutY(50);
@@ -454,10 +450,20 @@ public class GUIView implements View {
 
         root.getChildren().clear();
 
-        playerNickname = nickname;
-        this.IDToNicknameMap = IDToNicknameMap;
+        player.setNickname(nickname);
 
-        // Create player field
+        for (Map.Entry<Integer, String> entry : IDToNicknameMap.entrySet()){
+            if (entry.getKey() != player.getPlayerID()){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setNickname(entry.getValue());
+                opponent.setPlayerID(entry.getKey());
+                opponent.setMatchID(player.getMatchID());
+
+                opponents.add(opponent);
+            }
+        }
+
+        // Calculate all dimensions and creates all panes needed for the game
         setPlayArea();
 
         // Add common cards to the stage
@@ -579,104 +585,71 @@ public class GUIView implements View {
         createOtherPlayerSection();
 
         root.getChildren().add(commonAreaPane);
+        // endregion
     }
 
     private void createOtherPlayerSection() {
         AnchorPane playersSection = new AnchorPane();
         playersSection.setPrefSize(commonAreaWidth, stageHeight);
-        playersSection.setLayoutX(0);
+        playersSection.setLayoutX(50);
         playersSection.setLayoutY(0);
 
-        // Create player's label
+        Pane yourPlayerPane = createPlayerLabel(player.getNickname(), 1);
+        playersSection.getChildren().add(yourPlayerPane);
+
+        int i = 2;
+        for (PlayerViewModel opponent : opponents) {
+            Pane playerPane = createPlayerLabel(opponent.getNickname(), i);
+            i++;
+
+            playersSection.getChildren().add(playerPane);
+        }
+
+        commonAreaPane.getChildren().add(playersSection);
+    }
+
+    private Pane createPlayerLabel(String playerNick, int posMultiplier){
         Pane playerPane = new Pane();
-        playerPane.setPrefSize(200, 50);
+        playerPane.setPrefSize(300, 50);
         playerPane.setLayoutX(50);
-        playerPane.setLayoutY(0);
+        playerPane.setLayoutY(50 * posMultiplier);
+
+        Label playerLabel = new Label(playerNick + ": 0 points");
+        playerLabel.setPrefSize(300, 50);
+        playerLabel.setLayoutX(25);
+        playerLabel.setLayoutY(0);
 
         // Player circle when not selected
-        Circle playerCircle = new Circle(25, Color.BLUE); // TokenColors.getColorFromToken(playerColor));
-        playerCircle.setLayoutX(0);
-        playerCircle.setLayoutY(0);
+        Circle playerCircle = new Circle(10, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
+        playerCircle.setLayoutX(5);
+        playerCircle.setLayoutY(25);
 
         playersCircles.add(playerCircle);
 
         // Player rect when selected
-        Rectangle playerRect = new Rectangle(200, 50, Color.BLUE); // TokenColors.getColorFromToken(playerColor));
-        playerRect.setLayoutX(0);
-        playerRect.setLayoutY(0);
-        playerRect.setStrokeWidth(4);
-        playerRect.setFill(Color.TRANSPARENT);
+        Rectangle playerRectangle = new Rectangle(292, 42, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
+        playerRectangle.setLayoutX(4);
+        playerRectangle.setLayoutY(4);
+        playerRectangle.setStrokeWidth(4);
+        playerRectangle.setFill(Color.TRANSPARENT);
 
-        playersRectangles.add(playerRect);
+        playersRectangles.add(playerRectangle);
 
-        // Create player label
-        Label playerLabel = new Label(playerNickname + "(You): 0 points");
-        playerLabel.setPrefSize(200, 50);
-        playerLabel.setLayoutX(10);
-        playerLabel.setLayoutY(0);
-
-        Button yourAreaButton = new Button();
-        yourAreaButton.setPrefSize(200, 50);
-        yourAreaButton.setLayoutX(0);
-        yourAreaButton.setLayoutY(0);
-        yourAreaButton.setOpacity(0.1);
-        yourAreaButton.setOnAction((_) -> {
-            switchToPlayerField(playerNickname);
+        Button playerAreaButton = new Button();
+        playerAreaButton.setPrefSize(300, 50);
+        playerAreaButton.setLayoutX(0);
+        playerAreaButton.setLayoutY(0);
+        playerAreaButton.setOpacity(0.1);
+        playerAreaButton.setOnAction((_) -> {
+            switchToPlayerField(playerNick);
         });
 
-        playerPane.getChildren().add(playerRect);
+        playerPane.getChildren().add(playerRectangle);
         playerPane.getChildren().add(playerCircle);
         playerPane.getChildren().add(playerLabel);
-        playerPane.getChildren().add(yourAreaButton);
+        playerPane.getChildren().add(playerAreaButton);
 
-        playersSection.getChildren().add(playerPane);
-
-        // Create all enemies' labels
-        for (String enemyNickname : IDToNicknameMap.values()) {
-            Pane enemyPane = new Pane();
-            enemyPane.setPrefSize(200, 50);
-            enemyPane.setLayoutX(50);
-            enemyPane.setLayoutY(0);
-
-            Label enemyLabel = new Label(playerNickname + ": 0 points");
-            enemyLabel.setPrefSize(200, 50);
-            enemyLabel.setLayoutX(0);
-            enemyLabel.setLayoutY(0);
-
-            // Player circle when not selected
-            Circle enemyCircle = new Circle(25, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
-            enemyCircle.setLayoutX(0);
-            enemyCircle.setLayoutY(0);
-
-            playersCircles.add(enemyCircle);
-
-            // Player rect when selected
-            Rectangle enemyRect = new Rectangle(200, 50, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
-            enemyRect.setLayoutX(0);
-            enemyRect.setLayoutY(0);
-            enemyRect.setStrokeWidth(4);
-            enemyRect.setFill(Color.TRANSPARENT);
-
-            playersRectangles.add(enemyRect);
-
-            Button enemyAreaButton = new Button();
-            enemyAreaButton.setPrefSize(200, 50);
-            enemyAreaButton.setLayoutX(0);
-            enemyAreaButton.setLayoutY(0);
-            enemyAreaButton.setOpacity(0.1);
-            enemyAreaButton.setOnAction((_) -> {
-                switchToPlayerField(enemyNickname);
-            });
-
-            enemyPane.getChildren().add(enemyRect);
-            enemyPane.getChildren().add(enemyCircle);
-            enemyPane.getChildren().add(enemyLabel);
-            enemyPane.getChildren().add(enemyAreaButton);
-
-            playersSection.getChildren().add(enemyPane);
-        }
-
-        commonAreaPane.getChildren().add(playersSection);
+        return playerPane;
     }
 
     private void switchToPlayerField(String playerNickname) {
@@ -690,7 +663,7 @@ public class GUIView implements View {
         chatPane.setLayoutY(50);
 
         ScrollPane chatScroll = new ScrollPane();
-        chatScroll.setPrefSize(commonAreaWidth, stageHeight - 150);
+        chatScroll.setPrefSize(commonAreaWidth - 100, stageHeight - 150);
         chatScroll.setPannable(true);
         chatScroll.setLayoutX(0);
         chatScroll.setLayoutY(0);
@@ -698,24 +671,24 @@ public class GUIView implements View {
         chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
 
         chatBox = new VBox();
-        chatBox.setPrefSize(commonAreaWidth - 25, stageHeight - 150);
+        chatBox.setPrefSize(commonAreaWidth - 110, stageHeight - 150);
         chatBox.setLayoutX(0);
         chatBox.setLayoutY(0);
 
         AnchorPane chatInputPane = new AnchorPane();
-        chatInputPane.setPrefSize(commonAreaWidth, 50);
+        chatInputPane.setPrefSize(commonAreaWidth - 100, 50);
         chatInputPane.setLayoutX(0);
         chatInputPane.setLayoutY(stageHeight - 100);
 
         TextField chatInput = new TextField();
-        chatInput.setPrefSize(commonAreaWidth - 50, 50);
+        chatInput.setPrefSize(commonAreaWidth - 200, 50);
         chatInput.setLayoutX(0);
         chatInput.setLayoutY(0);
         chatInput.setPromptText("Enter message...");
 
         Button sendButton = new Button("Send");
         sendButton.setPrefSize(50, 50);
-        sendButton.setLayoutX(commonAreaWidth - 50);
+        sendButton.setLayoutX(commonAreaWidth - 75);
         sendButton.setLayoutY(0);
         sendButton.setOnAction((_) -> {
             if (chatInput.getText().isEmpty()) {
@@ -753,16 +726,20 @@ public class GUIView implements View {
         chatScroll.setContent(chatBox);
         chatPane.getChildren().add(chatScroll);
         chatPane.getChildren().add(chatInputPane);
-
-        commonAreaPane.getChildren().add(chatPane);
+        chatPane.getChildren().add(closeChatButton);
 
         chatOpen = false;
-        chatPane.setVisible(false);
     }
 
     private void openCloseChat() {
+        if (chatOpen) {
+            commonAreaPane.getChildren().remove(chatPane);
+        }
+        else {
+            commonAreaPane.getChildren().add(chatPane);
+        }
+
         chatOpen = !chatOpen;
-        chatPane.setVisible(chatOpen);
     }
 
     private void renderStarterCardChoice(int starterCardID){
@@ -838,13 +815,13 @@ public class GUIView implements View {
         Pane goldVisible2Pane = createCardPane(goldVisibleCard2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
 
         // Add draw buttons to cards
-        addDrawButtonToCard(resDeckPane, resDeckCardID, "deck");
-        addDrawButtonToCard(resVisible1Pane, resVisibleCard1ID, "visible");
-        addDrawButtonToCard(resVisible2Pane, resVisibleCard2ID, "visible");
+        addDrawButtonToCard(resDeckPane, -1, false, false);
+        addDrawButtonToCard(resVisible1Pane, 0, false, true);
+        addDrawButtonToCard(resVisible2Pane, 1, false, true);
 
-        addDrawButtonToCard(goldDeckPane, goldDeckCardID, "deck");
-        addDrawButtonToCard(goldVisible1Pane, goldVisibleCard1ID, "visible");
-        addDrawButtonToCard(goldVisible2Pane, goldVisibleCard2ID, "visible");
+        addDrawButtonToCard(goldDeckPane, -1, true, false);
+        addDrawButtonToCard(goldVisible1Pane, 0, true, true);
+        addDrawButtonToCard(goldVisible2Pane, 1, true, true);
 
         // Add cards to the stage
         commonAreaPane.getChildren().add(resDeckPane);
@@ -927,9 +904,7 @@ public class GUIView implements View {
         tempChoicePane.getChildren().add(secretObjective2Pane);
     }
 
-    private void addDrawButtonToCard(Pane cardPane, int cardID, String commonCardType){
-        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
-
+    private void addDrawButtonToCard(Pane cardPane, int cardIndex, boolean isGolden, boolean isVisible){
         Button drawButton = new Button();
         drawButton.setPrefSize(cardPane.getPrefWidth(), cardPane.getPrefHeight());
         drawButton.setLayoutX(0);
@@ -938,20 +913,21 @@ public class GUIView implements View {
 
         drawButton.setOnAction((_) -> {
             System.out.println("Draw button pressed");
-            if (commonCardType.equals("visible")){
-                if (cardID < 40){
-                    // sender.drawVisibleResourceCard(playerID, 0);
+            int playerID = player.getPlayerID();
+            if (isVisible){
+                if (isGolden){
+                    sender.drawVisibleGoldenCard(playerID, cardIndex);
                 }
                 else {
-                    // sender.drawVisibleGoldenCard(playerID, 0);
+                    sender.drawVisibleResourceCard(playerID, cardIndex);
                 }
             }
             else {
-                if (cardID < 40){
-                    sender.drawResourceCard(playerID);
+                if (isGolden){
+                    sender.drawGoldenCard(playerID);
                 }
                 else {
-                    sender.drawGoldenCard(playerID);
+                    sender.drawResourceCard(playerID);
                 }
             }
         });
@@ -992,7 +968,7 @@ public class GUIView implements View {
         return (1 - scale) * cardHeight / 2;
     }
 
-    private void addPlaceButtons(Pane cardPane, int ID, Position pos){
+    private void addPlaceButtons(int ID, Position pos){
         PlaceableCard card = GameResources.getPlaceableCardByID(ID);
 
         Position blPos = new Position(pos.getX() - 1, pos.getY() - 1);
@@ -1001,132 +977,44 @@ public class GUIView implements View {
         Position trPos = new Position(pos.getX() + 1, pos.getY() + 1);
 
         if (card.getFront().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
-            Pane blPane = new Pane();
-            blPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button blButton = new Button();
-            blButton.setPrefSize(cardWidth, cardHeight);
-            blButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
-            blButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
-            blButton.setOpacity(0.6);
-            blButton.setOnAction((_) -> {
-                if (playerHand.size() == 3 && selectedCard != null){
-                    // Place the card
-                    placeCard(selectedCard, blPos);
-
-                    // Remove the button
-                    cardPane.getChildren().remove(blButton);
-
-                    // Remove the card from the hand view
-                    playerHandPane.getChildren().remove(selectedCardPane);
-                }
-                else {
-                    showError("Cannot place a card!");
-                }
-            });
-
-            blPane.getChildren().add(blButton);
-            Position buttonGridPos = mapToGridPos(blPos);
-            playerFieldGrid.add(blPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(blPos, blPane);
+            addPlaceButtonAtPos(blPos);
         }
         if (card.getFront().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
-            Pane brPane = new Pane();
-            brPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button brButton = new Button();
-            brButton.setPrefSize(cardWidth, cardHeight);
-            brButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth * (1 - cardCornerWidthProportion));
-            brButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(cardHeight - cardHeight * cardCornerHeightProportion);
-            brButton.setOpacity(0.6);
-            brButton.setOnAction((_) -> {
-                if (playerHand.size() == 3 && selectedCard != null){
-                    // Place the card
-                    placeCard(selectedCard, brPos);
-
-                    // Remove the button
-                    cardPane.getChildren().remove(brButton);
-
-                    // Remove the card from the hand view
-                    playerHandPane.getChildren().remove(selectedCardPane);
-                }
-                else {
-                    showError("Cannot place a card!");
-                }
-            });
-
-            brPane.getChildren().add(brButton);
-            Position buttonGridPos = mapToGridPos(brPos);
-            playerFieldGrid.add(brPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(brPos, brPane);
+            addPlaceButtonAtPos(brPos);
         }
         if (card.getFront().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
-            Pane tlPane = new Pane();
-            tlPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button tlButton = new Button();
-            tlButton.setPrefSize(cardWidth, cardHeight);
-            tlButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(-cardWidth * (1 - cardCornerWidthProportion));
-            tlButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
-            tlButton.setOpacity(0.6);
-            tlButton.setOnAction((_) -> {
-                if (playerHand.size() == 3 && selectedCard != null){
-                    // Place the card
-                    placeCard(selectedCard, tlPos);
-
-                    // Remove the button
-                    cardPane.getChildren().remove(tlButton);
-
-                    // Remove the card from the hand view
-                    playerHandPane.getChildren().remove(selectedCardPane);
-                }
-                else {
-                    showError("Cannot place a card!");
-                }
-            });
-
-            tlPane.getChildren().add(tlButton);
-            Position buttonGridPos = mapToGridPos(tlPos);
-            playerFieldGrid.add(tlPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(tlPos, tlPane);
+            addPlaceButtonAtPos(tlPos);
         }
         if (card.getFront().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
-            Pane trPane = new Pane();
-            trPane.setPrefSize(gridCellWidth, gridCellHeight);
-
-            Button trButton = new Button();
-            trButton.setPrefSize(cardWidth, cardHeight);
-            trButton.setLayoutX(-cardWidth * cardCornerWidthProportion);  //(cardWidth - cardWidth * cardCornerWidthProportion);
-            trButton.setLayoutY(-cardHeight * cardCornerHeightProportion);//(-cardHeight * (1 - cardCornerHeightProportion));
-            trButton.setOpacity(0.6);
-            trButton.setOnAction((_) -> {
-                if (playerHand.size() == 3 && selectedCard != null){
-                    // Place the card
-                    placeCard(selectedCard, trPos);
-
-                    // Remove the button
-                    cardPane.getChildren().remove(trButton);
-
-                    // Remove the card from the hand view
-                    playerHandPane.getChildren().remove(selectedCardPane);
-                }
-                else {
-                    showError("Cannot place a card!");
-                }
-            });
-
-            trPane.getChildren().add(trButton);
-            Position buttonGridPos = mapToGridPos(trPos);
-            playerFieldGrid.add(trPane, buttonGridPos.getX(), buttonGridPos.getY());
-            validPosToButtonPane.put(trPos, trPane);
+            addPlaceButtonAtPos(trPos);
         }
+    }
+
+    private void addPlaceButtonAtPos(Position pos) {
+        Pane positionPane = new Pane();
+        positionPane.setPrefSize(gridCellWidth, gridCellHeight);
+
+        Button placeButton = new Button();
+        placeButton.setPrefSize(cardWidth, cardHeight);
+        placeButton.setLayoutX(-cardWidth * cardCornerWidthProportion);
+        placeButton.setLayoutY(-cardHeight * cardCornerHeightProportion);
+        placeButton.setOpacity(0.6);
+        placeButton.setOnAction((_) -> {
+            cardPlacePosition = pos;
+            sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos);
+        });
+
+        positionPane.getChildren().add(placeButton);
+        Position buttonGridPos = mapToGridPos(pos);
+        playerFieldGrid.add(positionPane, buttonGridPos.getX(), buttonGridPos.getY());
+        validPosToButtonPane.put(pos, positionPane);
     }
 
     private void updateIlLegalPositions(Position pos){
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
 
-        PlaceableCard card = playArea.get(pos);
+        PlaceableCard card = player.getPlayArea().get(pos);
 
         Side currSide = card.getCurrSide();
 
@@ -1196,20 +1084,24 @@ public class GUIView implements View {
         }
 
         // Update last placed card position in hand
-        lastPlacedCardX = selectedCardX;
-        lastPlacedCardY = selectedCardY;
+        placedCardXPosInHand = selectedCardX;
+        placedCardYPosInHand = selectedCardY;
 
         // Remove card from hand
-        playerHand.remove(card);
+        player.getPlayerHand().remove(card);
+        playerHandPane.getChildren().remove(selectedCardPane);
 
         // Create Image
         String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
 
-        if (!playArea.containsKey(pos)){
-            playArea.put(pos, card);
+        if (!player.getPlayArea().containsKey(pos)){
+            player.getPlayArea().put(pos, card);
         }
 
         updateIlLegalPositions(pos);
+
+        // Clear Pane in the grid position
+        playerFieldGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == mapToGridPos(pos).getY() && GridPane.getColumnIndex(node) == mapToGridPos(pos).getX());
 
         // Create Pane for card
         Pane cardPane = new Pane();
@@ -1226,7 +1118,7 @@ public class GUIView implements View {
 
         cardPane.getChildren().add(cardImgV);
 
-        addPlaceButtons(cardPane, card.getID(), pos);
+        addPlaceButtons(card.getID(), pos);
 
         Position gridPos = mapToGridPos(pos);
 
@@ -1256,9 +1148,21 @@ public class GUIView implements View {
         illegalPosList.clear();
         validPosToButtonPane.clear();
 
-        for (Position p : playArea.keySet()){
-            placeCard(playArea.get(p), p);
+        for (Position p : player.getPlayArea().keySet()){
+            placeCard(player.getPlayArea().get(p), p);
         }
+    }
+
+    private void drawCard(int drawnCardID) {
+        PlaceableCard drawnCard = GameResources.getPlaceableCardByID(drawnCardID);
+
+        player.getPlayerHand().add(drawnCard);
+
+        Pane cardPane = createCardPane(drawnCardID, CardSideType.FRONT, placedCardXPosInHand, placedCardYPosInHand, 1);
+
+        addSelectButtonToCard(cardPane, drawnCard);
+
+        playerHandPane.getChildren().add(cardPane);
     }
 
     private void drawPlayerHand(int card1ID, int card2ID, int card3ID, Color playerColor){
@@ -1266,9 +1170,9 @@ public class GUIView implements View {
         PlaceableCard card2 = GameResources.getPlaceableCardByID(card2ID);
         PlaceableCard card3 = GameResources.getPlaceableCardByID(card3ID);
 
-        playerHand.add(card1);
-        playerHand.add(card2);
-        playerHand.add(card3);
+        player.getPlayerHand().add(card1);
+        player.getPlayerHand().add(card2);
+        player.getPlayerHand().add(card3);
 
         double playerHandWidth = playerHandPane.getPrefWidth();
         double playerHandHeight = playerHandPane.getPrefHeight();
@@ -1360,6 +1264,40 @@ public class GUIView implements View {
         }, 4000);
     }
 
+    private void showSystemMessage(String systemMessage){
+        AnchorPane messagePane = new AnchorPane();
+        messagePane.setPrefSize(stageWidth - 20, 50);
+        messagePane.setLayoutX(10);
+        messagePane.setLayoutY(stageHeight - 50);
+
+        Rectangle messageRect = new Rectangle();
+        messageRect.setX(0);
+        messageRect.setY(0);
+        messageRect.setWidth(stageWidth - 20);
+        messageRect.setHeight(50);
+        messageRect.setFill(Color.LIGHTGRAY);
+        messageRect.setStroke(Color.RED);
+
+        Label messageLabel = new Label(systemMessage);
+        messageLabel.setPrefSize(stageWidth - 20, 50);
+        messageLabel.setLayoutX(0);
+        messageLabel.setLayoutY(0);
+        messageLabel.setFont(new Font(Font.getDefault().getName(), 24));
+        messageLabel.setTextFill(Color.BLUE);
+
+        messagePane.getChildren().add(messageRect);
+        messagePane.getChildren().add(messageLabel);
+
+        root.getChildren().add(messagePane);
+
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(() -> root.getChildren().remove(messagePane));
+            }
+        }, 4000);
+    }
+
     private void drawSeparationLines(){
         Line lineV = new Line();
         lineV.setStartX(3 * (defaultElementsOffset + cardWidth) + 10);
@@ -1419,7 +1357,7 @@ public class GUIView implements View {
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
-        this.matchID = matchID;
+        player.setMatchID(matchID);
 
         // Create window for waiting for other players
         Platform.runLater(() -> selectNickname(hostNickname));
@@ -1427,7 +1365,7 @@ public class GUIView implements View {
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
-        this.matchID = matchID;
+        player.setMatchID(matchID);
 
         // Create window for choosing nickname
         Platform.runLater(() -> openSelectNickWindow(nicknames));
@@ -1496,34 +1434,62 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayer(String nicknames) {
-
+    public void showNewPlayer(String nickname) {
     }
 
     @Override
     public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+        Platform.runLater(() -> {
+            String nickname = getPlayerNickname(playerID);
 
+            if (playerID == player.getPlayerID()){
+                showSystemMessage("It's your turn!");
+            }
+            else {
+                showSystemMessage("It's " + nickname + "'s turn!");
+            }
+        });
     }
 
     @Override
     public void placeCard() {
-
+        Platform.runLater(() -> {
+            placeCard(selectedCard, cardPlacePosition);
+        });
     }
 
     @Override
     public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
+        Platform.runLater(() -> {
+            // TODO: Update draw area for everyone
+            if (player.getPlayerID() == lastPlayerID){
+                drawCard(drawnCardID);
 
+                String nickname = getPlayerNickname(newPlayerID);
+                showSystemMessage("It's " + nickname + "'s turn!");
+            }
+            else {
+                if (player.getPlayerID() == newPlayerID){
+                    showSystemMessage("It's your turn!");
+                }
+                else {
+                    String nickname = getPlayerNickname(newPlayerID);
+                    showSystemMessage("It's " + nickname + "'s turn!");
+                }
+            }
+        });
     }
 
     @Override
-    public void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+    public void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
 
     }
 
     @Override
     public void setID(int playerID) {
         sender.setPlayerID(playerID);
-        this.playerID = playerID;
+        player.setPlayerID(playerID);
     }
 
     @Override
@@ -1534,15 +1500,20 @@ public class GUIView implements View {
     @Override
     public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
         Platform.runLater(() -> {
+            String fullMessage;
             if (recipientNickname.equals("all")){
-                chatMessages.add(senderNickname + ": " + message);
+                fullMessage = senderNickname + ": " + message;
             }
             else {
-                chatMessages.add(senderNickname + " -> " + recipientNickname + ": " + message);
+                fullMessage = senderNickname + " -> " + recipientNickname + ": " + message;
             }
 
-            Label chatLabel = new Label(message);
+            chatMessages.add(fullMessage);
+
+            Label chatLabel = new Label(fullMessage);
             chatLabel.setPrefSize(commonAreaWidth - 25, 25);
+            chatLabel.setLayoutX(0);
+            chatLabel.setLayoutY(0);
             chatLabel.setFont(new Font(Font.getDefault().getName(), 16));
             chatLabel.setTextFill(Color.BLACK);
 
@@ -1567,5 +1538,20 @@ public class GUIView implements View {
     @Override
     public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
 
+    }
+
+    private String getPlayerNickname(int playerID){
+        if (player.getPlayerID() == playerID){
+            return player.getNickname();
+        }
+        else {
+            for (PlayerViewModel p : opponents){
+                if (p.getPlayerID() == playerID){
+                    return p.getNickname();
+                }
+            }
+
+            return null;
+        }
     }
 }

@@ -81,7 +81,7 @@
         "cornerType": "ResourceCorner"
       },
       "TRCorner": {
-        "cornerType": "HiddenCorner"
+        "cornerType": "EmptyCorner"
       }
     }
   },

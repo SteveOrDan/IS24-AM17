@@ -607,6 +607,7 @@ public class MatchController {
                     throw new InvalidRecipientException();
                 }
 
+                // TODO: Don't we need to send the message back to the sender so that he can add it to his own chat?
                 getPlayerSender(recipientID).sendChatMessage(senderNickname, recipient, message);
             }
         }

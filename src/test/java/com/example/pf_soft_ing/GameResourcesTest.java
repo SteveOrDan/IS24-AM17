@@ -2,6 +2,7 @@ package com.example.pf_soft_ing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.example.pf_soft_ing.card.corner.EmptyCorner;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.card.GoldenCard;
 import com.example.pf_soft_ing.card.PlaceableCard;
@@ -96,5 +97,24 @@ class GameResourcesTest {
 
         assertNotNull(GameResources.getObjectiveDeck());
         assertEquals(16, GameResources.getObjectiveDeck().size());
+    }
+
+    @Test
+    void testCardsBack() {
+        GameResources.initializeAllDecks();
+
+        for (PlaceableCard card : GameResources.getResourcesDeck()) {
+            assertEquals(EmptyCorner.class, card.getBack().getTLCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getTRCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getBLCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getBRCorner().getClass());
+        }
+
+        for (PlaceableCard card : GameResources.getGoldenDeck()) {
+            assertEquals(EmptyCorner.class, card.getBack().getTLCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getTRCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getBLCorner().getClass());
+            assertEquals(EmptyCorner.class, card.getBack().getBRCorner().getClass());
+        }
     }
 }

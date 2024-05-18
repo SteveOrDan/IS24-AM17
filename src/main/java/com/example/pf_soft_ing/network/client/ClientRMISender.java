@@ -26,8 +26,9 @@ public class ClientRMISender implements ClientSender {
         new Thread(() -> {
             try {
                 serverInterface.getMatches(client);
-            } catch (RemoteException e) {
-                System.out.println("Connection to server lost");
+            }
+            catch (RemoteException e) {
+                System.out.println("Client: Connection to server lost");
             }
         }).start();
     }
