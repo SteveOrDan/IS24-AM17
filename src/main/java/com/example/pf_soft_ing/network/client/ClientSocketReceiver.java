@@ -78,7 +78,13 @@ public class ClientSocketReceiver {
 
             case ConfirmSecretObjectiveMsg ignored -> view.confirmSecretObjective();
 
-            case FirstPlayerTurnMsg castedMsg -> view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
+            case FirstPlayerTurnMsg castedMsg -> {
+                view.updateDrawArea(
+                        castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
+                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
+                );
+                view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
+            }
 
             case ConfirmPlaceCardMsg ignored -> view.placeCard();
 

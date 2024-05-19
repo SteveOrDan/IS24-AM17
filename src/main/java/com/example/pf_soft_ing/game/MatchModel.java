@@ -30,7 +30,7 @@ public class MatchModel {
     private ObjectiveCardsDeck objectiveCardsDeck;
     private StarterCardsDeck starterCardsDeck;
 
-    private int currPlayerID;
+    private int currPlayerID = -1;
     private int firstPlayerID;
     private int[] orderOfPlayersIDs;
 

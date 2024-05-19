@@ -91,8 +91,12 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) {
-        sendMessage(new FirstPlayerTurnMsg(playerID, IDtoOpponentPlayArea));
+    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+                                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+        sendMessage(new FirstPlayerTurnMsg(playerID, IDtoOpponentPlayArea,
+                resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
     }
 
     @Override

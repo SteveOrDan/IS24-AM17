@@ -575,9 +575,10 @@ public class TUIView implements View {
                 System.out.println(s);
             }
             System.out.println("It's " + playerNickname + "'s turn.");
-            System.out.println("While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
-                    "To check your hand, type: gh\n" +
-                    "To check opponents play area: opa <opponentNickname>");
+            System.out.println("""
+                    While waiting you can flip a card in your hand by typing: fc <cardID>
+                    To check your hand, type: gh
+                    To check opponents play area: opa <opponentNickname>""");
         }
         else {
             if (playerID == newPlayerID) {

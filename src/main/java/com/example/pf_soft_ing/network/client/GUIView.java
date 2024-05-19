@@ -65,6 +65,22 @@ public class GUIView implements View {
     private double selectedCardY;
     private Pane selectedCardPane;
 
+    private Pane drawnCardPane;
+
+    private int commonResDeckCardID;
+    private int commonVisibleResCardID1;
+    private int commonVisibleResCardID2;
+    private int commonGoldDeckCardID;
+    private int commonVisibleGoldCardID1;
+    private int commonVisibleGoldCardID2;
+
+    private Pane commonResDeckCardPane;
+    private Pane commonVisibleResCard1Pane;
+    private Pane commonVisibleResCard2Pane;
+    private Pane commonGoldDeckCardPane;
+    private Pane commonVisibleGoldCard1Pane;
+    private Pane commonVisibleGoldCard2Pane;
+
     private boolean pressingCtrl = false;
     private double zoomLevel = 1;
     private final static double minZoom = 0.5;
@@ -803,6 +819,7 @@ public class GUIView implements View {
 
     private void renderCommonCards(int resDeckCardID, int resVisibleCard1ID, int resVisibleCard2ID,
                                    int goldDeckCardID, int goldVisibleCard1ID, int goldVisibleCard2ID){
+        System.out.println("Common card IDs: " + resDeckCardID + " " + resVisibleCard1ID + " " + resVisibleCard2ID + " " + goldDeckCardID + " " + goldVisibleCard1ID + " " + goldVisibleCard2ID);
         double resourceCardsY = stageHeight - (2 * cardHeight) - 2 * defaultElementsOffset;
         double goldenCardsY = stageHeight - cardHeight - defaultElementsOffset;
 
@@ -813,6 +830,22 @@ public class GUIView implements View {
         Pane goldDeckPane = createCardPane(goldDeckCardID, CardSideType.BACK, defaultElementsOffset, goldenCardsY, 1);
         Pane goldVisible1Pane = createCardPane(goldVisibleCard1ID, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
         Pane goldVisible2Pane = createCardPane(goldVisibleCard2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
+
+        commonResDeckCardID = resDeckCardID;
+        commonVisibleResCardID1 = resVisibleCard1ID;
+        commonVisibleResCardID2 = resVisibleCard2ID;
+
+        commonGoldDeckCardID = goldDeckCardID;
+        commonVisibleGoldCardID1 = goldVisibleCard1ID;
+        commonVisibleGoldCardID2 = goldVisibleCard2ID;
+
+        commonResDeckCardPane = resDeckPane;
+        commonVisibleResCard1Pane = resVisible1Pane;
+        commonVisibleResCard2Pane = resVisible2Pane;
+
+        commonGoldDeckCardPane = goldDeckPane;
+        commonVisibleGoldCard1Pane = goldVisible1Pane;
+        commonVisibleGoldCard2Pane = goldVisible2Pane;
 
         // Add draw buttons to cards
         addDrawButtonToCard(resDeckPane, -1, false, false);
@@ -912,8 +945,9 @@ public class GUIView implements View {
         drawButton.setOpacity(0.1);
 
         drawButton.setOnAction((_) -> {
-            System.out.println("Draw button pressed");
             int playerID = player.getPlayerID();
+            drawnCardPane = cardPane;
+
             if (isVisible){
                 if (isGolden){
                     sender.drawVisibleGoldenCard(playerID, cardIndex);
@@ -1437,9 +1471,13 @@ public class GUIView implements View {
     public void showNewPlayer(String nickname) {
     }
 
+    // TODO: Called when the last player has chosen their secret objective (Find a way to show this to the player)
     @Override
     public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         Platform.runLater(() -> {
+            // TODO: Remove
+            confirmSecretObjective();
+
             String nickname = getPlayerNickname(playerID);
 
             if (playerID == player.getPlayerID()){
@@ -1483,7 +1521,84 @@ public class GUIView implements View {
     @Override
     public void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+        Platform.runLater(() -> {
+            double resourceCardsY = stageHeight - (2 * cardHeight) - 2 * defaultElementsOffset;
+            double goldenCardsY = stageHeight - cardHeight - defaultElementsOffset;
 
+            if (commonResDeckCardID != resDeckCardID) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonResDeckCardPane);
+
+                // Add new card
+                if (resDeckCardID >= 0) {
+                    commonResDeckCardID = resDeckCardID;
+                    Pane resDeckPane = createCardPane(resDeckCardID, CardSideType.BACK, defaultElementsOffset, resourceCardsY, 1);
+                    addDrawButtonToCard(resDeckPane, -1, false, false);
+                    commonAreaPane.getChildren().add(resDeckPane);
+                }
+            }
+            if (commonVisibleResCardID1 != visibleResCardID1) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonVisibleResCard1Pane);
+
+                // Add new card
+                if (visibleResCardID1 >= 0) {
+                    commonVisibleResCardID1 = visibleResCardID1;
+                    Pane resVisible1Pane = createCardPane(visibleResCardID1, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
+                    addDrawButtonToCard(resVisible1Pane, 0, false, true);
+                    commonAreaPane.getChildren().add(resVisible1Pane);
+                }
+            }
+            if (commonVisibleResCardID2 != visibleResCardID2) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonVisibleResCard2Pane);
+
+                // Add new card
+                if (visibleResCardID2 >= 0) {
+                    commonVisibleResCardID2 = visibleResCardID2;
+                    Pane resVisible2Pane = createCardPane(visibleResCardID2, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), resourceCardsY + yOffsetByScale(0.8), 0.8);
+                    addDrawButtonToCard(resVisible2Pane, 1, false, true);
+                    commonAreaPane.getChildren().add(resVisible2Pane);
+                }
+            }
+
+            if (commonGoldDeckCardID != goldDeckCardID) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonGoldDeckCardPane);
+
+                // Add new card
+                if (goldDeckCardID >= 0) {
+                    commonGoldDeckCardID = goldDeckCardID;
+                    Pane goldDeckPane = createCardPane(goldDeckCardID, CardSideType.BACK, defaultElementsOffset, goldenCardsY, 1);
+                    addDrawButtonToCard(goldDeckPane, -1, true, false);
+                    commonAreaPane.getChildren().add(goldDeckPane);
+                }
+            }
+            if (commonVisibleGoldCardID1 != visibleGoldCardID1) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonVisibleGoldCard1Pane);
+
+                // Add new card
+                if (visibleGoldCardID1 >= 0) {
+                    commonVisibleGoldCardID1 = visibleGoldCardID1;
+                    Pane goldVisible1Pane = createCardPane(visibleGoldCardID1, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
+                    addDrawButtonToCard(goldVisible1Pane, 0, true, true);
+                    commonAreaPane.getChildren().add(goldVisible1Pane);
+                }
+            }
+            if (commonVisibleGoldCardID2 != visibleGoldCardID2) {
+                // Remove old card
+                commonAreaPane.getChildren().remove(commonVisibleGoldCard2Pane);
+
+                // Add new card
+                if (visibleGoldCardID2 >= 0) {
+                    commonVisibleGoldCardID2 = visibleGoldCardID2;
+                    Pane goldVisible2Pane = createCardPane(visibleGoldCardID2, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth + xOffsetByScale(0.8), goldenCardsY + yOffsetByScale(0.8), 0.8);
+                    addDrawButtonToCard(goldVisible2Pane, 1, true, true);
+                    commonAreaPane.getChildren().add(goldVisible2Pane);
+                }
+            }
+        });
     }
 
     @Override

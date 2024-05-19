@@ -30,7 +30,9 @@ public interface ClientRMIInterface extends Remote {
                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                    int starterCardID) throws RemoteException;
 
-    void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea) throws RemoteException;
+    void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+                             int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                             int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
 
     void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor,
                           int commonObjectiveCardID1, int commonObjectiveCardID2,

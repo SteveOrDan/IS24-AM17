@@ -154,6 +154,12 @@ public class MatchController {
 
                 int currPlayerID = getCurrPlayerID();
 
+                List<PlaceableCard> visibleResCards = getVisibleResourceCards();
+                List<PlaceableCard> visibleGoldCards = getVisibleGoldenCards();
+
+                PlaceableCard resDeckCardID = checkFirstResDeckCard();
+                PlaceableCard goldDeckCardID = checkFirstGoldDeckCard();
+
                 for (Integer ID : getIDToPlayerMap().keySet()) {
                     Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea = new HashMap<>();
                     Map<Position, Integer> playArea = new HashMap<>();
@@ -166,7 +172,9 @@ public class MatchController {
                             IDtoOpponentPlayArea.put(player.getID(), playArea);
                         }
                     }
-                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, IDtoOpponentPlayArea);
+                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, IDtoOpponentPlayArea,
+                            resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                            goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
                 }
             }
             else {
@@ -394,12 +402,7 @@ public class MatchController {
             endTurn();
             GameState currGameState = matchModel.getGameState();
 
-            if (currGameState != oldGameState) {
-                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
-            }
-            else {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
-            }
+            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
         }
         catch (Exception e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -426,12 +429,7 @@ public class MatchController {
             endTurn();
             GameState currGameState = matchModel.getGameState();
 
-            if (currGameState != oldGameState) {
-                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
-            }
-            else {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
-            }
+            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
         }
         catch (Exception e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -455,12 +453,7 @@ public class MatchController {
             endTurn();
             GameState currGameState = matchModel.getGameState();
 
-            if (currGameState != oldGameState) {
-                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
-            }
-            else {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
-            }
+            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
         }
         catch (Exception e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -487,12 +480,7 @@ public class MatchController {
             endTurn();
             GameState currGameState = matchModel.getGameState();
 
-            if (currGameState != oldGameState) {
-                broadcastNewPlayerTurnNewState(drawnCard.getID(), playerID);
-            }
-            else {
-                broadcastNewPlayerTurn(drawnCard.getID(), playerID);
-            }
+            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
         }
         catch (Exception e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -607,7 +595,7 @@ public class MatchController {
                     throw new InvalidRecipientException();
                 }
 
-                // TODO: Don't we need to send the message back to the sender so that he can add it to his own chat?
+                // TODO: We need to send the message back to the sender so that he can add it to his own chat
                 getPlayerSender(recipientID).sendChatMessage(senderNickname, recipient, message);
             }
         }
@@ -621,45 +609,59 @@ public class MatchController {
      * @param drawnCardID ID of the drawn card
      * @param playerID ID of the player that drew the card
      */
-    private void broadcastNewPlayerTurn(int drawnCardID, int playerID) {
+    private void broadcastNewPlayerTurn(int drawnCardID, int playerID, boolean changedState) {
+        // FIXME: This way almost every card in the common area changes every turn (only change based on the drawn card)
         int newPlayerID = matchModel.getCurrPlayerID();
 
-        int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-        int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-        int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+        int resDeckCardID = -1;
+        int visibleResCardID1 = -1;
+        int visibleResCardID2 = -1;
 
-        int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-        int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-        int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+        int goldDeckCardID = -1;
+        int visibleGoldCardID1 = -1;
+        int visibleGoldCardID2 = -1;
 
-        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
-                    resDeckCardID, visibleResCardID1, visibleResCardID2,
-                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        if (!matchModel.getResourceCardsDeck().getDeck().isEmpty()) {
+            resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
         }
-    }
 
-    /**
-     * Broadcast the new player's turn to all players
-     * @param drawnCardID ID of the drawn card
-     * @param playerID ID of the player that drew the card
-     */
-    private void broadcastNewPlayerTurnNewState(int drawnCardID, int playerID) {
-        int newPlayerID = matchModel.getCurrPlayerID();
+        if (!matchModel.getVisibleResourceCards().isEmpty()) {
+            visibleResCardID1 = matchModel.getVisibleResourceCards().getFirst().getID();
+        }
 
-        int resDeckCardID = matchModel.getResourceCardsDeck().getDeck().getFirst().getID();
-        int visibleResCardID1 = matchModel.getVisibleResourceCards().get(0).getID();
-        int visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+        if (matchModel.getVisibleResourceCards().size() > 1) {
+            visibleResCardID2 = matchModel.getVisibleResourceCards().get(1).getID();
+        }
 
-        int goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
-        int visibleGoldCardID1 = matchModel.getVisibleGoldenCards().get(0).getID();
-        int visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+        if (!matchModel.getGoldenCardsDeck().getDeck().isEmpty()) {
+            goldDeckCardID = matchModel.getGoldenCardsDeck().getDeck().getFirst().getID();
+        }
 
-        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendNewPlayerTurnNewState(drawnCardID, playerID, newPlayerID,
-                    resDeckCardID, visibleResCardID1, visibleResCardID2,
-                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
-                    matchModel.getGameState());
+        if (!matchModel.getVisibleGoldenCards().isEmpty()) {
+            visibleGoldCardID1 = matchModel.getVisibleGoldenCards().getFirst().getID();
+        }
+
+        if (matchModel.getVisibleGoldenCards().size() > 1) {
+            visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
+        }
+
+        System.out.println("New common res cards: " + resDeckCardID + " " + visibleResCardID1 + " " + visibleResCardID2);
+        System.out.println("New common gold cards: " + goldDeckCardID + " " + visibleGoldCardID1 + " " + visibleGoldCardID2);
+
+        if (changedState){
+            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+                getPlayerSender(broadcastID).sendNewPlayerTurnNewState(drawnCardID, playerID, newPlayerID,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                        matchModel.getGameState());
+            }
+        }
+        else {
+            for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
         }
     }
 

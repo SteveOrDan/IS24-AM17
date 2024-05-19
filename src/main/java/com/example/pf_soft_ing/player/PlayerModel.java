@@ -281,8 +281,8 @@ public class PlayerModel {
      * @param pos Card's position to add to the player's playArea
      */
     public void placeCard(PlaceableCard card, Position pos, CardSideType chosenSide)
-            throws  PositionAlreadyTakenException, MissingResourcesException,
-            NoAdjacentCardsException, PlacingOnInvalidCornerException {
+            throws PositionAlreadyTakenException, MissingResourcesException,
+            NoAdjacentCardsException, PlacingOnInvalidCornerException, InvalidPlayerStateException {
 
         if (playArea.containsKey(pos)){
             throw new PositionAlreadyTakenException();
@@ -290,6 +290,10 @@ public class PlayerModel {
 
         if(!card.hasEnoughRequiredResources(numOfResourcesArr, chosenSide)){
             throw new MissingResourcesException();
+        }
+
+        if (state != PlayerState.PLACING){
+            throw new InvalidPlayerStateException(state.name(), PlayerState.PLACING.name());
         }
 
         ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
