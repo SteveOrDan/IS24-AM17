@@ -139,8 +139,15 @@ public class TUIView implements View {
 
             if (legalCommands.contains(command)) {
                 switch (command) {
-                    case "rml" -> sender.getMatches(); // RefreshMatchesList
 
+                    case "rml" -> { // RefreshMatchesList
+                        if (parts.length != 1) {
+                            System.out.println("Error: RefreshMatchesList does not take any arguments. Please, try again");
+                            break;
+                        }
+
+                        sender.getMatches();
+                    }
                     case "cm" -> { // CreateMatch
                         if (parts.length != 3) {
                             System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
@@ -346,6 +353,7 @@ public class TUIView implements View {
         if (matches.isEmpty()) {
             System.out.println("No matches available.");
             System.out.println("To create a new match, type: cm <players_num> <nickname>");
+            System.out.println("To refresh the match list, type: rml");
             return;
         }
 
@@ -356,6 +364,7 @@ public class TUIView implements View {
         }
         System.out.println("To create a new match, type: cm <players_num> <nickname>");
         System.out.println("To join a match, type: sm <matchID>");
+        System.out.println("To refresh the match list, type: rml");
     }
 
     @Override
@@ -478,17 +487,13 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         System.out.println("""
                 Now you can use the chat.
-                To send a message in the match chat, type: gmc <message>
-                To send a message in the private chat, type: chat <recipient nickname> <message>
+                To send a message in the match chat, type: wmm <message>
+                To send a message in the private chat, type: wpm <recipient nickname> <message>
                 To read the match chat, type: rmc
                 To read the private chat, type: rpc <opponent nickname>""");
-
-        if (this.playerID == lastPlayerID) {
-            confirmSecretObjective();
-        }
 
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
@@ -558,6 +563,7 @@ public class TUIView implements View {
         opponentCard.setCurrSideType(side);
 
         IDtoOpponentPlayerArea.get(playerId).put(pos, opponentCard);
+        GameResources.getPlaceableCardByID(cardID).setCurrSideType(side);
     }
 
     @Override
@@ -579,10 +585,6 @@ public class TUIView implements View {
                 System.out.println(s);
             }
             System.out.println("It's " + playerNickname + "'s turn.");
-            System.out.println("""
-                    While waiting you can flip a card in your hand by typing: fc <cardID>
-                    To check your hand, type: gh
-                    To check opponents play area: opa <opponentNickname>""");
         }
         else {
             if (playerID == newPlayerID) {
@@ -1763,7 +1765,7 @@ public class TUIView implements View {
 
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
-                new ArrayList<>(Arrays.asList("cm", "sm", "rml")));
+                new ArrayList<>(Arrays.asList("cm", "sm")));
 
         stateToCommands.put(PlayerState.MATCH_LOBBY,
                 new ArrayList<>());
