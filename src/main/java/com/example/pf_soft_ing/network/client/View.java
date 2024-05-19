@@ -33,7 +33,7 @@ public interface View {
 
     void showNewPlayer(String nicknames);
 
-    void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
+    void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void placeCard();
 

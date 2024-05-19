@@ -10,7 +10,6 @@ import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -172,7 +171,8 @@ public class MatchController {
                             IDtoOpponentPlayArea.put(player.getID(), playArea);
                         }
                     }
-                    getPlayerSender(ID).sendFirstPlayerTurn(currPlayerID, IDtoOpponentPlayArea,
+
+                    getPlayerSender(ID).sendFirstPlayerTurn(playerID, currPlayerID, IDtoOpponentPlayArea,
                             resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
                             goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
                 }
@@ -595,7 +595,8 @@ public class MatchController {
                     throw new InvalidRecipientException();
                 }
 
-                // TODO: We need to send the message back to the sender so that he can add it to his own chat
+                // Send the message to both the sender and the recipient
+                getPlayerSender(senderID).sendChatMessage(senderNickname, recipient, message);
                 getPlayerSender(recipientID).sendChatMessage(senderNickname, recipient, message);
             }
         }
@@ -610,7 +611,6 @@ public class MatchController {
      * @param playerID ID of the player that drew the card
      */
     private void broadcastNewPlayerTurn(int drawnCardID, int playerID, boolean changedState) {
-        // FIXME: This way almost every card in the common area changes every turn (only change based on the drawn card)
         int newPlayerID = matchModel.getCurrPlayerID();
 
         int resDeckCardID = -1;

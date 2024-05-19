@@ -65,8 +65,6 @@ public class GUIView implements View {
     private double selectedCardY;
     private Pane selectedCardPane;
 
-    private Pane drawnCardPane;
-
     private int commonResDeckCardID;
     private int commonVisibleResCardID1;
     private int commonVisibleResCardID2;
@@ -589,9 +587,7 @@ public class GUIView implements View {
         openChatButton.setPrefSize(50, 100);
         openChatButton.setLayoutX(0);
         openChatButton.setLayoutY(stageHeight / 2 - 50);
-        openChatButton.setOnAction((_) -> {
-            openCloseChat();
-        });
+        openChatButton.setOnAction((_) -> openCloseChat());
 
         commonAreaPane.getChildren().add(openChatButton);
 
@@ -656,9 +652,7 @@ public class GUIView implements View {
         playerAreaButton.setLayoutX(0);
         playerAreaButton.setLayoutY(0);
         playerAreaButton.setOpacity(0.1);
-        playerAreaButton.setOnAction((_) -> {
-            switchToPlayerField(playerNick);
-        });
+        playerAreaButton.setOnAction((_) -> switchToPlayerField(playerNick));
 
         playerPane.getChildren().add(playerRectangle);
         playerPane.getChildren().add(playerCircle);
@@ -670,6 +664,7 @@ public class GUIView implements View {
 
     private void switchToPlayerField(String playerNickname) {
         // TODO: implement
+
     }
 
     private void createChatPane() {
@@ -732,9 +727,7 @@ public class GUIView implements View {
         closeChatButton.setPrefSize(50, 50);
         closeChatButton.setLayoutX(commonAreaWidth - 50);
         closeChatButton.setLayoutY(0);
-        closeChatButton.setOnAction((_) -> {
-            openCloseChat();
-        });
+        closeChatButton.setOnAction((_) -> openCloseChat());
 
         chatInputPane.getChildren().add(chatInput);
         chatInputPane.getChildren().add(sendButton);
@@ -946,7 +939,6 @@ public class GUIView implements View {
 
         drawButton.setOnAction((_) -> {
             int playerID = player.getPlayerID();
-            drawnCardPane = cardPane;
 
             if (isVisible){
                 if (isGolden){
@@ -1471,12 +1463,12 @@ public class GUIView implements View {
     public void showNewPlayer(String nickname) {
     }
 
-    // TODO: Called when the last player has chosen their secret objective (Find a way to show this to the player)
     @Override
-    public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         Platform.runLater(() -> {
-            // TODO: Remove
-            confirmSecretObjective();
+            if (player.getPlayerID() == lastPlayerID){
+                confirmSecretObjective();
+            }
 
             String nickname = getPlayerNickname(playerID);
 
@@ -1491,15 +1483,12 @@ public class GUIView implements View {
 
     @Override
     public void placeCard() {
-        Platform.runLater(() -> {
-            placeCard(selectedCard, cardPlacePosition);
-        });
+        Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
     }
 
     @Override
     public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
         Platform.runLater(() -> {
-            // TODO: Update draw area for everyone
             if (player.getPlayerID() == lastPlayerID){
                 drawCard(drawnCardID);
 
@@ -1616,11 +1605,17 @@ public class GUIView implements View {
     public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
         Platform.runLater(() -> {
             String fullMessage;
+            String actualSender = senderNickname;
+
+            if (actualSender.equals(player.getNickname())){
+                actualSender = "You";
+            }
+
             if (recipientNickname.equals("all")){
-                fullMessage = senderNickname + ": " + message;
+                fullMessage = actualSender + ": " + message;
             }
             else {
-                fullMessage = senderNickname + " -> " + recipientNickname + ": " + message;
+                fullMessage = actualSender + " -> " + recipientNickname + ": " + message;
             }
 
             chatMessages.add(fullMessage);

@@ -5,7 +5,6 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
-import com.example.pf_soft_ing.network.messages.requests.ChatMessageMsg;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
@@ -91,10 +90,10 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
-        sendMessage(new FirstPlayerTurnMsg(playerID, IDtoOpponentPlayArea,
+        sendMessage(new FirstPlayerTurnMsg(lastPlayerID, playerID, IDtoOpponentPlayArea,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
     }

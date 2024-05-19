@@ -83,7 +83,7 @@ public class ClientSocketReceiver {
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
                 );
-                view.showFirstPlayerTurn(castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
+                view.showFirstPlayerTurn(castedMsg.getLastPlayerID(), castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
             }
 
             case ConfirmPlaceCardMsg ignored -> view.placeCard();
@@ -102,9 +102,7 @@ public class ClientSocketReceiver {
                 view.showNewPlayerTurnNewState(castedMsg.getDrawnCardID(), castedMsg.getLastPlayerID(), castedMsg.getNewPlayerID(), castedMsg.getGameState());
             }
 
-            case NewPlayerExtraTurnMsg castedMsg -> {
-                view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getNewPlayerID());
-            }
+            case NewPlayerExtraTurnMsg castedMsg -> view.showNewPlayerExtraTurn(castedMsg.getCardID(), castedMsg.getLastPlayerID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getNewPlayerID());
 
             case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());
 

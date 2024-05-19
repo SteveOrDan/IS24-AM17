@@ -68,12 +68,12 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea,
+    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException {
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        view.showFirstPlayerTurn(playerID, IDtoOpponentPlayArea);
+        view.showFirstPlayerTurn(lastPlayerID, playerID, IDtoOpponentPlayArea);
     }
 
     @Override

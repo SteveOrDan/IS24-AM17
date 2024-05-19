@@ -7,6 +7,7 @@ import java.util.Map;
 
 public class FirstPlayerTurnMsg extends Message {
 
+    private final int lastPlayerID;
     private final int playerID;
 
     private final Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea;
@@ -19,9 +20,10 @@ public class FirstPlayerTurnMsg extends Message {
     private final int visibleGoldCardID1;
     private final int visibleGoldCardID2;
 
-    public FirstPlayerTurnMsg(int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+    public FirstPlayerTurnMsg(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2){
+        this.lastPlayerID = lastPlayerID;
         this.playerID = playerID;
         this.IDtoOpponentPlayArea = IDtoOpponentPlayArea;
 
@@ -32,6 +34,10 @@ public class FirstPlayerTurnMsg extends Message {
         this.goldDeckCardID = goldDeckCardID;
         this.visibleGoldCardID1 = visibleGoldCardID1;
         this.visibleGoldCardID2 = visibleGoldCardID2;
+    }
+
+    public int getLastPlayerID(){
+        return lastPlayerID;
     }
 
     public int getPlayerID(){
