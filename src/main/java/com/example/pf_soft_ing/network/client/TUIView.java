@@ -487,13 +487,17 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurn(int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
         System.out.println("""
                 Now you can use the chat.
                 To send a message in the match chat, type: wmm <message>
                 To send a message in the private chat, type: wpm <recipient nickname> <message>
                 To read the match chat, type: rmc
                 To read the private chat, type: rpc <opponent nickname>""");
+
+        if (this.playerID == lastPlayerID) {
+            confirmSecretObjective();
+        }
 
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
