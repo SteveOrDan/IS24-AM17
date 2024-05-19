@@ -88,6 +88,8 @@ public class ClientSocketReceiver {
 
             case ConfirmPlaceCardMsg ignored -> view.placeCard();
 
+            case OpponentPlaceCardMsg castedMsg -> view.opponentPlaceCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
+
             case NewPlayerTurnMsg castedMsg -> {
                 view.updateDrawArea(
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),

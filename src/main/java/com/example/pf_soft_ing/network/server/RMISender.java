@@ -140,6 +140,18 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
+        new Thread(() -> {
+            try {
+                client.opponentPlaceCard(playerID, cardID, pos, chosenSide);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Opponent place card not shown");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
