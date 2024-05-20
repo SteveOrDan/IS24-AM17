@@ -15,7 +15,7 @@ public interface ClientRMIInterface extends Remote {
 
     void placeStarterCard() throws RemoteException;
 
-    void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException;
+    void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide, int score) throws RemoteException;
 
     void sendError(String errorMsg) throws RemoteException;
 
@@ -51,5 +51,5 @@ public interface ClientRMIInterface extends Remote {
                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) throws RemoteException;
 
-    void setNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) throws RemoteException;
+    void setNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) throws RemoteException;
 }

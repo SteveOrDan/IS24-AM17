@@ -128,10 +128,10 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score) {
         new Thread(() -> {
             try {
-                client.placeCardResult(playerID, cardID, pos, chosenSide);
+                client.placeCardResult(playerID, cardID, pos, chosenSide, score);
             }
             catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Place card not shown");
@@ -172,10 +172,10 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
+    public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) {
         new Thread(() ->{
             try {
-                client.setNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID);
+                client.setNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID, score);
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". New player's extra turn not shown");
             }

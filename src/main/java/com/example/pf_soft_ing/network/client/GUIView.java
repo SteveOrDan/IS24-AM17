@@ -1528,9 +1528,6 @@ public class GUIView implements View {
         Platform.runLater(() -> showError(errorMessage));
     }
 
-    @Override
-    public void showNewPlayer(String nickname) {
-    }
 
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
@@ -1553,7 +1550,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void placeCard(int playerId, int cardID, Position pos, CardSideType side) {
+    public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int score) {
         if (playerId == player.getPlayerID()){
             Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
         }
@@ -1719,7 +1716,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) {
 
     }
 

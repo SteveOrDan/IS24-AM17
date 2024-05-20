@@ -31,7 +31,7 @@ public interface Sender {
 
     void confirmSecretObjective();
 
-    void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide);
+    void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score);
 
     void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
                              int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
@@ -42,7 +42,7 @@ public interface Sender {
                            int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
-                                int newPlayerID);
+                                int newPlayerID, int score);
 
     void sendNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
                                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,

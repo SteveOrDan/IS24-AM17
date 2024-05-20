@@ -300,11 +300,13 @@ public class MatchController {
                     broadcastRanking(matchModel.getRankings());
                 }
                 else {
-                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide);
+                    int score = getIDToPlayerMap().get(playerID).getCurrScore();
+                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, score);
                 }
             }
             else {
-                broadcastPlaceCard(playerID, cardID, pos, chosenSide);
+                int score = getIDToPlayerMap().get(playerID).getCurrScore();
+                broadcastPlaceCard(playerID, cardID, pos, chosenSide, score);
             }
         }
         catch (Exception e) {
@@ -672,9 +674,9 @@ public class MatchController {
      * @param pos Position to place the card
      * @param side Side of the card
      */
-    private void broadcastNewPlayerExtraTurn(int playerID, int cardID, Position pos, CardSideType side) {
+    private void broadcastNewPlayerExtraTurn(int playerID, int cardID, Position pos, CardSideType side, int score) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID());
+            getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID(), score);
         }
     }
 
@@ -685,9 +687,9 @@ public class MatchController {
      * @param pos Position of the placed card
      * @param side Side of the placed card
      */
-    private void broadcastPlaceCard(int playerID, int cardID, Position pos, CardSideType side) {
+    private void broadcastPlaceCard(int playerID, int cardID, Position pos, CardSideType side, int score) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).placeCard(playerID, cardID, pos, side);
+            getPlayerSender(broadcastID).placeCard(playerID, cardID, pos, side, score);
         }
     }
 

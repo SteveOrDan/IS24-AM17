@@ -31,8 +31,6 @@ public interface View {
 
     void errorMessage(String errorMessage);
 
-    void showNewPlayer(String nicknames);
-
     void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
     void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID);
@@ -42,7 +40,7 @@ public interface View {
 
     void setID(int playerID);
 
-    void placeCard(int playerId, int cardID, Position pos, CardSideType side);
+    void placeCard(int playerId, int cardID, Position pos, CardSideType side, int score);
 
     void receiveChatMessage(String senderNickname, String recipientNickname, String message);
 
@@ -50,5 +48,5 @@ public interface View {
 
     void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState);
 
-    void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID);
+    void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score);
 }

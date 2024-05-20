@@ -62,6 +62,7 @@ public class TUIView implements View {
     private Position placingCardPos;
 
     private final Map<Integer, Map<Position, PlaceableCard>> IDtoOpponentPlayerArea = new HashMap<>();
+    private final Map<Integer,Integer> IDtoPlayerScore = new HashMap<>();
 
     private final List<String> chat = new ArrayList<>();
 
@@ -337,6 +338,14 @@ public class TUIView implements View {
 
                     printChat();
                 }
+                case "gs" -> { // GetScore
+                    if (parts.length != 1) {
+                        System.out.println("Error: GetScore does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    printScore();
+                }
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
@@ -408,6 +417,7 @@ public class TUIView implements View {
         this.IDToNicknameMap = IDToNicknameMap;
         for (int playerID : IDToNicknameMap.keySet()) {
             this.IDtoOpponentPlayerArea.put(playerID, new HashMap<>());
+            this.IDtoPlayerScore.put(playerID, 0);
         }
 
         playerState = PlayerState.PLACING_STARTER;
@@ -498,11 +508,6 @@ public class TUIView implements View {
         System.out.println(message);
     }
 
-    @Override
-    public void showNewPlayer(String nicknames) {
-        System.out.println("New player joined: " + nicknames + "\n" +
-                "Waiting for other players to join...");
-    }
 
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
@@ -550,7 +555,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void placeCard(int playerID, int cardID, Position pos, CardSideType side) {
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType side, int score) {
         if (this.playerID == playerID) {
             playerState = PlayerState.DRAWING;
 
@@ -559,6 +564,13 @@ public class TUIView implements View {
 
             // Add card to play area
             playArea.put(placingCardPos, placingCard);
+
+            // Update player score
+            for (Integer playerId : IDtoPlayerScore.keySet()){
+                if (playerId == this.playerID){
+                    IDtoPlayerScore.put(playerId, IDtoPlayerScore.get(playerId) + score);
+                }
+            }
 
             // Update legal and illegal positions
             updatePlacementPositions(placingCardPos);
@@ -577,8 +589,11 @@ public class TUIView implements View {
             // Print draw area
             printDrawArea();
 
+            // Print player score
+            System.out.println("Your score: " + IDtoPlayerScore.get(this.playerID));
+
             // Print available commands
-            System.out.println("""
+            System.out.println(""" 
                 To draw from resource deck, type: ddr
                 To draw a visible resource card, type: dvr <0 or 1>
                 To draw from gold deck, type: ddg
@@ -589,6 +604,7 @@ public class TUIView implements View {
             opponentCard.setCurrSideType(side);
 
             IDtoOpponentPlayerArea.get(playerID).put(pos, opponentCard);
+            System.out.println("Opponent " + IDToNicknameMap.get(playerID) + " actual score: " + score);
         }
     }
 
@@ -614,6 +630,7 @@ public class TUIView implements View {
             System.out.println("""
                     While waiting you can flip a card in your hand by typing: fc <cardID>
                     To check your hand, type: gh
+                    To check actual score, type: gs
                     To check opponents play area: opa <opponent Nickname>""");
         }
         else {
@@ -1810,10 +1827,10 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("chat", "gmc", "opa")));
+                new ArrayList<>(List.of("chat", "gmc", "gs", "opa")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "opa")));
+                new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "gs", "opa")));
 
         stateToCommands.put(PlayerState.PLACING,
                 new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "opa")));
@@ -1874,7 +1891,7 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) {
         if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
 
@@ -1884,6 +1901,13 @@ public class TUIView implements View {
             // Add card to play area
             playArea.put(placingCardPos, placingCard);
 
+            //Update player score
+            for (Integer playerID : IDtoPlayerScore.keySet()){
+                if (playerID == lastPlayerID){
+                    IDtoPlayerScore.put(playerID, IDtoPlayerScore.get(lastPlayerID) + score);
+                }
+            }
+
             // Update legal and illegal positions
             updatePlacementPositions(placingCardPos);
 
@@ -1892,11 +1916,16 @@ public class TUIView implements View {
 
             // Print play area
             printPlayArea();
+
+            // Print player score
+            System.out.println("Your score: " + IDtoPlayerScore.get(playerID));
         }
         else {
             // Add card to opponent's play area
             PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
             opponentCard.setCurrSideType(side);
+
+            System.out.println("Opponent " + IDToNicknameMap.get(playerID) + " actual score: " + score);
 
             IDtoOpponentPlayerArea.get(lastPlayerID).put(pos, opponentCard);
 
@@ -1925,6 +1954,7 @@ public class TUIView implements View {
                 System.out.println("It's " + newPlayerNickname + "'s turn.\n" +
                         "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
                         "To check your hand, type: gh\n" +
+                        "To check actual score, type: gs\n" +
                         "To check opponents play area: opa <opponentNickname>");
             }
         }
@@ -1942,6 +1972,13 @@ public class TUIView implements View {
 
         for (String message : chatCopy) {
             System.out.println(message);
+        }
+    }
+
+    private void printScore() {
+        for (Integer playerID : IDtoPlayerScore.keySet()){
+            String playerNick = IDToNicknameMap.get(playerID);
+            System.out.println(playerNick + ": " + IDtoPlayerScore.get(playerID));
         }
     }
 }

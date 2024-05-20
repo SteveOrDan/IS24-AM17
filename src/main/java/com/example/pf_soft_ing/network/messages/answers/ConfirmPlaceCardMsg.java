@@ -10,12 +10,14 @@ public class ConfirmPlaceCardMsg extends Message {
     private final int cardID;
     private final Position pos;
     private final CardSideType side;
+    private final int score;
 
-    public ConfirmPlaceCardMsg(int playerID, int cardID, Position pos, CardSideType side) {
+    public ConfirmPlaceCardMsg(int playerID, int cardID, Position pos, CardSideType side, int score) {
         this.playerID = playerID;
         this.cardID = cardID;
         this.pos = pos;
         this.side = side;
+        this.score = score;
     }
 
     public int getPlayerID() {
@@ -32,6 +34,10 @@ public class ConfirmPlaceCardMsg extends Message {
 
     public CardSideType getSide() {
         return side;
+    }
+
+    public int getScore() {
+        return score;
     }
 
     @Override

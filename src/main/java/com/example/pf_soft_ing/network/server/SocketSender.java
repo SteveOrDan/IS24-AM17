@@ -85,8 +85,8 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide){
-        sendMessage(new ConfirmPlaceCardMsg(playerID, cardID, pos, chosenSide));
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score){
+        sendMessage(new ConfirmPlaceCardMsg(playerID, cardID, pos, chosenSide, score));
     }
 
     @Override
@@ -110,9 +110,9 @@ public class SocketSender implements Sender {
 
     @Override
     public void sendNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side,
-                                       int newPlayerID) {
+                                       int newPlayerID, int score) {
         sendMessage(new NewPlayerExtraTurnMsg(cardID, lastPlayerID, pos, side,
-                newPlayerID));
+                newPlayerID, score));
     }
 
     @Override
