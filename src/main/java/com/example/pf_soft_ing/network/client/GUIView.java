@@ -37,6 +37,7 @@ public class GUIView implements View {
 
     private final Map<Position, Pane> validPosToButtonPane = new HashMap<>();
 
+    private int matchID;
     private final PlayerViewModel player;
     private final List<PlayerViewModel> opponents = new ArrayList<>();
 
@@ -456,7 +457,7 @@ public class GUIView implements View {
         anchorPane.setLayoutX(0);
         anchorPane.setLayoutY(0);
 
-        Label waitingLabel = new Label("Waiting for other players...\nEntering match " + player.getMatchID() + " with nick " + nick);
+        Label waitingLabel = new Label("Waiting for other players...\nEntering match " + matchID + " with nick " + nick);
         waitingLabel.setPrefSize(stageWidth, stageHeight);
         waitingLabel.setLayoutX(50);
         waitingLabel.setLayoutY(50);
@@ -467,7 +468,7 @@ public class GUIView implements View {
         root.getChildren().add(anchorPane);
     }
 
-    private void drawGameStart(String nickname, Map<Integer, String> IDToNicknameMap,
+    private void drawGameStart(Map<Integer, String> IDToNicknameMap,
                                int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                                int starterCardID){
@@ -475,16 +476,16 @@ public class GUIView implements View {
 
         root.getChildren().clear();
 
-        player.setNickname(nickname);
-
         for (Map.Entry<Integer, String> entry : IDToNicknameMap.entrySet()){
             if (entry.getKey() != player.getPlayerID()){
                 PlayerViewModel opponent = new PlayerViewModel();
-                opponent.setNickname(entry.getValue());
                 opponent.setPlayerID(entry.getKey());
-                opponent.setMatchID(player.getMatchID());
+                opponent.setNickname(entry.getValue());
 
                 opponents.add(opponent);
+            }
+            else {
+                player.setNickname(entry.getValue());
             }
         }
 
@@ -1450,7 +1451,7 @@ public class GUIView implements View {
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
-        player.setMatchID(matchID);
+        this.matchID = matchID;
 
         // Create window for waiting for other players
         Platform.runLater(() -> selectNickname(hostNickname));
@@ -1458,7 +1459,7 @@ public class GUIView implements View {
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
-        player.setMatchID(matchID);
+        this.matchID = matchID;
 
         // Create window for choosing nickname
         Platform.runLater(() -> openSelectNickWindow(nicknames));
@@ -1471,12 +1472,12 @@ public class GUIView implements View {
     }
 
     @Override
-    public void startGame(String nickname, Map<Integer, String> IDToNicknameMap,
+    public void startGame(Map<Integer, String> IDToNicknameMap,
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         Platform.runLater(() -> {
-            drawGameStart(nickname, IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
+            drawGameStart(IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
                     goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
 
             // Add events for zooming
@@ -1530,7 +1531,7 @@ public class GUIView implements View {
 
 
     @Override
-    public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
+    public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSideTypes) {
         Platform.runLater(() -> {
             if (player.getPlayerID() == lastPlayerID){
                 confirmSecretObjective();
@@ -1550,7 +1551,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int score) {
+    public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int deltaScore) {
         if (playerId == player.getPlayerID()){
             Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
         }
@@ -1678,7 +1679,7 @@ public class GUIView implements View {
             String actualSender = senderNickname;
 
             if (actualSender.equals(player.getNickname())){
-                actualSender = "You";
+                actualSender = "(You)";
             }
 
             if (recipientNickname.equals("all")){
@@ -1706,7 +1707,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showRanking(List<String> rankings) {
+    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfObjectives) {
 
     }
 
@@ -1716,7 +1717,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) {
+    public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int deltaScore) {
 
     }
 

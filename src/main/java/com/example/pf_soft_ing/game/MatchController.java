@@ -11,7 +11,6 @@ import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -159,20 +158,20 @@ public class MatchController {
                 PlaceableCard resDeckCardID = checkFirstResDeckCard();
                 PlaceableCard goldDeckCardID = checkFirstGoldDeckCard();
 
+                int[] playerIDs = new int[getIDToPlayerMap().size()];
+                int[] starterCardIDs = new int[getIDToPlayerMap().size()];
+                CardSideType[] starterCardSides = new CardSideType[getIDToPlayerMap().size()];
+
+                int i = 0;
+                for (int id : getIDToPlayerMap().keySet()) {
+                    playerIDs[i] = getIDToPlayerMap().get(id).getID();
+                    starterCardIDs[i] = getIDToPlayerMap().get(id).getStarterCard().getID();
+                    starterCardSides[i] = getIDToPlayerMap().get(id).getStarterCard().getCurrSideType();
+                    i++;
+                }
+
                 for (Integer ID : getIDToPlayerMap().keySet()) {
-                    Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea = new HashMap<>();
-                    Map<Position, Integer> playArea = new HashMap<>();
-
-                    for (PlayerModel player : getIDToPlayerMap().values()){
-                        if (player.getID() != ID) {
-                            for (Position key : player.getPlayArea().keySet()) {
-                                playArea.put(key, player.getPlayArea().get(key).getID());
-                            }
-                            IDtoOpponentPlayArea.put(player.getID(), playArea);
-                        }
-                    }
-
-                    getPlayerSender(ID).sendFirstPlayerTurn(playerID, currPlayerID, IDtoOpponentPlayArea,
+                    getPlayerSender(ID).sendFirstPlayerTurn(playerID, currPlayerID, playerIDs, starterCardIDs, starterCardSides,
                             resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
                             goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
                 }
@@ -181,7 +180,7 @@ public class MatchController {
                 getPlayerSender(playerID).confirmSecretObjective();
             }
         }
-        catch (InvalidPlayerIDException | InvalidObjectiveCardException e) {
+        catch (InvalidPlayerIDException | InvalidObjectiveCardException | StarterCardNotSetException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
@@ -294,21 +293,21 @@ public class MatchController {
 
             player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
 
-            int score = getIDToPlayerMap().get(playerID).getCurrScore() - oldScore;
+            int deltaScore = getIDToPlayerMap().get(playerID).getCurrScore() - oldScore;
 
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
 
                 // Send new player 'extra' turn or ranking if game ended
                 if (matchModel.getGameState() == GameState.END_GAME){
-                    broadcastRanking(matchModel.getRankings());
+                    broadcastRanking(playerID, cardID, pos, chosenSide, matchModel.getNicknamesRanked(), matchModel.getScoresRanked(), matchModel.getNumOfCompletedObjectivesRanked());
                 }
                 else {
-                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, score);
+                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, deltaScore);
                 }
             }
             else {
-                broadcastPlaceCard(playerID, cardID, pos, chosenSide, score);
+                broadcastPlaceCard(playerID, cardID, pos, chosenSide, deltaScore);
             }
         }
         catch (Exception e) {
@@ -613,6 +612,7 @@ public class MatchController {
      * Broadcast the new player's turn to all players
      * @param drawnCardID ID of the drawn card
      * @param playerID ID of the player that drew the card
+     * @param changedState true if the game state changed, false otherwise
      */
     private void broadcastNewPlayerTurn(int drawnCardID, int playerID, boolean changedState) {
         int newPlayerID = matchModel.getCurrPlayerID();
@@ -697,11 +697,13 @@ public class MatchController {
 
     /**
      * Broadcast the ranking of the players to all players
-     * @param rankings list of player nicknames in ranking order
+     * @param nicknames Array of nicknames of the players in the ranking order
+     * @param scores Array of scores of the players in the ranking order
+     * @param numOfSecretObjectives Array of the number of secret objectives completed by the players in the ranking order
      */
-    private void broadcastRanking(List<String> rankings) {
+    private void broadcastRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendRanking(rankings);
+            getPlayerSender(broadcastID).sendRanking(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives);
         }
     }
 }

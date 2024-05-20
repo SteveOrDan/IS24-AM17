@@ -96,7 +96,7 @@ public class GameModel {
             player.setState(PlayerState.MATCH_LOBBY);
             player.setMatchID(newID);
 
-            matches.add(match);
+            matches.addFirst(match);
 
             return match;
         }

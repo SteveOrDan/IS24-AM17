@@ -11,19 +11,16 @@ import java.util.Map;
 
 public class PlayerViewModel {
 
-    private int matchID;
-
     private int playerID;
     private String nickname;
     private TokenColors tokenColor;
+    private int score = 0;
 
+    private int priority = 0;
 
+    private final List<PlaceableCard> playerHand = new ArrayList<>();
 
     private final Map<Position, PlaceableCard> playArea = new HashMap<>();
-
-    public int getMatchID() {
-        return matchID;
-    }
 
     public int getPlayerID() {
         return playerID;
@@ -37,12 +34,16 @@ public class PlayerViewModel {
         return tokenColor;
     }
 
+    public int getScore() {
+        return score;
+    }
+
     public Map<Position, PlaceableCard> getPlayArea() {
         return playArea;
     }
 
-    public void setMatchID(int matchID) {
-        this.matchID = matchID;
+    public List<PlaceableCard> getPlayerHand() {
+        return playerHand;
     }
 
     public void setPlayerID(int playerID) {
@@ -55,5 +56,19 @@ public class PlayerViewModel {
 
     public void setTokenColor(TokenColors tokenColor) {
         this.tokenColor = tokenColor;
+    }
+
+    public void placeCard(PlaceableCard card, Position pos) {
+        card.setPriority(priority);
+        priority++;
+        playArea.put(pos, card);
+    }
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public void addScore(int deltaScore) {
+        score += deltaScore;
     }
 }

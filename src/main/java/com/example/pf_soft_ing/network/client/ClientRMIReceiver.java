@@ -64,16 +64,16 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) throws RemoteException {
-        view.startGame(nickname, IDtoNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+        view.startGame(IDtoNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
     }
 
     @Override
-    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea,
+    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException {
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
-        view.showFirstPlayerTurn(lastPlayerID, playerID, IDtoOpponentPlayArea);
+        view.showFirstPlayerTurn(lastPlayerID, playerID, playerIDs, starterCardIDs, starterCardSides);
     }
 
     @Override
@@ -91,8 +91,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void showRanking(List<String> rankings)throws RemoteException {
-        view.showRanking(rankings);
+    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives)throws RemoteException {
+        view.showRanking(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives);
     }
 
     @Override

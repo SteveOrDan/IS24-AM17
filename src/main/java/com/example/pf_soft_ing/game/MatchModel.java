@@ -38,7 +38,9 @@ public class MatchModel {
 
     private final List<TokenColors> tokenColors = new ArrayList<>(List.of(TokenColors.values()));
 
-    private final List<String> rankings = new ArrayList<>();
+    private String[] nicknamesRanked;
+    private int[] scoresRanked;
+    private int[] numOfCompletedObjectivesRanked;
 
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
@@ -252,10 +254,26 @@ public class MatchModel {
 
     /**
      * Getter
-     * @return List of player rankings
+     * @return Nicknames of the players ranked by their final scores
      */
-    public List<String> getRankings() {
-        return rankings;
+    public String[] getNicknamesRanked() {
+        return nicknamesRanked;
+    }
+
+    /**
+     * Getter
+     * @return Final scores of the players ranked
+     */
+    public int[] getScoresRanked() {
+        return scoresRanked;
+    }
+
+    /**
+     * Getter
+     * @return Array that contains the number of completed objectives of the players ranked
+     */
+    public int[] getNumOfCompletedObjectivesRanked() {
+        return numOfCompletedObjectivesRanked;
     }
 
     /**
@@ -434,6 +452,9 @@ public class MatchModel {
      */
     public void determineRanking() {
         List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
+        nicknamesRanked = new String[players.size()];
+        scoresRanked = new int[players.size()];
+        numOfCompletedObjectivesRanked = new int[players.size()];
 
         for (PlayerModel player : IDToPlayerMap.values()) {
             player.calculateObjectivePoints(player.getSecretObjective());
@@ -444,7 +465,9 @@ public class MatchModel {
         players.sort(new PlayerRanker());
 
         for (PlayerModel player : players) {
-            rankings.add(player.getNickname());
+            nicknamesRanked[players.indexOf(player)] = player.getNickname();
+            scoresRanked[players.indexOf(player)] = player.getCurrScore();
+            numOfCompletedObjectivesRanked[players.indexOf(player)] = player.getNumOfCompletedObjectives();
         }
     }
 

@@ -70,7 +70,8 @@ public class GameController {
     public void chooseNickname(int playerID, String nickname, MatchController matchController) {
         // The player chooses a nickname for the match and is completely added to the match
         try {
-            if (nickname == null || nickname.isEmpty() || nickname.isBlank()) {
+            if (nickname == null || nickname.isEmpty() || nickname.isBlank() ||
+                    nickname.equalsIgnoreCase("all") || nickname.equalsIgnoreCase("(you)")) {
                 throw new InvalidNicknameException();
             }
 

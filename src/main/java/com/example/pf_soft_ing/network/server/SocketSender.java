@@ -90,10 +90,10 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
-        sendMessage(new FirstPlayerTurnMsg(lastPlayerID, playerID, IDtoOpponentPlayArea,
+        sendMessage(new FirstPlayerTurnMsg(lastPlayerID, playerID, playerIDs, starterCardIDs, starterCardSides,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2));
     }
@@ -132,7 +132,7 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendRanking(List<String> rankings) {
-        sendMessage(new RankingMsg(rankings));
+    public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+        sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives));
     }
 }

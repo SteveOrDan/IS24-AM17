@@ -1,6 +1,7 @@
 package com.example.pf_soft_ing.network.messages.answers;
 
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.messages.Message;
 
 import java.util.Map;
@@ -10,7 +11,9 @@ public class FirstPlayerTurnMsg extends Message {
     private final int lastPlayerID;
     private final int playerID;
 
-    private final Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea;
+    private final int[] playerIDs;
+    private final int[] starterCardIDs;
+    private final CardSideType[] starterCardSides;
 
     private final int resDeckCardID;
     private final int visibleResCardID1;
@@ -20,12 +23,15 @@ public class FirstPlayerTurnMsg extends Message {
     private final int visibleGoldCardID1;
     private final int visibleGoldCardID2;
 
-    public FirstPlayerTurnMsg(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+    public FirstPlayerTurnMsg(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2){
         this.lastPlayerID = lastPlayerID;
         this.playerID = playerID;
-        this.IDtoOpponentPlayArea = IDtoOpponentPlayArea;
+
+        this.playerIDs = playerIDs;
+        this.starterCardIDs = starterCardIDs;
+        this.starterCardSides = starterCardSides;
 
         this.resDeckCardID = resDeckCardID;
         this.visibleResCardID1 = visibleResCardID1;
@@ -44,8 +50,16 @@ public class FirstPlayerTurnMsg extends Message {
         return playerID;
     }
 
-    public Map<Integer, Map<Position, Integer>> getIDtoOpponentPlayArea() {
-        return IDtoOpponentPlayArea;
+    public int[] getPlayerIDs() {
+        return playerIDs;
+    }
+
+    public int[] getStarterCardIDs() {
+        return starterCardIDs;
+    }
+
+    public CardSideType[] getStarterCardSides() {
+        return starterCardSides;
     }
 
     public int getResDeckCardID() {

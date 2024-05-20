@@ -33,7 +33,7 @@ public interface Sender {
 
     void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score);
 
-    void sendFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea,
+    void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
                              int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                              int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
@@ -51,5 +51,5 @@ public interface Sender {
 
     void sendChatMessage(String sender, String recipient, String message);
 
-    void sendRanking(List<String> rankings);
+    void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives);
 }

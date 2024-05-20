@@ -63,8 +63,7 @@ public class ClientSocketReceiver {
 
             case ErrorMessage castedMsg -> view.errorMessage(castedMsg.getMessage());
 
-            case GameStartMsg castedMsg -> view.startGame(
-                    castedMsg.getNickname(), castedMsg.getIDToNicknameMap(),
+            case GameStartMsg castedMsg -> view.startGame(castedMsg.getIDToNicknameMap(),
                     castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                     castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2(),
                     castedMsg.getStarterCardID()
@@ -83,7 +82,7 @@ public class ClientSocketReceiver {
                         castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
                         castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
                 );
-                view.showFirstPlayerTurn(castedMsg.getLastPlayerID(), castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
+                view.showFirstPlayerTurn(castedMsg.getLastPlayerID(), castedMsg.getPlayerID(), castedMsg.getPlayerIDs(), castedMsg.getStarterCardIDs(), castedMsg.getStarterCardSides());
             }
 
             case ConfirmPlaceCardMsg castedMsg -> view.placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getScore()) ;
@@ -106,7 +105,7 @@ public class ClientSocketReceiver {
 
             case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());
 
-            case RankingMsg castedMsg -> view.showRanking(castedMsg.getRankings());
+            case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
 
             case null, default -> System.out.println("Invalid message type");
         }
