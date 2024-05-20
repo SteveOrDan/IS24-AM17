@@ -139,7 +139,14 @@ public class TUIView implements View {
 
             if (legalCommands.contains(command)) {
                 switch (command) {
-                    case "rml" -> sender.getMatches(); // RefreshMatchesList
+                    case "rml" -> { // RefreshMatchesList
+                        if (parts.length != 1) {
+                            System.out.println("Error: RefreshMatchesList does not take any arguments. Please, try again");
+                            break;
+                        }
+
+                        sender.getMatches();
+                    }
 
                     case "cm" -> { // CreateMatch
                         if (parts.length != 3) {
@@ -386,6 +393,8 @@ public class TUIView implements View {
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
+        createInvalidCardLines();
+
         System.out.println("Game started.");
 
         playerNickname = nickname;
@@ -411,6 +420,17 @@ public class TUIView implements View {
         // Print available commands
         System.out.println("To view the other side of the starter card, type: fsc \n" +
                 "To place the starter card on the current side, type: psc");
+    }
+
+    private void createInvalidCardLines() {
+        List<String> invalidCardLines = new ArrayList<>();
+
+        for (int i = 0; i < 7; i++) {
+            invalidCardLines.add("                         ");
+        }
+
+        cardIDToCardFrontTUILines.put(-1, invalidCardLines);
+        cardIDToCardBackTUILines.put(-1, invalidCardLines);
     }
 
     @Override
@@ -479,16 +499,15 @@ public class TUIView implements View {
 
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>> IDtoOpponentPlayArea) {
-        System.out.println("""
-                Now you can use the chat.
-                To send a message in the match chat, type: gmc <message>
-                To send a message in the private chat, type: chat <recipient nickname> <message>
-                To read the match chat, type: rmc
-                To read the private chat, type: rpc <opponent nickname>""");
-
         if (this.playerID == lastPlayerID) {
             confirmSecretObjective();
         }
+
+        System.out.println("""
+                Now you can use the chat.
+                To view the match chat, type: gmc
+                To send a message in the chat, type: chat <recipient nickname> <message>
+                    recipient nickname can be 'all' to send a message to all players.""");
 
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
@@ -582,7 +601,7 @@ public class TUIView implements View {
             System.out.println("""
                     While waiting you can flip a card in your hand by typing: fc <cardID>
                     To check your hand, type: gh
-                    To check opponents play area: opa <opponentNickname>""");
+                    To check opponents play area: opa <opponent nNickname>""");
         }
         else {
             if (playerID == newPlayerID) {
@@ -609,7 +628,7 @@ public class TUIView implements View {
                 System.out.println("It's " + playerNickname + "'s turn.\n" +
                         "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
                         "To check your hand, type: gh\n" +
-                        "To check opponents play area: opa <opponentNickname>");
+                        "To check opponents play area: opa <opponent nickname>");
             }
         }
     }
@@ -1778,16 +1797,16 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("rmc", "rpc", "chat", "gmc")));
+                new ArrayList<>(List.of("chat", "gmc")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat", "gmc")));
+                new ArrayList<>(List.of("fc", "gh", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat", "gmc")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat", "gmc")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc")));
     }
 
     @Override

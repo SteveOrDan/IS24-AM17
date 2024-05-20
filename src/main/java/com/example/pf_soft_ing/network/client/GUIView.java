@@ -40,6 +40,8 @@ public class GUIView implements View {
     private final PlayerViewModel player;
     private final List<PlayerViewModel> opponents = new ArrayList<>();
 
+    private final List<PlaceableCard> playerHand = new ArrayList<>();
+
     private final List<Shape> playersCircles = new ArrayList<>();
     private final List<Shape> playersRectangles = new ArrayList<>();
 
@@ -56,11 +58,13 @@ public class GUIView implements View {
     private boolean chatOpen = false;
     private AnchorPane chatPane;
 
+    private int selectedCardIndex;
+
     private PlaceableCard selectedCard;
     private Position cardPlacePosition;
 
-    private double placedCardXPosInHand;
-    private double placedCardYPosInHand;
+    private int placedCardIndexInHand;
+
     private double selectedCardX;
     private double selectedCardY;
     private Pane selectedCardPane;
@@ -78,6 +82,8 @@ public class GUIView implements View {
     private Pane commonGoldDeckCardPane;
     private Pane commonVisibleGoldCard1Pane;
     private Pane commonVisibleGoldCard2Pane;
+
+    private Label currPlayerTurnLabel;
 
     private boolean pressingCtrl = false;
     private double zoomLevel = 1;
@@ -297,11 +303,16 @@ public class GUIView implements View {
         addMatchButton.setPrefSize(200, 50);
         addMatchButton.setLayoutX((stageWidth - 200) * 0.5);
         addMatchButton.setLayoutY(stageHeight - 100);
+        addMatchButton.setOnAction((_) -> openCreateMatchWindow());
 
-        addMatchButton.setOnAction((_) -> { // event
-            openCreateMatchWindow();
-        });
+        // Create button to refresh matches
+        Button refreshButton = new Button("Refresh");
+        refreshButton.setPrefSize(200, 50);
+        refreshButton.setLayoutX(200);
+        refreshButton.setLayoutY(stageHeight - 100);
+        refreshButton.setOnAction((_) -> sender.getMatches());
 
+        mainMenu.getChildren().add(refreshButton);
         mainMenu.getChildren().add(addMatchButton);
 
         root.getChildren().add(mainMenu);
@@ -508,20 +519,20 @@ public class GUIView implements View {
         gridColumns = (int) Math.floor(Math.ceil(playerFieldRectWidth / gridCellWidth) / 2) * 2 + 1;
 
         // Calculate total grid dimensions
-        gridWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
-        gridHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
+        gridWidth = gridCellWidth * gridColumns + cardCornerWidthProportion * cardWidth;
+        gridHeight = gridCellHeight * gridRows + cardCornerHeightProportion * cardHeight;
 
         // region Player field
         // Create scroll pane for player field
         ScrollPane playerFieldScroll = new ScrollPane();
         playerFieldScroll.setPrefSize(playerFieldRectWidth, playerFieldRectHeight);
         playerFieldScroll.setPannable(true);
-        playerFieldScroll.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
+        playerFieldScroll.setLayoutX(commonAreaWidth);
         playerFieldScroll.setLayoutY(0);
 
         // Create player field anchor pane
-        double playerFieldWidth = gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
-        double playerFieldHeight = gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
+        double playerFieldWidth = gridCellWidth * gridColumns + 3 * cardCornerWidthProportion * cardWidth; // gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
+        double playerFieldHeight = gridCellHeight * gridRows + 3 * cardCornerHeightProportion * cardHeight; // gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
 
         playerField = new AnchorPane();
         playerField.setPrefSize(playerFieldWidth, playerFieldHeight);
@@ -531,8 +542,8 @@ public class GUIView implements View {
         // Create grid for player field
         playerFieldGrid = new GridPane();
         playerFieldGrid.setPrefSize(gridWidth, gridHeight);
-        playerFieldGrid.setLayoutX(cardCornerWidthProportion * cardWidth);
-        playerFieldGrid.setLayoutY(cardCornerHeightProportion * cardHeight);
+        playerFieldGrid.setLayoutX(2 * cardCornerWidthProportion * cardWidth);
+        playerFieldGrid.setLayoutY(2 * cardCornerHeightProportion * cardHeight);
 
         playerFieldGrid.getColumnConstraints().add(new ColumnConstraints(gridCellWidth));
         playerFieldGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
@@ -581,6 +592,14 @@ public class GUIView implements View {
         commonAreaPane.setPrefSize(commonAreaWidth, stageHeight);
         commonAreaPane.setLayoutX(0);
         commonAreaPane.setLayoutY(0);
+
+        // Create label for current player's turn
+        currPlayerTurnLabel = new Label("Current player: None");
+        currPlayerTurnLabel.setPrefSize(commonAreaWidth, 50);
+        currPlayerTurnLabel.setLayoutX(50);
+        currPlayerTurnLabel.setLayoutY(0);
+
+        commonAreaPane.getChildren().add(currPlayerTurnLabel);
 
         // Create chat area
         Button openChatButton = new Button(">");
@@ -812,7 +831,6 @@ public class GUIView implements View {
 
     private void renderCommonCards(int resDeckCardID, int resVisibleCard1ID, int resVisibleCard2ID,
                                    int goldDeckCardID, int goldVisibleCard1ID, int goldVisibleCard2ID){
-        System.out.println("Common card IDs: " + resDeckCardID + " " + resVisibleCard1ID + " " + resVisibleCard2ID + " " + goldDeckCardID + " " + goldVisibleCard1ID + " " + goldVisibleCard2ID);
         double resourceCardsY = stageHeight - (2 * cardHeight) - 2 * defaultElementsOffset;
         double goldenCardsY = stageHeight - cardHeight - defaultElementsOffset;
 
@@ -1026,7 +1044,6 @@ public class GUIView implements View {
         placeButton.setLayoutY(-cardHeight * cardCornerHeightProportion);
         placeButton.setOpacity(0.6);
         placeButton.setOnAction((_) -> {
-            cardPlacePosition = pos;
             sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos);
         });
 
@@ -1109,12 +1126,11 @@ public class GUIView implements View {
             updateGridDimension();
         }
 
-        // Update last placed card position in hand
-        placedCardXPosInHand = selectedCardX;
-        placedCardYPosInHand = selectedCardY;
+        cardPlacePosition = pos;
+        placedCardIndexInHand = selectedCardIndex;
 
         // Remove card from hand
-        player.getPlayerHand().remove(card);
+        playerHand.remove(card);
         playerHandPane.getChildren().remove(selectedCardPane);
 
         // Create Image
@@ -1150,6 +1166,11 @@ public class GUIView implements View {
 
         // Add card to the grid
         playerFieldGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+
+        // playerFieldRectWidth, playerFieldRectHeight
+        // TODO: Check how it works
+//        playerField.setLayoutX((playerFieldRectWidth - playerField.getPrefWidth()) / 2);
+//        playerField.setLayoutY((playerFieldRectHeight - playerField.getPrefHeight()) / 2);
     }
 
     private void updateGridDimension(){
@@ -1182,11 +1203,11 @@ public class GUIView implements View {
     private void drawCard(int drawnCardID) {
         PlaceableCard drawnCard = GameResources.getPlaceableCardByID(drawnCardID);
 
-        player.getPlayerHand().add(drawnCard);
+        playerHand.add(drawnCard);
 
-        Pane cardPane = createCardPane(drawnCardID, CardSideType.FRONT, placedCardXPosInHand, placedCardYPosInHand, 1);
+        Pane cardPane = createCardInHandPane(drawnCard, placedCardIndexInHand);
 
-        addSelectButtonToCard(cardPane, drawnCard);
+        addSelectButtonToCard(cardPane, drawnCard, placedCardIndexInHand);
 
         playerHandPane.getChildren().add(cardPane);
     }
@@ -1196,24 +1217,22 @@ public class GUIView implements View {
         PlaceableCard card2 = GameResources.getPlaceableCardByID(card2ID);
         PlaceableCard card3 = GameResources.getPlaceableCardByID(card3ID);
 
-        player.getPlayerHand().add(card1);
-        player.getPlayerHand().add(card2);
-        player.getPlayerHand().add(card3);
-
         double playerHandWidth = playerHandPane.getPrefWidth();
         double playerHandHeight = playerHandPane.getPrefHeight();
 
         // Create panes for each card
-        double cardsYPos = (playerHandHeight - cardHeight) * 0.5;
+        Pane card1Pane = createCardInHandPane(card1, 0);
+        Pane card2Pane = createCardInHandPane(card2, 1);
+        Pane card3Pane = createCardInHandPane(card3, 2);
 
-        Pane card1Pane = createCardPane(card1ID, CardSideType.FRONT, 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
-        Pane card2Pane = createCardPane(card2ID, CardSideType.FRONT, 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
-        Pane card3Pane = createCardPane(card3ID, CardSideType.FRONT, 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
+        playerHand.add(card1);
+        playerHand.add(card2);
+        playerHand.add(card3);
 
         // Add select buttons to cards
-        addSelectButtonToCard(card1Pane, card1);
-        addSelectButtonToCard(card2Pane, card2);
-        addSelectButtonToCard(card3Pane, card3);
+        addSelectButtonToCard(card1Pane, card1, 0);
+        addSelectButtonToCard(card2Pane, card2, 1);
+        addSelectButtonToCard(card3Pane, card3, 2);
 
         // Add rectangle to highlight player color
         Rectangle plRect = new Rectangle();
@@ -1233,7 +1252,54 @@ public class GUIView implements View {
         playerHandPane.getChildren().add(card3Pane);
     }
 
-    private void addSelectButtonToCard(Pane cardPane, PlaceableCard card){
+    private Pane createCardInHandPane(PlaceableCard card, int index) {
+        double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
+
+        // Create Pane for card
+        Pane cardPane = new Pane();
+
+        cardPane.setPrefSize(cardWidth, cardHeight);
+        cardPane.setLayoutX((index + 2) * defaultElementsOffset + (index + 1) * cardWidth);
+        cardPane.setLayoutY(cardsYPos);
+
+        // Create Image
+        String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
+
+        Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
+        ImageView cardImgV = new ImageView(cardImg);
+
+        cardImgV.setFitHeight(cardHeight);
+        cardImgV.setFitWidth(cardWidth);
+
+        cardImgV.setX(0);
+        cardImgV.setY(0);
+
+        cardPane.getChildren().add(cardImgV);
+
+        // Create buttons to flip card
+        Button flipButton = new Button("Flip");
+        flipButton.setPrefSize(100, 50);
+        flipButton.setLayoutX((cardWidth - 100) / 2);
+        flipButton.setLayoutY(cardHeight + 10);
+        flipButton.setOnAction((_) -> flipCard(card, cardImgV));
+
+        cardPane.getChildren().add(flipButton);
+
+        return cardPane;
+    }
+
+    private void flipCard(PlaceableCard card, ImageView imageView) {
+        // Flip placeable card
+        card.setCurrSideType(card.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
+
+        // Change image view
+        String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
+
+        Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
+        imageView.setImage(cardImg);
+    }
+
+    private void addSelectButtonToCard(Pane cardPane, PlaceableCard card, int index){
         Button selectButton = new Button();
         selectButton.setPrefSize(cardPane.getPrefWidth(), cardPane.getPrefHeight());
         selectButton.setLayoutX(0);
@@ -1245,6 +1311,7 @@ public class GUIView implements View {
                 if (selectedCardPane != null){
                     selectedCardPane.setLayoutY(selectedCardPane.getLayoutY() + selectedCardOffset);
                 }
+                selectedCardIndex = index;
                 selectedCard = card;
                 selectedCardX = cardPane.getLayoutX();
                 selectedCardY = cardPane.getLayoutY();
@@ -1408,8 +1475,14 @@ public class GUIView implements View {
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
-        Platform.runLater(() -> drawGameStart(nickname, IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
-                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
+        Platform.runLater(() -> {
+            drawGameStart(nickname, IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
+                    goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
+
+            // Add events for zooming
+            stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
+            stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
+        });
 
 //        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
 //            root.getChildren().clear();
@@ -1419,10 +1492,6 @@ public class GUIView implements View {
 //            root.getChildren().clear();
 //            updateWindow();
 //        });
-
-        // Add events for zooming
-        stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
-        stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
     }
 
     @Override
@@ -1478,6 +1547,8 @@ public class GUIView implements View {
             else {
                 showSystemMessage("It's " + nickname + "'s turn!");
             }
+
+            currPlayerTurnLabel.setText("Current player: " + nickname);
         });
     }
 
@@ -1489,10 +1560,11 @@ public class GUIView implements View {
     @Override
     public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
         Platform.runLater(() -> {
+            String nickname = getPlayerNickname(newPlayerID);
+
             if (player.getPlayerID() == lastPlayerID){
                 drawCard(drawnCardID);
 
-                String nickname = getPlayerNickname(newPlayerID);
                 showSystemMessage("It's " + nickname + "'s turn!");
             }
             else {
@@ -1500,10 +1572,11 @@ public class GUIView implements View {
                     showSystemMessage("It's your turn!");
                 }
                 else {
-                    String nickname = getPlayerNickname(newPlayerID);
                     showSystemMessage("It's " + nickname + "'s turn!");
                 }
             }
+
+            currPlayerTurnLabel.setText("Current player: " + nickname);
         });
     }
 

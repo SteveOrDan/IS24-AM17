@@ -17,7 +17,7 @@ public class PlayerViewModel {
     private String nickname;
     private TokenColors tokenColor;
 
-    private final List<PlaceableCard> playerHand = new ArrayList<>();
+
 
     private final Map<Position, PlaceableCard> playArea = new HashMap<>();
 
@@ -35,10 +35,6 @@ public class PlayerViewModel {
 
     public TokenColors getTokenColor() {
         return tokenColor;
-    }
-
-    public List<PlaceableCard> getPlayerHand() {
-        return playerHand;
     }
 
     public Map<Position, PlaceableCard> getPlayArea() {
