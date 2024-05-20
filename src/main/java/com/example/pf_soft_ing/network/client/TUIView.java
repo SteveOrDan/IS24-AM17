@@ -39,8 +39,8 @@ public class TUIView implements View {
 
     private PlaceableCard starterCard;
 
-    private int secretObjectiveCardID0;
     private int secretObjectiveCardID1;
+    private int secretObjectiveCardID2;
 
     private int secretObjectiveCardID;
 
@@ -204,12 +204,12 @@ public class TUIView implements View {
 
                         try {
                             int choice = Integer.parseInt(parts[1]);
-                            if (choice != 0 && choice != 1) {
-                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
+                            if (choice != 1 && choice != 2) {
+                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
                                 break;
                             }
 
-                            secretObjectiveCardID = choice == 0 ? secretObjectiveCardID0 : secretObjectiveCardID1;
+                            secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
 
                             sender.chooseSecretObjective(secretObjectiveCardID);
                         }
@@ -310,10 +310,6 @@ public class TUIView implements View {
                     case "opa" -> { // PrintOpponentPlayArea
                         if (parts.length != 2) {
                             System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
-                            break;
-                        }
-                        if (parts[1].equals(playerNickname)) {
-                            System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
                             break;
                         }
                         printOpponentPlayArea(parts[1]);
@@ -464,7 +460,7 @@ public class TUIView implements View {
     public void confirmSecretObjective() {
         playerState = PlayerState.COMPLETED_SETUP;
 
-        int otherSecretObjectiveCardID = secretObjectiveCardID == secretObjectiveCardID0 ? secretObjectiveCardID1 : secretObjectiveCardID0;
+        int otherSecretObjectiveCardID = secretObjectiveCardID == secretObjectiveCardID1 ? secretObjectiveCardID2 : secretObjectiveCardID1;
 
         cardIDToCardFrontTUILines.remove(otherSecretObjectiveCardID);
 
@@ -501,12 +497,6 @@ public class TUIView implements View {
 
         if (this.playerID == lastPlayerID) {
             confirmSecretObjective();
-        }
-
-        for (Integer opponentID : IDtoOpponentPlayArea.keySet()){
-            for (Position pos : IDtoOpponentPlayArea.get(opponentID).keySet()){
-                IDtoOpponentPlayerArea.get(opponentID).put(pos, GameResources.getPlaceableCardByID(IDtoOpponentPlayArea.get(opponentID).get(pos)));
-            }
         }
 
         if (playerID == this.playerID) {
@@ -598,10 +588,7 @@ public class TUIView implements View {
             for (String s : cardIDToCardFrontTUILines.get(drawnCardID)) {
                 System.out.println(s);
             }
-            System.out.println("It's " + playerNickname + "'s turn.\n" +
-                    "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
-                    "To check your hand, type: gh\n" +
-                    "To check opponents play area: opa <opponentNickname>");
+            System.out.println("It's " + playerNickname + "'s turn.");
         }
         else {
             if (playerID == newPlayerID) {
@@ -825,16 +812,16 @@ public class TUIView implements View {
     }
 
     private void setSecretObjectives(int secretObjectiveCardID1, int secretObjectiveCardID2) {
-        this.secretObjectiveCardID0 = secretObjectiveCardID1;
-        this.secretObjectiveCardID1 = secretObjectiveCardID2;
+        this.secretObjectiveCardID1 = secretObjectiveCardID1;
+        this.secretObjectiveCardID2 = secretObjectiveCardID2;
 
         createObjectiveCardLines(secretObjectiveCardID1);
         createObjectiveCardLines(secretObjectiveCardID2);
     }
 
     private void printSecretObjectiveChoice() {
-        List<String> secretObjectiveCard1Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID0);
-        List<String> secretObjectiveCard2Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID1);
+        List<String> secretObjectiveCard1Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID1);
+        List<String> secretObjectiveCard2Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID2);
 
         System.out.println("Secret objectives:");
 
@@ -842,7 +829,7 @@ public class TUIView implements View {
             System.out.println(secretObjectiveCard1Front.get(i) + "   " + secretObjectiveCard2Front.get(i));
         }
 
-        System.out.println("To choose one of the secret objectives, type: cso <0 or 1>.");
+        System.out.println("To choose one of the secret objectives, type: cso <1 or 2>.");
     }
 
     private String[][] createPlayerArr(Map<Position, PlaceableCard> playArea) {
@@ -1782,7 +1769,7 @@ public class TUIView implements View {
 
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
-                new ArrayList<>(Arrays.asList("cm", "sm", "rml")));
+                new ArrayList<>(Arrays.asList("cm", "sm")));
 
         stateToCommands.put(PlayerState.MATCH_LOBBY,
                 new ArrayList<>());
@@ -1797,16 +1784,16 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("rmc", "rpc", "chat", "gmc", "opa")));
+                new ArrayList<>(List.of("rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat", "gmc", "opa")));
+                new ArrayList<>(List.of("fc", "gh", "rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat", "gmc", "opa")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "rmc", "rpc", "chat", "gmc")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat", "gmc", "opa")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "rmc", "rpc", "chat", "gmc")));
     }
 
     @Override
