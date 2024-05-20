@@ -42,8 +42,6 @@ public interface ClientRMIInterface extends Remote {
                           int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
 
-    void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException;
-
     void showRanking(List<String> rankings) throws RemoteException;
 
     void confirmSecretObjective() throws RemoteException;

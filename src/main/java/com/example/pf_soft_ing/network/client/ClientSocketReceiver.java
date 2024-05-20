@@ -86,7 +86,7 @@ public class ClientSocketReceiver {
                 view.showFirstPlayerTurn(castedMsg.getLastPlayerID(), castedMsg.getPlayerID(), castedMsg.getIDtoOpponentPlayArea());
             }
 
-            case ConfirmPlaceCardMsg ignored -> view.placeCard();
+            case ConfirmPlaceCardMsg castedMsg -> view.placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
 
             case NewPlayerTurnMsg castedMsg -> {
                 view.updateDrawArea(

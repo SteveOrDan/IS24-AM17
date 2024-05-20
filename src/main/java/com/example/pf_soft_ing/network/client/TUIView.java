@@ -312,6 +312,11 @@ public class TUIView implements View {
                             System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
                             break;
                         }
+                        if (parts[1].equals(playerNickname)) {
+                            System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
+                            break;
+                        }
+
                         printOpponentPlayArea(parts[1]);
                 }
                 case "chat" -> { // Write a message in the chat
@@ -353,6 +358,7 @@ public class TUIView implements View {
         if (matches.isEmpty()) {
             System.out.println("No matches available.");
             System.out.println("To create a new match, type: cm <players_num> <nickname>");
+            System.out.println("To refresh the matches list, type: rml");
             return;
         }
 
@@ -363,6 +369,7 @@ public class TUIView implements View {
         }
         System.out.println("To create a new match, type: cm <players_num> <nickname>");
         System.out.println("To join a match, type: sm <matchID>");
+        System.out.println("To refresh the matches list, type: rml");
     }
 
     @Override
@@ -503,6 +510,12 @@ public class TUIView implements View {
             confirmSecretObjective();
         }
 
+        for (Integer opponentID : IDtoOpponentPlayArea.keySet()){
+            for (Position pos : IDtoOpponentPlayArea.get(opponentID).keySet()) {
+                IDtoOpponentPlayerArea.get(opponentID).put(pos, GameResources.getPlaceableCardByID(IDtoOpponentPlayArea.get(opponentID).get(pos)));
+            }
+        }
+
         System.out.println("""
                 Now you can use the chat.
                 To view the match chat, type: gmc
@@ -537,46 +550,46 @@ public class TUIView implements View {
     }
 
     @Override
-    public void placeCard() {
-        playerState = PlayerState.DRAWING;
+    public void placeCard(int playerID, int cardID, Position pos, CardSideType side) {
+        if (this.playerID == playerID) {
+            playerState = PlayerState.DRAWING;
 
-        placingCard.setPriority(priority);
-        priority++;
+            placingCard.setPriority(priority);
+            priority++;
 
-        // Add card to play area
-        playArea.put(placingCardPos, placingCard);
+            // Add card to play area
+            playArea.put(placingCardPos, placingCard);
 
-        // Update legal and illegal positions
-        updatePlacementPositions(placingCardPos);
+            // Update legal and illegal positions
+            updatePlacementPositions(placingCardPos);
 
-        // Remove card from player hand
-        for (PlaceableCard card : playerHand) {
-            if (card.getID() == placingCard.getID()) {
-                playerHand.remove(card);
-                break;
+            // Remove card from player hand
+            for (PlaceableCard card : playerHand) {
+                if (card.getID() == placingCard.getID()) {
+                    playerHand.remove(card);
+                    break;
+                }
             }
-        }
 
-        // Print play area
-        printPlayArea();
+            // Print play area
+            printPlayArea();
 
-        // Print draw area
-        printDrawArea();
+            // Print draw area
+            printDrawArea();
 
-        // Print available commands
-        System.out.println("""
+            // Print available commands
+            System.out.println("""
                 To draw from resource deck, type: ddr
                 To draw a visible resource card, type: dvr <0 or 1>
                 To draw from gold deck, type: ddg
                 To draw a visible gold card, type: dvg <0 or 1>""");
-    }
+        }
+        else {
+            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
+            opponentCard.setCurrSideType(side);
 
-    @Override
-    public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
-        PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
-        opponentCard.setCurrSideType(side);
-
-        IDtoOpponentPlayerArea.get(playerId).put(pos, opponentCard);
+            IDtoOpponentPlayerArea.get(playerID).put(pos, opponentCard);
+        }
     }
 
     @Override
@@ -601,7 +614,7 @@ public class TUIView implements View {
             System.out.println("""
                     While waiting you can flip a card in your hand by typing: fc <cardID>
                     To check your hand, type: gh
-                    To check opponents play area: opa <opponent nNickname>""");
+                    To check opponents play area: opa <opponent Nickname>""");
         }
         else {
             if (playerID == newPlayerID) {
@@ -1797,16 +1810,16 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("chat", "gmc")));
+                new ArrayList<>(List.of("chat", "gmc", "opa")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "chat", "gmc")));
+                new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "opa")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "opa")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "opa")));
     }
 
     @Override

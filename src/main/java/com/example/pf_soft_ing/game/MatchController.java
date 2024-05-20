@@ -304,7 +304,7 @@ public class MatchController {
                 }
             }
             else {
-                getPlayerSender(playerID).placeCard(playerID, cardID, pos, chosenSide);
+                broadcastPlaceCard(playerID, cardID, pos, chosenSide);
             }
         }
         catch (Exception e) {
@@ -675,6 +675,19 @@ public class MatchController {
     private void broadcastNewPlayerExtraTurn(int playerID, int cardID, Position pos, CardSideType side) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
             getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID());
+        }
+    }
+
+    /**
+     * Broadcast the player's placed card
+     * @param playerID ID of the player that placed the card
+     * @param cardID ID of the placed card
+     * @param pos Position of the placed card
+     * @param side Side of the placed card
+     */
+    private void broadcastPlaceCard(int playerID, int cardID, Position pos, CardSideType side) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            getPlayerSender(broadcastID).placeCard(playerID, cardID, pos, side);
         }
     }
 

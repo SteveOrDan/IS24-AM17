@@ -35,8 +35,6 @@ public interface View {
 
     void showFirstPlayerTurn(int lastPlayerID, int playerID, Map<Integer, Map<Position, Integer>>IDtoOpponentPlayArea);
 
-    void placeCard();
-
     void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID);
 
     void updateDrawArea(int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
@@ -44,7 +42,7 @@ public interface View {
 
     void setID(int playerID);
 
-    void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side);
+    void placeCard(int playerId, int cardID, Position pos, CardSideType side);
 
     void receiveChatMessage(String senderNickname, String recipientNickname, String message);
 

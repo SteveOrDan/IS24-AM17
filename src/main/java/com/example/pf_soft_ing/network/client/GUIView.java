@@ -1553,8 +1553,13 @@ public class GUIView implements View {
     }
 
     @Override
-    public void placeCard() {
-        Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
+    public void placeCard(int playerId, int cardID, Position pos, CardSideType side) {
+        if (playerId == player.getPlayerID()){
+            Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
+        }
+        else {
+            //TODO: save opponent placed card
+        }
     }
 
     @Override
@@ -1667,11 +1672,6 @@ public class GUIView implements View {
     public void setID(int playerID) {
         sender.setPlayerID(playerID);
         player.setPlayerID(playerID);
-    }
-
-    @Override
-    public void opponentPlaceCard(int playerId, int cardID, Position pos, CardSideType side) {
-
     }
 
     @Override

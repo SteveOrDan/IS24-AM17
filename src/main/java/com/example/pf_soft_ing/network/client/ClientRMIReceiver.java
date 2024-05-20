@@ -36,7 +36,7 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
 
     @Override
     public void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException {
-        view.placeCard();
+        view.placeCard(playerID, cardID, pos, chosenSide);
     }
 
     @Override
@@ -88,11 +88,6 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
         view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
         view.showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID);
-    }
-
-    @Override
-    public void opponentPlaceCard(int playerID, int cardID, Position pos, CardSideType chosenSide) throws RemoteException {
-        view.opponentPlaceCard(playerID, cardID, pos, chosenSide);
     }
 
     @Override
