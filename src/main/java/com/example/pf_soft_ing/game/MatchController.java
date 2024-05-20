@@ -117,13 +117,13 @@ public class MatchController {
      * @param side Side of the starter card
      */
     public void placeStarterCardForPlayer(int playerID, CardSideType side){
-        getIDToPlayerMap().get(playerID).placeStarterCard(side);
-
         try {
             List<Integer> hand = fillPlayerHand(playerID); // return cards
             TokenColors color = setPlayerToken(playerID); // ret token color
             List<Integer> commonObjectives = getCommonObjectivesID(); // ret common objectives
             List<Integer> objToChoose = setObjectivesToChoose(playerID); // ret secret objectives
+
+            getIDToPlayerMap().get(playerID).placeStarterCard(side);
 
             getPlayerSender(playerID).sendMissingSetup(hand.getFirst(), hand.get(1), hand.get(2), color, commonObjectives.getFirst(), commonObjectives.get(1), objToChoose.getFirst(), objToChoose.get(1));
         }

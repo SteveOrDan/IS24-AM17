@@ -1729,13 +1729,13 @@ public class TUIView implements View {
         List<String> lines = new ArrayList<>();
 
         if (card.getID() >= 94 && card.getID() <= 97) {
-            String color = card.getResourceType().getBgColor();
+            String r = card.getResourceType().getColor() + card.getResourceType() + CC.RESET;
 
             lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
             lines.add("┃               " + card.getPoints() + "       ┃");
             lines.add("┃                       ┃");
-            lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
-            lines.add("┃           " + color + "   " + CC.RESET + "   " + color + "   " + CC.RESET + "   ┃");
+            lines.add("┃               " + r + "       ┃");
+            lines.add("┃            " + r + "     " + r + "    ┃");
             lines.add("┃                       ┃");
             lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
         }

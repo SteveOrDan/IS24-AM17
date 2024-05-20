@@ -252,7 +252,9 @@ public class PlayerModel {
             return;
         }
 
-        for (ResourceType resource : starterCard.getResources(starterCard.getSideFromType(chosenSide))){
+        starterCard.setCurrSideType(chosenSide);
+
+        for (ResourceType resource : starterCard.getResources(starterCard.getCurrSide())){
             numOfResourcesArr[resource.getValue()]++;
         }
 
@@ -260,11 +262,7 @@ public class PlayerModel {
 
         currMaxPriority++;
 
-        starterCard.setCurrSideType(chosenSide);
-
         playArea.put(new Position(0,0), starterCard);
-
-//        sender.placeStarterCard(true);
     }
 
     /**
@@ -397,14 +395,6 @@ public class PlayerModel {
      * @param card Card to add to the player's hand
      */
     public void drawCard(PlaceableCard card){
-//        if (card != null && hand.size() < 3){
-//
-//        }
         hand.add(card);
-//        sender.addCardToPlayerHand(card);
     }
-
-//    public void requestError(){
-//        sender.sendError();
-//    }
 }

@@ -8,6 +8,7 @@ import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -37,11 +38,19 @@ public class GUIView implements View {
 
     private final Map<Position, Pane> validPosToButtonPane = new HashMap<>();
 
-    private int matchID;
-    private final PlayerViewModel player;
     private final List<PlayerViewModel> opponents = new ArrayList<>();
+    private int matchID;
+
+    private int playerID;
+    private String nickname;
+    private TokenColors tokenColor;
+    private int score = 0;
+
+    private int priority = 0;
 
     private final List<PlaceableCard> playerHand = new ArrayList<>();
+
+    private final Map<Position, PlaceableCard> playArea = new HashMap<>();
 
     private final List<Shape> playersCircles = new ArrayList<>();
     private final List<Shape> playersRectangles = new ArrayList<>();
@@ -66,8 +75,6 @@ public class GUIView implements View {
 
     private int placedCardIndexInHand;
 
-    private double selectedCardX;
-    private double selectedCardY;
     private Pane selectedCardPane;
 
     private int commonResDeckCardID;
@@ -127,6 +134,7 @@ public class GUIView implements View {
     private AnchorPane playerHandPane;
     private AnchorPane tempChoicePane;
     private AnchorPane commonAreaPane;
+    private AnchorPane helpPane;
 
     private final String ip;
     private ClientSender sender;
@@ -136,7 +144,6 @@ public class GUIView implements View {
     public GUIView(Stage stage, String ip) {
         this.stage = stage;
         this.ip = ip;
-        player = new PlayerViewModel();
 
         launchApp();
     }
@@ -477,7 +484,7 @@ public class GUIView implements View {
         root.getChildren().clear();
 
         for (Map.Entry<Integer, String> entry : IDToNicknameMap.entrySet()){
-            if (entry.getKey() != player.getPlayerID()){
+            if (entry.getKey() != playerID){
                 PlayerViewModel opponent = new PlayerViewModel();
                 opponent.setPlayerID(entry.getKey());
                 opponent.setNickname(entry.getValue());
@@ -485,7 +492,7 @@ public class GUIView implements View {
                 opponents.add(opponent);
             }
             else {
-                player.setNickname(entry.getValue());
+                nickname = entry.getValue();
             }
         }
 
@@ -611,10 +618,14 @@ public class GUIView implements View {
 
         commonAreaPane.getChildren().add(openChatButton);
 
+        // Create chat pane
         createChatPane();
 
         // Create other player's section
         createOtherPlayerSection();
+
+        // Create help button
+        createHelpSection();
 
         root.getChildren().add(commonAreaPane);
         // endregion
@@ -622,11 +633,11 @@ public class GUIView implements View {
 
     private void createOtherPlayerSection() {
         AnchorPane playersSection = new AnchorPane();
-        playersSection.setPrefSize(commonAreaWidth, stageHeight);
+        playersSection.setPrefSize(commonAreaWidth - 100, stageHeight);
         playersSection.setLayoutX(50);
         playersSection.setLayoutY(0);
 
-        Pane yourPlayerPane = createPlayerLabel(player.getNickname(), 1);
+        Pane yourPlayerPane = createPlayerLabel(nickname, 1);
         playersSection.getChildren().add(yourPlayerPane);
 
         int i = 2;
@@ -680,6 +691,85 @@ public class GUIView implements View {
         playerPane.getChildren().add(playerAreaButton);
 
         return playerPane;
+    }
+
+    private void createHelpSection() {
+        helpPane = new AnchorPane();
+        helpPane.setPrefSize(stageWidth, stageHeight);
+        helpPane.setLayoutX(0);
+        helpPane.setLayoutY(0);
+
+        // Black background
+        Rectangle backgroundRect = new Rectangle();
+        backgroundRect.setWidth(stageWidth);
+        backgroundRect.setHeight(stageHeight);
+        backgroundRect.setFill(Color.rgb(0, 0, 0, 0.3));
+
+        // White foreground
+        AnchorPane helpBackground = new AnchorPane();
+        helpBackground.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
+        helpBackground.setLayoutX(stageWidth * 0.25);
+        helpBackground.setLayoutY(stageHeight * 0.25);
+        helpBackground.setOpacity(0.9);
+
+        // Black background
+        Rectangle foregroundRect = new Rectangle();
+        foregroundRect.setWidth(stageWidth * 0.5);
+        foregroundRect.setHeight(stageHeight * 0.5);
+        foregroundRect.setFill(Color.rgb(255, 255, 255, 0.9));
+
+        // Create title label
+        Label helpLabel = new Label("Help");
+        helpLabel.setPrefSize(stageWidth * 0.5, 50);
+        helpLabel.setLayoutX(0);
+        helpLabel.setLayoutY(0);
+        helpLabel.setFont(new Font(Font.getDefault().getName(), 24));
+        helpLabel.setAlignment(Pos.CENTER);
+
+        // Create chat help label
+        Label chatHelpLabel = new Label("Chat: Type a message and press enter to send it to all players. " +
+                "Type /whisper <player> <message> to send a private message to a player.");
+        chatHelpLabel.setPrefSize(stageWidth * 0.5, 150);
+        chatHelpLabel.setLayoutX(0);
+        chatHelpLabel.setLayoutY(50);
+        chatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        chatHelpLabel.setWrapText(true);
+        chatHelpLabel.setAlignment(Pos.CENTER);
+
+        // Create zoom help label
+        Label zoomHelpLabel = new Label("Zoom: Hold the Ctrl key and press arrow key up or down to zoom in or out.");
+        zoomHelpLabel.setPrefSize(stageWidth * 0.5, 50);
+        zoomHelpLabel.setLayoutX(0);
+        zoomHelpLabel.setLayoutY(200);
+        zoomHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        zoomHelpLabel.setWrapText(true);
+        zoomHelpLabel.setAlignment(Pos.CENTER);
+
+        // Create close button
+        Button closeButton = new Button("X");
+        closeButton.setPrefSize(50, 50);
+        closeButton.setLayoutX(stageWidth - 100);
+        closeButton.setLayoutY(50);
+        closeButton.setOnAction((_) -> root.getChildren().remove(helpPane));
+
+        // Add to hierarchy
+        helpBackground.getChildren().add(foregroundRect);
+        helpBackground.getChildren().add(helpLabel);
+        helpBackground.getChildren().add(chatHelpLabel);
+        helpBackground.getChildren().add(zoomHelpLabel);
+
+        helpPane.getChildren().add(backgroundRect);
+        helpPane.getChildren().add(helpBackground);
+        helpPane.getChildren().add(closeButton);
+
+        // Create help button
+        Button helpButton = new Button("?");
+        helpButton.setPrefSize(50, 50);
+        helpButton.setLayoutX(commonAreaWidth - 50);
+        helpButton.setLayoutY(0);
+        helpButton.setOnAction((_) -> root.getChildren().add(helpPane));
+
+        commonAreaPane.getChildren().add(helpButton);
     }
 
     private void switchToPlayerField(String playerNickname) {
@@ -957,8 +1047,6 @@ public class GUIView implements View {
         drawButton.setOpacity(0.1);
 
         drawButton.setOnAction((_) -> {
-            int playerID = player.getPlayerID();
-
             if (isVisible){
                 if (isGolden){
                     sender.drawVisibleGoldenCard(playerID, cardIndex);
@@ -1021,16 +1109,16 @@ public class GUIView implements View {
         Position tlPos = new Position(pos.getX() - 1, pos.getY() + 1);
         Position trPos = new Position(pos.getX() + 1, pos.getY() + 1);
 
-        if (card.getFront().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
+        if (card.getCurrSide().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
             addPlaceButtonAtPos(blPos);
         }
-        if (card.getFront().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
+        if (card.getCurrSide().getBRCorner().isAvailable() && !illegalPosList.contains(brPos) && !validPosToButtonPane.containsKey(brPos)){
             addPlaceButtonAtPos(brPos);
         }
-        if (card.getFront().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
+        if (card.getCurrSide().getTLCorner().isAvailable() && !illegalPosList.contains(tlPos) && !validPosToButtonPane.containsKey(tlPos)){
             addPlaceButtonAtPos(tlPos);
         }
-        if (card.getFront().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
+        if (card.getCurrSide().getTRCorner().isAvailable() && !illegalPosList.contains(trPos) && !validPosToButtonPane.containsKey(trPos)){
             addPlaceButtonAtPos(trPos);
         }
     }
@@ -1045,6 +1133,7 @@ public class GUIView implements View {
         placeButton.setLayoutY(-cardHeight * cardCornerHeightProportion);
         placeButton.setOpacity(0.6);
         placeButton.setOnAction((_) -> {
+            System.out.println("Placing card at " + pos.getX() + " " + pos.getY());
             sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos);
         });
 
@@ -1054,11 +1143,11 @@ public class GUIView implements View {
         validPosToButtonPane.put(pos, positionPane);
     }
 
-    private void updateIlLegalPositions(Position pos){
+    private void updatePlacementPositions(Position pos){
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
 
-        PlaceableCard card = player.getPlayArea().get(pos);
+        PlaceableCard card = playArea.get(pos);
 
         Side currSide = card.getCurrSide();
 
@@ -1137,11 +1226,11 @@ public class GUIView implements View {
         // Create Image
         String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
 
-        if (!player.getPlayArea().containsKey(pos)){
-            player.getPlayArea().put(pos, card);
+        if (!playArea.containsKey(pos)){
+            playArea.put(pos, card);
         }
 
-        updateIlLegalPositions(pos);
+        updatePlacementPositions(pos);
 
         // Clear Pane in the grid position
         playerFieldGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == mapToGridPos(pos).getY() && GridPane.getColumnIndex(node) == mapToGridPos(pos).getX());
@@ -1196,8 +1285,8 @@ public class GUIView implements View {
         illegalPosList.clear();
         validPosToButtonPane.clear();
 
-        for (Position p : player.getPlayArea().keySet()){
-            placeCard(player.getPlayArea().get(p), p);
+        for (Position p : playArea.keySet()){
+            placeCard(playArea.get(p), p);
         }
     }
 
@@ -1314,8 +1403,6 @@ public class GUIView implements View {
                 }
                 selectedCardIndex = index;
                 selectedCard = card;
-                selectedCardX = cardPane.getLayoutX();
-                selectedCardY = cardPane.getLayoutY();
                 selectedCardPane = cardPane;
                 cardPane.setLayoutY(cardPane.getLayoutY() - selectedCardOffset);
             }
@@ -1533,13 +1620,13 @@ public class GUIView implements View {
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSideTypes) {
         Platform.runLater(() -> {
-            if (player.getPlayerID() == lastPlayerID){
+            if (this.playerID == lastPlayerID){
                 confirmSecretObjective();
             }
 
             String nickname = getPlayerNickname(playerID);
 
-            if (playerID == player.getPlayerID()){
+            if (this.playerID == playerID){
                 showSystemMessage("It's your turn!");
             }
             else {
@@ -1552,8 +1639,8 @@ public class GUIView implements View {
 
     @Override
     public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int deltaScore) {
-        if (playerId == player.getPlayerID()){
-            Platform.runLater(() -> placeCard(selectedCard, cardPlacePosition));
+        if (playerId == this.playerID){
+            Platform.runLater(() -> placeCard(selectedCard, pos));
         }
         else {
             //TODO: save opponent placed card
@@ -1565,13 +1652,13 @@ public class GUIView implements View {
         Platform.runLater(() -> {
             String nickname = getPlayerNickname(newPlayerID);
 
-            if (player.getPlayerID() == lastPlayerID){
+            if (playerID == lastPlayerID){
                 drawCard(drawnCardID);
 
                 showSystemMessage("It's " + nickname + "'s turn!");
             }
             else {
-                if (player.getPlayerID() == newPlayerID){
+                if (playerID == newPlayerID){
                     showSystemMessage("It's your turn!");
                 }
                 else {
@@ -1669,7 +1756,7 @@ public class GUIView implements View {
     @Override
     public void setID(int playerID) {
         sender.setPlayerID(playerID);
-        player.setPlayerID(playerID);
+        this.playerID = playerID;
     }
 
     @Override
@@ -1678,7 +1765,7 @@ public class GUIView implements View {
             String fullMessage;
             String actualSender = senderNickname;
 
-            if (actualSender.equals(player.getNickname())){
+            if (actualSender.equals(nickname)){
                 actualSender = "(You)";
             }
 
@@ -1711,6 +1798,99 @@ public class GUIView implements View {
 
     }
 
+    private void drawMatchRanking(String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+        // Create ranking window
+        AnchorPane rankingPane = new AnchorPane();
+        rankingPane.setPrefSize(stageWidth, stageHeight);
+        rankingPane.setLayoutX(0);
+        rankingPane.setLayoutY(0);
+
+        Rectangle backgroundRect = new Rectangle();
+        backgroundRect.setX(0);
+        backgroundRect.setY(0);
+        backgroundRect.setWidth(stageWidth);
+        backgroundRect.setHeight(stageHeight);
+        backgroundRect.setFill(Color.LIGHTGRAY);
+        backgroundRect.setStroke(Color.BLACK);
+
+        Rectangle rankingRect = new Rectangle();
+        rankingRect.setX(0);
+        rankingRect.setY(0);
+        rankingRect.setWidth(stageWidth * 0.8);
+        rankingRect.setHeight(stageHeight * 0.8);
+        rankingRect.setFill(Color.WHITE);
+        rankingRect.setStroke(Color.WHITE);
+
+        Label rankingLabel = new Label("Ranking");
+        rankingLabel.setPrefSize(stageWidth, 100);
+        rankingLabel.setLayoutX(0);
+        rankingLabel.setLayoutY(100);
+        rankingLabel.setFont(new Font(Font.getDefault().getName(), 32));
+        rankingLabel.setTextFill(Color.BLACK);
+        rankingLabel.setAlignment(Pos.CENTER);
+
+        rankingPane.getChildren().add(backgroundRect);
+        rankingPane.getChildren().add(rankingLabel);
+
+        for (int i = 0; i < nicknames.length; i++){
+            Label playerLabel = new Label(nicknames[i] + ": " + scores[i] + " points, " + numOfSecretObjectives[i] + " secret objectives completed");
+            playerLabel.setPrefSize(stageWidth, 50);
+            playerLabel.setLayoutX(0);
+            playerLabel.setLayoutY(200 + i * 50);
+            playerLabel.setFont(new Font(Font.getDefault().getName(), 24));
+            playerLabel.setTextFill(Color.BLACK);
+            playerLabel.setAlignment(Pos.CENTER);
+
+            rankingPane.getChildren().add(playerLabel);
+        }
+
+        // Create button to return to main menu
+        Button returnButton = new Button("Return to main menu");
+        returnButton.setPrefSize(200, 50);
+        returnButton.setLayoutX(stageWidth / 2 - 250);
+        returnButton.setLayoutY(stageHeight - 100);
+        returnButton.setOnAction((_) -> sender.getMatches());
+
+        rankingPane.getChildren().add(returnButton);
+
+        // Create button to watch players' maps
+        Button watchMapsButton = new Button("Watch players' maps");
+        watchMapsButton.setPrefSize(200, 50);
+        watchMapsButton.setLayoutX(stageWidth / 2 + 50);
+        watchMapsButton.setLayoutY(stageHeight - 100);
+        watchMapsButton.setOnAction((_) -> showEndgameMaps(opponents.size() + 1));
+
+        root.getChildren().add(rankingPane);
+    }
+
+    private void showEndgameMaps(int playersNum) {
+        if (playersNum == 2) {
+            renderPlayArea(playArea, tokenColor, 0, 0, stageWidth / 2, stageHeight);
+            renderPlayArea(opponents.getFirst().getPlayArea(), opponents.getFirst().getTokenColor(), stageWidth / 2, 0, stageWidth / 2, stageHeight);
+        }
+        else if (playersNum == 3) {
+            renderPlayArea(playArea, tokenColor, 0, 0, stageWidth / 2, stageHeight);
+            renderPlayArea(opponents.getFirst().getPlayArea(), opponents.getFirst().getTokenColor(), stageWidth / 2, 0, stageWidth / 2, stageHeight / 2);
+            renderPlayArea(opponents.get(1).getPlayArea(), opponents.get(1).getTokenColor(), stageWidth / 2, stageHeight / 2, stageWidth / 2, stageHeight / 2);
+        }
+        else if (playersNum == 4) {
+            renderPlayArea(playArea, tokenColor, 0, 0, stageWidth / 2, stageHeight / 2);
+            renderPlayArea(opponents.getFirst().getPlayArea(), opponents.getFirst().getTokenColor(), stageWidth / 2, 0, stageWidth / 2, stageHeight / 2);
+            renderPlayArea(opponents.get(1).getPlayArea(), opponents.get(1).getTokenColor(), 0, stageHeight / 2, stageWidth / 2, stageHeight / 2);
+            renderPlayArea(opponents.get(2).getPlayArea(), opponents.get(2).getTokenColor(), stageWidth / 2, stageHeight / 2, stageWidth / 2, stageHeight / 2);
+        }
+    }
+
+    private void renderPlayArea(Map<Position, PlaceableCard> playArea, TokenColors colors,
+                                double xPos, double yPos, double width, double height) {
+        // Create play area scroll pane
+        ScrollPane playAreaScrollPane = new ScrollPane();
+        playAreaScrollPane.setPrefSize(width, height);
+        playAreaScrollPane.setLayoutX(xPos);
+        playAreaScrollPane.setLayoutY(yPos);
+
+    }
+
     @Override
     public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState) {
 
@@ -1722,17 +1902,12 @@ public class GUIView implements View {
     }
 
     private String getPlayerNickname(int playerID){
-        if (player.getPlayerID() == playerID){
-            return player.getNickname();
-        }
-        else {
-            for (PlayerViewModel p : opponents){
-                if (p.getPlayerID() == playerID){
-                    return p.getNickname();
-                }
+        for (PlayerViewModel p : opponents){
+            if (p.getPlayerID() == playerID){
+                return p.getNickname();
             }
-
-            return null;
         }
+
+        return nickname;
     }
 }
