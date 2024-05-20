@@ -556,6 +556,9 @@ public class TUIView implements View {
 
     @Override
     public void placeCard(int playerID, int cardID, Position pos, CardSideType side, int score) {
+        // Update player score
+        IDtoPlayerScore.put(playerID, IDtoPlayerScore.get(playerID) + score);
+
         if (this.playerID == playerID) {
             playerState = PlayerState.DRAWING;
 
@@ -564,13 +567,6 @@ public class TUIView implements View {
 
             // Add card to play area
             playArea.put(placingCardPos, placingCard);
-
-            // Update player score
-            for (Integer playerId : IDtoPlayerScore.keySet()){
-                if (playerId == this.playerID){
-                    IDtoPlayerScore.put(playerId, IDtoPlayerScore.get(playerId) + score);
-                }
-            }
 
             // Update legal and illegal positions
             updatePlacementPositions(placingCardPos);
@@ -589,8 +585,8 @@ public class TUIView implements View {
             // Print draw area
             printDrawArea();
 
-            // Print player score
-            System.out.println("Your score: " + IDtoPlayerScore.get(this.playerID));
+            // Print player scored points
+            System.out.println("You scored " + score + " points");
 
             // Print available commands
             System.out.println(""" 
@@ -604,7 +600,9 @@ public class TUIView implements View {
             opponentCard.setCurrSideType(side);
 
             IDtoOpponentPlayerArea.get(playerID).put(pos, opponentCard);
-            System.out.println("Opponent " + IDToNicknameMap.get(playerID) + " actual score: " + score);
+
+            // Print opponent scored points
+            System.out.println("Opponent " + IDToNicknameMap.get(playerID) + " scored " + score + " points");
         }
     }
 
@@ -1833,10 +1831,10 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "gs", "opa")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "opa")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "gs", "opa")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "opa")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "gs", "opa")));
     }
 
     @Override
@@ -1892,6 +1890,8 @@ public class TUIView implements View {
 
     @Override
     public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) {
+        //Update last player score
+        IDtoPlayerScore.put(lastPlayerID, IDtoPlayerScore.get(lastPlayerID) + score);
         if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
 
@@ -1900,13 +1900,6 @@ public class TUIView implements View {
 
             // Add card to play area
             playArea.put(placingCardPos, placingCard);
-
-            //Update player score
-            for (Integer playerID : IDtoPlayerScore.keySet()){
-                if (playerID == lastPlayerID){
-                    IDtoPlayerScore.put(playerID, IDtoPlayerScore.get(lastPlayerID) + score);
-                }
-            }
 
             // Update legal and illegal positions
             updatePlacementPositions(placingCardPos);
@@ -1918,14 +1911,15 @@ public class TUIView implements View {
             printPlayArea();
 
             // Print player score
-            System.out.println("Your score: " + IDtoPlayerScore.get(playerID));
+            System.out.println("You scored " + score + " points");
         }
         else {
             // Add card to opponent's play area
             PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
             opponentCard.setCurrSideType(side);
 
-            System.out.println("Opponent " + IDToNicknameMap.get(playerID) + " actual score: " + score);
+            // Print opponent scored points
+            System.out.println("Opponent " + IDToNicknameMap.get(lastPlayerID) + " scored " + score + " points");
 
             IDtoOpponentPlayerArea.get(lastPlayerID).put(pos, opponentCard);
 

@@ -288,9 +288,13 @@ public class MatchController {
                 throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
             }
 
+            int oldScore = getIDToPlayerMap().get(playerID).getCurrScore();
+
             PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
 
             player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
+
+            int score = getIDToPlayerMap().get(playerID).getCurrScore() - oldScore;
 
             if (matchModel.getGameState() == GameState.EXTRA_ROUND){
                 endTurn();
@@ -300,12 +304,10 @@ public class MatchController {
                     broadcastRanking(matchModel.getRankings());
                 }
                 else {
-                    int score = getIDToPlayerMap().get(playerID).getCurrScore();
                     broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, score);
                 }
             }
             else {
-                int score = getIDToPlayerMap().get(playerID).getCurrScore();
                 broadcastPlaceCard(playerID, cardID, pos, chosenSide, score);
             }
         }
