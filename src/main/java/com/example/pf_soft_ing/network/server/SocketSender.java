@@ -132,7 +132,7 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
-        sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives));
+    public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side , int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+        sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives));
     }
 }

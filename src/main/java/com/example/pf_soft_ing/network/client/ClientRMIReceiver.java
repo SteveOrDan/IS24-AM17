@@ -91,8 +91,8 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives)throws RemoteException {
-        view.showRanking(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives);
+    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives)throws RemoteException {
+        view.showRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
     }
 
     @Override

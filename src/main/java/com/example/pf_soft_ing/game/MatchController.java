@@ -300,7 +300,7 @@ public class MatchController {
 
                 // Send new player 'extra' turn or ranking if game ended
                 if (matchModel.getGameState() == GameState.END_GAME){
-                    broadcastRanking(playerID, cardID, pos, chosenSide, matchModel.getNicknamesRanked(), matchModel.getScoresRanked(), matchModel.getNumOfCompletedObjectivesRanked());
+                    broadcastRanking(playerID, cardID, pos, chosenSide, deltaScore, matchModel.getNicknamesRanked(), matchModel.getScoresRanked(), matchModel.getNumOfCompletedObjectivesRanked());
                 }
                 else {
                     broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, deltaScore);
@@ -701,9 +701,9 @@ public class MatchController {
      * @param scores Array of scores of the players in the ranking order
      * @param numOfSecretObjectives Array of the number of secret objectives completed by the players in the ranking order
      */
-    private void broadcastRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+    private void broadcastRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendRanking(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives);
+            getPlayerSender(broadcastID).sendRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
         }
     }
 }

@@ -209,10 +209,10 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+    public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         new Thread(() ->{
             try {
-                client.showRanking(lastPlayerID, cardID, pos, side, nicknames, scores, numOfSecretObjectives);
+                client.showRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
             }

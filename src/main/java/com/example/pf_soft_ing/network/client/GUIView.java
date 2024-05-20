@@ -1707,7 +1707,7 @@ public class GUIView implements View {
     }
 
     @Override
-    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfObjectives) {
+    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfObjectives) {
 
     }
 

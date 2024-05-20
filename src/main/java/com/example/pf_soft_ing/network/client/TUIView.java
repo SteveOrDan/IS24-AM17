@@ -1887,15 +1887,47 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side,String[] nicknames, int[] scores, int[] numOfObjectives) {
-        if (lastPlayerID == playerID){
+    public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfObjectives) {
+        if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
+
+            this.score += deltaScore;
+
             PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
             placingCard.setPriority(priority);
             priority++;
-            placingCard.setCurrSideType(side);
 
+            // Add card to play area
             playArea.put(pos, placingCard);
+
+            // Update legal and illegal positions
+            updatePlacementPositions(pos);
+
+            // Remove card from player hand
+            for (PlaceableCard card : playerHand) {
+                if (card.getID() == placingCard.getID()) {
+                    playerHand.remove(card);
+                    break;
+                }
+            }
+
+            // Print play area
+            printPlayArea();
+
+            // Print player score
+            System.out.println("You scored " + deltaScore + " points");
+        }
+        else {
+            // Add card to opponent's play area
+            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
+            opponentCard.setCurrSideType(side);
+
+            addCardToOppMap(lastPlayerID, opponentCard, pos);
+
+            // Update opponent score and print it
+            getOpponentByID(lastPlayerID).addScore(deltaScore);
+
+            System.out.println("Opponent " + getOpponentByID(lastPlayerID).getNickname() + " scored " + deltaScore + " points");
         }
 
         System.out.println("The final ranking is:");
@@ -1935,13 +1967,23 @@ public class TUIView implements View {
             updatePlacementPositions(pos);
 
             // Remove card from player hand
-            playerHand.remove(placingCard.getID());
+            for (PlaceableCard card : playerHand) {
+                if (card.getID() == placingCard.getID()) {
+                    playerHand.remove(card);
+                    break;
+                }
+            }
 
             // Print play area
             printPlayArea();
 
             // Print player score
-            System.out.println("You scored " + deltaScore + " points");
+            System.out.println("  " + deltaScore + " points");
+            System.out.println("It's " + getPlayerNickname(newPlayerID) + "'s turn.\n" +
+                    "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
+                    "To check your hand, type: gh\n" +
+                    "To check actual score, type: gs\n" +
+                    "To check opponents play area: opa <opponentNickname>");
         }
         else {
             // Add card to opponent's play area

@@ -51,5 +51,5 @@ public interface Sender {
 
     void sendChatMessage(String sender, String recipient, String message);
 
-    void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives);
+    void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives);
 }

@@ -10,15 +10,18 @@ public class RankingMsg extends Message {
     private final int cardID;
     private final Position pos;
     private final CardSideType side;
+
+    private final int deltaScore;
     private final String[] nicknames;
     private final int[] scores;
     private final int[] numOfSecretObjectives;
 
-    public RankingMsg(int lastPlayerID, int cardID, Position pos, CardSideType side, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+    public RankingMsg(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         this.lastPlayerID = lastPlayerID;
         this.cardID = cardID;
         this.pos = pos;
         this.side = side;
+        this.deltaScore = deltaScore;
         this.nicknames = nicknames;
         this.scores = scores;
         this.numOfSecretObjectives = numOfSecretObjectives;
@@ -50,6 +53,10 @@ public class RankingMsg extends Message {
 
     public CardSideType getSide() {
         return side;
+    }
+
+    public int getDeltaScore() {
+        return deltaScore;
     }
 
     @Override
