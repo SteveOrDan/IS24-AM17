@@ -218,4 +218,15 @@ public class RMISender implements Sender {
             }
         }).start();
     }
+
+    @Override
+    public void sendPing() {
+        new Thread(() ->{
+            try {
+                client.sendPing();
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Ping not sent");
+            }
+        }).start();
+    }
 }

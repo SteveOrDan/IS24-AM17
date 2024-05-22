@@ -361,7 +361,7 @@ public class TUIView implements View {
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
-            System.err.println("Disconnecting...");
+            System.exit(0);
         }
         else {
             System.out.println("Error: " + command + " is not a valid command. Please, try again");
@@ -2026,6 +2026,11 @@ public class TUIView implements View {
                         "To check opponents play area: opa <opponentNickname>");
             }
         }
+    }
+
+    @Override
+    public void receivePing() {
+        sender.sendPong();
     }
 
     /**

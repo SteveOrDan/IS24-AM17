@@ -9,6 +9,7 @@ import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -134,5 +135,10 @@ public class SocketSender implements Sender {
     @Override
     public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side , int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives));
+    }
+
+    @Override
+    public void sendPing() {
+
     }
 }

@@ -3,6 +3,7 @@ package com.example.pf_soft_ing.network.client;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.network.messages.Message;
+import com.example.pf_soft_ing.network.messages.answers.PongMsg;
 import com.example.pf_soft_ing.network.messages.requests.*;
 
 import java.io.IOException;
@@ -89,5 +90,10 @@ public class ClientSocketSender implements ClientSender {
     @Override
     public void sendChatMessage(String recipient, String message) {
         sendMessage(new ChatMessageMsg(recipient, message));
+    }
+
+    @Override
+    public void sendPong() {
+        sendMessage(new PongMsg(this.playerID));
     }
 }

@@ -1901,6 +1901,11 @@ public class GUIView implements View {
 
     }
 
+    @Override
+    public void receivePing() {
+        sender.sendPong();
+    }
+
     private String getPlayerNickname(int playerID){
         for (PlayerViewModel p : opponents){
             if (p.getPlayerID() == playerID){

@@ -20,4 +20,5 @@ public interface ClientSender {
     void drawVisibleGoldenCard(int playerID, int index);
 
     void sendChatMessage(String recipient, String message);
+    void sendPong();
 }

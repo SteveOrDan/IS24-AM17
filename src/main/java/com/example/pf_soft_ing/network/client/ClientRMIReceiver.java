@@ -116,4 +116,9 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
         view.showNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID, score);
     }
 
+    @Override
+    public void sendPing() throws RemoteException {
+        view.receivePing();
+    }
+
 }
