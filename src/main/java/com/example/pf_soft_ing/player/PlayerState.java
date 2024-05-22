@@ -9,5 +9,6 @@ public enum PlayerState {
     COMPLETED_SETUP,
     WAITING,
     PLACING,
-    DRAWING
+    DRAWING,
+    DISCONNECTED
 }

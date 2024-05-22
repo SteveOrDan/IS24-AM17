@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
+import com.example.pf_soft_ing.network.messages.requests.PingMsg;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
@@ -134,5 +135,10 @@ public class SocketSender implements Sender {
     @Override
     public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side , int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives));
+    }
+
+    @Override
+    public void sendPing() {
+        sendMessage(new PingMsg());
     }
 }

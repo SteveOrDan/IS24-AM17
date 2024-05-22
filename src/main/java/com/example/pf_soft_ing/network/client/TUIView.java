@@ -361,7 +361,7 @@ public class TUIView implements View {
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
-            System.err.println("Disconnecting...");
+            System.exit(0);
         }
         else {
             System.out.println("Error: " + command + " is not a valid command. Please, try again");
@@ -2028,6 +2028,11 @@ public class TUIView implements View {
         }
     }
 
+    @Override
+    public void receivePing() {
+        sender.sendPong();
+    }
+
     /**
      * Prints the chat.
      */
@@ -2038,8 +2043,14 @@ public class TUIView implements View {
             chatCopy = new ArrayList<>(chat);
         }
 
-        for (String message : chatCopy) {
-            System.out.println(message);
+        if (!chatCopy.isEmpty()) {
+            System.out.println("Chat:");
+            for (String message : chatCopy) {
+                System.out.println(message);
+            }
+        }
+        else {
+            System.out.println("No messages in chat.");
         }
     }
 

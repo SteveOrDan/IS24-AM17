@@ -18,12 +18,12 @@ public class MatchController {
 
     private final MatchModel matchModel;
 
-    private Sender getPlayerSender(int playerID){
-        return matchModel.getIDToPlayerMap().get(playerID).getSender();
-    }
-
     public MatchController(int maxPlayers, int matchID){
         matchModel = new MatchModel(maxPlayers, matchID);
+    }
+
+    public Sender getPlayerSender(int playerID){
+        return matchModel.getIDToPlayerMap().get(playerID).getSender();
     }
 
     /**
@@ -111,10 +111,9 @@ public class MatchController {
     }
 
     /**
-     * Setter
-     * Set the starter card's side
+     * Place the starter card for the player
      * @param playerID ID of the player
-     * @param side Side of the starter card
+     * @param side Side of the card to place
      */
     public void placeStarterCardForPlayer(int playerID, CardSideType side){
         try {
@@ -572,6 +571,14 @@ public class MatchController {
 
     public void setGameState(GameState gameState) {
         matchModel.setGameState(gameState);
+    }
+
+    /**
+     * Method to handle player disconnection
+     * @param playerID ID of the player that disconnected
+     */
+    public void disconnectPlayer(int playerID) {
+        // TODO: Implement player disconnection handling
     }
 
     public void chatMessage(int senderID, String recipient, String message) {

@@ -25,6 +25,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
+    // TODO: Fix the tests adding the necessary set state for the player model and using game resources to get the cards
 
     private final CardCorner emptyCorner = new EmptyCorner();
     private final CardCorner hiddenCorner = new HiddenCorner();

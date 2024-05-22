@@ -11,12 +11,14 @@ import com.example.pf_soft_ing.player.PlayerModel;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
+import java.util.Map;
 
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
     private final GameController gameController;
-    private static final HashMap<Integer, PlayerModel> IDToPlayer = new HashMap<>();
-    private static final HashMap<Integer, MatchController> playerIDToMatch = new HashMap<>();
+    private final Map<Integer, PlayerModel> IDToPlayer = new HashMap<>();
+    private final Map<Integer, MatchController> playerIDToMatch = new HashMap<>();
+    private final Map<Integer, DisconnectionManager> playerIDToDiscMan = new HashMap<>();
 
     public RMIReceiver(GameController gameController) throws RemoteException {
         this.gameController = gameController;
@@ -35,6 +37,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         gameController.createMatch(playerID, numberOfPlayers, nickname);
         try {
             playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
+            DisconnectionManager discMan = new DisconnectionManager(playerIDToMatch.get(playerID), playerIDToMatch.get(playerID).getPlayerSender(playerID), playerID);
+            playerIDToDiscMan.put(playerID, discMan);
+            discMan.startPing();
         }
         catch (InvalidMatchIDException e) {
             System.out.println("Already notified client, failed match selection");
@@ -46,6 +51,9 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         gameController.selectMatch(playerID, matchID);
         try {
             playerIDToMatch.put(playerID, gameController.getMatchByID(gameController.getMatchIDWithPlayer(playerID)));
+            DisconnectionManager discMan = new DisconnectionManager(playerIDToMatch.get(playerID), playerIDToMatch.get(playerID).getPlayerSender(playerID), playerID);
+            playerIDToDiscMan.put(playerID, discMan);
+            discMan.startPing();
         }
         catch (InvalidMatchIDException e) {
             System.out.println("Already notified client, failed match selection");
@@ -95,5 +103,10 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     @Override
     public void sendChatMessage(int playerID, String recipientNickname, String message) throws RemoteException {
         playerIDToMatch.get(playerID).chatMessage(playerID, recipientNickname, message);
+    }
+
+    @Override
+    public void sendPong(int playerID) throws RemoteException {
+        playerIDToDiscMan.get(playerID).resetPacketLoss();
     }
 }

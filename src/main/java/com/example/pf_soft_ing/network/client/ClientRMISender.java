@@ -164,4 +164,16 @@ public class ClientRMISender implements ClientSender {
             }
         }).start();
     }
+
+    @Override
+    public void sendPong() {
+        new Thread(() -> {
+            try {
+                serverInterface.sendPong(playerID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        }).start();
+    }
 }

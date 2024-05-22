@@ -1,15 +1,19 @@
 package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.network.messages.*;
+import com.example.pf_soft_ing.network.messages.answers.PongMsg;
 import com.example.pf_soft_ing.network.messages.requests.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Decoder {
 
     private static GameController gameController;
-
-    private static MatchController matchController;
+    private static final Map<Integer, MatchController> playerIDToMatch = new HashMap<>();
+    private static final Map<Integer, DisconnectionManager> playerIDToDiscMan = new HashMap<>();
 
     public static void decode(Message message, int playerID) {
         System.out.println("Received msg from player " + playerID);
@@ -17,38 +21,52 @@ public class Decoder {
         switch (message) {
             case GetMatchesMsg ignored -> gameController.getMatches(playerID);
 
-            case CreateMatchMsg castedMsg -> matchController = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
+            case CreateMatchMsg castedMsg -> {
+                MatchController mc = gameController.createMatch(playerID, castedMsg.getNumberOfPlayers(), castedMsg.getNickname());
+                playerIDToMatch.put(playerID, mc);
+                DisconnectionManager discMan = new DisconnectionManager(mc, mc.getPlayerSender(playerID), playerID);
+                playerIDToDiscMan.put(playerID, discMan);
+                discMan.startPing();
+            }
 
-            case SelectMatchMsg castedMsg -> matchController = gameController.selectMatch(playerID, castedMsg.getMatchID());
+            case SelectMatchMsg castedMsg -> {
+                MatchController mc = gameController.selectMatch(playerID, castedMsg.getMatchID());
+                playerIDToMatch.put(playerID, mc);
+                DisconnectionManager discMan = new DisconnectionManager(mc, mc.getPlayerSender(playerID), playerID);
+                playerIDToDiscMan.put(playerID, discMan);
+                discMan.startPing();
+            }
 
-            case ChooseNicknameMsg castedMsg -> gameController.chooseNickname(playerID, castedMsg.getNickname(), matchController);
+            case ChooseNicknameMsg castedMsg -> gameController.chooseNickname(playerID, castedMsg.getNickname(), playerIDToMatch.get(playerID));
 
-            case PlaceStarterCardMsg castedMsg -> matchController.placeStarterCardForPlayer(playerID, castedMsg.getSide());
+            case PlaceStarterCardMsg castedMsg -> playerIDToMatch.get(playerID).placeStarterCardForPlayer(playerID, castedMsg.getSide());
 
-            case ChooseSecretObjMsg castedMsg -> matchController.setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
+            case ChooseSecretObjMsg castedMsg -> playerIDToMatch.get(playerID).setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
 
-            case PlaceCardMsg castedMsg -> matchController.placeCard(playerID, castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
+            case PlaceCardMsg castedMsg -> playerIDToMatch.get(playerID).placeCard(playerID, castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
 
             case DrawCardMsg castedMsg -> {
                 if (castedMsg.isGolden()) {
                     if (castedMsg.isVisible()) {
-                        matchController.drawVisibleGoldenCard(playerID, castedMsg.getIndex());
+                        playerIDToMatch.get(playerID).drawVisibleGoldenCard(playerID, castedMsg.getIndex());
                     }
                     else {
-                        matchController.drawGoldenCard(playerID);
+                        playerIDToMatch.get(playerID).drawGoldenCard(playerID);
                     }
                 }
                 else {
                     if (castedMsg.isVisible()) {
-                        matchController.drawVisibleResourceCard(playerID, castedMsg.getIndex());
+                        playerIDToMatch.get(playerID).drawVisibleResourceCard(playerID, castedMsg.getIndex());
                     }
                     else {
-                        matchController.drawResourceCard(playerID);
+                        playerIDToMatch.get(playerID).drawResourceCard(playerID);
                     }
                 }
             }
 
-            case ChatMessageMsg castedMsg -> matchController.chatMessage(playerID, castedMsg.getRecipient(), castedMsg.getMessage());
+            case ChatMessageMsg castedMsg -> playerIDToMatch.get(playerID).chatMessage(playerID, castedMsg.getRecipient(), castedMsg.getMessage());
+
+            case PongMsg ignored -> playerIDToDiscMan.get(playerID).resetPacketLoss();
 
             case null, default -> System.out.println("Invalid message type");
         }
