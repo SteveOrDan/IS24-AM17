@@ -46,27 +46,32 @@ public class TestClientSender implements ClientSender {
     }
 
     @Override
-    public void drawResourceCard(int playerID) {
+    public void drawResourceCard() {
 
     }
 
     @Override
-    public void drawVisibleResourceCard(int playerID, int index) {
+    public void drawVisibleResourceCard(int index) {
 
     }
 
     @Override
-    public void drawGoldenCard(int playerID) {
+    public void drawGoldenCard() {
 
     }
 
     @Override
-    public void drawVisibleGoldenCard(int playerID, int index) {
+    public void drawVisibleGoldenCard(int index) {
 
     }
 
     @Override
     public void sendChatMessage(String recipient, String message) {
+
+    }
+
+    @Override
+    public void sendPong() {
 
     }
 }
