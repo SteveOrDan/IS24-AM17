@@ -2,6 +2,8 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.ArrayList;
@@ -19,7 +21,6 @@ public class PlayerViewModel {
     private int priority = 0;
 
     private final List<PlaceableCard> playerHand = new ArrayList<>();
-
     private final Map<Position, PlaceableCard> playArea = new HashMap<>();
 
     public int getPlayerID() {
@@ -68,7 +69,22 @@ public class PlayerViewModel {
         this.score = score;
     }
 
-    public void addScore(int deltaScore) {
+    public void placeCardInPlayArea(int cardID, CardSideType side, Position pos, int deltaScore) {
+        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+
+        card.setCurrSideType(side);
+        card.setPriority(priority);
+        priority++;
+
+        playArea.put(pos, card);
+
         score += deltaScore;
+
+        playerHand.remove(card);
+    }
+
+    public void drawCard(int cardID) {
+        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+        playerHand.add(card);
     }
 }

@@ -535,7 +535,7 @@ public class TUIView implements View {
 
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs,
-                                    int[] starterCardIDs, CardSideType[] starterCardSides) {
+                                    int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands) {
         if (this.playerID == lastPlayerID) {
             confirmSecretObjective();
         }
@@ -543,10 +543,8 @@ public class TUIView implements View {
         // Add starter card to opponents' play areas
         for (int i = 0; i < playerIDs.length; i++) {
             if (playerIDs[i] != this.playerID) {
-                PlaceableCard starterCard = GameResources.getPlaceableCardByID(starterCardIDs[i]);
-                starterCard.setCurrSideType(starterCardSides[i]);
-
-                addCardToOppMap(playerIDs[i], starterCard, new Position(0, 0));
+                // Place starter card
+                getOpponentByID(playerIDs[i]).placeCardInPlayArea(starterCardIDs[i], starterCardSides[i], new Position(0, 0), 0);
             }
         }
 
@@ -625,15 +623,11 @@ public class TUIView implements View {
                 To draw a visible gold card, type: dvg <0 or 1>""");
         }
         else {
-            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
-            opponentCard.setCurrSideType(side);
+            // Place card for opponent
+            PlayerViewModel opponent = getOpponentByID(playerID);
+            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
 
-            // Add card to opponent play area
-            addCardToOppMap(playerID, opponentCard, pos);
-
-            // Set opponent score and print it
-            getOpponentByID(playerID).addScore(deltaScore);
-            System.out.println("Opponent " + getOpponentByID(playerID).getNickname() + " scored " + deltaScore + " points");
+            System.out.println("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
         }
     }
 
@@ -1715,7 +1709,7 @@ public class TUIView implements View {
         List<String> lines = new ArrayList<>();
 
         lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃               " + card.getPoints() + "       ┃");
         lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
         lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
         lines.add("┃                 " + mainColor + "   " + CC.RESET + "   ┃");
@@ -1760,7 +1754,7 @@ public class TUIView implements View {
         List<String> lines = new ArrayList<>();
 
         lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃               " + card.getPoints() + "       ┃");
         lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
         lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
         lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
@@ -1777,7 +1771,7 @@ public class TUIView implements View {
         List<String> lines = new ArrayList<>();
 
         lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃               " + card.getPoints() + "       ┃");
         lines.add("┃           " + mainColor + "   " + CC.RESET + "         ┃");
         lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
         lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
@@ -1793,7 +1787,7 @@ public class TUIView implements View {
         List<String> lines = new ArrayList<>();
 
         lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
+        lines.add("┃               " + card.getPoints() + "       ┃");
         lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
         lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
         lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
@@ -1918,16 +1912,11 @@ public class TUIView implements View {
             System.out.println("You scored " + deltaScore + " points");
         }
         else {
-            // Add card to opponent's play area
-            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
-            opponentCard.setCurrSideType(side);
+            // Place card for opponent
+            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
 
-            addCardToOppMap(lastPlayerID, opponentCard, pos);
-
-            // Update opponent score and print it
-            getOpponentByID(lastPlayerID).addScore(deltaScore);
-
-            System.out.println("Opponent " + getOpponentByID(lastPlayerID).getNickname() + " scored " + deltaScore + " points");
+            System.out.println("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
         }
 
         System.out.println("The final ranking is:");
@@ -1986,16 +1975,11 @@ public class TUIView implements View {
                     "To check opponents play area: opa <opponentNickname>");
         }
         else {
-            // Add card to opponent's play area
-            PlaceableCard opponentCard = GameResources.getPlaceableCardByID(cardID);
-            opponentCard.setCurrSideType(side);
+            // Place card for opponent
+            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
 
-            addCardToOppMap(lastPlayerID, opponentCard, pos);
-
-            // Update opponent score and print it
-            getOpponentByID(lastPlayerID).addScore(deltaScore);
-
-            System.out.println("Opponent " + getOpponentByID(lastPlayerID).getNickname() + " scored " + deltaScore + " points");
+            System.out.println("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
 
             if (playerID == newPlayerID) {
                 playerState = PlayerState.PLACING;
@@ -2102,19 +2086,6 @@ public class TUIView implements View {
                 .filter(opponent -> opponent.getPlayerID() == playerID)
                 .findFirst()
                 .orElse(null);
-    }
-
-    /**
-     * Adds a card to the opponent's play area.
-     * @param playerID The ID of the opponent.
-     * @param card The card to add.
-     * @param pos The position to add the card to.
-     */
-    private void addCardToOppMap(int playerID, PlaceableCard card, Position pos){
-        opponents.stream()
-                .filter(opponent -> opponent.getPlayerID() == playerID)
-                .findFirst()
-                .ifPresent(opponent -> opponent.placeCard(card, pos));
     }
 
     /**

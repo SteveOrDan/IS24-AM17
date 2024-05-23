@@ -4,8 +4,6 @@ import com.example.pf_soft_ing.network.client.*;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import java.io.*;
-
 public class GUIApp extends Application {
 
     private static String ip;

@@ -23,7 +23,7 @@ public enum TokenColors {
             case RED -> Color.RED;
             case BLUE -> Color.BLUE;
             case GREEN -> Color.GREEN;
-            case YELLOW -> Color.YELLOW;
+            case YELLOW -> Color.rgb(235, 196, 0, 1);
             case BLACK -> Color.BLACK;
         };
     }
