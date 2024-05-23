@@ -5,7 +5,6 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +33,8 @@ public interface Sender {
 
     void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score);
 
-    void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
+    void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs,
+                             CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands,
                              int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                              int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 

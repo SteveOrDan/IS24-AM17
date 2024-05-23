@@ -31,7 +31,9 @@ public interface View {
 
     void errorMessage(String errorMessage);
 
-    void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides);
+    void showFirstPlayerTurn(int lastPlayerID, int playerID,
+                             int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
+                             TokenColors[] tokenColors, int[][] playerHands);
 
     void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID);
 

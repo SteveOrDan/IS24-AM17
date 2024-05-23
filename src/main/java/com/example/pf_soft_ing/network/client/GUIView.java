@@ -70,8 +70,7 @@ public class GUIView implements View {
 
     private int selectedCardIndex;
 
-    private PlaceableCard selectedCard;
-    private Position cardPlacePosition;
+     private PlaceableCard selectedCard;
 
     private int placedCardIndexInHand;
 
@@ -129,12 +128,17 @@ public class GUIView implements View {
     private final static double cardCornerHeightProportion = 0.4;
 
     private Group root;
-    private GridPane playerFieldGrid;
+    private ScrollPane playerFieldScroll;
     private AnchorPane playerField;
+    private GridPane playerFieldGrid;
+    private AnchorPane playerHandParentPane;
     private AnchorPane playerHandPane;
     private AnchorPane tempChoicePane;
     private AnchorPane commonAreaPane;
     private AnchorPane helpPane;
+    private AnchorPane endgameMapsPane;
+
+    private final Map<String, Label> nicknameToScoreLabel = new HashMap<>();
 
     private final String ip;
     private ClientSender sender;
@@ -161,6 +165,7 @@ public class GUIView implements View {
 
         stage.setMaximized(true);
 
+//        testShowRanking();
         drawConnectionChoiceScene();
     }
 
@@ -532,7 +537,7 @@ public class GUIView implements View {
 
         // region Player field
         // Create scroll pane for player field
-        ScrollPane playerFieldScroll = new ScrollPane();
+        playerFieldScroll = new ScrollPane();
         playerFieldScroll.setPrefSize(playerFieldRectWidth, playerFieldRectHeight);
         playerFieldScroll.setPannable(true);
         playerFieldScroll.setLayoutX(commonAreaWidth);
@@ -574,16 +579,22 @@ public class GUIView implements View {
 
         // region Player hand
         // Create player hand's pane
+        playerHandParentPane = new AnchorPane();
         playerHandPane = new AnchorPane();
 
         double playerHandWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
         double playerHandHeight = (2 * cardHeight) + (3 * defaultElementsOffset);
 
-        playerHandPane.setPrefSize(playerHandWidth, playerHandHeight);
-        playerHandPane.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
-        playerHandPane.setLayoutY(playerFieldRectHeight);
+        playerHandParentPane.setPrefSize(playerHandWidth, playerHandHeight);
+        playerHandParentPane.setLayoutX(3 * (defaultElementsOffset + cardWidth) + 10);
+        playerHandParentPane.setLayoutY(playerFieldRectHeight);
 
-        root.getChildren().add(playerHandPane);
+        playerHandPane.setPrefSize(playerHandWidth, playerHandHeight);
+        playerHandPane.setLayoutX(0);
+        playerHandPane.setLayoutY(0);
+
+        playerHandParentPane.getChildren().add(playerHandPane);
+        root.getChildren().add(playerHandParentPane);
         // endregion
 
         // region Temp choice pane
@@ -622,75 +633,13 @@ public class GUIView implements View {
         createChatPane();
 
         // Create other player's section
-        createOtherPlayerSection();
+        // createOtherPlayerSection();
 
         // Create help button
         createHelpSection();
 
         root.getChildren().add(commonAreaPane);
         // endregion
-    }
-
-    private void createOtherPlayerSection() {
-        AnchorPane playersSection = new AnchorPane();
-        playersSection.setPrefSize(commonAreaWidth - 100, stageHeight);
-        playersSection.setLayoutX(50);
-        playersSection.setLayoutY(0);
-
-        Pane yourPlayerPane = createPlayerLabel(nickname, 1);
-        playersSection.getChildren().add(yourPlayerPane);
-
-        int i = 2;
-        for (PlayerViewModel opponent : opponents) {
-            Pane playerPane = createPlayerLabel(opponent.getNickname(), i);
-            i++;
-
-            playersSection.getChildren().add(playerPane);
-        }
-
-        commonAreaPane.getChildren().add(playersSection);
-    }
-
-    private Pane createPlayerLabel(String playerNick, int posMultiplier){
-        Pane playerPane = new Pane();
-        playerPane.setPrefSize(300, 50);
-        playerPane.setLayoutX(50);
-        playerPane.setLayoutY(50 * posMultiplier);
-
-        Label playerLabel = new Label(playerNick + ": 0 points");
-        playerLabel.setPrefSize(300, 50);
-        playerLabel.setLayoutX(25);
-        playerLabel.setLayoutY(0);
-
-        // Player circle when not selected
-        Circle playerCircle = new Circle(10, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
-        playerCircle.setLayoutX(5);
-        playerCircle.setLayoutY(25);
-
-        playersCircles.add(playerCircle);
-
-        // Player rect when selected
-        Rectangle playerRectangle = new Rectangle(292, 42, Color.BLACK); // TokenColors.getColorFromToken(otherPlayersColors.get(enemyNickname)));
-        playerRectangle.setLayoutX(4);
-        playerRectangle.setLayoutY(4);
-        playerRectangle.setStrokeWidth(4);
-        playerRectangle.setFill(Color.TRANSPARENT);
-
-        playersRectangles.add(playerRectangle);
-
-        Button playerAreaButton = new Button();
-        playerAreaButton.setPrefSize(300, 50);
-        playerAreaButton.setLayoutX(0);
-        playerAreaButton.setLayoutY(0);
-        playerAreaButton.setOpacity(0.1);
-        playerAreaButton.setOnAction((_) -> switchToPlayerField(playerNick));
-
-        playerPane.getChildren().add(playerRectangle);
-        playerPane.getChildren().add(playerCircle);
-        playerPane.getChildren().add(playerLabel);
-        playerPane.getChildren().add(playerAreaButton);
-
-        return playerPane;
     }
 
     private void createHelpSection() {
@@ -716,7 +665,7 @@ public class GUIView implements View {
         Rectangle foregroundRect = new Rectangle();
         foregroundRect.setWidth(stageWidth * 0.5);
         foregroundRect.setHeight(stageHeight * 0.5);
-        foregroundRect.setFill(Color.rgb(255, 255, 255, 0.9));
+        foregroundRect.setFill(Color.rgb(255, 255, 255, 1));
 
         // Create title label
         Label helpLabel = new Label("Help");
@@ -729,7 +678,7 @@ public class GUIView implements View {
         // Create chat help label
         Label chatHelpLabel = new Label("Chat: Type a message and press enter to send it to all players. " +
                 "Type /whisper <player> <message> to send a private message to a player.");
-        chatHelpLabel.setPrefSize(stageWidth * 0.5, 150);
+        chatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
         chatHelpLabel.setLayoutX(0);
         chatHelpLabel.setLayoutY(50);
         chatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
@@ -772,9 +721,150 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(helpButton);
     }
 
-    private void switchToPlayerField(String playerNickname) {
-        // TODO: implement
+    private void switchToPlayerField(String playerNickname, Circle playerCircle, Rectangle playerRectangle) {
+        for (Shape circle : playersCircles) {
+            circle.setVisible(true);
+        }
+        for (Shape rectangle : playersRectangles) {
+            rectangle.setVisible(false);
+        }
 
+        playerCircle.setVisible(false);
+        playerRectangle.setVisible(true);
+
+        if (nickname.equals(playerNickname)) {
+            // Set play area to be the default one
+            playerFieldScroll.setContent(playerField);
+
+            playerHandParentPane.getChildren().clear();
+            playerHandParentPane.getChildren().add(playerHandPane);
+        }
+        else {
+            Map<Position, PlaceableCard> playArea = getOpponentByNickname(playerNickname).getPlayArea();
+            List<PlaceableCard> playerHand = getOpponentByNickname(playerNickname).getPlayerHand();
+            TokenColors color = getOpponentByNickname(playerNickname).getTokenColor();
+
+            // Create the play area grid
+            AnchorPane opponentFieldPane = createEnemyPlayField(playArea);
+
+            // Create the hand pane
+            AnchorPane opponentHandPane = createOpponentHandPane(playerHand, color);
+
+            // Redraw the play area for that player
+            playerFieldScroll.setContent(opponentFieldPane);
+
+            playerHandParentPane.getChildren().clear();
+            playerHandParentPane.getChildren().add(opponentHandPane);
+        }
+    }
+
+    private AnchorPane createOpponentHandPane(List<PlaceableCard> opponentHand, TokenColors color) {
+        double playerHandWidth = playerHandPane.getPrefWidth();
+        double playerHandHeight = playerHandPane.getPrefHeight();
+
+        AnchorPane opponentHandPane = new AnchorPane();
+        opponentHandPane.setPrefSize(playerHandWidth, playerHandHeight);
+        opponentHandPane.setLayoutX(0);
+        opponentHandPane.setLayoutY(0);
+
+        double cardsYPos = (opponentHandPane.getPrefHeight() - cardHeight) * 0.5;
+
+        for (int i = 0; i < 3; i++) {
+            if (i < opponentHand.size() && opponentHand.get(i) != null) {
+                Pane cardPane = createCardPane(opponentHand.get(i).getID(), CardSideType.BACK, (i + 2) * defaultElementsOffset + (i + 1) * cardWidth, cardsYPos, 1);
+
+                opponentHandPane.getChildren().add(cardPane);
+            }
+        }
+
+        // Create panes for each card
+//        Pane card1Pane = createCardPane(opponentHand.getFirst().getID(), CardSideType.BACK, 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
+//        Pane card2Pane = createCardPane(opponentHand.get(1).getID(), CardSideType.BACK, 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
+//        Pane card3Pane = createCardPane(opponentHand.get(2).getID(), CardSideType.BACK, 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
+
+        // Uh... 90 just because it's an objective card
+        Pane secretObjectivePane = createCardPane(90, CardSideType.BACK, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+
+        // Add rectangle to highlight player color
+        Rectangle plRect = new Rectangle();
+        plRect.setStrokeWidth(6);
+        plRect.setX(3);
+        plRect.setY(3);
+        plRect.setWidth(playerHandWidth - 5);
+        plRect.setHeight(playerHandHeight - 2);
+        plRect.setFill(Color.TRANSPARENT);
+        plRect.setStroke(TokenColors.getColorFromToken(color));
+        plRect.setMouseTransparent(true);
+
+        opponentHandPane.getChildren().add(plRect);
+
+        // Add cards to stage
+        opponentHandPane.getChildren().add(secretObjectivePane);
+//        opponentHandPane.getChildren().add(card1Pane);
+//        opponentHandPane.getChildren().add(card2Pane);
+//        opponentHandPane.getChildren().add(card3Pane);
+
+        return opponentHandPane;
+    }
+
+    private AnchorPane createEnemyPlayField(Map<Position, PlaceableCard> playArea) {
+        // Calculate number of rows and columns
+        int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
+        int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
+
+        int columns = maxX - minX + 1;
+        int rows = maxY - minY + 1;
+
+        // Create anchor pane for play area
+        AnchorPane scrollContent = new AnchorPane();
+        scrollContent.setPrefSize(columns * gridCellWidth + cardWidth, rows * gridCellHeight + cardHeight);
+        scrollContent.setLayoutX(0);
+        scrollContent.setLayoutY(0);
+
+        // Create grid pane for play area
+        GridPane playAreaGrid = new GridPane();
+        playAreaGrid.setPrefSize(columns * gridCellWidth, rows * gridCellHeight);
+        playAreaGrid.setLayoutX(cardWidth / 2);
+        playAreaGrid.setLayoutY(cardHeight / 2);
+
+        playAreaGrid.getColumnConstraints().add(new ColumnConstraints(gridCellWidth));
+        playAreaGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
+
+        Map<Position, PlaceableCard> sortedPlayArea = sortByPriority(playArea);
+
+        for (Map.Entry<Position, PlaceableCard> entry : sortedPlayArea.entrySet()) {
+            PlaceableCard card = entry.getValue();
+            Position pos = entry.getKey();
+
+            // Create Image
+            String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
+
+            // Create Pane for card
+            Pane cardPane = new Pane();
+            cardPane.setPrefSize(gridCellWidth, gridCellHeight);
+
+            Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
+            ImageView cardImgV = new ImageView(cardImg);
+
+            cardImgV.setFitHeight(cardHeight);
+            cardImgV.setFitWidth(cardWidth);
+
+            cardImgV.setX(-cardWidth * cardCornerWidthProportion / 2);
+            cardImgV.setY(-cardHeight * cardCornerHeightProportion / 2);
+
+            cardPane.getChildren().add(cardImgV);
+
+            Position gridPos = new Position(pos.getX() - minX, -pos.getY() + maxY);
+
+            // Add card to the grid
+            playAreaGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+        }
+
+        scrollContent.getChildren().add(playAreaGrid);
+
+        return scrollContent;
     }
 
     private void createChatPane() {
@@ -812,13 +902,13 @@ public class GUIView implements View {
         sendButton.setLayoutX(commonAreaWidth - 75);
         sendButton.setLayoutY(0);
         sendButton.setOnAction((_) -> {
-            if (chatInput.getText().isEmpty()) {
+            if (chatInput.getText().isEmpty() || chatInput.getText().isBlank()) {
                 return;
             }
 
             if (chatInput.getText().startsWith("/")) {
                 String[] command = chatInput.getText().split(" ");
-                if (command[0].equals("/whisper") && command.length >= 3) {
+                if (command[0].equals("/whisper") && command.length >= 3 && !command[1].equals(nickname)) {
                     sender.sendChatMessage(command[1], chatInput.getText().substring(command[0].length() + command[1].length() + 2));
                 }
                 else {
@@ -1132,10 +1222,7 @@ public class GUIView implements View {
         placeButton.setLayoutX(-cardWidth * cardCornerWidthProportion);
         placeButton.setLayoutY(-cardHeight * cardCornerHeightProportion);
         placeButton.setOpacity(0.6);
-        placeButton.setOnAction((_) -> {
-            System.out.println("Placing card at " + pos.getX() + " " + pos.getY());
-            sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos);
-        });
+        placeButton.setOnAction((_) -> sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos));
 
         positionPane.getChildren().add(placeButton);
         Position buttonGridPos = mapToGridPos(pos);
@@ -1210,13 +1297,12 @@ public class GUIView implements View {
         return new Position(mapPos.getX() + gridRows / 2, gridColumns / 2 - mapPos.getY());
     }
 
-    private void placeCard(PlaceableCard card, Position pos){
+    private void placeCardAction(PlaceableCard card, Position pos){
         if (pos.getX() <= -gridColumns / 2 || pos.getX() >= gridColumns / 2 ||
                 pos.getY() <= -gridRows / 2 || pos.getY() >= gridRows / 2){
             updateGridDimension();
         }
 
-        cardPlacePosition = pos;
         placedCardIndexInHand = selectedCardIndex;
 
         // Remove card from hand
@@ -1286,7 +1372,7 @@ public class GUIView implements View {
         validPosToButtonPane.clear();
 
         for (Position p : playArea.keySet()){
-            placeCard(playArea.get(p), p);
+            placeCardAction(playArea.get(p), p);
         }
     }
 
@@ -1589,8 +1675,9 @@ public class GUIView implements View {
         Platform.runLater(() -> {
             // Clear temp choice pane and place starter card before proceeding
             tempChoicePane.getChildren().clear();
+            this.tokenColor = tokenColor;
 
-            placeCard(starterCard, new Position(0, 0));
+            placeCardAction(starterCard, new Position(0, 0));
 
             drawMissingSetUp(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2);
         });
@@ -1616,9 +1703,8 @@ public class GUIView implements View {
         Platform.runLater(() -> showError(errorMessage));
     }
 
-
     @Override
-    public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSideTypes) {
+    public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSideTypes, TokenColors[] tokenColors, int[][] playerHands) {
         Platform.runLater(() -> {
             if (this.playerID == lastPlayerID){
                 confirmSecretObjective();
@@ -1628,23 +1714,125 @@ public class GUIView implements View {
 
             if (this.playerID == playerID){
                 showSystemMessage("It's your turn!");
+                nickname = "(You)";
             }
             else {
                 showSystemMessage("It's " + nickname + "'s turn!");
             }
 
+            for (int i = 0; i < playerIDs.length; i++){
+                if (playerIDs[i] != this.playerID){
+                    getOpponentByID(playerIDs[i]).setTokenColor(tokenColors[i]);
+                    getOpponentByID(playerIDs[i]).placeCardInPlayArea(starterCardIDs[i], starterCardSideTypes[i], new Position(0, 0), 0);
+
+                    for (int cardID : playerHands[i]) {
+                        getOpponentByID(playerIDs[i]).drawCard(cardID);
+                    }
+                }
+            }
+
+            // Create player labels for each player in common area
+            createOtherPlayerSection();
+
             currPlayerTurnLabel.setText("Current player: " + nickname);
         });
     }
 
+    private void createOtherPlayerSection() {
+        AnchorPane playersSection = new AnchorPane();
+        playersSection.setPrefSize(commonAreaWidth - 100, 200);
+        playersSection.setLayoutX(50);
+        playersSection.setLayoutY(0);
+
+        Pane yourPlayerPane = createPlayerLabel(nickname, tokenColor, 1);
+        playersSection.getChildren().add(yourPlayerPane);
+
+        int i = 2;
+        for (PlayerViewModel opponent : opponents) {
+            Pane playerPane = createPlayerLabel(opponent.getNickname(), opponent.getTokenColor(), i);
+            i++;
+
+            playersSection.getChildren().add(playerPane);
+        }
+
+        commonAreaPane.getChildren().add(playersSection);
+    }
+
+    private Pane createPlayerLabel(String playerNick, TokenColors color, int posMultiplier){
+        Pane playerPane = new Pane();
+        playerPane.setPrefSize(300, 50);
+        playerPane.setLayoutX(50);
+        playerPane.setLayoutY(50 * posMultiplier);
+
+        String actualNick = playerNick.equals(nickname) ? nickname + " (You)" : playerNick;
+
+        Label playerLabel = new Label(actualNick + ": 0 points");
+        playerLabel.setPrefSize(300, 50);
+        playerLabel.setLayoutX(30);
+        playerLabel.setLayoutY(0);
+
+        nicknameToScoreLabel.put(playerNick, playerLabel);
+
+        // Player circle when not selected
+        Circle playerCircle = new Circle(10, TokenColors.getColorFromToken(color));
+        playerCircle.setLayoutX(15);
+        playerCircle.setLayoutY(25);
+        playerCircle.setMouseTransparent(true);
+        playerCircle.setVisible(true);
+
+        playersCircles.add(playerCircle);
+
+        // Player rect when selected
+        Rectangle playerRectangle = new Rectangle(292, 42);
+        playerRectangle.setLayoutX(4);
+        playerRectangle.setLayoutY(4);
+        playerRectangle.setFill(Color.TRANSPARENT);
+        playerRectangle.setStroke(TokenColors.getColorFromToken(color));
+        playerRectangle.setStrokeWidth(4);
+        playerRectangle.setMouseTransparent(true);
+        playerRectangle.setVisible(false);
+
+        playersRectangles.add(playerRectangle);
+
+        if (playerNick.equals(nickname)){
+            playerCircle.setVisible(false);
+            playerRectangle.setVisible(true);
+        }
+
+        Button playerAreaButton = new Button();
+        playerAreaButton.setPrefSize(300, 50);
+        playerAreaButton.setLayoutX(0);
+        playerAreaButton.setLayoutY(0);
+        playerAreaButton.setOpacity(0.1);
+        playerAreaButton.setOnAction((_) -> switchToPlayerField(playerNick, playerCircle, playerRectangle));
+
+        playerPane.getChildren().add(playerCircle);
+        playerPane.getChildren().add(playerLabel);
+        playerPane.getChildren().add(playerAreaButton);
+        playerPane.getChildren().add(playerRectangle);
+
+        return playerPane;
+    }
+
     @Override
     public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int deltaScore) {
-        if (playerId == this.playerID){
-            Platform.runLater(() -> placeCard(selectedCard, pos));
-        }
-        else {
-            //TODO: save opponent placed card
-        }
+        Platform.runLater(() -> {
+            if (playerId == this.playerID){
+                // place card for current player
+                placeCardAction(selectedCard, pos);
+                score += deltaScore;
+
+                nicknameToScoreLabel.get(nickname).setText(nickname + " (You): " + score + " points");
+            }
+            else {
+                // Place card in the opponent's play area
+                getOpponentByID(playerId).placeCardInPlayArea(cardID, side, pos, deltaScore);
+
+                String playerNick = getPlayerNickname(playerId);
+
+                nicknameToScoreLabel.get(playerNick).setText(playerNick + ": " + getOpponentByID(playerId).getScore() + " points");
+            }
+        });
     }
 
     @Override
@@ -1659,11 +1847,15 @@ public class GUIView implements View {
             }
             else {
                 if (playerID == newPlayerID){
+                    nickname = "(You)";
+
                     showSystemMessage("It's your turn!");
                 }
                 else {
                     showSystemMessage("It's " + nickname + "'s turn!");
                 }
+
+                getOpponentByID(lastPlayerID).drawCard(drawnCardID);
             }
 
             currPlayerTurnLabel.setText("Current player: " + nickname);
@@ -1795,7 +1987,81 @@ public class GUIView implements View {
 
     @Override
     public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfObjectives) {
+        if (playerID == lastPlayerID){
+            score += deltaScore;
 
+            PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
+            placingCard.setPriority(priority);
+            priority++;
+
+            // Add card to play area
+            playArea.put(pos, placingCard);
+
+            // Update legal and illegal positions
+            updatePlacementPositions(pos);
+
+            // Remove card from player hand
+            for (PlaceableCard card : playerHand) {
+                if (card.getID() == placingCard.getID()) {
+                    playerHand.remove(card);
+                    break;
+                }
+            }
+        }
+        else {
+            // Place card for opponent
+            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
+        }
+
+        drawMatchRanking(nicknames, scores, numOfObjectives);
+    }
+
+    private void testShowRanking() {
+        int playersNum = 4;
+
+        GameResources.initializeAllDecks();
+
+        PlaceableCard starter = GameResources.getPlaceableCardByID(81);
+        starter.setCurrSideType(CardSideType.BACK);
+        starter.setPriority(0);
+        playArea.put(new Position(0, 0), starter);
+        tokenColor = TokenColors.YELLOW;
+
+        Random rng = new Random();
+
+        for (int i = 1; i <= 10; i++) {
+            int rand = rng.nextInt(80);
+            PlaceableCard card = GameResources.getPlaceableCardByID(rand);
+            card.setCurrSideType(rand % 2 == 0 ? CardSideType.FRONT : CardSideType.BACK);
+            card.setPriority(i);
+            playArea.put(new Position(i, i), card);
+        }
+
+        for (int i = 0; i < playersNum - 1; i++) {
+            PlayerViewModel opp = new PlayerViewModel();
+            opp.setTokenColor(TokenColors.values()[i]);
+
+            opponents.add(opp);
+
+            for (int j = 1; j <= 10; j++) {
+                int rand = rng.nextInt(80);
+
+                opp.placeCardInPlayArea(rand, rand % 2 == 0 ? CardSideType.FRONT : CardSideType.BACK, new Position(j, j), 0);
+            }
+        }
+
+        String[] players = new String[playersNum];
+        int[] scores = new int[playersNum];
+        int[] numOfSecretObjectives = new int[playersNum];
+
+        for (int i = 0; i < playersNum; i++) {
+            players[i] = "Player " + i;
+            scores[i] = i;
+            numOfSecretObjectives[i] = i;
+        }
+
+        drawMatchRanking(players, scores, numOfSecretObjectives);
     }
 
     private void drawMatchRanking(String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
@@ -1814,8 +2080,8 @@ public class GUIView implements View {
         backgroundRect.setStroke(Color.BLACK);
 
         Rectangle rankingRect = new Rectangle();
-        rankingRect.setX(0);
-        rankingRect.setY(0);
+        rankingRect.setX(stageWidth * 0.1);
+        rankingRect.setY(stageHeight * 0.1);
         rankingRect.setWidth(stageWidth * 0.8);
         rankingRect.setHeight(stageHeight * 0.8);
         rankingRect.setFill(Color.WHITE);
@@ -1830,6 +2096,7 @@ public class GUIView implements View {
         rankingLabel.setAlignment(Pos.CENTER);
 
         rankingPane.getChildren().add(backgroundRect);
+        rankingPane.getChildren().add(rankingRect);
         rankingPane.getChildren().add(rankingLabel);
 
         for (int i = 0; i < nicknames.length; i++){
@@ -1848,7 +2115,7 @@ public class GUIView implements View {
         Button returnButton = new Button("Return to main menu");
         returnButton.setPrefSize(200, 50);
         returnButton.setLayoutX(stageWidth / 2 - 250);
-        returnButton.setLayoutY(stageHeight - 100);
+        returnButton.setLayoutY(stageHeight - 200);
         returnButton.setOnAction((_) -> sender.getMatches());
 
         rankingPane.getChildren().add(returnButton);
@@ -1857,13 +2124,33 @@ public class GUIView implements View {
         Button watchMapsButton = new Button("Watch players' maps");
         watchMapsButton.setPrefSize(200, 50);
         watchMapsButton.setLayoutX(stageWidth / 2 + 50);
-        watchMapsButton.setLayoutY(stageHeight - 100);
+        watchMapsButton.setLayoutY(stageHeight - 200);
         watchMapsButton.setOnAction((_) -> showEndgameMaps(opponents.size() + 1));
+
+        rankingPane.getChildren().add(watchMapsButton);
 
         root.getChildren().add(rankingPane);
     }
 
     private void showEndgameMaps(int playersNum) {
+        // Create window for watching players' maps
+        endgameMapsPane = new AnchorPane();
+        endgameMapsPane.setPrefSize(stageWidth, stageHeight);
+        endgameMapsPane.setLayoutX(0);
+        endgameMapsPane.setLayoutY(0);
+
+        // Create background rectangle
+        Rectangle backgroundRect = new Rectangle();
+        backgroundRect.setX(0);
+        backgroundRect.setY(0);
+        backgroundRect.setWidth(stageWidth);
+        backgroundRect.setHeight(stageHeight);
+        backgroundRect.setFill(Color.LIGHTGRAY);
+        backgroundRect.setStroke(Color.BLACK);
+
+        endgameMapsPane.getChildren().add(backgroundRect);
+        root.getChildren().add(endgameMapsPane);
+
         if (playersNum == 2) {
             renderPlayArea(playArea, tokenColor, 0, 0, stageWidth / 2, stageHeight);
             renderPlayArea(opponents.getFirst().getPlayArea(), opponents.getFirst().getTokenColor(), stageWidth / 2, 0, stageWidth / 2, stageHeight);
@@ -1879,26 +2166,178 @@ public class GUIView implements View {
             renderPlayArea(opponents.get(1).getPlayArea(), opponents.get(1).getTokenColor(), 0, stageHeight / 2, stageWidth / 2, stageHeight / 2);
             renderPlayArea(opponents.get(2).getPlayArea(), opponents.get(2).getTokenColor(), stageWidth / 2, stageHeight / 2, stageWidth / 2, stageHeight / 2);
         }
+
+        // Create button to return to rankings
+        Button returnButton = new Button("<-");
+        returnButton.setPrefSize(50, 50);
+        returnButton.setLayoutX(0);
+        returnButton.setLayoutY(0);
+        returnButton.setOnAction((_) -> root.getChildren().remove(endgameMapsPane));
+
+        endgameMapsPane.getChildren().add(returnButton);
     }
 
     private void renderPlayArea(Map<Position, PlaceableCard> playArea, TokenColors colors,
                                 double xPos, double yPos, double width, double height) {
+        // Create anchor pane to store scroll
+        AnchorPane playAreaPane = new AnchorPane();
+        playAreaPane.setPrefSize(width, height);
+        playAreaPane.setLayoutX(xPos);
+        playAreaPane.setLayoutY(yPos);
+
         // Create play area scroll pane
         ScrollPane playAreaScrollPane = new ScrollPane();
         playAreaScrollPane.setPrefSize(width, height);
-        playAreaScrollPane.setLayoutX(xPos);
-        playAreaScrollPane.setLayoutY(yPos);
+        playAreaScrollPane.setLayoutX(0);
+        playAreaScrollPane.setLayoutY(0);
+        playAreaScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        playAreaScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        playAreaScrollPane.setPannable(true);
 
+        // Create border rectangle
+        Rectangle borderRect = new Rectangle();
+        borderRect.setX(4);
+        borderRect.setY(4);
+        borderRect.setWidth(width - 8);
+        borderRect.setHeight(height - 8);
+        borderRect.setFill(Color.TRANSPARENT);
+        borderRect.setStroke(TokenColors.getColorFromToken(colors));
+        borderRect.setStrokeWidth(8);
+        borderRect.setMouseTransparent(true);
+
+        // Calculate number of rows and columns
+        int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
+        int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
+
+        int rows = maxX - minX;
+        int columns = maxY - minY;
+
+        cardWidth = (stageWidth - (9 * defaultElementsOffset)) / 7;
+        cardHeight = cardWidth / 1.5;
+
+        // Calculate grid cell dimensions
+        gridCellWidth = cardWidth - (cardCornerWidthProportion * cardWidth);
+        gridCellHeight = cardHeight - (cardCornerHeightProportion * cardHeight);
+
+        // Create anchor pane for play area
+        AnchorPane scrollContent = new AnchorPane();
+        scrollContent.setPrefSize(columns * gridCellWidth + cardWidth, rows * gridCellHeight + cardHeight);
+        scrollContent.setLayoutX(0);
+        scrollContent.setLayoutY(0);
+
+        // Create grid pane for play area
+        GridPane playAreaGrid = new GridPane();
+        playAreaGrid.setPrefSize(columns * gridCellWidth, rows * gridCellHeight);
+        playAreaGrid.setLayoutX(cardWidth / 2);
+        playAreaGrid.setLayoutY(cardHeight / 2);
+
+        playAreaGrid.getColumnConstraints().add(new ColumnConstraints(gridCellWidth));
+        playAreaGrid.getRowConstraints().add(new RowConstraints(gridCellHeight));
+
+        Map<Position, PlaceableCard> sortedPlayArea = sortByPriority(playArea);
+
+        for (Map.Entry<Position, PlaceableCard> entry : sortedPlayArea.entrySet()) {
+            PlaceableCard card = entry.getValue();
+            Position pos = entry.getKey();
+
+            // Create Image
+            String cardName = "/cards/" + card.getCurrSideType().toString().toLowerCase() + "/card" + card.getID() + ".png";
+
+            // Create Pane for card
+            Pane cardPane = new Pane();
+            cardPane.setPrefSize(gridCellWidth, gridCellHeight);
+
+            Image cardImg = new Image(Objects.requireNonNull(getClass().getResourceAsStream(cardName)));
+            ImageView cardImgV = new ImageView(cardImg);
+
+            cardImgV.setFitHeight(cardHeight);
+            cardImgV.setFitWidth(cardWidth);
+
+            cardImgV.setX(-cardWidth * cardCornerWidthProportion / 2);
+            cardImgV.setY(-cardHeight * cardCornerHeightProportion / 2);
+
+            cardPane.getChildren().add(cardImgV);
+
+            Position gridPos = new Position(pos.getX() - minX, pos.getY() - minY);
+
+            // Add card to the grid
+            playAreaGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+        }
+
+        scrollContent.getChildren().add(playAreaGrid);
+        playAreaScrollPane.setContent(scrollContent);
+
+        playAreaPane.getChildren().add(playAreaScrollPane);
+        playAreaPane.getChildren().add(borderRect);
+
+        endgameMapsPane.getChildren().add(playAreaPane);
     }
 
     @Override
     public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState) {
+        Platform.runLater(() -> {
+            if (gameState == GameState.FINAL_ROUND) {
+                showSystemMessage("The game entered the final round state.");
+            }
+            else {
+                showSystemMessage("The game entered the extra round state.");
+            }
 
+            showNewPlayerTurn(drawnCardID, lastPlayerID, newPlayerID);
+        });
     }
 
     @Override
     public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int deltaScore) {
+        String nickname = getPlayerNickname(newPlayerID);
 
+        if (playerID == lastPlayerID){
+            score += deltaScore;
+
+            PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
+            placingCard.setPriority(priority);
+            priority++;
+
+            // Add card to play area
+            playArea.put(pos, placingCard);
+
+            // Update legal and illegal positions
+            updatePlacementPositions(pos);
+
+            // Remove card from player hand
+            for (PlaceableCard card : playerHand) {
+                if (card.getID() == placingCard.getID()) {
+                    playerHand.remove(card);
+                    break;
+                }
+            }
+
+            showSystemMessage("It's your turn!");
+
+            nicknameToScoreLabel.get(this.nickname).setText(nickname + " (You): " + score + " points");
+        }
+        else {
+            // Place card for opponent
+            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
+
+            showSystemMessage("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
+
+            if (playerID == newPlayerID) {
+                showSystemMessage("It's your turn!");
+            }
+            else {
+                showSystemMessage("It's " + nickname + "'s turn!");
+            }
+
+            nicknameToScoreLabel.get(nickname).setText(nickname + ": " + getOpponentByID(lastPlayerID).getScore() + " points");
+        }
+
+        String actualNick = this.nickname.equals(nickname) ? "(You)" : nickname;
+
+        currPlayerTurnLabel.setText("Current player: " + actualNick);
     }
 
     @Override
@@ -1914,5 +2353,36 @@ public class GUIView implements View {
         }
 
         return nickname;
+    }
+
+    private PlayerViewModel getOpponentByID(int playerID){
+        return opponents.stream()
+                .filter(opponent -> opponent.getPlayerID() == playerID)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private Map<Position, PlaceableCard> sortByPriority(Map<Position, PlaceableCard> map) {
+        List<Map.Entry<Position, PlaceableCard>> list = new ArrayList<>(map.entrySet());
+        list.sort((o1, o2) -> {
+            if (o1.getValue().getPriority() == o2.getValue().getPriority()) {
+                return 0;
+            }
+            return o1.getValue().getPriority() > o2.getValue().getPriority() ? 1 : -1;
+        });
+
+        Map<Position, PlaceableCard> result = new LinkedHashMap<>();
+        for (Map.Entry<Position, PlaceableCard> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+    }
+
+    private PlayerViewModel getOpponentByNickname(String nickname) {
+        return opponents.stream()
+                .filter(opponent -> opponent.getNickname().equals(nickname))
+                .findFirst()
+                .orElse(null);
     }
 }

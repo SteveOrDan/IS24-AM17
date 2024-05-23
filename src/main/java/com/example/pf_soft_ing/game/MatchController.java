@@ -160,17 +160,25 @@ public class MatchController {
                 int[] playerIDs = new int[getIDToPlayerMap().size()];
                 int[] starterCardIDs = new int[getIDToPlayerMap().size()];
                 CardSideType[] starterCardSides = new CardSideType[getIDToPlayerMap().size()];
+                TokenColors[] tokenColors = new TokenColors[getIDToPlayerMap().size()];
+                int[][] playerHands = new int[getIDToPlayerMap().size()][3];
 
                 int i = 0;
                 for (int id : getIDToPlayerMap().keySet()) {
                     playerIDs[i] = getIDToPlayerMap().get(id).getID();
                     starterCardIDs[i] = getIDToPlayerMap().get(id).getStarterCard().getID();
                     starterCardSides[i] = getIDToPlayerMap().get(id).getStarterCard().getCurrSideType();
+                    tokenColors[i] = getIDToPlayerMap().get(id).getToken();
+                    for (int j = 0; j < 3; j++) {
+                        playerHands[i][j] = getIDToPlayerMap().get(id).getHand().get(j).getID();
+                    }
+
                     i++;
                 }
 
                 for (Integer ID : getIDToPlayerMap().keySet()) {
                     getPlayerSender(ID).sendFirstPlayerTurn(playerID, currPlayerID, playerIDs, starterCardIDs, starterCardSides,
+                            tokenColors, playerHands,
                             resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
                             goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
                 }

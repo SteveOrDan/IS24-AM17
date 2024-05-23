@@ -140,12 +140,13 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides,
+    public void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs,
+                                    CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands,
                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
         new Thread(() -> {
             try {
-                client.sendFirstPlayerTurn(lastPlayerID, playerID, playerIDs, starterCardIDs, starterCardSides,
+                client.sendFirstPlayerTurn(lastPlayerID, playerID, playerIDs, starterCardIDs, starterCardSides, tokenColors, playerHands,
                         resDeckCardID, visibleResCardID1, visibleResCardID2,
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }

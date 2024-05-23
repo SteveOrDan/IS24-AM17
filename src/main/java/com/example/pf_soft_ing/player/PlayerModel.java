@@ -390,4 +390,8 @@ public class PlayerModel {
     public void drawCard(PlaceableCard card){
         hand.add(card);
     }
+
+    public TokenColors getToken() {
+        return token.getColor();
+    }
 }
