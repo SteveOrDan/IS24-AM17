@@ -17,7 +17,7 @@ public class GameModel {
      * @return Map of match IDs with the corresponding nicknames
      */
     public Map<Integer, List<String>> getMatches(){
-        Map<Integer, List<String>> allMatches = new HashMap<>();
+        Map<Integer, List<String>> allMatches = new LinkedHashMap<>();
         List<MatchController> matchesCopy;
 
         synchronized (matches){

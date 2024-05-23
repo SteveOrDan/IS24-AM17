@@ -106,7 +106,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawResourceCard(int playerID) {
+    public void drawResourceCard() {
         new Thread(() -> {
             try {
                 serverInterface.drawResourceCard(playerID);
@@ -118,7 +118,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawVisibleResourceCard(int playerID, int index) {
+    public void drawVisibleResourceCard(int index) {
         new Thread(() -> {
             try {
                 serverInterface.drawVisibleResourceCard(playerID, index);
@@ -130,7 +130,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawGoldenCard(int playerID) {
+    public void drawGoldenCard() {
         new Thread(() -> {
             try {
                 serverInterface.drawGoldenCard(playerID);
@@ -142,7 +142,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawVisibleGoldenCard(int playerID, int index) {
+    public void drawVisibleGoldenCard(int index) {
         new Thread(() -> {
             try {
                 serverInterface.drawVisibleGoldenCard(playerID, index);

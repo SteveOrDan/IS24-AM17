@@ -179,7 +179,7 @@ public class MatchController {
                 getPlayerSender(playerID).confirmSecretObjective();
             }
         }
-        catch (InvalidPlayerIDException | InvalidObjectiveCardException | StarterCardNotSetException e) {
+        catch (InvalidPlayerIDException | InvalidObjectiveCardIDException | StarterCardNotSetException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
@@ -207,8 +207,6 @@ public class MatchController {
         List<ObjectiveCard> objectives = new ArrayList<>();
         objectives.add(matchModel.drawObjectiveCard());
         objectives.add(matchModel.drawObjectiveCard());
-
-        player.setObjectivesToChoose(objectives);
 
         return List.of(objectives.get(0).getID(), objectives.get(1).getID());
     }

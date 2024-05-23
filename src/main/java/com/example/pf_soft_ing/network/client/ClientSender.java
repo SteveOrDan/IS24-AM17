@@ -14,10 +14,10 @@ public interface ClientSender {
     void placeStarterCard(CardSideType side);
     void chooseSecretObjective(int cardID);
     void placeCard(int cardID, CardSideType side, Position pos);
-    void drawResourceCard(int playerID);
-    void drawVisibleResourceCard(int playerID, int index);
-    void drawGoldenCard(int playerID);
-    void drawVisibleGoldenCard(int playerID, int index);
+    void drawResourceCard();
+    void drawVisibleResourceCard(int index);
+    void drawGoldenCard();
+    void drawVisibleGoldenCard(int index);
 
     void sendChatMessage(String recipient, String message);
     void sendPong();

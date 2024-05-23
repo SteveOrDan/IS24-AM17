@@ -264,7 +264,7 @@ public class TUIView implements View {
                             break;
                         }
 
-                        sender.drawResourceCard(playerID);
+                        sender.drawResourceCard();
                     }
                     case "dvr" -> { // DrawVisibleResourceCard
                         if (parts.length != 2) {
@@ -273,7 +273,7 @@ public class TUIView implements View {
                         }
 
                         try {
-                            sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
+                            sender.drawVisibleResourceCard(Integer.parseInt(parts[1]));
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -285,7 +285,7 @@ public class TUIView implements View {
                             break;
                         }
 
-                        sender.drawGoldenCard(playerID);
+                        sender.drawGoldenCard();
                     }
                     case "dvg" -> { // DrawVisibleGoldCard
                         if (parts.length != 2) {
@@ -298,7 +298,7 @@ public class TUIView implements View {
                                 System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
                                 break;
                             }
-                            sender.drawVisibleGoldenCard(playerID, choice);
+                            sender.drawVisibleGoldenCard(choice);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -370,8 +370,8 @@ public class TUIView implements View {
 
     @Override
     public void setID(int playerID) {
-        sender.setPlayerID(playerID);
         this.playerID = playerID;
+        sender.setPlayerID(playerID);
     }
 
     @Override

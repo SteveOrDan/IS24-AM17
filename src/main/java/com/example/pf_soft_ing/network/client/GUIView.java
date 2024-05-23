@@ -1049,18 +1049,18 @@ public class GUIView implements View {
         drawButton.setOnAction((_) -> {
             if (isVisible){
                 if (isGolden){
-                    sender.drawVisibleGoldenCard(playerID, cardIndex);
+                    sender.drawVisibleGoldenCard(cardIndex);
                 }
                 else {
-                    sender.drawVisibleResourceCard(playerID, cardIndex);
+                    sender.drawVisibleResourceCard(cardIndex);
                 }
             }
             else {
                 if (isGolden){
-                    sender.drawGoldenCard(playerID);
+                    sender.drawGoldenCard();
                 }
                 else {
-                    sender.drawResourceCard(playerID);
+                    sender.drawResourceCard();
                 }
             }
         });
@@ -1755,8 +1755,8 @@ public class GUIView implements View {
 
     @Override
     public void setID(int playerID) {
-        sender.setPlayerID(playerID);
         this.playerID = playerID;
+        sender.setPlayerID(playerID);
     }
 
     @Override
