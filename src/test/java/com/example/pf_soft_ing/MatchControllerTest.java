@@ -639,7 +639,7 @@ class MatchControllerTest {
         for (Integer i : matchController.getIDToPlayerMap().keySet()){
             List<Integer> objectivesID = assertDoesNotThrow(() -> matchController.setObjectivesToChoose(i));
 
-            assertThrows(InvalidObjectiveCardException.class, () -> matchController.getIDToPlayerMap().get(i).setSecretObjective(-3)); // Wrong objective card id
+            assertThrows(InvalidObjectiveCardIDException.class, () -> matchController.getIDToPlayerMap().get(i).setSecretObjective(-3)); // Wrong objective card id
             assertDoesNotThrow(() -> matchController.getIDToPlayerMap().get(i).setSecretObjective(objectivesID.getFirst())); // Correct
 
             assertNotNull(matchController.getIDToPlayerMap().get(i).getSecretObjective());

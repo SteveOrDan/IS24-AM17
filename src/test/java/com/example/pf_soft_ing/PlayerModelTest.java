@@ -6,49 +6,16 @@ import com.example.pf_soft_ing.game.*;
 import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
-import com.example.pf_soft_ing.card.corner.CardCorner;
-import com.example.pf_soft_ing.card.corner.EmptyCorner;
-import com.example.pf_soft_ing.card.corner.HiddenCorner;
-import com.example.pf_soft_ing.card.corner.ResourceCorner;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.card.side.Back;
-import com.example.pf_soft_ing.card.side.Front;
-import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
-    // TODO: Fix the tests adding the necessary set state for the player model and using game resources to get the cards
-
-    private final CardCorner emptyCorner = new EmptyCorner();
-    private final CardCorner hiddenCorner = new HiddenCorner();
-
-    private final CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
-    private final CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
-    private final CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
-    private final CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
-    private final CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
-    private final CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
-    private final CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
-
-    private final Side starterFront1 = new Front(hiddenCorner, pCorner, iCorner, fCorner);
-    private final Side starerBack1 = new Back(emptyCorner, emptyCorner, emptyCorner, emptyCorner, new ArrayList<>(){{add(ResourceType.FUNGI);}});
-
-    private final PlaceableCard starterCard1 = new StarterCard(2, starterFront1, starerBack1);
-
-    private final int resourceCardPoints = 2;
-
-    private final Side normalFront = new Front(aCorner, kCorner, mCorner, qCorner);
-    private final Side normalBack = new Back(emptyCorner, emptyCorner, emptyCorner,emptyCorner, new ArrayList<>(){{add(ResourceType.ANIMAL);}});
-
-    private final ResourceCard normalCard = new ResourceCard(resourceCardPoints, CardElementType.ANIMAL, 3, normalFront, normalBack);
 
     private PlayerModel playerModel;
 
@@ -64,6 +31,10 @@ class PlayerModelTest {
     @DisplayName("Test for placing a starter card in the player area")
     @Test
     void placeStarterCard() {
+        GameResources.initializeAllDecks();
+
+        PlaceableCard starterCard1 = GameResources.getPlaceableCardByID(80);
+
         createPlayerModel();
 
         playerModel.setStarterCard(starterCard1);
@@ -80,7 +51,15 @@ class PlayerModelTest {
     @DisplayName("Test for placing a card in a valid position")
     @Test
     void placeCardInValidPos() {
+        GameResources.initializeAllDecks();
+
+        PlaceableCard starterCard1 = GameResources.getPlaceableCardByID(80);
+        PlaceableCard resourceCard = GameResources.getPlaceableCardByID(0);
+
         createPlayerModel();
+
+        playerModel.setState(PlayerState.PLACING);
+
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard1);
         playerModel.placeStarterCard(CardSideType.FRONT);
@@ -88,20 +67,29 @@ class PlayerModelTest {
 
         //Now place a card in a valid position
         Position pos = new Position(1,1);
-        assertDoesNotThrow(() -> playerModel.placeCard(normalCard, pos, CardSideType.FRONT));
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard, pos, CardSideType.FRONT));
 
         assertTrue(playerModel.getPlayArea().containsKey(pos));
-        assertEquals(playerModel.getPlayArea().get(pos), normalCard);
-        assertEquals(playerModel.getCurrScore(), resourceCardPoints);
+        assertEquals(playerModel.getPlayArea().get(pos), resourceCard);
+        assertEquals(0, playerModel.getCurrScore());
+        assertEquals(PlayerState.DRAWING, playerModel.getState());
     }
 
     @DisplayName("Test for placing a card in an invalid position")
     @Test
     void placeCardInInvalidPos() {
+        GameResources.initializeAllDecks();
+
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(84);
+        PlaceableCard resourceCard = GameResources.getPlaceableCardByID(0);
+
         createPlayerModel();
+
+        playerModel.setState(PlayerState.PLACING);
+
         //Start by placing a starter card in the play area
-        playerModel.setStarterCard(starterCard1);
-        playerModel.placeStarterCard(CardSideType.FRONT);
+        playerModel.setStarterCard(starterCard);
+        playerModel.placeStarterCard(CardSideType.BACK);
         assertEquals(0, playerModel.getCurrScore());
 
         //Now place a card in an invalid position
@@ -109,12 +97,11 @@ class PlayerModelTest {
         Position pos2 = new Position(1,0);
         Position pos3 = new Position(-1,-1);
 
+        assertThrows(PositionAlreadyTakenException.class, () -> playerModel.placeCard(resourceCard, pos1, CardSideType.FRONT));
+        assertThrows(NoAdjacentCardsException.class, () -> playerModel.placeCard(resourceCard, pos2, CardSideType.FRONT));
+        assertThrows(PlacingOnInvalidCornerException.class, () -> playerModel.placeCard(resourceCard, pos3, CardSideType.FRONT));
 
-        assertThrows(PositionAlreadyTakenException.class, () -> playerModel.placeCard(normalCard, pos1, CardSideType.FRONT));
-        assertThrows(NoAdjacentCardsException.class, () -> playerModel.placeCard(normalCard, pos2, CardSideType.FRONT));
-        assertThrows(PlacingOnInvalidCornerException.class, () -> playerModel.placeCard(normalCard, pos3, CardSideType.FRONT));
-
-        assertFalse(playerModel.getPlayArea().containsValue(normalCard));
+        assertFalse(playerModel.getPlayArea().containsValue(resourceCard));
 
         assertFalse(playerModel.getPlayArea().containsKey(pos2));
         assertFalse(playerModel.getPlayArea().containsKey(pos3));
@@ -122,53 +109,61 @@ class PlayerModelTest {
         assertEquals(0, playerModel.getCurrScore());
     }
 
-
     @DisplayName("Test for the top right to bottom left diagonal objective card")
     @Test
     void checkTRBLDiagonalObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 3 fungi resource cards and flip them
-        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
-        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(1);
-        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
+        PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(0);
+        PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(1);
+        PlaceableCard resourceCard3 = GameResources.getPlaceableCardByID(2);
 
         //Place the resource cards
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK));
 
         //Same thing with 3 animal golden cards
-        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
-        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
-        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
+        PlaceableCard goldenCard1 = GameResources.getPlaceableCardByID(60);
+        PlaceableCard goldenCard2 = GameResources.getPlaceableCardByID(61);
+        PlaceableCard goldenCard3 = GameResources.getPlaceableCardByID(62);
 
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
 
         //Select 2 objective cards
-        ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
-        ObjectiveCard objectiveCard2 = objectiveDeck.get(2);
+        ObjectiveCard objectiveCard1 = GameResources.getObjectiveCardByID(86);
+        ObjectiveCard objectiveCard2 = GameResources.getObjectiveCardByID(88);
 
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
     }
@@ -176,50 +171,58 @@ class PlayerModelTest {
     @DisplayName("Test for the top left to bottom right diagonal objective card")
     @Test
     void checkTLBRDiagonalObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
-
         //Use 3 plant resource cards and flip them
-        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
-        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
-        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
+        PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(10);
+        PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(11);
+        PlaceableCard resourceCard3 = GameResources.getPlaceableCardByID(12);
 
         //Place the resource cards
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(2, 0), CardSideType.BACK));
 
         //Same thing with 3 insect golden cards
-        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
-        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
-        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
+        PlaceableCard goldenCard1 = GameResources.getPlaceableCardByID(70);
+        PlaceableCard goldenCard2 = GameResources.getPlaceableCardByID(71);
+        PlaceableCard goldenCard3 = GameResources.getPlaceableCardByID(72);
 
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(-2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
 
         //Select 2 objective cards
-        ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
-        ObjectiveCard objectiveCard2 = objectiveDeck.get(3);
+        ObjectiveCard objectiveCard1 = GameResources.getObjectiveCardByID(87);
+        ObjectiveCard objectiveCard2 = GameResources.getObjectiveCardByID(89);
 
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
     }
@@ -227,63 +230,80 @@ class PlayerModelTest {
     @DisplayName("Different diagonal cases from top right to bottom left")
     @Test
     void checkTRBLDiagonalCases(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 6 fungi resource cards and flip them
-        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(0);
-        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(1);
-        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(2);
-        ResourceCard resourceCard4 = (ResourceCard) resourceDeck.get(3);
-        ResourceCard resourceCard5 = (ResourceCard) resourceDeck.get(4);
-        ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(5);
+        PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(0);
+        PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(1);
+        PlaceableCard resourceCard3 = GameResources.getPlaceableCardByID(2);
+        PlaceableCard resourceCard4 = GameResources.getPlaceableCardByID(3);
+        PlaceableCard resourceCard5 = GameResources.getPlaceableCardByID(4);
+        PlaceableCard resourceCard6 = GameResources.getPlaceableCardByID(5);
 
-        //Place the resource cards
+        //Place the 4 resource cards
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(-1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(-2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard4, new Position(1, 3), CardSideType.BACK));
 
         //Same thing with 6 animal golden cards
-        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(20);
-        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(21);
-        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(22);
-        GoldenCard goldenCard4 = (GoldenCard) goldenDeck.get(23);
-        GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(24);
-        GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(25);
+        PlaceableCard goldenCard1 = GameResources.getPlaceableCardByID(60);
+        PlaceableCard goldenCard2 = GameResources.getPlaceableCardByID(61);
+        PlaceableCard goldenCard3 = GameResources.getPlaceableCardByID(62);
+        PlaceableCard goldenCard4 = GameResources.getPlaceableCardByID(63);
+        PlaceableCard goldenCard5 = GameResources.getPlaceableCardByID(64);
+        PlaceableCard goldenCard6 = GameResources.getPlaceableCardByID(65);
 
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(1, -1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard4, new Position(3, 1), CardSideType.BACK));
 
         //Select 2 objective cards
-        ObjectiveCard objectiveCard1 = objectiveDeck.get(0);
-        ObjectiveCard objectiveCard2 = objectiveDeck.get(2);
+        ObjectiveCard objectiveCard1 = GameResources.getObjectiveCardByID(86);
+        ObjectiveCard objectiveCard2 = GameResources.getObjectiveCardByID(88);
 
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
 
+
         //Place a fifth card in the diagonal
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(-3, -1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(4,2), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(2, 4), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(4, 2), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -291,12 +311,17 @@ class PlayerModelTest {
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
 
+
         //Place a sixth card in the diagonal
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(-4, -2), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(5,3), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(3, 5), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(5, 3), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -311,63 +336,80 @@ class PlayerModelTest {
     @DisplayName("Different diagonal cases from top left to bottom right")
     @Test
     void checkTLBRDiagonal(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
-        //Use 6 plant resource cards and flip them
-        ResourceCard resourceCard1 = (ResourceCard) resourceDeck.get(10);
-        ResourceCard resourceCard2 = (ResourceCard) resourceDeck.get(11);
-        ResourceCard resourceCard3 = (ResourceCard) resourceDeck.get(12);
-        ResourceCard resourceCard4 = (ResourceCard) resourceDeck.get(13);
-        ResourceCard resourceCard5 = (ResourceCard) resourceDeck.get(14);
-        ResourceCard resourceCard6 = (ResourceCard) resourceDeck.get(15);
+        //Use 6 fungi resource cards and flip them
+        PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(10);
+        PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(11);
+        PlaceableCard resourceCard3 = GameResources.getPlaceableCardByID(12);
+        PlaceableCard resourceCard4 = GameResources.getPlaceableCardByID(13);
+        PlaceableCard resourceCard5 = GameResources.getPlaceableCardByID(14);
+        PlaceableCard resourceCard6 = GameResources.getPlaceableCardByID(15);
 
-        //Place the resource cards
+        //Place the 4 resource cards
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard1, new Position(1, 1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(2, 0), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(3, -1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard4, new Position(4, -2), CardSideType.BACK));
 
-        //Same thing with 6 insect golden cards
-        GoldenCard goldenCard1 = (GoldenCard) goldenDeck.get(30);
-        GoldenCard goldenCard2 = (GoldenCard) goldenDeck.get(31);
-        GoldenCard goldenCard3 = (GoldenCard) goldenDeck.get(32);
-        GoldenCard goldenCard4 = (GoldenCard) goldenDeck.get(33);
-        GoldenCard goldenCard5 = (GoldenCard) goldenDeck.get(34);
-        GoldenCard goldenCard6 = (GoldenCard) goldenDeck.get(35);
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard2, new Position(0, 2), CardSideType.BACK));
 
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard3, new Position(2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard4, new Position(-1, 3), CardSideType.BACK));
+
+        //Same thing with 6 animal golden cards
+        PlaceableCard goldenCard1 = GameResources.getPlaceableCardByID(70);
+        PlaceableCard goldenCard2 = GameResources.getPlaceableCardByID(71);
+        PlaceableCard goldenCard3 = GameResources.getPlaceableCardByID(72);
+        PlaceableCard goldenCard4 = GameResources.getPlaceableCardByID(73);
+        PlaceableCard goldenCard5 = GameResources.getPlaceableCardByID(74);
+        PlaceableCard goldenCard6 = GameResources.getPlaceableCardByID(75);
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(goldenCard1, new Position(-1, -1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(0, -2), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(1, -3), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard4, new Position(2, -4), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard2, new Position(-2, 0), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard3, new Position(0, -2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard4, new Position(-3, 1), CardSideType.BACK));
 
         //Select 2 objective cards
-        ObjectiveCard objectiveCard1 = objectiveDeck.get(1);
-        ObjectiveCard objectiveCard2 = objectiveDeck.get(3);
+        ObjectiveCard objectiveCard1 = GameResources.getObjectiveCardByID(87);
+        ObjectiveCard objectiveCard2 = GameResources.getObjectiveCardByID(89);
 
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
 
+
         //Place a fifth card in the diagonal
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(5, -3), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(3, -5), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard5, new Position(-2, 4), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard5, new Position(-4, 2), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -375,12 +417,17 @@ class PlayerModelTest {
         //Check if the calculated score of the objective cards is correct
         playerModel.calculateObjectivePoints(objectiveCard1);
         assertEquals(2, playerModel.getCurrScore());
+
         playerModel.calculateObjectivePoints(objectiveCard2);
         assertEquals(4, playerModel.getCurrScore());
 
+
         //Place a sixth card in the diagonal
-        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(6, -4), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(4,-6), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(resourceCard6, new Position(-3, 5), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(goldenCard6, new Position(-5, 3), CardSideType.BACK));
 
         //Reset the player's score
         playerModel.setCurrScore(0);
@@ -395,35 +442,38 @@ class PlayerModelTest {
     @DisplayName("Test for the top right L shape objective card")
     @Test
     void checkTRLShapeObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 fungus golden card and 2 animal resource cards and flip them
-        PlaceableCard mainCard = goldenDeck.getFirst();
-        PlaceableCard card1 = resourceDeck.get(20);
-        PlaceableCard card2 = resourceDeck.get(21);
+        PlaceableCard card0 = GameResources.getPlaceableCardByID(0);
+        PlaceableCard card1 = GameResources.getPlaceableCardByID(20);
+        PlaceableCard card2 = GameResources.getPlaceableCardByID(21);
 
         //Place the cards
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(2,2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card0, new Position(2,2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK));
 
         //Select an objective card
-        ObjectiveCard objectiveCard = objectiveDeck.get(6);
+        ObjectiveCard objectiveCard = GameResources.getObjectiveCardByID(92);
 
         //Check if the calculated score of the objective card is correct
         playerModel.calculateObjectivePoints(objectiveCard);
@@ -433,35 +483,38 @@ class PlayerModelTest {
     @DisplayName("Test for the top left L shape objective card")
     @Test
     void checkTLLShapeObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
-        //Use 1 animal golden card and 2 insect resource cards and flip them
-        PlaceableCard mainCard = goldenDeck.get(20);
-        PlaceableCard card1 = resourceDeck.get(30);
-        PlaceableCard card2 = resourceDeck.get(31);
+        //Use 1 fungus golden card and 2 animal resource cards and flip them
+        PlaceableCard card0 = GameResources.getPlaceableCardByID(20);
+        PlaceableCard card1 = GameResources.getPlaceableCardByID(30);
+        PlaceableCard card2 = GameResources.getPlaceableCardByID(31);
 
         //Place the cards
-        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(-1, 1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(-2,2), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(-1,-1), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card0, new Position(0,2), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK));
 
         //Select an objective card
-        ObjectiveCard objectiveCard = objectiveDeck.get(7);
+        ObjectiveCard objectiveCard = GameResources.getObjectiveCardByID(93);
 
         //Check if the calculated score of the objective card is correct
         playerModel.calculateObjectivePoints(objectiveCard);
@@ -471,35 +524,38 @@ class PlayerModelTest {
     @DisplayName("Test for the bottom right L shape objective card")
     @Test
     void checkBRLShapeObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
-        //Use 1 plant golden card and 2 fungi resource cards and flip them
-        PlaceableCard mainCard = goldenDeck.get(10);
-        PlaceableCard card1 = resourceDeck.get(0);
-        PlaceableCard card2 = resourceDeck.get(1);
+        //Use 1 fungus golden card and 2 animal resource cards and flip them
+        PlaceableCard card0 = GameResources.getPlaceableCardByID(10);
+        PlaceableCard card1 = GameResources.getPlaceableCardByID(0);
+        PlaceableCard card2 = GameResources.getPlaceableCardByID(1);
 
         //Place the cards
-        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, -1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(2,-2), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,1), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card0, new Position(2,-2), CardSideType.BACK));
 
         //Select an objective card
-        ObjectiveCard objectiveCard = objectiveDeck.get(4);
+        ObjectiveCard objectiveCard = GameResources.getObjectiveCardByID(90);
 
         //Check if the calculated score of the objective card is correct
         playerModel.calculateObjectivePoints(objectiveCard);
@@ -509,35 +565,38 @@ class PlayerModelTest {
     @DisplayName("Test for the bottom left L shape objective card")
     @Test
     void checkBLLShapeObjective(){
-        createPlayerModel();
-        GameResources.initializeAllDecks();
         //Initialize the decks
-        List<PlaceableCard> resourceDeck = new ArrayList<>(GameResources.getResourcesDeck());
-        List<PlaceableCard> goldenDeck = new ArrayList<>(GameResources.getGoldenDeck());
-        List<PlaceableCard> starterDeck = new ArrayList<>(GameResources.getStarterDeck());
-        List<ObjectiveCard> objectiveDeck = new ArrayList<>(GameResources.getObjectiveDeck());
+        GameResources.initializeAllDecks();
 
         //Initialize the player
         createPlayerModel();
 
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
         //Set the player's starter card
-        playerModel.setStarterCard(starterDeck.getFirst());
+        playerModel.setStarterCard(starterCard);
 
         //Place the starter card
         playerModel.placeStarterCard(CardSideType.FRONT);
 
         //Use 1 fungus golden card and 2 animal resource cards and flip them
-        PlaceableCard mainCard = goldenDeck.get(30);
-        PlaceableCard card1 = resourceDeck.get(10);
-        PlaceableCard card2 = resourceDeck.get(11);
+        PlaceableCard card0 = GameResources.getPlaceableCardByID(30);
+        PlaceableCard card1 = GameResources.getPlaceableCardByID(10);
+        PlaceableCard card2 = GameResources.getPlaceableCardByID(11);
 
         //Place the cards
-        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(-1, -1), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(mainCard, new Position(-2,-2), CardSideType.BACK));
-        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(-1,1), CardSideType.BACK));
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card1, new Position(1, 1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card2, new Position(1,-1), CardSideType.BACK));
+
+        playerModel.setState(PlayerState.PLACING);
+        assertDoesNotThrow(() -> playerModel.placeCard(card0, new Position(0,-2), CardSideType.BACK));
 
         //Select an objective card
-        ObjectiveCard objectiveCard = objectiveDeck.get(5);
+        ObjectiveCard objectiveCard = GameResources.getObjectiveCardByID(91);
 
         //Check if the calculated score of the objective card is correct
         playerModel.calculateObjectivePoints(objectiveCard);
