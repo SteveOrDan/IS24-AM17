@@ -1380,8 +1380,10 @@ public class GUIView implements View {
         illegalPosList.clear();
         validPosToButtonPane.clear();
 
-        for (Position p : playArea.keySet()){
-            placeCardAction(playArea.get(p), p);
+        Map<Position, PlaceableCard> sortedPlayArea = sortByPriority(playArea);
+
+        for (Position p : sortedPlayArea.keySet()){
+            placeCardAction(sortedPlayArea.get(p), p);
         }
     }
 
@@ -1686,6 +1688,9 @@ public class GUIView implements View {
             tempChoicePane.getChildren().clear();
             this.tokenColor = tokenColor;
 
+            starterCard.setPriority(priority);
+            priority++;
+
             placeCardAction(starterCard, new Position(0, 0));
 
             drawMissingSetUp(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2);
@@ -1827,6 +1832,9 @@ public class GUIView implements View {
     public void placeCard(int playerId, int cardID, Position pos, CardSideType side, int deltaScore) {
         Platform.runLater(() -> {
             if (playerId == this.playerID){
+                selectedCard.setPriority(priority);
+                priority++;
+
                 // place card for current player
                 placeCardAction(selectedCard, pos);
                 score += deltaScore;
@@ -2080,6 +2088,8 @@ public class GUIView implements View {
     }
 
     private void drawMatchRanking(String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
+        root.getChildren().clear();
+
         // Create ranking window
         AnchorPane rankingPane = new AnchorPane();
         rankingPane.setPrefSize(stageWidth, stageHeight);
