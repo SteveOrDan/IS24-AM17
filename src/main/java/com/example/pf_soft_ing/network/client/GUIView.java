@@ -786,11 +786,6 @@ public class GUIView implements View {
             }
         }
 
-        // Create panes for each card
-//        Pane card1Pane = createCardPane(opponentHand.getFirst().getID(), CardSideType.BACK, 2 * defaultElementsOffset + cardWidth, cardsYPos, 1);
-//        Pane card2Pane = createCardPane(opponentHand.get(1).getID(), CardSideType.BACK, 3 * defaultElementsOffset + 2 * cardWidth, cardsYPos, 1);
-//        Pane card3Pane = createCardPane(opponentHand.get(2).getID(), CardSideType.BACK, 4 * defaultElementsOffset + 3 * cardWidth, cardsYPos, 1);
-
         // Uh... 90 just because it's an objective card
         Pane secretObjectivePane = createCardPane(90, CardSideType.BACK, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
 
@@ -809,9 +804,6 @@ public class GUIView implements View {
 
         // Add cards to stage
         opponentHandPane.getChildren().add(secretObjectivePane);
-//        opponentHandPane.getChildren().add(card1Pane);
-//        opponentHandPane.getChildren().add(card2Pane);
-//        opponentHandPane.getChildren().add(card3Pane);
 
         return opponentHandPane;
     }

@@ -541,10 +541,14 @@ public class TUIView implements View {
         }
 
         // Add starter card to opponents' play areas
-        for (int i = 0; i < playerIDs.length; i++) {
-            if (playerIDs[i] != this.playerID) {
-                // Place starter card
+        for (int i = 0; i < playerIDs.length; i++){
+            if (playerIDs[i] != this.playerID){
+                getOpponentByID(playerIDs[i]).setTokenColor(tokenColors[i]);
                 getOpponentByID(playerIDs[i]).placeCardInPlayArea(starterCardIDs[i], starterCardSides[i], new Position(0, 0), 0);
+
+                for (int cardID : playerHands[i]) {
+                    getOpponentByID(playerIDs[i]).drawCard(cardID);
+                }
             }
         }
 
@@ -683,6 +687,8 @@ public class TUIView implements View {
                         "To check your hand, type: gh\n" +
                         "To check opponents play area: opa <opponent nickname>");
             }
+
+            getOpponentByID(lastPlayerID).drawCard(drawnCardID);
         }
     }
 
@@ -1184,6 +1190,31 @@ public class TUIView implements View {
             for (String s : strings) {
                 line.append(Objects.requireNonNullElse(s, " "));
             }
+            System.out.println(line);
+        }
+
+        // Print opponent hand
+        List<PlaceableCard> playerHand = getOpponentByID(opponentID).getPlayerHand();
+
+        List<List<String>> handToPrint = new ArrayList<>();
+
+        for (PlaceableCard card : playerHand) {
+            if (!cardIDToCardBackTUILines.containsKey(card.getID())) {
+                // Create TUI lines for the card
+                createPlaceableCardLines(card.getID(), CardSideType.BACK);
+            }
+
+            handToPrint.add(cardIDToCardBackTUILines.get(card.getID()));
+        }
+
+        System.out.println(opponentNick + "'s hand:");
+        for (int i = 0; i < handToPrint.getFirst().size(); i++) {
+            StringBuilder line = new StringBuilder();
+
+            for (List<String> card : handToPrint) {
+                line.append(card.get(i)).append("   ");
+            }
+
             System.out.println(line);
         }
     }
