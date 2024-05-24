@@ -1967,7 +1967,7 @@ public class TUIView implements View {
             printPlayArea();
 
             // Print player score
-            System.out.println("  " + deltaScore + " points");
+            System.out.println("You scored " + deltaScore + " points");
             System.out.println("It's " + getPlayerNickname(newPlayerID) + "'s turn.\n" +
                     "While waiting you can flip a card in your hand by typing: fc <cardID>\n" +
                     "To check your hand, type: gh\n" +

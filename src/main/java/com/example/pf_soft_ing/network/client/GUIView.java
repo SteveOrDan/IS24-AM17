@@ -675,21 +675,29 @@ public class GUIView implements View {
         helpLabel.setFont(new Font(Font.getDefault().getName(), 24));
         helpLabel.setAlignment(Pos.CENTER);
 
-        // Create chat help label
-        Label chatHelpLabel = new Label("Chat: Type a message and press enter to send it to all players. " +
-                "Type /whisper <player> <message> to send a private message to a player.");
-        chatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
-        chatHelpLabel.setLayoutX(0);
-        chatHelpLabel.setLayoutY(50);
-        chatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
-        chatHelpLabel.setWrapText(true);
-        chatHelpLabel.setAlignment(Pos.CENTER);
+        // Create global chat help label
+        Label globalChatHelpLabel = new Label("Global chat: Type a message and press enter to send it to all players.");
+        globalChatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
+        globalChatHelpLabel.setLayoutX(0);
+        globalChatHelpLabel.setLayoutY(100);
+        globalChatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        globalChatHelpLabel.setWrapText(true);
+        globalChatHelpLabel.setAlignment(Pos.CENTER);
+
+        // Create private chat help label
+        Label privateChatHelpLabel = new Label("Private chat: Type /whisper <player> <message> to send a private message to a player.");
+        privateChatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
+        privateChatHelpLabel.setLayoutX(0);
+        privateChatHelpLabel.setLayoutY(175);
+        privateChatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        privateChatHelpLabel.setWrapText(true);
+        privateChatHelpLabel.setAlignment(Pos.CENTER);
 
         // Create zoom help label
         Label zoomHelpLabel = new Label("Zoom: Hold the Ctrl key and press arrow key up or down to zoom in or out.");
         zoomHelpLabel.setPrefSize(stageWidth * 0.5, 50);
         zoomHelpLabel.setLayoutX(0);
-        zoomHelpLabel.setLayoutY(200);
+        zoomHelpLabel.setLayoutY(250);
         zoomHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
         zoomHelpLabel.setWrapText(true);
         zoomHelpLabel.setAlignment(Pos.CENTER);
@@ -704,7 +712,8 @@ public class GUIView implements View {
         // Add to hierarchy
         helpBackground.getChildren().add(foregroundRect);
         helpBackground.getChildren().add(helpLabel);
-        helpBackground.getChildren().add(chatHelpLabel);
+        helpBackground.getChildren().add(globalChatHelpLabel);
+        helpBackground.getChildren().add(privateChatHelpLabel);
         helpBackground.getChildren().add(zoomHelpLabel);
 
         helpPane.getChildren().add(backgroundRect);
@@ -1822,6 +1831,9 @@ public class GUIView implements View {
                 placeCardAction(selectedCard, pos);
                 score += deltaScore;
 
+                if(deltaScore != 0) {
+                    showSystemMessage("You scored " + deltaScore + " points!");
+                }
                 nicknameToScoreLabel.get(nickname).setText(nickname + " (You): " + score + " points");
             }
             else {
@@ -1830,6 +1842,9 @@ public class GUIView implements View {
 
                 String playerNick = getPlayerNickname(playerId);
 
+                if(deltaScore != 0) {
+                    showSystemMessage(playerNick + " scored " + deltaScore + " points!");
+                }
                 nicknameToScoreLabel.get(playerNick).setText(playerNick + ": " + getOpponentByID(playerId).getScore() + " points");
             }
         });
@@ -2314,7 +2329,12 @@ public class GUIView implements View {
                 }
             }
 
-            showSystemMessage("It's your turn!");
+            if(deltaScore != 0) {
+                showSystemMessage("You scored " + deltaScore + " points! Now it's " + nickname + " turn!");
+            }
+            else {
+                showSystemMessage("It's " + nickname + " turn!");
+            }
 
             nicknameToScoreLabel.get(this.nickname).setText(nickname + " (You): " + score + " points");
         }
