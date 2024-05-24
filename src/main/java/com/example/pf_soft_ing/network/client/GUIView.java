@@ -2010,34 +2010,36 @@ public class GUIView implements View {
 
     @Override
     public void showRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfObjectives) {
-        if (playerID == lastPlayerID){
-            score += deltaScore;
+        Platform.runLater(() -> {
+            if (playerID == lastPlayerID){
+                score += deltaScore;
 
-            PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
-            placingCard.setPriority(priority);
-            priority++;
+                PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
+                placingCard.setPriority(priority);
+                priority++;
 
-            // Add card to play area
-            playArea.put(pos, placingCard);
+                // Add card to play area
+                playArea.put(pos, placingCard);
 
-            // Update legal and illegal positions
-            updatePlacementPositions(pos);
+                // Update legal and illegal positions
+                updatePlacementPositions(pos);
 
-            // Remove card from player hand
-            for (PlaceableCard card : playerHand) {
-                if (card.getID() == placingCard.getID()) {
-                    playerHand.remove(card);
-                    break;
+                // Remove card from player hand
+                for (PlaceableCard card : playerHand) {
+                    if (card.getID() == placingCard.getID()) {
+                        playerHand.remove(card);
+                        break;
+                    }
                 }
             }
-        }
-        else {
-            // Place card for opponent
-            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
-            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
-        }
+            else {
+                // Place card for opponent
+                PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+                opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
+            }
 
-        drawMatchRanking(nicknames, scores, numOfObjectives);
+            drawMatchRanking(nicknames, scores, numOfObjectives);
+        });
     }
 
     private void testShowRanking() {
@@ -2316,63 +2318,67 @@ public class GUIView implements View {
 
     @Override
     public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int deltaScore) {
-        String nickname = getPlayerNickname(newPlayerID);
+        Platform.runLater(() -> {
+            String nickname = getPlayerNickname(newPlayerID);
 
-        if (playerID == lastPlayerID){
-            score += deltaScore;
+            if (playerID == lastPlayerID){
+                score += deltaScore;
 
-            PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
-            placingCard.setPriority(priority);
-            priority++;
+                PlaceableCard placingCard = GameResources.getPlaceableCardByID(cardID);
+                placingCard.setPriority(priority);
+                priority++;
 
-            // Add card to play area
-            playArea.put(pos, placingCard);
+                // Add card to play area
+                playArea.put(pos, placingCard);
 
-            // Update legal and illegal positions
-            updatePlacementPositions(pos);
+                // Update legal and illegal positions
+                updatePlacementPositions(pos);
 
-            // Remove card from player hand
-            for (PlaceableCard card : playerHand) {
-                if (card.getID() == placingCard.getID()) {
-                    playerHand.remove(card);
-                    break;
+                // Remove card from player hand
+                for (PlaceableCard card : playerHand) {
+                    if (card.getID() == placingCard.getID()) {
+                        playerHand.remove(card);
+                        break;
+                    }
                 }
-            }
 
-            if(deltaScore != 0) {
-                showSystemMessage("You scored " + deltaScore + " points! Now it's " + nickname + " turn!");
-            }
-            else {
-                showSystemMessage("It's " + nickname + " turn!");
-            }
+                if(deltaScore != 0) {
+                    showSystemMessage("You scored " + deltaScore + " points! Now it's " + nickname + " turn!");
+                }
+                else {
+                    showSystemMessage("It's " + nickname + " turn!");
+                }
 
-            nicknameToScoreLabel.get(this.nickname).setText(nickname + " (You): " + score + " points");
-        }
-        else {
-            // Place card for opponent
-            PlayerViewModel opponent = getOpponentByID(lastPlayerID);
-            opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
-
-            showSystemMessage("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
-
-            if (playerID == newPlayerID) {
-                showSystemMessage("It's your turn!");
+                nicknameToScoreLabel.get(this.nickname).setText(nickname + " (You): " + score + " points");
             }
             else {
-                showSystemMessage("It's " + nickname + "'s turn!");
+                // Place card for opponent
+                PlayerViewModel opponent = getOpponentByID(lastPlayerID);
+                opponent.placeCardInPlayArea(cardID, side, pos, deltaScore);
+
+                showSystemMessage("Opponent " + opponent.getNickname() + " scored " + deltaScore + " points");
+
+                if (playerID == newPlayerID) {
+                    showSystemMessage("It's your turn!");
+                }
+                else {
+                    showSystemMessage("It's " + nickname + "'s turn!");
+                }
+
+                nicknameToScoreLabel.get(nickname).setText(nickname + ": " + getOpponentByID(lastPlayerID).getScore() + " points");
             }
 
-            nicknameToScoreLabel.get(nickname).setText(nickname + ": " + getOpponentByID(lastPlayerID).getScore() + " points");
-        }
+            String actualNick = this.nickname.equals(nickname) ? "(You)" : nickname;
 
-        String actualNick = this.nickname.equals(nickname) ? "(You)" : nickname;
-
-        currPlayerTurnLabel.setText("Current player: " + actualNick);
+            currPlayerTurnLabel.setText("Current player: " + actualNick);
+        });
     }
 
     @Override
     public void receivePing() {
-        sender.sendPong();
+        Platform.runLater(() ->
+            sender.sendPong()
+        );
     }
 
     private String getPlayerNickname(int playerID){
