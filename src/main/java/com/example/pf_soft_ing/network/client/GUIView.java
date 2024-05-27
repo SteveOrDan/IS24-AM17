@@ -2230,8 +2230,8 @@ public class GUIView implements View {
         int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
         int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
 
-        int rows = maxX - minX;
-        int columns = maxY - minY;
+        int columns = maxX - minX + 1;
+        int rows = maxY - minY + 1;
 
         cardWidth = (stageWidth - (9 * defaultElementsOffset)) / 7;
         cardHeight = cardWidth / 1.5;

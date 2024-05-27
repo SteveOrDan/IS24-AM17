@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.example.pf_soft_ing.network.server.ServerMain
+Main-Class: com.example.pf_soft_ing.Main
 

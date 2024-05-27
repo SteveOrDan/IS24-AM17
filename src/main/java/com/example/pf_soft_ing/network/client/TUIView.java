@@ -1311,29 +1311,29 @@ public class TUIView implements View {
         }
 
         if (cardSide.getTLCorner().isAvailable()) {
-            A1 = "┏━━━━━┳";
+            A1 = "┌─────┬";
             String r = cardSide.getTLCorner().getResource() != null ?
                     cardSide.getTLCorner().getResource().getColor() + cardSide.getTLCorner().getResource().toString() + CC.RESET : " ";
-            A2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
-            A3 = cardColor + "┣━━━━━┛" + CC.RESET;
+            A2 = cardColor + "│  " + CC.RESET + r + cardColor + "  │" + CC.RESET;
+            A3 = cardColor + "├─────┘" + CC.RESET;
         }
         else{
-            A1 = "┏━━━━━━";
-            A2 = cardColor + "┃      " + CC.RESET;
-            A3 = cardColor + "┃      " + CC.RESET;
+            A1 = "┌──────";
+            A2 = cardColor + "│      " + CC.RESET;
+            A3 = cardColor + "│      " + CC.RESET;
         }
 
         if (cardSide.getTRCorner().isAvailable()) {
-            B1 = "┳━━━━━┓";
+            B1 = "┬─────┐";
             String r = cardSide.getTRCorner().getResource() != null ?
                     cardSide.getTRCorner().getResource().getColor() + cardSide.getTRCorner().getResource().toString() + CC.RESET : " ";
-            B2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
-            B3 = cardColor + "┗━━━━━┫" + CC.RESET;
+            B2 = cardColor + "│  " + CC.RESET + r + cardColor + "  │" + CC.RESET;
+            B3 = cardColor + "└─────┤" + CC.RESET;
         }
         else{
-            B1 = "━━━━━━┓";
-            B2 = cardColor + "      ┃" + CC.RESET;
-            B3 = cardColor + "      ┃" + CC.RESET;
+            B1 = "──────┐";
+            B2 = cardColor + "      │" + CC.RESET;
+            B3 = cardColor + "      │" + CC.RESET;
         }
 
         C = (sideType.equals(CardSideType.FRONT) && card.getPoints() != 0) ? String.valueOf(card.getPoints()) : " ";
@@ -1349,40 +1349,40 @@ public class TUIView implements View {
         }
 
         if (cardSide.getBLCorner().isAvailable()) {
-            E1 = cardColor + "┣━━━━━┓" + CC.RESET;
+            E1 = cardColor + "├─────┐" + CC.RESET;
             String r = cardSide.getBLCorner().getResource() != null ?
                     cardSide.getBLCorner().getResource().getColor() + cardSide.getBLCorner().getResource().toString() + CC.RESET : " ";
-            E2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
-            E3 = "┗━━━━━┻";
+            E2 = cardColor + "│  " + CC.RESET + r + cardColor + "  │" + CC.RESET;
+            E3 = "└─────┴";
         }
         else {
-            E1 = cardColor + "┃      " + CC.RESET;
-            E2 = cardColor + "┃      " + CC.RESET;
-            E3 = "┗━━━━━━";
+            E1 = cardColor + "│      " + CC.RESET;
+            E2 = cardColor + "│      " + CC.RESET;
+            E3 = "└──────";
         }
 
         if (cardSide.getBRCorner().isAvailable()) {
-            F1 = cardColor + "┏━━━━━┫" + CC.RESET;
+            F1 = cardColor + "┌─────┤" + CC.RESET;
             String r = cardSide.getBRCorner().getResource() != null ?
                     cardSide.getBRCorner().getResource().getColor() + cardSide.getBRCorner().getResource().toString() + CC.RESET : " ";
-            F2 = cardColor + "┃  " + CC.RESET + r + cardColor + "  ┃" + CC.RESET;
-            F3 = "┻━━━━━┛";
+            F2 = cardColor + "│  " + CC.RESET + r + cardColor + "  │" + CC.RESET;
+            F3 = "┴─────┘";
         }
         else {
-            F1 = cardColor + "      ┃" + CC.RESET;
-            F2 = cardColor + "      ┃" + CC.RESET;
-            F3 = "━━━━━━┛";
+            F1 = cardColor + "      │" + CC.RESET;
+            F2 = cardColor + "      │" + CC.RESET;
+            F3 = "──────┘";
         }
 
         List<String> lines = new ArrayList<>();
 
-        lines.add(cardColor + A1 + "━━━━━━━━━━━" + B1 + CC.RESET);
+        lines.add(cardColor + A1 + "───────────" + B1 + CC.RESET);
         lines.add(A2 + "     " + C + "     " + B2);
         lines.add(A3 + "           " + B3);
-        lines.add(cardColor + "┃           " + CC.RESET + D + cardColor + "           ┃" + CC.RESET);
+        lines.add(cardColor + "│           " + CC.RESET + D + cardColor + "           │" + CC.RESET);
         lines.add(E1 + "           " + F1);
         lines.add(E2 + "           " + F2);
-        lines.add(cardColor + E3 + "━━━━━━━━━━━" + F3 + CC.RESET);
+        lines.add(cardColor + E3 + "───────────" + F3 + CC.RESET);
 
         if (sideType.equals(CardSideType.FRONT)){
             cardIDToCardFrontTUILines.put(cardID, lines);
@@ -1623,7 +1623,7 @@ public class TUIView implements View {
         else {
             E1 = "│      ";
             E2 = "│      ";
-            E3 = "└──────";
+            E3 = "└──────"; 
         }
 
         if (cardSide.getBRCorner().isAvailable()) {
@@ -1642,7 +1642,7 @@ public class TUIView implements View {
         else {
             F1 = "      │";
             F2 = "      │";
-            F3 = "──────┘";
+            F3 = "──────┘"; 
         }
 
         if (sideType.equals(CardSideType.BACK)) {
@@ -1722,13 +1722,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints() + "       ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃           " + mainColor + "   " + CC.RESET + "         ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               "+ card.getPoints() + "       │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│           " + mainColor + "   " + CC.RESET + "         │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1739,13 +1739,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               " + card.getPoints() + "       ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃                 " + mainColor + "   " + CC.RESET + "   ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               " + card.getPoints() + "       │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│                 " + mainColor + "   " + CC.RESET + "   │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1756,24 +1756,24 @@ public class TUIView implements View {
         if (card.getID() >= 94 && card.getID() <= 97) {
             String r = card.getResourceType().getColor() + card.getResourceType() + CC.RESET;
 
-            lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-            lines.add("┃               " + card.getPoints() + "       ┃");
-            lines.add("┃                       ┃");
-            lines.add("┃               " + r + "       ┃");
-            lines.add("┃            " + r + "     " + r + "    ┃");
-            lines.add("┃                       ┃");
-            lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+            lines.add("┌───────────────────────┐");
+            lines.add("│               " + card.getPoints() + "       │");
+            lines.add("│                       │");
+            lines.add("│               " + r + "       │");
+            lines.add("│            " + r + "     " + r + "    │");
+            lines.add("│                       │");
+            lines.add("└───────────────────────┘");
         }
         else {
             String resType = card.getResourceType().toString();
 
-            lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-            lines.add("┃               "+ card.getPoints()+ "       ┃");
-            lines.add("┃                       ┃");
-            lines.add("┃              " + CC.YELLOW + resType + "  "  + resType + CC.RESET + "     ┃");
-            lines.add("┃                       ┃");
-            lines.add("┃                       ┃");
-            lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+            lines.add("┌───────────────────────┐");
+            lines.add("│               "+ card.getPoints()+ "       │");
+            lines.add("│                       │");
+            lines.add("│              " + CC.YELLOW + resType + "  "  + resType + CC.RESET + "     │");
+            lines.add("│                       │");
+            lines.add("│                       │");
+            lines.add("└───────────────────────┘");
         }
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
@@ -1784,13 +1784,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               " + card.getPoints() + "       ┃");
-        lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
-        lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
-        lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               " + card.getPoints() + "       │");
+        lines.add("│           " + color + "   " + CC.RESET + "         │");
+        lines.add("│              " + color + "   " + CC.RESET + "      │");
+        lines.add("│                 " + color + "   " + CC.RESET + "   │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1801,13 +1801,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               " + card.getPoints() + "       ┃");
-        lines.add("┃           " + mainColor + "   " + CC.RESET + "         ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               " + card.getPoints() + "       │");
+        lines.add("│           " + mainColor + "   " + CC.RESET + "         │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1817,13 +1817,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               " + card.getPoints() + "       ┃");
-        lines.add("┃                 " + color + "   " + CC.RESET + "   ┃");
-        lines.add("┃              " + color + "   " + CC.RESET + "      ┃");
-        lines.add("┃           " + color + "   " + CC.RESET + "         ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               " + card.getPoints() + "       │");
+        lines.add("│                 " + color + "   " + CC.RESET + "   │");
+        lines.add("│              " + color + "   " + CC.RESET + "      │");
+        lines.add("│           " + color + "   " + CC.RESET + "         │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1831,13 +1831,13 @@ public class TUIView implements View {
     private void createTrinityObjectiveCardLines(TrinityObjectiveCard card) {
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
-        lines.add("┃                       ┃");
-        lines.add("┃            " + CC.YELLOW + "Q  K  M" + CC.RESET + "    ┃");
-        lines.add("┃                       ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               "+ card.getPoints()+ "       │");
+        lines.add("│                       │");
+        lines.add("│            " + CC.YELLOW + "Q  K  M" + CC.RESET + "    │");
+        lines.add("│                       │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
@@ -1848,13 +1848,13 @@ public class TUIView implements View {
 
         List<String> lines = new ArrayList<>();
 
-        lines.add("┏━━━━━━━━━━━━━━━━━━━━━━━┓");
-        lines.add("┃               "+ card.getPoints()+ "       ┃");
-        lines.add("┃                 " + mainColor + "   " + CC.RESET + "   ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃              " + secColor + "   " + CC.RESET + "      ┃");
-        lines.add("┃                       ┃");
-        lines.add("┗━━━━━━━━━━━━━━━━━━━━━━━┛");
+        lines.add("┌───────────────────────┐");
+        lines.add("│               "+ card.getPoints()+ "       │");
+        lines.add("│                 " + mainColor + "   " + CC.RESET + "   │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│              " + secColor + "   " + CC.RESET + "      │");
+        lines.add("│                       │");
+        lines.add("└───────────────────────┘");
 
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }

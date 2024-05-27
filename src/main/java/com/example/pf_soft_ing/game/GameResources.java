@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.game;
 
+import com.example.pf_soft_ing.Main;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.corner.CardCorner;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
@@ -23,18 +24,17 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameResources {
 
-    private final static String resourceCardsFilename = "src/main/resources/JsonFiles/CardsData/ResourceCards.json";
-    private final static String goldenCardsFilename = "src/main/resources/JsonFiles/CardsData/GoldenCards.json";
-    private final static String starterCardsFilename = "src/main/resources/JsonFiles/CardsData/StarterCards.json";
-    private final static String objectiveCardsFilename = "src/main/resources/JsonFiles/CardsData/ObjectiveCards.json";
+    private final static String resourceCardsFilename = "/JsonFiles/CardsData/ResourceCards.json"; // src/main/resources
+    private final static String goldenCardsFilename = "/JsonFiles/CardsData/GoldenCards.json";
+    private final static String starterCardsFilename = "/JsonFiles/CardsData/StarterCards.json";
+    private final static String objectiveCardsFilename = "/JsonFiles/CardsData/ObjectiveCards.json";
 
     private static List<PlaceableCard> resourcesDeck;
     private static List<PlaceableCard> goldenDeck;
@@ -149,9 +149,13 @@ public class GameResources {
         }
     }
 
+    public static void main(String[] args) {
+        initializeResourceDeck();
+    }
+
     public static void initializeResourceDeck() {
         try {
-            JsonReader resourceCardsReader = new JsonReader(new FileReader(resourceCardsFilename));
+            JsonReader resourceCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(resourceCardsFilename))));
 
             ResourceCardDeserializer resourceCardDeserializer = new ResourceCardDeserializer();
 
@@ -163,14 +167,14 @@ public class GameResources {
 
             resourcesDeck = gson.fromJson(resourceCardsReader, listOfClassObject);
         }
-        catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+        catch (JsonIOException | JsonSyntaxException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public static void initializeGoldenDeck() {
         try {
-            JsonReader goldenCardsReader = new JsonReader(new FileReader(goldenCardsFilename));
+            JsonReader goldenCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(goldenCardsFilename))));
 
             GoldenCardDeserializer goldenCardDeserializer = new GoldenCardDeserializer();
 
@@ -182,14 +186,14 @@ public class GameResources {
 
             goldenDeck = gson.fromJson(goldenCardsReader, listOfClassObject);
         }
-        catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+        catch (JsonIOException | JsonSyntaxException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public static void initializeStarterDeck() {
         try {
-            JsonReader starterCardsReader = new JsonReader(new FileReader(starterCardsFilename));
+            JsonReader starterCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(starterCardsFilename))));
 
             StarterCardDeserializer starterCardDeserializer = new StarterCardDeserializer();
 
@@ -201,14 +205,14 @@ public class GameResources {
 
             starterDeck = gson.fromJson(starterCardsReader, listOfClassObject);
         }
-        catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+        catch (JsonIOException | JsonSyntaxException e) {
             System.out.println(e.getMessage());
         }
     }
 
     public static void initializeObjectiveDeck() {
         try {
-            JsonReader objectiveCardsReader = new JsonReader(new FileReader(objectiveCardsFilename));
+            JsonReader objectiveCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(objectiveCardsFilename))));
 
             ObjectiveCardDeserializer objectiveCardDeserializer = new ObjectiveCardDeserializer();
 
@@ -220,7 +224,7 @@ public class GameResources {
 
             objectiveDeck = gson.fromJson(objectiveCardsReader, listOfClassObject);
         }
-        catch (FileNotFoundException | JsonIOException | JsonSyntaxException e) {
+        catch (JsonIOException | JsonSyntaxException e) {
             System.out.println(e.getMessage());
         }
     }
