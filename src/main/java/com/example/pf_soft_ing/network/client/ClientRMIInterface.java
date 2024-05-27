@@ -53,5 +53,7 @@ public interface ClientRMIInterface extends Remote {
 
     void setNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) throws RemoteException;
 
-    void sendPing() throws RemoteException;
+    void sendPlayerDisconnection(int playerID) throws RemoteException;
+
+    void startHeartbeat() throws RemoteException;
 }

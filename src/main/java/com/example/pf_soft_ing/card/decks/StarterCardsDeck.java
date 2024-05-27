@@ -3,6 +3,7 @@ package com.example.pf_soft_ing.card.decks;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class StarterCardsDeck {
     private final List<PlaceableCard> deck;
 
     public StarterCardsDeck(List<PlaceableCard> deck) {
-        this.deck = deck;
+        this.deck = new ArrayList<>(deck);
     }
 
     public List<PlaceableCard> getDeck() {

@@ -14,7 +14,7 @@ public class UsableCardsDeck {
     private final List<PlaceableCard> visibleCards;
 
     public UsableCardsDeck(List<PlaceableCard> deck) {
-        this.deck = deck;
+        this.deck = new ArrayList<>(deck);
         visibleCards = new ArrayList<>();
     }
 

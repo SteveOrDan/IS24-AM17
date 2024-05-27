@@ -17,7 +17,7 @@ public class GameModel {
      * @return Map of match IDs with the corresponding nicknames
      */
     public Map<Integer, List<String>> getMatches(){
-        Map<Integer, List<String>> allMatches = new HashMap<>();
+        Map<Integer, List<String>> allMatches = new LinkedHashMap<>();
         List<MatchController> matchesCopy;
 
         synchronized (matches){
@@ -167,5 +167,26 @@ public class GameModel {
      */
     public void startGame(MatchController matchController){
         matchController.setUpGame();
+    }
+
+    /**
+     * Removes a match from the game model
+     * @param matchID ID of the match
+     */
+    public void removeMatch(int matchID) {
+        synchronized (matches) {
+            matches.removeIf(match -> match.getMatchID() == matchID);
+        }
+    }
+
+    /**
+     * Checks if a match is in the game model
+     * @param matchController MatchController of the match
+     * @return True if the match is in the game model, false otherwise
+     */
+    public boolean containsMatch(MatchController matchController) {
+        synchronized (matches) {
+            return matches.contains(matchController);
+        }
     }
 }

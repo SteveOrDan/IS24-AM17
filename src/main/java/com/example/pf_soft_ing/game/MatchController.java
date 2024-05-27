@@ -179,7 +179,7 @@ public class MatchController {
                 getPlayerSender(playerID).confirmSecretObjective();
             }
         }
-        catch (InvalidPlayerIDException | InvalidObjectiveCardException | StarterCardNotSetException e) {
+        catch (InvalidPlayerIDException | InvalidObjectiveCardIDException | StarterCardNotSetException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
@@ -202,13 +202,9 @@ public class MatchController {
             throw new InvalidPlayerIDException();
         }
 
-        PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
-
         List<ObjectiveCard> objectives = new ArrayList<>();
         objectives.add(matchModel.drawObjectiveCard());
         objectives.add(matchModel.drawObjectiveCard());
-
-        player.setObjectivesToChoose(objectives);
 
         return List.of(objectives.get(0).getID(), objectives.get(1).getID());
     }
@@ -578,9 +574,35 @@ public class MatchController {
      * @param playerID ID of the player that disconnected
      */
     public void disconnectPlayer(int playerID) {
-        // TODO: Implement player disconnection handling
+        GameState oldGameState = getGameState();
+        PlayerState oldPlayerState = getIDToPlayerMap().get(playerID).getState();
+        // Set the player's state to "disconnected"
+        getIDToPlayerMap().get(playerID).setState(PlayerState.DISCONNECTED);
+
+        // If the game is in the pre-game phase, remove the player from the game
+        if (oldGameState == GameState.PREGAME) {
+            matchModel.removePlayer(playerID);
+        }
+        // If the game is in the set-up phase, simply broadcast the disconnection to other players
+        else if (oldGameState == GameState.SET_UP) {
+            broadcastPlayerDisconnection(playerID);
+        }
+        else if (oldGameState == GameState.PLAYING) {
+            matchModel.reducePlayersOnline(playerID);
+
+            // If the game is in the playing phase and the player disconnected after placing a card, undo the card placement
+            if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING){
+                // TODO: Undo card placement
+            }
+        }
     }
 
+    /**
+     * Method to send a chat message to a player (or all players)
+     * @param senderID ID of the sender
+     * @param recipient Recipient of the message
+     * @param message Message to send
+     */
     public void chatMessage(int senderID, String recipient, String message) {
         try {
             String senderNickname = matchModel.getIDToPlayerMap().get(senderID).getNickname();
@@ -685,7 +707,9 @@ public class MatchController {
      */
     private void broadcastNewPlayerExtraTurn(int playerID, int cardID, Position pos, CardSideType side, int score) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID(), score);
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED) {
+                getPlayerSender(broadcastID).sendNewPlayerExtraTurn(cardID, playerID, pos, side, matchModel.getCurrPlayerID(), score);
+            }
         }
     }
 
@@ -698,7 +722,9 @@ public class MatchController {
      */
     private void broadcastPlaceCard(int playerID, int cardID, Position pos, CardSideType side, int score) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).placeCard(playerID, cardID, pos, side, score);
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED) {
+                getPlayerSender(broadcastID).placeCard(playerID, cardID, pos, side, score);
+            }
         }
     }
 
@@ -710,7 +736,30 @@ public class MatchController {
      */
     private void broadcastRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-            getPlayerSender(broadcastID).sendRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED) {
+                getPlayerSender(broadcastID).sendRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
+            }
         }
+    }
+
+    /**
+     * Broadcast the player disconnection to all players
+     * @param playerID ID of the player that disconnected
+     */
+    private void broadcastPlayerDisconnection(int playerID) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            // Broadcast the disconnection to all players online excluding the disconnected player
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
+                getPlayerSender(broadcastID).sendPlayerDisconnection(playerID);
+            }
+        }
+    }
+
+    public boolean hasNoPlayers() {
+        return matchModel.hasNoPlayers();
+    }
+
+    public boolean hasNoPlayersOnline() {
+        return matchModel.hasNoPlayersOnline();
     }
 }

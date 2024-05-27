@@ -88,20 +88,6 @@ public class MatchModel {
 
     /**
      * Getter
-     * @return A map with other players ID (as key) and nickname (as value)
-     */
-    public Map<Integer, String> getNicknamesMap(int currPlayerID) {
-        Map<Integer, String> nicknamesMap = new HashMap<>();
-        for (PlayerModel playerModel : IDToPlayerMap.values()){
-            if (playerModel.getID() != currPlayerID) {
-                nicknamesMap.put(playerModel.getID(), playerModel.getNickname());
-            }
-        }
-        return nicknamesMap;
-    }
-
-    /**
-     * Getter
      * @return Number of maximum players in the match
      */
     public int getMaxPlayers() {
@@ -199,7 +185,15 @@ public class MatchModel {
      */
     public void addCurrPlayer(PlayerModel playerModel) throws GameIsFullException {
         if (currPlayers >= maxPlayers){
-            throw new GameIsFullException();
+            // If there are no players disconnected, the match is full
+            if (allPlayersOnline()) {
+                throw new GameIsFullException();
+            }
+            // If there are players disconnected
+            else {
+                // TODO: implement reconnection
+                playersReady++;
+            }
         }
         IDToPlayerMap.put(playerModel.getID(), playerModel);
 
@@ -412,13 +406,27 @@ public class MatchModel {
         if (gameState == GameState.PLAYING){
             checkForEndGame();
         }
-        if (currPlayerIndex == orderOfPlayersIDs.length - 1){
-            currPlayerID = orderOfPlayersIDs[0];
+
+        boolean hasLooped = false;
+        boolean foundNextPlayer = false;
+        while (!foundNextPlayer){
+            if (currPlayerIndex == orderOfPlayersIDs.length - 1){
+                currPlayerIndex = 0;
+                hasLooped = true;
+            }
+            else {
+                currPlayerIndex++;
+            }
+
+            if (IDToPlayerMap.get(orderOfPlayersIDs[currPlayerIndex]).getState() != PlayerState.DISCONNECTED){
+                foundNextPlayer = true;
+            }
+        }
+
+        if (hasLooped){
             manageEndGame();
         }
-        else {
-            currPlayerID = orderOfPlayersIDs[currPlayerIndex + 1];
-        }
+        currPlayerID = orderOfPlayersIDs[currPlayerIndex];
 
         if (gameState != GameState.END_GAME){
             IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
@@ -509,6 +517,10 @@ public class MatchModel {
         }
     }
 
+    /**
+     * Getter
+     * @return Map of player IDs to their nicknames
+     */
     public Map<Integer, String> getIDtoNicknameMap() {
         Map<Integer, String> IDToNickname = new HashMap<>();
 
@@ -516,5 +528,53 @@ public class MatchModel {
             IDToNickname.put(player.getID(), player.getNickname());
         }
         return IDToNickname;
+    }
+
+    /**
+     * Removes the player with the given ID from the match
+     * @param playerID ID of the player to remove
+     */
+    public void removePlayer(int playerID) {
+        IDToPlayerMap.remove(playerID);
+        currPlayers--;
+        playersReady--;
+    }
+
+    /**
+     * Method to check if the match has no players
+     * @return true if the match has no players, false otherwise
+     */
+    public boolean hasNoPlayers() {
+        return currPlayers == 0;
+    }
+
+    /**
+     * Method to check if all players are disconnected
+     * @return true if the match has no players online, false otherwise
+     */
+    public boolean hasNoPlayersOnline() {
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getState() != PlayerState.DISCONNECTED){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Method to check if all players are online
+     * @return true if all players are online, false otherwise
+     */
+    private boolean allPlayersOnline() {
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getState() == PlayerState.DISCONNECTED){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void reducePlayersOnline(int playerID) {
+        // TODO: implement timer before announcing the last connected player as winner
     }
 }

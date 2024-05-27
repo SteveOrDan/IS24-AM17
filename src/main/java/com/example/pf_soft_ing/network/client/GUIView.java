@@ -141,6 +141,15 @@ public class GUIView implements View {
 
     private final Stage stage;
 
+    private final Timer timer = new Timer();
+    private final TimerTask pingTask = new TimerTask() {
+        @Override
+        public void run() {
+            sender.sendPing();
+        }
+    };
+    private static final int PING_INTERVAL = 1000;
+
     public GUIView(Stage stage, String ip) {
         this.stage = stage;
         this.ip = ip;
@@ -1902,8 +1911,13 @@ public class GUIView implements View {
     }
 
     @Override
-    public void receivePing() {
-        sender.sendPong();
+    public void showPlayerDisconnection(int playerID) {
+
+    }
+
+    @Override
+    public void startHeartbeat() {
+        timer.scheduleAtFixedRate(pingTask, 0, PING_INTERVAL);
     }
 
     private String getPlayerNickname(int playerID){

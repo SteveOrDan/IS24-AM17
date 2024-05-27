@@ -136,4 +136,14 @@ public class GameController {
     public Sender getPlayerSender(int playerID) {
         return gameModel.getIDToPlayers().get(playerID).getSender();
     }
+
+    public void checkMatchState(MatchController matchController) {
+        if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline()) {
+            gameModel.removeMatch(matchController.getMatchID());
+        }
+    }
+
+    public boolean matchNotPresent(MatchController matchController) {
+        return !gameModel.containsMatch(matchController);
+    }
 }

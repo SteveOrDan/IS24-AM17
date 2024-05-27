@@ -63,6 +63,15 @@ public class TUIView implements View {
 
     private final List<String> chat = new ArrayList<>();
 
+    private final Timer timer = new Timer();
+    private final TimerTask pingTask = new TimerTask() {
+        @Override
+        public void run() {
+            sender.sendPing();
+        }
+    };
+    private static final int PING_INTERVAL = 1000;
+
     public void start(String[] args) {
         createStateToCommandsMap();
         playerState = PlayerState.MAIN_MENU;
@@ -2029,8 +2038,13 @@ public class TUIView implements View {
     }
 
     @Override
-    public void receivePing() {
-        sender.sendPong();
+    public void showPlayerDisconnection(int playerID) {
+        System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+    }
+
+    @Override
+    public void startHeartbeat() {
+        timer.scheduleAtFixedRate(pingTask, 0, PING_INTERVAL);
     }
 
     /**

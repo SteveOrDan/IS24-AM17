@@ -107,6 +107,8 @@ public class ClientSocketReceiver {
 
             case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
 
+            case StartHeartbeatMsg ignored -> view.startHeartbeat();
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

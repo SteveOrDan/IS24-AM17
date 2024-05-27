@@ -9,7 +9,6 @@ import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -22,14 +21,12 @@ public class SocketSender implements Sender {
     }
 
     protected void sendMessage(Message output){
-        new Thread(() -> {
-            try {
-                out.writeObject(output);
-            }
-            catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }).start();
+        try {
+            out.writeObject(output);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -138,7 +135,12 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendPing() {
+    public void sendPlayerDisconnection(int playerID) {
+        sendMessage(new PlayerDisconnectionMsg(playerID));
+    }
 
+    @Override
+    public void startHeartbeat() {
+        sendMessage(new StartHeartbeatMsg());
     }
 }

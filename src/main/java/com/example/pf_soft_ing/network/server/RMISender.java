@@ -220,12 +220,23 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void sendPing() {
+    public void sendPlayerDisconnection(int playerID) {
         new Thread(() ->{
             try {
-                client.sendPing();
+                client.sendPlayerDisconnection(playerID);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Ping not sent");
+                System.out.println("Error: " + e.getMessage() + ". Player disconnection not shown");
+            }
+        }).start();
+    }
+
+    @Override
+    public void startHeartbeat() {
+        new Thread(() ->{
+            try {
+                client.startHeartbeat();
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Start heartbeat request not sent");
             }
         }).start();
     }

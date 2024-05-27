@@ -166,10 +166,10 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendPong() {
+    public void sendPing() {
         new Thread(() -> {
             try {
-                serverInterface.sendPong(playerID);
+                serverInterface.sendPing(playerID);
             }
             catch (RemoteException e) {
                 System.out.println("Connection to server lost");

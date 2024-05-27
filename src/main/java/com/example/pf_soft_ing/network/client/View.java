@@ -50,5 +50,7 @@ public interface View {
 
     void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int deltaScore);
 
-    void receivePing();
+    void showPlayerDisconnection(int playerID);
+
+    void startHeartbeat();
 }

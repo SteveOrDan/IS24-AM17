@@ -13,7 +13,7 @@ public class ObjectiveCardsDeck {
     private final List<ObjectiveCard> commonObjectives;
 
     public ObjectiveCardsDeck(List<ObjectiveCard> deck) {
-        this.deck = deck;
+        this.deck = new ArrayList<>(deck);
         commonObjectives = new ArrayList<>();
     }
 

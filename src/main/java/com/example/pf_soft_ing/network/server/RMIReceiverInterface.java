@@ -33,5 +33,5 @@ public interface RMIReceiverInterface extends Remote {
 
     void sendChatMessage(int playerID, String recipientNickname, String message) throws RemoteException;
 
-    void sendPong(int playerID) throws RemoteException;
+    void sendPing(int playerID) throws RemoteException;
 }

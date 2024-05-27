@@ -5,7 +5,6 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
 
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
 
@@ -54,5 +53,7 @@ public interface Sender {
 
     void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives);
 
-    void sendPing();
+    void sendPlayerDisconnection(int playerID);
+
+    void startHeartbeat();
 }

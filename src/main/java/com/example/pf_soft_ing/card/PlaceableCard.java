@@ -85,7 +85,6 @@ public abstract class PlaceableCard {
         return sideType.equals(CardSideType.FRONT) ? front : back;
     }
 
-    // TODO: Remove this method
     /**
      * Returns the correct side of the card based on the chosen side
      * @return Current side of the card

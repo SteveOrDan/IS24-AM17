@@ -23,7 +23,6 @@ public class PlayerModel {
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
-    private List<ObjectiveCard> objectivesToChoose;
     private ObjectiveCard secretObjective;
 
     private PlaceableCard starterCard;
@@ -105,14 +104,6 @@ public class PlayerModel {
     }
 
     /**
-     * Setter
-     * @param objectives List of 2 objective cards to choose from
-     */
-    public void setObjectivesToChoose(List<ObjectiveCard> objectives){
-        objectivesToChoose = objectives;
-    }
-
-    /**
      * Getter
      * @return List of objective cards to choose from
      */
@@ -124,9 +115,11 @@ public class PlayerModel {
      * Sets the player's secret objective card
      * @param cardID ID of the card to set as the secret objective
      */
-    public void setSecretObjective(int cardID) throws InvalidObjectiveCardException {
-        if (!objectivesToChoose.contains(GameResources.getObjectiveCardByID(cardID))) {
-            throw new InvalidObjectiveCardException();
+    public void setSecretObjective(int cardID) throws InvalidObjectiveCardIDException {
+        List<Integer> objectiveIDs = GameResources.getObjectiveDeck().stream().map(ObjectiveCard::getID).toList();
+
+        if (!objectiveIDs.contains(cardID)){
+            throw new InvalidObjectiveCardIDException();
         }
         secretObjective = GameResources.getObjectiveCardByID(cardID);
     }
