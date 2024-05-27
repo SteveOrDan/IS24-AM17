@@ -130,13 +130,13 @@ public class GameModel {
     public void chooseNickname(int playerID, String nickname) throws InvalidMatchIDException, NicknameAlreadyExistsException {
         int matchID = IDToPlayers.get(playerID).getMatchID();
 
-        MatchController matchModel = getMatchByID(matchID);
+        MatchController matchController = getMatchByID(matchID);
 
-        matchModel.checkNickname(nickname);
+        matchController.checkNickname(nickname);
 
         IDToPlayers.get(playerID).setNickname(nickname);
 
-        matchModel.addReadyPlayer();
+        matchController.addReadyPlayer();
     }
 
     /**
