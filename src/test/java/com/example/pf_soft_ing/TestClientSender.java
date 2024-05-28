@@ -6,6 +6,11 @@ import com.example.pf_soft_ing.network.client.ClientSender;
 
 public class TestClientSender implements ClientSender {
     @Override
+    public void connect() {
+
+    }
+
+    @Override
     public void setPlayerID(int playerID) {
 
     }

@@ -27,14 +27,133 @@ class MatchControllerTest {
 
     private final static int numOfPlayers = 4;
     private final MatchController matchController = new MatchController(numOfPlayers, 1);
-
     private final GameController gameController = new GameController();
+
+
 
     @Test
     void checkResources(){
         matchController.initializeDecks();
 
         assertEquals(86, GameResources.getIDToPlaceableCardMap().size());
+    }
+    @Test
+    void placeStarterCardForPlayer(){
+        PlayerModel player1 = gameController.createPlayer(new TestSender());
+        PlayerModel player2 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player1.getID());
+        MatchController matchController = gameController.createMatch(player1.getID(), 2, "player1");
+        gameController.getMatches(player2.getID());
+        MatchController matchController1 = gameController.selectMatch(player2.getID(), matchController.getMatchID());
+        matchController1.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
+
+        gameController.chooseNickname(player2.getID(), "player2",matchController1);
+
+        matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
+        matchController1.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
+
+        try {
+            assertEquals(CardSideType.BACK, player1.getStarterCard().getCurrSideType());
+            assertEquals(CardSideType.BACK, player2.getStarterCard().getCurrSideType());
+        } catch (StarterCardNotSetException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+    @Test
+    void placeCardExceptions(){
+        PlayerModel player1 = gameController.createPlayer(new TestSender());
+        PlayerModel player2 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player1.getID());
+        gameController.getMatches(player2.getID());
+        MatchController matchController1 = gameController.createMatch(player1.getID(), 2, "player1");
+        MatchController matchController2 = gameController.selectMatch(player2.getID(), matchController1.getMatchID());
+        gameController.chooseNickname(player2.getID(), "player2",matchController2);
+        matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
+        matchController2.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
+        matchController1.setSecretObjectiveForPlayer(player1.getID(), 86);
+        matchController2.setSecretObjectiveForPlayer(player2.getID(), 87);
+
+        if (player1.getState() == PlayerState.PLACING){
+            // current player is player1
+            PlaceableCard card1 = player1.getHand().getFirst();
+            PlaceableCard card2 = player2.getHand().getFirst();
+
+            // Card not in current player's hand
+            matchController1.placeCard(player1.getID(), card2.getID(), new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player1.getState());
+
+            // not current player tries to Place a card
+            matchController2.placeCard(player2.getID(), card2.getID(), new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player1.getState());
+
+            // Current player tries to place a invalid card
+            matchController1.placeCard(player1.getID(), 100, new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player1.getState());
+
+            // Game State is in Extra Round
+            matchController1.setGameState(GameState.EXTRA_ROUND);
+            matchController1.placeCard(player1.getID(), card1.getID(), new Position(1, 1), CardSideType.FRONT);
+            assertEquals(PlayerState.WAITING, player1.getState());
+
+        } else {
+            // current player is player2
+            PlaceableCard card1 = player1.getHand().getFirst();
+            PlaceableCard card2 = player2.getHand().getFirst();
+
+            // Card not in current player's hand
+            matchController2.placeCard(player2.getID(), card1.getID(), new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player2.getState());
+
+            // not current player tries to Place a card
+            matchController1.placeCard(player1.getID(), card1.getID(), new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player2.getState());
+
+            // Current player tries to place a invalid card
+            matchController2.placeCard(player2.getID(), 100, new Position(0, 0), CardSideType.FRONT);
+            assertEquals(PlayerState.PLACING, player2.getState());
+
+            // Game State is in Extra Round
+            matchController2.setGameState(GameState.EXTRA_ROUND);
+            matchController2.placeCard(player2.getID(), card2.getID(), new Position(1, 1), CardSideType.FRONT);
+            assertEquals(PlayerState.WAITING, player2.getState());
+        }
+        }
+
+    @Test
+    void setSecretObjectiveForPlayer(){
+        PlayerModel player1 = gameController.createPlayer(new TestSender());
+        PlayerModel player2 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player1.getID());
+        gameController.getMatches(player2.getID());
+        MatchController matchController1 = gameController.createMatch(player1.getID(), 2, "player1");
+        MatchController matchController2 = gameController.selectMatch(player2.getID(), matchController1.getMatchID());
+        gameController.chooseNickname(player2.getID(), "player2",matchController2);
+        matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
+        matchController2.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
+        matchController1.setSecretObjectiveForPlayer(player1.getID(), 86);
+        matchController2.setSecretObjectiveForPlayer(player2.getID(), 87);
+        assertEquals(86, player1.getSecretObjective().getID());
+        assertEquals(87, player2.getSecretObjective().getID());
+    }
+
+    @Test
+    void chatMessage(){
+        PlayerModel player1 = gameController.createPlayer(new TestSender());
+        PlayerModel player2 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player1.getID());
+        gameController.getMatches(player2.getID());
+        MatchController matchController1 = gameController.createMatch(player1.getID(), 2, "player1");
+        MatchController matchController2 = gameController.selectMatch(player2.getID(), matchController1.getMatchID());
+        gameController.chooseNickname(player2.getID(), "player2",matchController2);
+        matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
+        matchController2.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
+        matchController1.setSecretObjectiveForPlayer(player1.getID(), 86);
+        matchController2.setSecretObjectiveForPlayer(player2.getID(), 87);
+        matchController1.chatMessage(player1.getID(),player2.getNickname(), "Hello");
+
+        matchController2.chatMessage(player1.getID(), "player3","Hello");
+        matchController2.chatMessage(player1.getID(),"all", "Hello");
     }
 
     @Test

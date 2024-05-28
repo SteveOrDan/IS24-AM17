@@ -253,7 +253,7 @@ public class GUIView implements View {
         }
 
         if (connected) {
-            sender.getMatches();
+            sender.connect();
         }
         else {
             showError(errorMessage);
