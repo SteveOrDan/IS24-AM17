@@ -25,11 +25,18 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void getMatches(ClientRMIInterface client) throws RemoteException {
+    public void connect(ClientRMIInterface client) throws RemoteException {
+        // Create player and add to IDToPlayerMap
         PlayerModel playerModel = gameController.createPlayer(new RMISender(client));
         IDToPlayer.put(playerModel.getID(), playerModel);
 
-        gameController.getMatches(playerModel.getID());
+        // Send matches to client
+        getMatches(playerModel.getID());
+    }
+
+    @Override
+    public void getMatches(int playerID) throws RemoteException {
+        gameController.getMatches(playerID);
     }
 
     @Override

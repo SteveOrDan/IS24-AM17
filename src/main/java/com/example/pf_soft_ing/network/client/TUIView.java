@@ -107,7 +107,7 @@ public class TUIView implements View {
             }
         }
 
-        sender.getMatches();
+        sender.connect();
 
         startInputReading();
     }

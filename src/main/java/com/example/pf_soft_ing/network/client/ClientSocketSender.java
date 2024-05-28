@@ -33,6 +33,11 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
+    public void connect() {
+        getMatches();
+    }
+
+    @Override
     public void getMatches() {
         sendMessage(new GetMatchesMsg());
     }

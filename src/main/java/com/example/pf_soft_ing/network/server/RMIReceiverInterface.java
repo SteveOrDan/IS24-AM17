@@ -9,7 +9,9 @@ import java.rmi.RemoteException;
 
 public interface RMIReceiverInterface extends Remote {
 
-    void getMatches(ClientRMIInterface client) throws RemoteException;
+    void connect(ClientRMIInterface client) throws RemoteException;
+
+    void getMatches(int playerID) throws RemoteException;
 
     void createMatch(int playerID, int numberOfPlayers, String nickname) throws RemoteException;
 

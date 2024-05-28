@@ -5,6 +5,7 @@ import com.example.pf_soft_ing.card.side.CardSideType;
 
 public interface ClientSender {
 
+    void connect();
     void setPlayerID(int playerID);
     void getMatches();
     void createMatch(int numberOfPlayers, String nickname);

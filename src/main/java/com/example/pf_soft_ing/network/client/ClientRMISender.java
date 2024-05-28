@@ -22,10 +22,22 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
+    public void connect() {
+        new Thread(() -> {
+            try {
+                serverInterface.connect(client);
+            }
+            catch (RemoteException e) {
+                System.out.println("Client: Connection to server lost");
+            }
+        }).start();
+    }
+
+    @Override
     public void getMatches() {
         new Thread(() -> {
             try {
-                serverInterface.getMatches(client);
+                serverInterface.getMatches(playerID);
             }
             catch (RemoteException e) {
                 System.out.println("Client: Connection to server lost");
