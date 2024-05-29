@@ -100,7 +100,7 @@ class MatchModelTest {
         matchModel.initializeDecks();
         matchModel.setVisibleCards();
 
-        PlaceableCard card = null;
+        PlaceableCard card;
         try {
             card = matchModel.drawResourceCard();
             assertNotNull(card);
@@ -115,7 +115,7 @@ class MatchModelTest {
         matchModel.initializeDecks();
         matchModel.setVisibleCards();
 
-        PlaceableCard card = null;
+        PlaceableCard card;
         try {
             card = matchModel.drawGoldenCard();
             assertNotNull(card);

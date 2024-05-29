@@ -14,12 +14,12 @@ import java.rmi.registry.Registry;
 public class ClientMain {
 
     public static void main(String[] args) {
-        if (args.length != 2) {
+        if (args.length != 3) {
             System.out.println("Error: You have to insert the IP address and the view type (TUI or GUI).");
             return;
         }
 
-        if (args[1].equals("TUI")) {
+        if (args[2].equals("TUI")) {
             TUIApp.main(args);
         }
         else {

@@ -602,4 +602,38 @@ class PlayerModelTest {
         playerModel.calculateObjectivePoints(objectiveCard);
         assertEquals(3, playerModel.getCurrScore());
     }
+
+    @DisplayName("Test for place card exceptions")
+    @Test
+    void placeCardExceptions() {
+        //Initialize the decks
+        GameResources.initializeAllDecks();
+
+        //Initialize the player
+        createPlayerModel();
+
+        // Create cards
+        PlaceableCard starterCard = GameResources.getPlaceableCardByID(80);
+
+        //Set the player's starter card
+        playerModel.setStarterCard(starterCard);
+
+        //Place the starter card
+        playerModel.placeStarterCard(CardSideType.FRONT);
+
+        //Use 1 fungus golden card and 2 animal resource cards and flip them
+        PlaceableCard card0 = GameResources.getPlaceableCardByID(69);
+
+        //Place the cards
+        playerModel.setState(PlayerState.PLACING);
+        assertThrows(PositionAlreadyTakenException.class, () -> playerModel.placeCard(card0, new Position(0, 0), CardSideType.BACK));
+
+        //Place the cards
+        playerModel.setState(PlayerState.PLACING);
+        assertThrows(MissingResourcesException.class, () -> playerModel.placeCard(card0, new Position(1, 1), CardSideType.FRONT));
+
+        //Place the cards
+        playerModel.setState(PlayerState.DRAWING);
+        assertThrows(InvalidPlayerStateException.class, () -> playerModel.placeCard(card0, new Position(1, 1), CardSideType.BACK));
+    }
 }

@@ -15,7 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -63,7 +62,7 @@ public class GUIView implements View {
 
     private int secretObjectiveCardID;
 
-    private String connectionType;
+    private final String connectionType;
 
     private boolean chatOpen = false;
     private AnchorPane chatPane;
@@ -145,9 +144,10 @@ public class GUIView implements View {
 
     private final Stage stage;
 
-    public GUIView(Stage stage, String ip) {
+    public GUIView(Stage stage, String ip, String connectionType) {
         this.stage = stage;
         this.ip = ip;
+        this.connectionType = connectionType.toLowerCase();
 
         launchApp();
     }
@@ -165,17 +165,8 @@ public class GUIView implements View {
 
         stage.setMaximized(true);
 
-//        testShowRanking();
         drawConnectionChoiceScene();
     }
-
-    // Game flow:
-    // 1. Place shuffled decks and 4 visible cards
-    // 2. Place starter card
-    // 3. Choose token
-    // 4. Fill hand
-    // 5. Place common objectives
-    // 6. Choose secret objective
 
     private void drawConnectionChoiceScene(){
         // Create connection choice scene
@@ -183,29 +174,6 @@ public class GUIView implements View {
         connectionChoice.setPrefSize(stageWidth, stageHeight);
         connectionChoice.setLayoutX(0);
         connectionChoice.setLayoutY(0);
-
-        // Create buttons for connection type choice
-        Button socketButton = new Button("Socket");
-        socketButton.setPrefSize(200, 100);
-        socketButton.setLayoutX((stageWidth - 200) * 0.5 - 150);
-        socketButton.setLayoutY((stageHeight - 350) * 0.5);
-
-
-        Button rmiButton = new Button("RMI");
-        rmiButton.setPrefSize(200, 100);
-        rmiButton.setLayoutX((stageWidth - 200) * 0.5 + 150);
-        rmiButton.setLayoutY((stageHeight - 350) * 0.5);
-
-        socketButton.setOnAction((_) -> {
-            connectionType = "socket";
-            socketButton.setEffect(new ColorAdjust(0.7, 0.2, 0, 0));
-            rmiButton.setEffect(new ColorAdjust(0, 0, 0, 0));
-        });
-        rmiButton.setOnAction((_) -> {
-            connectionType = "rmi";
-            rmiButton.setEffect(new ColorAdjust(0.7, 0.2, 0, 0));
-            socketButton.setEffect(new ColorAdjust(0, 0, 0, 0));
-        });
 
         // Create text field for IP
         TextField IPField = new TextField();
@@ -224,8 +192,6 @@ public class GUIView implements View {
 
         connectionChoice.getChildren().add(IPField);
         connectionChoice.getChildren().add(confirmIP);
-        connectionChoice.getChildren().add(socketButton);
-        connectionChoice.getChildren().add(rmiButton);
 
         root.getChildren().add(connectionChoice);
     }

@@ -88,20 +88,6 @@ public class MatchModel {
 
     /**
      * Getter
-     * @return A map with other players ID (as key) and nickname (as value)
-     */
-    public Map<Integer, String> getNicknamesMap(int currPlayerID) {
-        Map<Integer, String> nicknamesMap = new HashMap<>();
-        for (PlayerModel playerModel : IDToPlayerMap.values()){
-            if (playerModel.getID() != currPlayerID) {
-                nicknamesMap.put(playerModel.getID(), playerModel.getNickname());
-            }
-        }
-        return nicknamesMap;
-    }
-
-    /**
-     * Getter
      * @return Number of maximum players in the match
      */
     public int getMaxPlayers() {

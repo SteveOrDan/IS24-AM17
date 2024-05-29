@@ -94,22 +94,20 @@ class GameControllerTest {
         assertEquals("player2", player2.getNickname());
 
         PlayerModel player3 = gameController.createPlayer(new TestSender());
-        PlayerModel playe4 = gameController.createPlayer(new TestSender());
+        PlayerModel player4 = gameController.createPlayer(new TestSender());
 
         gameController.getMatches(player3.getID());
-        gameController.getMatches(playe4.getID());
+        gameController.getMatches(player4.getID());
 
         MatchController matchController3 = gameController.selectMatch(player3.getID(), matchID);
-        MatchController matchController4 = gameController.selectMatch(playe4.getID(), matchID);
+        MatchController matchController4 = gameController.selectMatch(player4.getID(), matchID);
         gameController.chooseNickname(player3.getID(), "player3", matchController3);
-        gameController.chooseNickname(playe4.getID(), "player4", matchController4);
+        gameController.chooseNickname(player4.getID(), "player4", matchController4);
 
-        assertEquals(true, matchController1.checkForGameStart());
-        assertEquals(true, matchController2.checkForGameStart());
-        assertEquals(true, matchController3.checkForGameStart());
-        assertEquals(true, matchController4.checkForGameStart());
-
-
+        assertTrue(matchController1.checkForGameStart());
+        assertTrue(matchController2.checkForGameStart());
+        assertTrue(matchController3.checkForGameStart());
+        assertTrue(matchController4.checkForGameStart());
     }
 
     @Test

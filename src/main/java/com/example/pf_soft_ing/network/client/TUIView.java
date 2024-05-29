@@ -73,15 +73,10 @@ public class TUIView implements View {
         int portNumber = 0;
 
         while (!connected){
-            System.out.println("Choose connection, type:\n\t-'1' for Socket;\n\t-'2' for RMI;");
-
             try {
-                String connectionType = stdIn.readLine();
-                while (!connectionType.equals("1") && !connectionType.equals("2")) {
-                    System.out.println("Please insert a valid choice (either 1 or 2).");
-                    connectionType = stdIn.readLine();
-                }
-                System.out.println("Enter the port number:");
+                String connectionType = args[1];
+
+                System.out.println("Enter the port number for " + connectionType + " connection:");
                 boolean hasPort = false;
 
                 while (!hasPort) {
@@ -94,7 +89,7 @@ public class TUIView implements View {
                     }
                 }
 
-                if (connectionType.equals("1")) {
+                if (connectionType.equals("socket")) {
                     sender = ClientMain.startSocket(args[0], portNumber, this);
                 }
                 else {

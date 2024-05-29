@@ -102,10 +102,18 @@ public class MatchController {
         return matchModel.getVisibleGoldenCards();
     }
 
+    /**
+     * Getter
+     * @return the first card of the resource deck without removing it
+     */
     public PlaceableCard checkFirstResDeckCard() {
         return matchModel.getResourceCardsDeck().getDeck().getFirst();
     }
 
+    /**
+     * Getter
+     * @return the first card of the golden deck without removing it
+     */
     public PlaceableCard checkFirstGoldDeckCard() {
         return matchModel.getGoldenCardsDeck().getDeck().getFirst();
     }

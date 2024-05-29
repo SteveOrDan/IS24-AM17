@@ -12,9 +12,10 @@ public class Main {
             ServerMain.main(newArgs);
         }
         else if (args[0].equalsIgnoreCase("client")) {
-            String[] newArgs = new String[2];
-            newArgs[0] = args[1];
-            newArgs[1] = args[2];
+            String[] newArgs = new String[3];
+            newArgs[0] = args[1]; // IP
+            newArgs[1] = args[2]; // connection type
+            newArgs[2] = args[3]; // view type
 
             ClientMain.main(newArgs);
         }

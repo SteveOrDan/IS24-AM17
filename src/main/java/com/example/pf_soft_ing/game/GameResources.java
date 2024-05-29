@@ -24,7 +24,6 @@ import com.google.gson.stream.JsonReader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -147,10 +146,6 @@ public class GameResources {
         catch (FileNotFoundException e) {
             return null;
         }
-    }
-
-    public static void main(String[] args) {
-        initializeResourceDeck();
     }
 
     public static void initializeResourceDeck() {

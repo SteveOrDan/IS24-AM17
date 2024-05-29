@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class NetworkMatchTest {
 
     @Test
-    void simulateMatch(){
+    void simulateMatch() {
         GameController gameController = new GameController();
 
         PlayerModel player = gameController.createPlayer(new TestSender());
