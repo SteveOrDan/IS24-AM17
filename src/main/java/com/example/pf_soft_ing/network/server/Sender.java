@@ -55,5 +55,5 @@ public interface Sender {
 
     void sendPlayerDisconnection(int playerID);
 
-    void startHeartbeat();
+    void sendPing();
 }

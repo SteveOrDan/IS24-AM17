@@ -10,6 +10,7 @@ import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
@@ -63,14 +64,25 @@ public class TUIView implements View {
 
     private final List<String> chat = new ArrayList<>();
 
+    private static final int COUNT_DEC_PERIOD = 1000;
+    private static final int MAX_PACKET_LOSS = 3;
+    private int packetLoss = 0;
+    private final Object packetLossLock = new Object();
+
     private final Timer timer = new Timer();
-    private final TimerTask pingTask = new TimerTask() {
+    private final TimerTask packetLossTask = new TimerTask() {
         @Override
         public void run() {
-            sender.sendPing();
+            synchronized (packetLossLock) {
+                if (packetLoss >= MAX_PACKET_LOSS) {
+                    playerState = PlayerState.DISCONNECTED;
+                    showConnectionLoss();
+                    cancel();
+                }
+                packetLoss++;
+            }
         }
     };
-    private static final int PING_INTERVAL = 1000;
 
     public void start(String[] args) {
         createStateToCommandsMap();
@@ -144,6 +156,11 @@ public class TUIView implements View {
 
         List<String> legalCommands = stateToCommands.get(playerState);
 
+        if (playerState == PlayerState.DISCONNECTED) {
+            System.out.println("You are disconnected. Please, restart the game.");
+            return;
+        }
+
             if (legalCommands.contains(command)) {
                 switch (command) {
                     case "rml" -> { // RefreshMatchesList
@@ -162,6 +179,7 @@ public class TUIView implements View {
                         }
                         try {
                             sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
+                            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -174,6 +192,7 @@ public class TUIView implements View {
                         }
                         try {
                             sender.selectMatch(Integer.parseInt(parts[1]));
+                            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
                         }
                         catch (NumberFormatException e){
                             System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -2043,8 +2062,11 @@ public class TUIView implements View {
     }
 
     @Override
-    public void startHeartbeat() {
-        timer.scheduleAtFixedRate(pingTask, 0, PING_INTERVAL);
+    public void receivePing() {
+        synchronized (packetLossLock) {
+            packetLoss = 0;
+        }
+        sender.sendPong();
     }
 
     /**
@@ -2138,5 +2160,12 @@ public class TUIView implements View {
         }
 
         return false;
+    }
+
+    /**
+     * Notifies the player that he has lost connection to the server.
+     */
+    private void showConnectionLoss() {
+        System.out.println("Connection lost. Please restart the game to reconnect.");
     }
 }

@@ -1,12 +1,12 @@
-package com.example.pf_soft_ing.network.messages.answers;
+package com.example.pf_soft_ing.network.messages.requests;
 
 import com.example.pf_soft_ing.network.messages.Message;
 
-public class PlayerDisconnectionMsg extends Message {
+public class PongMsg extends Message {
 
     private final int playerID;
 
-    public PlayerDisconnectionMsg(int playerID) {
+    public PongMsg(int playerID) {
         this.playerID = playerID;
     }
 
@@ -16,6 +16,6 @@ public class PlayerDisconnectionMsg extends Message {
 
     @Override
     public String toString() {
-        return "Player " + playerID + " disconnected";
+        return "Pong message from player " + playerID;
     }
 }

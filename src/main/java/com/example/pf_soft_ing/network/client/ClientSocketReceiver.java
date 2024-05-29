@@ -17,7 +17,6 @@ public class ClientSocketReceiver {
 
     /**
      * Starts a new thread that listens for incoming messages from the server
-     * until it receives a CloseConnectionMsg
      * @param inputStream ObjectInputStream
      */
     public void startReceivingThread(ObjectInputStream inputStream){
@@ -38,7 +37,7 @@ public class ClientSocketReceiver {
                         decodeMessage(input);
                     }
                     catch (IOException | ClassNotFoundException e) {
-                        System.err.println(e.getMessage());
+                        System.out.println("Server is down!");
                         isRunning = false;
                     }
                 }
@@ -107,7 +106,9 @@ public class ClientSocketReceiver {
 
             case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
 
-            case StartHeartbeatMsg ignored -> view.startHeartbeat();
+            case PingMsg ignored -> view.receivePing();
+
+            case PlayerDisconnectionMsg castedMsg -> view.showPlayerDisconnection(castedMsg.getPlayerID());
 
             case null, default -> System.out.println("Invalid message type");
         }

@@ -52,5 +52,5 @@ public interface View {
 
     void showPlayerDisconnection(int playerID);
 
-    void startHeartbeat();
+    void receivePing();
 }

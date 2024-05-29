@@ -55,5 +55,5 @@ public interface ClientRMIInterface extends Remote {
 
     void sendPlayerDisconnection(int playerID) throws RemoteException;
 
-    void startHeartbeat() throws RemoteException;
+    void sendPing() throws RemoteException;
 }

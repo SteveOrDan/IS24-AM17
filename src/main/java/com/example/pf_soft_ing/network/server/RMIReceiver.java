@@ -120,7 +120,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     }
 
     @Override
-    public void sendPing(int playerID) throws RemoteException {
+    public void sendPong(int playerID) throws RemoteException {
         synchronized (playerIDToMatch) {
             playerIDToDiscMan.get(playerID).resetPacketLoss();
         }

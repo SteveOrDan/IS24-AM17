@@ -577,4 +577,8 @@ public class MatchModel {
     public void reducePlayersOnline(int playerID) {
         // TODO: implement timer before announcing the last connected player as winner
     }
+
+    public void undoCardPlacement(int playerID) {
+        IDToPlayerMap.get(playerID).undoCardPlacement();
+    }
 }

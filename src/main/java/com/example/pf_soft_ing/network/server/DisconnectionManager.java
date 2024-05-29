@@ -9,6 +9,7 @@ import java.util.TimerTask;
 public class DisconnectionManager {
 
     private static final int MAX_PACKET_LOSS = 3;
+    private static final int PING_PERIOD = 1000;
     private static final int COUNT_DEC_PERIOD = 1000;
 
     private final GameController gameController;
@@ -17,17 +18,29 @@ public class DisconnectionManager {
     private final int playerID;
 
     private int packetLoss = 0;
+    private final Object packetLossLock = new Object();
     private final Timer timer = new Timer();
+
+    private final TimerTask pingClientTask = new TimerTask() {
+        @Override
+        public void run() {
+            sender.sendPing();
+        }
+    };
+
     private final TimerTask packetLossTask = new TimerTask() {
         @Override
         public void run() {
-            if (packetLoss >= MAX_PACKET_LOSS) {
-                System.out.println("Player " + playerID + " disconnected");
-                matchController.disconnectPlayer(playerID);
-                gameController.checkMatchState(matchController);
-                cancel();
+            synchronized (packetLossLock) {
+                if (packetLoss >= MAX_PACKET_LOSS) {
+                    pingClientTask.cancel();
+                    System.out.println("Player " + playerID + " disconnected");
+                    matchController.disconnectPlayer(playerID);
+                    gameController.checkMatchState(matchController);
+                    cancel();
+                }
+                packetLoss++;
             }
-            packetLoss++;
         }
     };
 
@@ -39,13 +52,15 @@ public class DisconnectionManager {
     }
 
     public void startConnectionCheck() {
-        // Let the client start sending pings
-        sender.startHeartbeat();
+        // Send ping to player every second
+        timer.scheduleAtFixedRate(pingClientTask, 0, PING_PERIOD);
         // Start checking for packet loss
         timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
     }
 
     public void resetPacketLoss() {
-        packetLoss = 0;
+        synchronized (packetLossLock) {
+            packetLoss = 0;
+        }
     }
 }

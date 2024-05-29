@@ -117,12 +117,12 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendPlayerDisconnection(int playerID) throws RemoteException {
-        view.showPlayerDisconnection(playerID);
+    public void sendPing() throws RemoteException {
+        view.receivePing();
     }
 
     @Override
-    public void startHeartbeat() throws RemoteException {
-        view.startHeartbeat();
+    public void sendPlayerDisconnection(int playerID) throws RemoteException {
+        view.showPlayerDisconnection(playerID);
     }
 }

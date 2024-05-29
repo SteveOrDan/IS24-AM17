@@ -140,7 +140,7 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void startHeartbeat() {
-        sendMessage(new StartHeartbeatMsg());
+    public void sendPing() {
+        sendMessage(new PingMsg());
     }
 }

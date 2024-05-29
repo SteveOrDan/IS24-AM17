@@ -592,7 +592,8 @@ public class MatchController {
 
             // If the game is in the playing phase and the player disconnected after placing a card, undo the card placement
             if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING){
-                // TODO: Undo card placement
+                matchModel.undoCardPlacement(playerID);
+                // TODO: broadcast the undo card placement
             }
         }
     }

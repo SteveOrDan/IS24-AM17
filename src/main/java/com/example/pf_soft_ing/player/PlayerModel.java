@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlayerModel {
+    private final static int NUM_OF_RESOURCES = 7;
 
     private String nickname = "";
     private final int ID;
@@ -28,7 +29,12 @@ public class PlayerModel {
     private PlaceableCard starterCard;
 
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
-    private final int[] numOfResourcesArr = new int[7];
+    private final int[] numOfResourcesArr = new int[NUM_OF_RESOURCES];
+
+    private int lastCardPlacedID = -1;
+    private Position lastCardPlacedPos = null;
+    private int lastScore = 0;
+    private int[] lastNumOfResources = new int[NUM_OF_RESOURCES];
 
     private int currScore = 0;
     private int numOfCompletedObjectives = 0;
@@ -287,6 +293,13 @@ public class PlayerModel {
             throw new InvalidPlayerStateException(state.name(), PlayerState.PLACING.name());
         }
 
+        // Save the last card placed and its position for undo
+        lastCardPlacedID = card.getID();
+        lastCardPlacedPos = pos;
+        // Save the last score and the last number of resources for undo
+        lastScore = currScore;
+        lastNumOfResources = numOfResourcesArr.clone();
+
         ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
 
         // Set chosen side
@@ -304,7 +317,7 @@ public class PlayerModel {
             numOfResourcesArr[resource.getValue()]++;
         }
 
-        // Add card points
+        // Calculate points and add to score
         currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSideType());
 
         // Set card priority
@@ -389,5 +402,9 @@ public class PlayerModel {
      */
     public void drawCard(PlaceableCard card){
         hand.add(card);
+    }
+
+    public void undoCardPlacement() {
+        // TODO: Implement undoCardPlacement
     }
 }

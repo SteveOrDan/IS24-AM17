@@ -231,12 +231,12 @@ public class RMISender implements Sender {
     }
 
     @Override
-    public void startHeartbeat() {
+    public void sendPing() {
         new Thread(() ->{
             try {
-                client.startHeartbeat();
+                client.sendPing();
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Start heartbeat request not sent");
+                System.out.println("Error: " + e.getMessage() + ". Ping not sent");
             }
         }).start();
     }

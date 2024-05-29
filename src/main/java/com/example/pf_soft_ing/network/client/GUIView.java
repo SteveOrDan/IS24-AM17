@@ -141,14 +141,24 @@ public class GUIView implements View {
 
     private final Stage stage;
 
+    private static final int COUNT_DEC_PERIOD = 1000;
+    private static final int MAX_PACKET_LOSS = 3;
+    private int packetLoss = 0;
+    private final Object packetLossLock = new Object();
+
     private final Timer timer = new Timer();
-    private final TimerTask pingTask = new TimerTask() {
+    private final TimerTask packetLossTask = new TimerTask() {
         @Override
         public void run() {
-            sender.sendPing();
+            synchronized (packetLossLock) {
+                if (packetLoss >= MAX_PACKET_LOSS) {
+                    showConnectionLoss();
+                    cancel();
+                }
+                packetLoss++;
+            }
         }
     };
-    private static final int PING_INTERVAL = 1000;
 
     public GUIView(Stage stage, String ip) {
         this.stage = stage;
@@ -363,6 +373,7 @@ public class GUIView implements View {
 
         selectButton.setOnAction((_) -> { // event
             sender.selectMatch(matchID);
+            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
         });
 
         matchPane.getChildren().add(matchInfo);
@@ -404,6 +415,7 @@ public class GUIView implements View {
             String nickname = nameField.getText();
 
             sender.createMatch(numOfPlayers, nickname);
+            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
         });
 
         createPane.getChildren().add(playersField);
@@ -1916,8 +1928,11 @@ public class GUIView implements View {
     }
 
     @Override
-    public void startHeartbeat() {
-        timer.scheduleAtFixedRate(pingTask, 0, PING_INTERVAL);
+    public void receivePing() {
+        synchronized (packetLossLock) {
+            packetLoss = 0;
+        }
+        sender.sendPong();
     }
 
     private String getPlayerNickname(int playerID){
@@ -1928,5 +1943,12 @@ public class GUIView implements View {
         }
 
         return nickname;
+    }
+
+    /**
+     * Shows a message to the user that the connection has been lost.
+     */
+    private void showConnectionLoss() {
+        // TODO: implement showing connection loss
     }
 }
