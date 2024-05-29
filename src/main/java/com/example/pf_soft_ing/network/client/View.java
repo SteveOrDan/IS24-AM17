@@ -52,5 +52,7 @@ public interface View {
 
     void showPlayerDisconnection(int playerID);
 
+    void undoCardPlacement(int playerID, Position pos, int score);
+
     void receivePing();
 }

@@ -231,6 +231,17 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score) {
+        new Thread(() ->{
+            try {
+                client.sendUndoCardPlacement(playerID, pos, score);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Card placement not undone");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendPing() {
         new Thread(() ->{
             try {

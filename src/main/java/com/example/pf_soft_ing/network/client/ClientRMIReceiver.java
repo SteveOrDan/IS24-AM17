@@ -125,4 +125,9 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     public void sendPlayerDisconnection(int playerID) throws RemoteException {
         view.showPlayerDisconnection(playerID);
     }
+
+    @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score) throws RemoteException {
+        view.undoCardPlacement(playerID, pos, score);
+    }
 }

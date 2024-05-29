@@ -29,9 +29,8 @@ public class PlayerModel {
     private PlaceableCard starterCard;
 
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
-    private final int[] numOfResourcesArr = new int[NUM_OF_RESOURCES];
+    private int[] numOfResourcesArr = new int[NUM_OF_RESOURCES];
 
-    private int lastCardPlacedID = -1;
     private Position lastCardPlacedPos = null;
     private int lastScore = 0;
     private int[] lastNumOfResources = new int[NUM_OF_RESOURCES];
@@ -42,6 +41,7 @@ public class PlayerModel {
     private Token token;
     private Token firstPlayerToken;
 
+    private PlayerState lastPlayerState = PlayerState.MAIN_MENU;
     private PlayerState state = PlayerState.MAIN_MENU;
 
     private int currMaxPriority = 0;
@@ -128,6 +128,8 @@ public class PlayerModel {
             throw new InvalidObjectiveCardIDException();
         }
         secretObjective = GameResources.getObjectiveCardByID(cardID);
+
+        setState(PlayerState.COMPLETED_SETUP);
     }
 
     /**
@@ -145,6 +147,7 @@ public class PlayerModel {
 
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
+        setState(PlayerState.PLACING_STARTER);
     }
 
     /**
@@ -229,6 +232,7 @@ public class PlayerModel {
      * @param state New state of the player
      */
     public void setState(PlayerState state){
+        lastPlayerState = this.state;
         this.state = state;
     }
 
@@ -262,6 +266,8 @@ public class PlayerModel {
         currMaxPriority++;
 
         playArea.put(new Position(0,0), starterCard);
+
+        setState(PlayerState.CHOOSING_OBJECTIVE);
     }
 
     /**
@@ -293,8 +299,7 @@ public class PlayerModel {
             throw new InvalidPlayerStateException(state.name(), PlayerState.PLACING.name());
         }
 
-        // Save the last card placed and its position for undo
-        lastCardPlacedID = card.getID();
+        // Save the position of the last card placed for undo
         lastCardPlacedPos = pos;
         // Save the last score and the last number of resources for undo
         lastScore = currScore;
@@ -404,7 +409,28 @@ public class PlayerModel {
         hand.add(card);
     }
 
+    public Position getLastCardPlacedPos() {
+        return lastCardPlacedPos;
+    }
+
+    /**
+     * Undoes the last card placement
+     * Removes the card from the playArea
+     * Resets the player's resources and score to the last state
+     * Adds the card back to the player's hand after resetting its priority and side
+     */
     public void undoCardPlacement() {
-        // TODO: Implement undoCardPlacement
+        // Remove card from playArea
+        PlaceableCard lastCardPlaced = playArea.remove(lastCardPlacedPos);
+        currMaxPriority--;
+
+        // Reset resources and score to last state
+        numOfResourcesArr = lastNumOfResources.clone();
+        currScore = lastScore;
+
+        // Add card back to hand after resetting its priority and side
+        lastCardPlaced.setPriority(0);
+        lastCardPlaced.setCurrSideType(CardSideType.FRONT);
+        hand.add(lastCardPlaced);
     }
 }

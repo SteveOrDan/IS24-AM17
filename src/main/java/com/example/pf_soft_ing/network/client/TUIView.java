@@ -2062,6 +2062,12 @@ public class TUIView implements View {
     }
 
     @Override
+    public void undoCardPlacement(int playerID, Position pos, int score) {
+        System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+        getOpponentByID(playerID).removeCard(pos, score);
+    }
+
+    @Override
     public void receivePing() {
         synchronized (packetLossLock) {
             packetLoss = 0;

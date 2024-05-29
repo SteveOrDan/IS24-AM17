@@ -114,7 +114,7 @@ public class GameModel {
 
         getMatchByID(matchID).addCurrPlayer(player);
 
-        player.setState(PlayerState.MATCH_LOBBY);
+        player.setState(PlayerState.CHOOSING_NICKNAME);
         player.setMatchID(matchID);
 
         return getMatchByID(matchID);
@@ -135,6 +135,8 @@ public class GameModel {
         matchModel.checkNickname(nickname);
 
         IDToPlayers.get(playerID).setNickname(nickname);
+
+        IDToPlayers.get(playerID).setState(PlayerState.MATCH_LOBBY);
 
         matchModel.addReadyPlayer();
     }

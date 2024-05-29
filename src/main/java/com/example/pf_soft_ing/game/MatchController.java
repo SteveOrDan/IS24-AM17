@@ -142,9 +142,6 @@ public class MatchController {
             // Set secret objective
             getIDToPlayerMap().get(playerID).setSecretObjective(cardID);
 
-            // Mark the player as ready (set up completed)
-            setPlayerEndedSetUp(playerID);
-
             // If all players are ready, start the turn order phase
             if (checkForTurnOrderPhase()) {
                 startTurnOrderPhase();
@@ -179,7 +176,7 @@ public class MatchController {
                 getPlayerSender(playerID).confirmSecretObjective();
             }
         }
-        catch (InvalidPlayerIDException | InvalidObjectiveCardIDException | StarterCardNotSetException e) {
+        catch (InvalidObjectiveCardIDException | StarterCardNotSetException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
@@ -345,20 +342,6 @@ public class MatchController {
     }
 
     /**
-     * Changes the state of the player to "completed set up"
-     * @param playerID ID of the player
-     * @throws InvalidPlayerIDException if the player ID is invalid
-     */
-    public void setPlayerEndedSetUp(int playerID) throws InvalidPlayerIDException {
-        if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-            // Invalid player ID
-            throw new InvalidPlayerIDException();
-        }
-
-        matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.COMPLETED_SETUP);
-    }
-
-    /**
      * Check if all players have completed the set-up
      * @return true if all players have completed the set-up, false otherwise
      */
@@ -393,8 +376,6 @@ public class MatchController {
             PlaceableCard drawnCard = matchModel.drawResourceCard();
 
             matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
-
-            matchModel.getIDToPlayerMap().get(playerID).setState(PlayerState.WAITING);
 
             GameState oldGameState = matchModel.getGameState();
             endTurn();
@@ -485,6 +466,7 @@ public class MatchController {
         }
     }
 
+    // TODO: Remove this method (only used in tests)
     /**
      * Draw a starter card from the deck and set it as the player's starter card
      * Handles exceptions for invalid game state, invalid player ID
@@ -594,6 +576,7 @@ public class MatchController {
             if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING){
                 matchModel.undoCardPlacement(playerID);
                 // TODO: broadcast the undo card placement
+                broadcastUndoCardPlacement(playerID, getIDToPlayerMap().get(playerID).getLastCardPlacedPos(), getIDToPlayerMap().get(playerID).getCurrScore());
             }
         }
     }
@@ -752,6 +735,15 @@ public class MatchController {
             // Broadcast the disconnection to all players online excluding the disconnected player
             if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
                 getPlayerSender(broadcastID).sendPlayerDisconnection(playerID);
+            }
+        }
+    }
+
+    private void broadcastUndoCardPlacement(int playerID, Position pos, int score) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            // Broadcast the undo card placement to all players online excluding the player that disconnected
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
+                getPlayerSender(broadcastID).sendUndoCardPlacement(playerID, pos, score);
             }
         }
     }

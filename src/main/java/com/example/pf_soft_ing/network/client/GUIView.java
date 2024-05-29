@@ -1928,6 +1928,11 @@ public class GUIView implements View {
     }
 
     @Override
+    public void undoCardPlacement(int playerID, Position pos, int score) {
+
+    }
+
+    @Override
     public void receivePing() {
         synchronized (packetLossLock) {
             packetLoss = 0;

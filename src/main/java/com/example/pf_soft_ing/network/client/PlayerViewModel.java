@@ -2,6 +2,8 @@ package com.example.pf_soft_ing.network.client;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.TokenColors;
 
 import java.util.ArrayList;
@@ -70,5 +72,16 @@ public class PlayerViewModel {
 
     public void addScore(int deltaScore) {
         score += deltaScore;
+    }
+
+    public void removeCard(Position pos, int score) {
+        PlaceableCard card = playArea.remove(pos);
+        priority--;
+
+        this.score = score;
+
+        card.setPriority(0);
+        card.setCurrSideType(CardSideType.FRONT);
+        playerHand.add(card);
     }
 }

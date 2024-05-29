@@ -110,6 +110,8 @@ public class ClientSocketReceiver {
 
             case PlayerDisconnectionMsg castedMsg -> view.showPlayerDisconnection(castedMsg.getPlayerID());
 
+            case UndoCardPlacementMsg castedMsg -> view.undoCardPlacement(castedMsg.getPlayerID(), castedMsg.getPosition(), castedMsg.getScore());
+
             case null, default -> System.out.println("Invalid message type");
         }
     }

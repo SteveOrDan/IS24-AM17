@@ -140,6 +140,11 @@ public class SocketSender implements Sender {
     }
 
     @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score) {
+        sendMessage(new UndoCardPlacementMsg(playerID, pos, score));
+    }
+
+    @Override
     public void sendPing() {
         sendMessage(new PingMsg());
     }
