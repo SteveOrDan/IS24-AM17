@@ -43,6 +43,7 @@ public class PlayerModel {
 
     private PlayerState lastPlayerState = PlayerState.MAIN_MENU;
     private PlayerState state = PlayerState.MAIN_MENU;
+    private final Object stateLock = new Object();
 
     private int currMaxPriority = 0;
 
@@ -224,7 +225,9 @@ public class PlayerModel {
      * @return Player's current state
      */
     public PlayerState getState() {
-        return state;
+        synchronized (stateLock) {
+            return state;
+        }
     }
 
     /**
@@ -232,8 +235,10 @@ public class PlayerModel {
      * @param state New state of the player
      */
     public void setState(PlayerState state){
-        lastPlayerState = this.state;
-        this.state = state;
+        synchronized (stateLock) {
+            lastPlayerState = this.state;
+            this.state = state;
+        }
     }
 
     /**

@@ -55,7 +55,11 @@ public interface Sender {
 
     void sendPlayerDisconnection(int playerID);
 
-    void sendUndoCardPlacement(int playerID, Position pos, int score);
+    void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
+
+    void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score);
+
+    void sendSoleWinnerMessage();
 
     void sendPing();
 }

@@ -17,12 +17,19 @@ import java.util.TimerTask;
 public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInterface {
 
     private final GameController gameController;
-    private final Map<Integer, MatchController> playerIDToMatch = new HashMap<>();
-    private final Map<Integer, DisconnectionManager> playerIDToDiscMan = new HashMap<>();
+    private static final Map<Integer, MatchController> playerIDToMatch = new HashMap<>();
+    private static final Map<Integer, DisconnectionManager> playerIDToDiscMan = new HashMap<>();
 
     public RMIReceiver(GameController gameController) throws RemoteException {
         this.gameController = gameController;
         startPeriodicCleanup();
+    }
+
+    public static void finishedMatch(int playerID) {
+        if (! playerIDToDiscMan.containsKey(playerID)) return;
+        synchronized (playerIDToDiscMan) {
+            playerIDToDiscMan.get(playerID).stopConnectionCheck();
+        }
     }
 
     @Override
@@ -48,14 +55,16 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     @Override
     public void selectMatch(int playerID, int matchID) throws RemoteException {
         MatchController mc = gameController.selectMatch(playerID, matchID);
-        synchronized (playerIDToMatch) {
-            playerIDToMatch.put(playerID, mc);
+        if (mc != null) {
+            synchronized (playerIDToMatch) {
+                playerIDToMatch.put(playerID, mc);
+            }
+            DisconnectionManager discMan = new DisconnectionManager(gameController, playerIDToMatch.get(playerID), playerIDToMatch.get(playerID).getPlayerSender(playerID), playerID);
+            synchronized (playerIDToDiscMan) {
+                playerIDToDiscMan.put(playerID, discMan);
+            }
+            discMan.startConnectionCheck();
         }
-        DisconnectionManager discMan = new DisconnectionManager(gameController, playerIDToMatch.get(playerID), playerIDToMatch.get(playerID).getPlayerSender(playerID), playerID);
-        synchronized (playerIDToDiscMan) {
-            playerIDToDiscMan.put(playerID, discMan);
-        }
-        discMan.startConnectionCheck();
     }
 
     @Override
@@ -148,7 +157,6 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         };
 
         long CLEANUP_PERIOD = 10000;
-        long CLEANUP_DELAY = 300000;
-        timer.scheduleAtFixedRate(timerTaskCleanup, CLEANUP_DELAY, CLEANUP_PERIOD);
+        timer.scheduleAtFixedRate(timerTaskCleanup, 0, CLEANUP_PERIOD);
     }
 }

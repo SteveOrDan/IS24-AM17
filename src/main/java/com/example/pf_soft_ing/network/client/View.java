@@ -52,7 +52,9 @@ public interface View {
 
     void showPlayerDisconnection(int playerID);
 
-    void undoCardPlacement(int playerID, Position pos, int score);
+    void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
+
+    void showSoleWinnerMessage();
 
     void receivePing();
 }

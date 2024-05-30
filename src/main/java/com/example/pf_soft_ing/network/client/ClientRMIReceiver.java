@@ -127,7 +127,17 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
-    public void sendUndoCardPlacement(int playerID, Position pos, int score) throws RemoteException {
-        view.undoCardPlacement(playerID, pos, score);
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) throws RemoteException {
+        view.undoCardPlacement(playerID, pos, score, nextPlayerID);
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) throws RemoteException {
+        view.undoCardPlacement(playerID, pos, score, -1);
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() throws RemoteException {
+        view.showSoleWinnerMessage();
     }
 }

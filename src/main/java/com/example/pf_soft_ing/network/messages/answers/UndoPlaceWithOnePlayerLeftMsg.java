@@ -3,37 +3,31 @@ package com.example.pf_soft_ing.network.messages.answers;
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.network.messages.Message;
 
-public class UndoCardPlacementMsg extends Message {
+public class UndoPlaceWithOnePlayerLeftMsg extends Message {
     private final int playerID;
-    private final Position position;
+    private final Position pos;
     private final int score;
-    private final int nextPlayerID;
 
-    public UndoCardPlacementMsg(int playerID, Position position, int score, int nextPlayerID) {
+    public UndoPlaceWithOnePlayerLeftMsg(int playerID, Position pos, int score) {
         this.playerID = playerID;
-        this.position = position;
+        this.pos = pos;
         this.score = score;
-        this.nextPlayerID = nextPlayerID;
     }
 
     public int getPlayerID() {
         return playerID;
     }
 
-    public Position getPosition() {
-        return position;
+    public Position getPos() {
+        return pos;
     }
 
     public int getScore() {
         return score;
     }
 
-    public int getNextPlayerID() {
-        return nextPlayerID;
-    }
-
     @Override
     public String toString() {
-        return "UndoCardPlacementMsg";
+        return "UndoPlaceWithOnePlayerLeftMsg";
     }
 }

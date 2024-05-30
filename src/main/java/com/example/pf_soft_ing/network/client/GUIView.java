@@ -1928,7 +1928,12 @@ public class GUIView implements View {
     }
 
     @Override
-    public void undoCardPlacement(int playerID, Position pos, int score) {
+    public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+
+    }
+
+    @Override
+    public void showSoleWinnerMessage() {
 
     }
 

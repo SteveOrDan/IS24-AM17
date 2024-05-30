@@ -19,9 +19,14 @@ public class Decoder {
     private static final long CLEANUP_PERIOD = 10000;
     private static final long CLEANUP_DELAY = 300000;
 
-    public static void decode(Message message, int playerID) {
-        System.out.println("Received msg from player " + playerID);
+    public static void finishedMatch(int playerID) {
+        if (! playerIDToDiscMan.containsKey(playerID)) return;
+        synchronized (playerIDToDiscMan) {
+            playerIDToDiscMan.get(playerID).stopConnectionCheck();
+        }
+    }
 
+    public static void decode(Message message, int playerID) {
         switch (message) {
             case GetMatchesMsg ignored -> gameController.getMatches(playerID);
 
@@ -39,14 +44,16 @@ public class Decoder {
 
             case SelectMatchMsg castedMsg -> {
                 MatchController mc = gameController.selectMatch(playerID, castedMsg.getMatchID());
-                synchronized (playerIDToMatch) {
-                    playerIDToMatch.put(playerID, mc);
+                if (mc != null) {
+                    synchronized (playerIDToMatch) {
+                        playerIDToMatch.put(playerID, mc);
+                    }
+                    DisconnectionManager discMan = new DisconnectionManager(gameController, mc, mc.getPlayerSender(playerID), playerID);
+                    synchronized (playerIDToDiscMan) {
+                        playerIDToDiscMan.put(playerID, discMan);
+                    }
+                    discMan.startConnectionCheck();
                 }
-                DisconnectionManager discMan = new DisconnectionManager(gameController, mc, mc.getPlayerSender(playerID), playerID);
-                synchronized (playerIDToDiscMan) {
-                    playerIDToDiscMan.put(playerID, discMan);
-                }
-                discMan.startConnectionCheck();
             }
 
             case ChooseNicknameMsg castedMsg -> {

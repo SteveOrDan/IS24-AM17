@@ -134,7 +134,7 @@ public class RMISender implements Sender {
                 client.placeCardResult(playerID, cardID, pos, chosenSide, score);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Place card not shown");
+                System.out.println("Error: " + e.getMessage() + ". Place card not sent");
             }
         }).start();
     }
@@ -150,7 +150,7 @@ public class RMISender implements Sender {
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New first player turn not sent");
             }
         }).start();
     }
@@ -166,7 +166,7 @@ public class RMISender implements Sender {
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's turn not sent");
             }
         }).start();
     }
@@ -177,7 +177,7 @@ public class RMISender implements Sender {
             try {
                 client.setNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID, score);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's extra turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's extra turn not sent");
             }
         }).start();
     }
@@ -192,7 +192,7 @@ public class RMISender implements Sender {
                         resDeckCardID, visibleResCardID1, visibleResCardID2,
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, gameState);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's turn state not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's turn state not sent");
             }
         }).start();
     }
@@ -214,7 +214,7 @@ public class RMISender implements Sender {
             try {
                 client.showRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
+                System.out.println("Error: " + e.getMessage() + ". Ranking not sent");
             }
         }).start();
     }
@@ -225,18 +225,40 @@ public class RMISender implements Sender {
             try {
                 client.sendPlayerDisconnection(playerID);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Player disconnection not shown");
+                System.out.println("Error: " + e.getMessage() + ". Player disconnection not sent");
             }
         }).start();
     }
 
     @Override
-    public void sendUndoCardPlacement(int playerID, Position pos, int score) {
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
         new Thread(() ->{
             try {
-                client.sendUndoCardPlacement(playerID, pos, score);
+                client.sendUndoCardPlacement(playerID, pos, score, nextPlayerID);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Card placement not undone");
+                System.out.println("Error: " + e.getMessage() + ". Card placement undo not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) {
+        new Thread(() ->{
+            try {
+                client.sendUndoPlaceWithOnePlayerLeft(playerID, pos, score);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Undo place card with one player left not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() {
+        new Thread(() ->{
+            try {
+                client.sendSoleWinnerMessage();
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Sole winner message not sent");
             }
         }).start();
     }

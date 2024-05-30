@@ -55,7 +55,11 @@ public interface ClientRMIInterface extends Remote {
 
     void sendPlayerDisconnection(int playerID) throws RemoteException;
 
-    void sendUndoCardPlacement(int playerID, Position pos, int score) throws RemoteException;
+    void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) throws RemoteException;
+
+    void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) throws RemoteException;
+
+    void sendSoleWinnerMessage() throws RemoteException;
 
     void sendPing() throws RemoteException;
 }

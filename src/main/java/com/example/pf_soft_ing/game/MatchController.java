@@ -570,13 +570,18 @@ public class MatchController {
             broadcastPlayerDisconnection(playerID);
         }
         else if (oldGameState == GameState.PLAYING) {
-            matchModel.reducePlayersOnline(playerID);
-
             // If the game is in the playing phase and the player disconnected after placing a card, undo the card placement
             if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING){
                 matchModel.undoCardPlacement(playerID);
-                // TODO: broadcast the undo card placement
-                broadcastUndoCardPlacement(playerID, getIDToPlayerMap().get(playerID).getLastCardPlacedPos(), getIDToPlayerMap().get(playerID).getCurrScore());
+                if (matchModel.checkForLastPlayerStanding()) {
+                    matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
+                    matchModel.getIDToPlayerMap().get(getCurrPlayerID()).getSender().sendUndoPlaceWithOnePlayerLeft(playerID,
+                            getIDToPlayerMap().get(playerID).getLastCardPlacedPos(), getIDToPlayerMap().get(playerID).getCurrScore());
+                }
+                else {
+                    broadcastUndoCardPlacement(playerID, getIDToPlayerMap().get(playerID).getLastCardPlacedPos(),
+                            getIDToPlayerMap().get(playerID).getCurrScore(), matchModel.getCurrPlayerID());
+                }
             }
         }
     }
@@ -739,11 +744,18 @@ public class MatchController {
         }
     }
 
-    private void broadcastUndoCardPlacement(int playerID, Position pos, int score) {
+    /**
+     * Broadcast the disconnection of all players to all players
+     * @param playerID ID of the player that disconnected
+     * @param pos Position of the last card placed by the player
+     * @param score new score of the player
+     * @param nextPlayerID ID of the next player
+     */
+    private void broadcastUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
         for (Integer broadcastID : getIDToPlayerMap().keySet()) {
             // Broadcast the undo card placement to all players online excluding the player that disconnected
             if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
-                getPlayerSender(broadcastID).sendUndoCardPlacement(playerID, pos, score);
+                getPlayerSender(broadcastID).sendUndoCardPlacement(playerID, pos, score, nextPlayerID);
             }
         }
     }
@@ -754,5 +766,9 @@ public class MatchController {
 
     public boolean hasNoPlayersOnline() {
         return matchModel.hasNoPlayersOnline();
+    }
+
+    public boolean isOver() {
+        return matchModel.isOver();
     }
 }

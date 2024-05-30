@@ -140,8 +140,18 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendUndoCardPlacement(int playerID, Position pos, int score) {
-        sendMessage(new UndoCardPlacementMsg(playerID, pos, score));
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        sendMessage(new UndoCardPlacementMsg(playerID, pos, score, nextPlayerID));
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) {
+        sendMessage(new UndoPlaceWithOnePlayerLeftMsg(playerID, pos, score));
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() {
+        sendMessage(new SoleWinnerMsg());
     }
 
     @Override

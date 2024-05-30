@@ -9,6 +9,8 @@ import com.example.pf_soft_ing.exceptions.GameIsFullException;
 import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
 import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
+import com.example.pf_soft_ing.network.server.Decoder;
+import com.example.pf_soft_ing.network.server.RMIReceiver;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
 import com.example.pf_soft_ing.player.PlayerState;
@@ -42,9 +44,12 @@ public class MatchModel {
     private int[] scoresRanked;
     private int[] numOfCompletedObjectivesRanked;
 
+    private final Timer timer = new Timer();
+    private TimerTask announceSoleWinner;
+    private final static int SOLE_WINNER_ANNOUNCE_DELAY = 3000;
+
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
-
         this.matchID = matchID;
     }
 
@@ -393,7 +398,9 @@ public class MatchModel {
      * the next player in the order
      */
     public void endTurn(){
-        IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
+        if (IDToPlayerMap.get(currPlayerID).getState() != PlayerState.DISCONNECTED) {
+            IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
+        }
 
         int currPlayerIndex = 0;
         for (int i = 0; i < orderOfPlayersIDs.length; i++){
@@ -476,7 +483,9 @@ public class MatchModel {
             nicknamesRanked[players.indexOf(player)] = player.getNickname();
             scoresRanked[players.indexOf(player)] = player.getCurrScore();
             numOfCompletedObjectivesRanked[players.indexOf(player)] = player.getNumOfCompletedObjectives();
+            stopPinging(player);
         }
+
     }
 
     public boolean checkForTurnOrderPhase() {
@@ -574,11 +583,62 @@ public class MatchModel {
         return true;
     }
 
-    public void reducePlayersOnline(int playerID) {
-        // TODO: implement timer before announcing the last connected player as winner
-    }
-
     public void undoCardPlacement(int playerID) {
         IDToPlayerMap.get(playerID).undoCardPlacement();
+        endTurn();
+    }
+
+    /**
+     * Method to check if there is only one player left in the match
+     * and announce him as the sole winner after a delay
+     */
+    public boolean checkForLastPlayerStanding() {
+        int playersOnline = 0;
+        int lastPlayerID = -1;
+
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getState() != PlayerState.DISCONNECTED){
+                playersOnline++;
+                lastPlayerID = player.getID();
+            }
+        }
+
+        if (playersOnline == 1) {
+            announceSoleWinner = new TimerTask() {
+                @Override
+                public void run() {
+                    int playersOnline = 0;
+                    int lastPlayerID = -1;
+
+                    for (PlayerModel player : IDToPlayerMap.values()) {
+                        if (player.getState() != PlayerState.DISCONNECTED) {
+                            playersOnline++;
+                            lastPlayerID = player.getID();
+                        }
+                    }
+
+                    if (playersOnline == 1) {
+                        IDToPlayerMap.get(lastPlayerID).getSender().sendSoleWinnerMessage();
+                        gameState = GameState.END_GAME;
+                        IDToPlayerMap.get(lastPlayerID).setState(PlayerState.MAIN_MENU);
+                        stopPinging(IDToPlayerMap.get(lastPlayerID));
+                    }
+                }
+            };
+            // Announce the sole winner after a delay
+            timer.schedule(announceSoleWinner, SOLE_WINNER_ANNOUNCE_DELAY);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOver() {
+        return gameState == GameState.END_GAME;
+    }
+
+    private static void stopPinging(PlayerModel player) {
+        Decoder.finishedMatch(player.getID());
+        RMIReceiver.finishedMatch(player.getID());
     }
 }

@@ -6,5 +6,5 @@ public enum GameState {
     PLAYING,
     FINAL_ROUND,
     EXTRA_ROUND,
-    END_GAME
+    END_GAME,
 }

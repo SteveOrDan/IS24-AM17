@@ -4,7 +4,6 @@ import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.player.PlayerModel;
-import com.example.pf_soft_ing.player.PlayerState;
 
 import java.util.List;
 
@@ -139,7 +138,7 @@ public class GameController {
     }
 
     public void checkMatchState(MatchController matchController) {
-        if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline()) {
+        if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline() || matchController.isOver()) {
             gameModel.removeMatch(matchController.getMatchID());
         }
     }

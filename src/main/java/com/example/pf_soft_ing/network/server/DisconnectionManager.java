@@ -21,28 +21,9 @@ public class DisconnectionManager {
     private final Object packetLossLock = new Object();
     private final Timer timer = new Timer();
 
-    private final TimerTask pingClientTask = new TimerTask() {
-        @Override
-        public void run() {
-            sender.sendPing();
-        }
-    };
+    private TimerTask pingClientTask;
 
-    private final TimerTask packetLossTask = new TimerTask() {
-        @Override
-        public void run() {
-            synchronized (packetLossLock) {
-                if (packetLoss >= MAX_PACKET_LOSS) {
-                    pingClientTask.cancel();
-                    System.out.println("Player " + playerID + " disconnected");
-                    matchController.disconnectPlayer(playerID);
-                    gameController.checkMatchState(matchController);
-                    cancel();
-                }
-                packetLoss++;
-            }
-        }
-    };
+    private TimerTask packetLossTask;
 
     public DisconnectionManager(GameController gameController, MatchController matchController, Sender sender, int playerID) {
         this.gameController = gameController;
@@ -52,8 +33,30 @@ public class DisconnectionManager {
     }
 
     public void startConnectionCheck() {
+        pingClientTask = new TimerTask() {
+            @Override
+            public void run() {
+                sender.sendPing();
+            }
+        };
         // Send ping to player every second
         timer.scheduleAtFixedRate(pingClientTask, 0, PING_PERIOD);
+
+        packetLossTask = new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (packetLossLock) {
+                    if (packetLoss >= MAX_PACKET_LOSS) {
+                        pingClientTask.cancel();
+                        System.out.println("Player " + playerID + " disconnected");
+                        matchController.disconnectPlayer(playerID);
+                        gameController.checkMatchState(matchController);
+                        cancel();
+                    }
+                    packetLoss++;
+                }
+            }
+        };
         // Start checking for packet loss
         timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
     }
@@ -62,5 +65,11 @@ public class DisconnectionManager {
         synchronized (packetLossLock) {
             packetLoss = 0;
         }
+    }
+
+    public void stopConnectionCheck() {
+        pingClientTask.cancel();
+        packetLossTask.cancel();
+        timer.cancel();
     }
 }

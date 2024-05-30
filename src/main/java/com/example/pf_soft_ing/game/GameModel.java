@@ -25,8 +25,10 @@ public class GameModel {
         }
 
         for (MatchController match : matchesCopy){
-            List<String> nicknames = new ArrayList<>(match.getNicknames());
-            allMatches.put(match.getMatchID(), nicknames);
+            if (match.getGameState() != GameState.END_GAME) {
+                List<String> nicknames = new ArrayList<>(match.getNicknames());
+                allMatches.put(match.getMatchID(), nicknames);
+            }
         }
         return allMatches;
     }
