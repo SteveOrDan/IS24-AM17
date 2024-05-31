@@ -88,7 +88,7 @@ public class ClientSocketReceiver {
                         castedMsg.getTokenColors(), castedMsg.getPlayerHands());
             }
 
-            case ConfirmPlaceCardMsg castedMsg -> view.placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getScore()) ;
+            case ConfirmPlaceCardMsg castedMsg -> view.placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore()) ;
 
             case NewPlayerTurnMsg castedMsg -> {
                 view.updateDrawArea(

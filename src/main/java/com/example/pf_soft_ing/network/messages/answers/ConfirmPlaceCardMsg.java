@@ -10,14 +10,14 @@ public class ConfirmPlaceCardMsg extends Message {
     private final int cardID;
     private final Position pos;
     private final CardSideType side;
-    private final int score;
+    private final int deltaScore;
 
-    public ConfirmPlaceCardMsg(int playerID, int cardID, Position pos, CardSideType side, int score) {
+    public ConfirmPlaceCardMsg(int playerID, int cardID, Position pos, CardSideType side, int deltaScore) {
         this.playerID = playerID;
         this.cardID = cardID;
         this.pos = pos;
         this.side = side;
-        this.score = score;
+        this.deltaScore = deltaScore;
     }
 
     public int getPlayerID() {
@@ -36,8 +36,8 @@ public class ConfirmPlaceCardMsg extends Message {
         return side;
     }
 
-    public int getScore() {
-        return score;
+    public int getDeltaScore() {
+        return deltaScore;
     }
 
     @Override

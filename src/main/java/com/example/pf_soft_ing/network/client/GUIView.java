@@ -7,14 +7,13 @@ import com.example.pf_soft_ing.card.side.Side;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.player.TokenColors;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -27,10 +26,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.util.*;
 
 public class GUIView implements View {
+
+    private final static String ERAS_FONT = "Eras Bold ITC";
+
+    private Timeline timeline;
 
     private final List<Position> legalPosList = new ArrayList<>();
     private final List<Position> illegalPosList = new ArrayList<>();
@@ -175,6 +179,19 @@ public class GUIView implements View {
         connectionChoice.setLayoutX(0);
         connectionChoice.setLayoutY(0);
 
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/FirstBG.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(stageWidth + 2);
+        bgView.setFitHeight(stageHeight + 2);
+
+        // Create label
+        Label connectionLabel = new Label("Choose port for " + connectionType + " connection");
+        connectionLabel.setPrefSize(stageWidth, 50);
+        connectionLabel.setLayoutX(0);
+        connectionLabel.setLayoutY((stageHeight - 150) * 0.5);
+        connectionLabel.setFont(new Font(ERAS_FONT, 24));
+        connectionLabel.setAlignment(Pos.CENTER);
+
         // Create text field for IP
         TextField IPField = new TextField();
         IPField.setPrefSize(200, 50);
@@ -182,18 +199,47 @@ public class GUIView implements View {
         IPField.setLayoutY((stageHeight - 50) * 0.5);
         IPField.setPromptText("Enter port number...");
 
-        // Create confirm button
-        Button confirmIP = new Button("Confirm");
-        confirmIP.setPrefSize(200, 50);
-        confirmIP.setLayoutX((stageWidth - 200) * 0.5);
-        confirmIP.setLayoutY((stageHeight + 75) * 0.5);
-        confirmIP.setDefaultButton(true);
-        confirmIP.setOnAction((_) -> tryConnect(IPField.getText()));
+        Pane confirmIP = createTextButton("Confirm", 20, "/RectButton200x50.png",
+                200, 50, (stageWidth - 200) * 0.5, (stageHeight + 150) * 0.5,
+                () -> tryConnect(IPField.getText()));
 
+        connectionChoice.getChildren().add(bgView);
+        connectionChoice.getChildren().add(connectionLabel);
         connectionChoice.getChildren().add(IPField);
         connectionChoice.getChildren().add(confirmIP);
 
         root.getChildren().add(connectionChoice);
+    }
+
+    public Pane createTextButton(String text, int fontSize, String imagePath, double width, double height, double x, double y, Runnable action) {
+        // Create Pane
+        Pane button = new Pane();
+        button.setPrefSize(width, height);
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+
+        // Create image button
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(imagePath)));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        imageView.setLayoutX(0);
+        imageView.setLayoutY(0);
+        imageView.setOnMouseClicked((_) -> action.run());
+
+        // Create label
+        Label label = new Label(text);
+        label.setPrefSize(width, height);
+        label.setLayoutX(0);
+        label.setLayoutY(0);
+        label.setFont(new Font(ERAS_FONT, fontSize));
+        label.setAlignment(Pos.CENTER);
+        label.setMouseTransparent(true);
+
+        button.getChildren().add(imageView);
+        button.getChildren().add(label);
+
+        return button;
     }
 
     private void tryConnect(String port){
@@ -235,11 +281,19 @@ public class GUIView implements View {
         mainMenu.setLayoutX(0);
         mainMenu.setLayoutY(0);
 
+        // Create background
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SecondBG.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(stageWidth + 2);
+        bgView.setFitHeight(stageHeight + 2);
+
+        mainMenu.getChildren().add(bgView);
+
         // Create scroll rect
         ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setPrefSize(stageWidth - 50, stageHeight - 150);
-        scrollPane.setLayoutX(25);
-        scrollPane.setLayoutY(25);
+        scrollPane.setPrefSize(stageWidth - 220, stageHeight - 190);
+        scrollPane.setLayoutX(110);
+        scrollPane.setLayoutY(100);
 
         scrollPane.setPannable(true);
 
@@ -250,14 +304,14 @@ public class GUIView implements View {
         }
 
         VBox matchList = new VBox();
-        matchList.setPrefSize(stageWidth - 50, spacesNum * 50);
+        matchList.setPrefSize(stageWidth - 200, spacesNum * 50);
         matchList.setLayoutX(0);
         matchList.setLayoutY(0);
 
         if (matches.isEmpty()) {
-            Label noMatches = new Label("No matches available");
-            noMatches.setPrefSize(stageWidth - 50, 50);
-            noMatches.setFont(new Font(Font.getDefault().getName(), 24));
+            Label noMatches = new Label("  No matches available");
+            noMatches.setPrefSize(stageWidth - 50, 100);
+            noMatches.setFont(new Font(ERAS_FONT, 24));
             noMatches.setLayoutX(0);
             noMatches.setLayoutY(0);
 
@@ -278,23 +332,48 @@ public class GUIView implements View {
         mainMenu.getChildren().add(scrollPane);
 
         // Create add match button
-        Button addMatchButton = new Button("+ Add Match");
-        addMatchButton.setPrefSize(200, 50);
-        addMatchButton.setLayoutX((stageWidth - 200) * 0.5);
-        addMatchButton.setLayoutY(stageHeight - 100);
-        addMatchButton.setOnAction((_) -> openCreateMatchWindow());
+        Pane addMatchButton = createTextButton("Add Match", 20, "/RectButton200x50.png",
+                200, 50, (stageWidth - 200) * 0.5, stageHeight - 75, this::openCreateMatchWindow);
 
         // Create button to refresh matches
-        Button refreshButton = new Button("Refresh");
-        refreshButton.setPrefSize(200, 50);
-        refreshButton.setLayoutX(200);
-        refreshButton.setLayoutY(stageHeight - 100);
-        refreshButton.setOnAction((_) -> sender.getMatches());
+        Pane refreshButton = createIconButton("/SquareButton.png", "/icons/Refresh.png",
+                50, 50, 55, stageHeight - 90, () -> sender.getMatches());
 
         mainMenu.getChildren().add(refreshButton);
         mainMenu.getChildren().add(addMatchButton);
 
         root.getChildren().add(mainMenu);
+    }
+
+    private Pane createIconButton(String buttonImagePath, String iconImagePath, double width, double height, double x, double y, Runnable action) {
+        // Create Pane
+        Pane button = new Pane();
+        button.setPrefSize(width, height);
+        button.setLayoutX(x);
+        button.setLayoutY(y);
+
+        // Create image button
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(buttonImagePath)));
+        ImageView imageView = new ImageView(image);
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
+        imageView.setLayoutX(0);
+        imageView.setLayoutY(0);
+        imageView.setOnMouseClicked((_) -> action.run());
+
+        // Create icon
+        Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconImagePath)));
+        ImageView iconView = new ImageView(icon);
+        iconView.setFitWidth(width * 0.8);
+        iconView.setFitHeight(height * 0.8);
+        iconView.setLayoutX(width * 0.1);
+        iconView.setLayoutY(height * 0.1);
+        iconView.setMouseTransparent(true);
+
+        button.getChildren().add(imageView);
+        button.getChildren().add(iconView);
+
+        return button;
     }
 
     private Pane createMatchPane(int matchID, List<String> players){
@@ -307,14 +386,14 @@ public class GUIView implements View {
 
         Label matchName = new Label("Match " + matchID);
         matchName.setPrefSize(stageWidth - 100, 50);
-        matchName.setFont(new Font(Font.getDefault().getName(), 24));
+        matchName.setFont(new Font(ERAS_FONT, 24));
 
         matchInfo.getChildren().add(matchName);
 
         for (String player : players){
             Label playerLabel = new Label(player);
             playerLabel.setPrefSize(stageWidth - 100, 50);
-            playerLabel.setFont(new Font(Font.getDefault().getName(), 18));
+            playerLabel.setFont(new Font(ERAS_FONT, 18));
 
             matchInfo.getChildren().add(playerLabel);
         }
@@ -341,36 +420,55 @@ public class GUIView implements View {
         createPane.setLayoutX(0);
         createPane.setLayoutY(0);
 
+        // Create background
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SecondBG.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(stageWidth + 2);
+        bgView.setFitHeight(stageHeight + 2);
+
+        // Create labels
+        Label numOfPlayersLabel = new Label("Enter number of players");
+        numOfPlayersLabel.setPrefSize(stageWidth, 50);
+        numOfPlayersLabel.setLayoutX(0);
+        numOfPlayersLabel.setLayoutY(100);
+        numOfPlayersLabel.setFont(new Font(ERAS_FONT, 24));
+        numOfPlayersLabel.setAlignment(Pos.CENTER);
+
+        Label chooseNickLabel = new Label("Enter nickname");
+        chooseNickLabel.setPrefSize(stageWidth, 50);
+        chooseNickLabel.setLayoutX(0);
+        chooseNickLabel.setLayoutY(350);
+        chooseNickLabel.setFont(new Font(ERAS_FONT, 24));
+        chooseNickLabel.setAlignment(Pos.CENTER);
+
         // Create text field for number of players
         TextField playersField = new TextField();
         playersField.setPrefSize(300, 50);
         playersField.setLayoutX((stageWidth - 300) * 0.5);
-        playersField.setLayoutY(100);
+        playersField.setLayoutY(200);
         playersField.setPromptText("Enter number of players...");
 
         // Create text field for nickname
         TextField nameField = new TextField();
         nameField.setPrefSize(300, 50);
         nameField.setLayoutX((stageWidth - 300) * 0.5);
-        nameField.setLayoutY(200);
+        nameField.setLayoutY(450);
         nameField.setPromptText("Enter nickname...");
 
         // Create confirm button
-        Button confirmMatch = new Button("Create");
-        confirmMatch.setPrefSize(150, 50);
-        confirmMatch.setLayoutX((stageWidth - 150) * 0.5);
-        confirmMatch.setLayoutY(300);
-        confirmMatch.setDefaultButton(true);
-        confirmMatch.setOnAction((_) -> {
+        Pane confirmMatch = createTextButton("Create", 20, "/RectButton200x50.png",
+                200, 50, (stageWidth - 200) * 0.5, 600, () -> {
             int numOfPlayers = playersField.getText().isEmpty() ? 0 : Integer.parseInt(playersField.getText());
-            String nickname = nameField.getText();
 
-            sender.createMatch(numOfPlayers, nickname);
+            sender.createMatch(numOfPlayers, nameField.getText());
         });
 
+        createPane.getChildren().add(bgView);
         createPane.getChildren().add(playersField);
         createPane.getChildren().add(nameField);
         createPane.getChildren().add(confirmMatch);
+        createPane.getChildren().add(numOfPlayersLabel);
+        createPane.getChildren().add(chooseNickLabel);
 
         root.getChildren().add(createPane);
     }
@@ -383,46 +481,71 @@ public class GUIView implements View {
         joinPane.setLayoutX(0);
         joinPane.setLayoutY(0);
 
+        // Create background
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SecondBG.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(stageWidth + 2);
+        bgView.setFitHeight(stageHeight + 2);
+
+        // Create label
+        Label joinLabel = new Label("Choose a nickname");
+        joinLabel.setPrefSize(stageWidth, 50);
+        joinLabel.setLayoutX(0);
+        joinLabel.setLayoutY(100);
+        joinLabel.setFont(new Font(ERAS_FONT, 24));
+        joinLabel.setAlignment(Pos.CENTER);
+
         // Create text field for nickname
         TextField nameField = new TextField();
         nameField.setPrefSize(200, 50);
-        nameField.setLayoutX((stageWidth - 200) * 0.5 - 50);
-        nameField.setLayoutY(100);
+        nameField.setLayoutX((stageWidth - 200) * 0.5);
+        nameField.setLayoutY(150);
 
         // Create confirm button
-        Button confirmNick = new Button("Join");
-        confirmNick.setPrefSize(150, 50);
-        confirmNick.setLayoutX((stageWidth + 200) * 0.5 + 100);
-        confirmNick.setLayoutY(100);
-        confirmNick.setDefaultButton(true);
-        confirmNick.setOnAction((_) -> { // event
+        Pane confirmNick = createTextButton("Join", 20, "/RectButton200x50.png",
+                200, 50, (stageWidth - 200) * 0.5, 200, () -> {
             sender.chooseNickname(nameField.getText());
         });
 
         // Create IP label
-        Label IPLabel = new Label("IP: 127.0.0.1");
+        Label IPLabel = new Label("IP: " + ip);
         IPLabel.setPrefSize(200, 50);
         IPLabel.setLayoutX(10);
         IPLabel.setLayoutY(stageHeight - 60);
+        IPLabel.setFont(new Font(ERAS_FONT, 18));
+
+        // Create curr players label
+        Label currPlayersLabel = new Label("Current players:");
+        currPlayersLabel.setPrefSize(stageWidth, 50);
+        currPlayersLabel.setLayoutX(0);
+        currPlayersLabel.setLayoutY(300);
+        currPlayersLabel.setFont(new Font(ERAS_FONT, 24));
+        currPlayersLabel.setAlignment(Pos.CENTER);
 
         // Create table of current players
         VBox playerList = new VBox();
-        playerList.setPrefSize(stageWidth - 100, stageHeight - 300);
-        playerList.setLayoutX(50);
-        playerList.setLayoutY(150);
+        playerList.setPrefSize(stageWidth, stageHeight - 400);
+        playerList.setLayoutX(0);
+        playerList.setLayoutY(350);
 
         for (String player : players){
-            Label playerLabel = new Label(player);
-            playerLabel.setPrefSize(stageWidth - 100, 50);
-            playerLabel.setFont(new Font(Font.getDefault().getName(), 24));
+            if (!player.isBlank()) {
+                Label playerLabel = new Label("- " + player);
+                playerLabel.setPrefSize(stageWidth - 100, 50);
+                playerLabel.setFont(new Font(ERAS_FONT, 24));
+                playerLabel.setAlignment(Pos.CENTER);
 
-            playerList.getChildren().add(playerLabel);
+                playerList.getChildren().add(playerLabel);
+            }
         }
 
+        joinPane.getChildren().add(bgView);
         joinPane.getChildren().add(nameField);
         joinPane.getChildren().add(confirmNick);
         joinPane.getChildren().add(IPLabel);
+        joinPane.getChildren().add(currPlayersLabel);
         joinPane.getChildren().add(playerList);
+        joinPane.getChildren().add(joinLabel);
 
         root.getChildren().add(joinPane);
     }
@@ -435,12 +558,30 @@ public class GUIView implements View {
         anchorPane.setLayoutX(0);
         anchorPane.setLayoutY(0);
 
+        // Create background
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SecondBG.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setFitWidth(stageWidth + 2);
+        bgView.setFitHeight(stageHeight + 2);
+
+        // Create label
         Label waitingLabel = new Label("Waiting for other players...\nEntering match " + matchID + " with nick " + nick);
         waitingLabel.setPrefSize(stageWidth, stageHeight);
-        waitingLabel.setLayoutX(50);
-        waitingLabel.setLayoutY(50);
-        waitingLabel.setFont(new Font(Font.getDefault().getName(), 32));
+        waitingLabel.setLayoutX(0);
+        waitingLabel.setLayoutY(0);
+        waitingLabel.setFont(new Font(ERAS_FONT, 32));
+        waitingLabel.setAlignment(Pos.CENTER);
 
+        // Create animation to update the label
+        timeline = new Timeline(
+                new KeyFrame(Duration.seconds(1), _ -> waitingLabel.setText("Waiting for other players...\nEntering match " + matchID + " with nick " + nick + ".")),
+                new KeyFrame(Duration.seconds(2), _ -> waitingLabel.setText("Waiting for other players...\nEntering match " + matchID + " with nick " + nick + "..")),
+                new KeyFrame(Duration.seconds(3), _ -> waitingLabel.setText("Waiting for other players...\nEntering match " + matchID + " with nick " + nick + "...")));
+
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+
+        anchorPane.getChildren().add(bgView);
         anchorPane.getChildren().add(waitingLabel);
 
         root.getChildren().add(anchorPane);
@@ -583,15 +724,13 @@ public class GUIView implements View {
         currPlayerTurnLabel.setPrefSize(commonAreaWidth, 50);
         currPlayerTurnLabel.setLayoutX(50);
         currPlayerTurnLabel.setLayoutY(0);
+        currPlayerTurnLabel.setFont(new Font(ERAS_FONT, 24));
 
         commonAreaPane.getChildren().add(currPlayerTurnLabel);
 
-        // Create chat area
-        Button openChatButton = new Button(">");
-        openChatButton.setPrefSize(50, 100);
-        openChatButton.setLayoutX(0);
-        openChatButton.setLayoutY(stageHeight / 2 - 50);
-        openChatButton.setOnAction((_) -> openCloseChat());
+        // Create chat button
+        Pane openChatButton = createIconButton("/SquareButton.png", "/icons/Chat.png",
+                50, 50, 0, stageHeight / 2 - 25, this::openCloseChat);
 
         commonAreaPane.getChildren().add(openChatButton);
 
@@ -638,7 +777,7 @@ public class GUIView implements View {
         helpLabel.setPrefSize(stageWidth * 0.5, 50);
         helpLabel.setLayoutX(0);
         helpLabel.setLayoutY(0);
-        helpLabel.setFont(new Font(Font.getDefault().getName(), 24));
+        helpLabel.setFont(new Font(ERAS_FONT, 24));
         helpLabel.setAlignment(Pos.CENTER);
 
         // Create global chat help label
@@ -646,7 +785,7 @@ public class GUIView implements View {
         globalChatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
         globalChatHelpLabel.setLayoutX(0);
         globalChatHelpLabel.setLayoutY(100);
-        globalChatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        globalChatHelpLabel.setFont(new Font(ERAS_FONT, 18));
         globalChatHelpLabel.setWrapText(true);
         globalChatHelpLabel.setAlignment(Pos.CENTER);
 
@@ -655,7 +794,7 @@ public class GUIView implements View {
         privateChatHelpLabel.setPrefSize(stageWidth * 0.5, 50);
         privateChatHelpLabel.setLayoutX(0);
         privateChatHelpLabel.setLayoutY(175);
-        privateChatHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        privateChatHelpLabel.setFont(new Font(ERAS_FONT, 18));
         privateChatHelpLabel.setWrapText(true);
         privateChatHelpLabel.setAlignment(Pos.CENTER);
 
@@ -664,16 +803,13 @@ public class GUIView implements View {
         zoomHelpLabel.setPrefSize(stageWidth * 0.5, 50);
         zoomHelpLabel.setLayoutX(0);
         zoomHelpLabel.setLayoutY(250);
-        zoomHelpLabel.setFont(new Font(Font.getDefault().getName(), 18));
+        zoomHelpLabel.setFont(new Font(ERAS_FONT, 18));
         zoomHelpLabel.setWrapText(true);
         zoomHelpLabel.setAlignment(Pos.CENTER);
 
         // Create close button
-        Button closeButton = new Button("X");
-        closeButton.setPrefSize(50, 50);
-        closeButton.setLayoutX(stageWidth - 100);
-        closeButton.setLayoutY(50);
-        closeButton.setOnAction((_) -> root.getChildren().remove(helpPane));
+        Pane closeButton = createIconButton("/SquareButton.png", "/icons/Close.png",
+                50, 50, stageWidth - 100, 0, () -> root.getChildren().remove(helpPane));
 
         // Add to hierarchy
         helpBackground.getChildren().add(foregroundRect);
@@ -687,11 +823,8 @@ public class GUIView implements View {
         helpPane.getChildren().add(closeButton);
 
         // Create help button
-        Button helpButton = new Button("?");
-        helpButton.setPrefSize(50, 50);
-        helpButton.setLayoutX(commonAreaWidth - 50);
-        helpButton.setLayoutY(0);
-        helpButton.setOnAction((_) -> root.getChildren().add(helpPane));
+        Pane helpButton = createIconButton("/SquareButton.png", "/icons/Help.png",
+                50, 50, commonAreaWidth - 50, 0, () -> root.getChildren().add(helpPane));
 
         commonAreaPane.getChildren().add(helpButton);
     }
@@ -858,17 +991,16 @@ public class GUIView implements View {
         chatInputPane.setLayoutX(0);
         chatInputPane.setLayoutY(stageHeight - 100);
 
+        // Create text input field
         TextField chatInput = new TextField();
         chatInput.setPrefSize(commonAreaWidth - 200, 50);
         chatInput.setLayoutX(0);
         chatInput.setLayoutY(0);
         chatInput.setPromptText("Enter message...");
 
-        Button sendButton = new Button("Send");
-        sendButton.setPrefSize(50, 50);
-        sendButton.setLayoutX(commonAreaWidth - 75);
-        sendButton.setLayoutY(0);
-        sendButton.setOnAction((_) -> {
+        // Create send button
+        Pane sendButton = createIconButton("/SquareButton.png", "/icons/Send.png",
+                50, 50, commonAreaWidth - 75, 0, () -> {
             if (chatInput.getText().isEmpty() || chatInput.getText().isBlank()) {
                 return;
             }
@@ -890,11 +1022,8 @@ public class GUIView implements View {
         });
 
         // Create close chat button
-        Button closeChatButton = new Button("X");
-        closeChatButton.setPrefSize(50, 50);
-        closeChatButton.setLayoutX(commonAreaWidth - 50);
-        closeChatButton.setLayoutY(0);
-        closeChatButton.setOnAction((_) -> openCloseChat());
+        Pane closeChatButton = createIconButton("/SquareButton.png", "/icons/Close.png",
+                50, 50, commonAreaWidth - 50, 0, this::openCloseChat);
 
         chatInputPane.getChildren().add(chatInput);
         chatInputPane.getChildren().add(sendButton);
@@ -934,6 +1063,14 @@ public class GUIView implements View {
         backgroundPane.setStyle("-fx-background-color: white;");
         backgroundPane.setOpacity(0.9);
 
+        // Create label
+        Label choiceLabel = new Label("Choose the side of the starter card");
+        choiceLabel.setPrefSize(stageWidth, 50);
+        choiceLabel.setLayoutX(0);
+        choiceLabel.setLayoutY(50);
+        choiceLabel.setFont(new Font(ERAS_FONT, 24));
+        choiceLabel.setAlignment(Pos.CENTER);
+
         // Render starter card
         Pane starterCardPane = createCardPane(starterCardID, CardSideType.FRONT, (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5 - 100, 1);
         starterCard.setCurrSideType(CardSideType.FRONT);
@@ -964,6 +1101,7 @@ public class GUIView implements View {
         tempChoicePane.getChildren().add(starterCardPane);
         tempChoicePane.getChildren().add(flipButton);
         tempChoicePane.getChildren().add(placeButton);
+        tempChoicePane.getChildren().add(choiceLabel);
 
         root.getChildren().add(tempChoicePane);
     }
@@ -1060,6 +1198,14 @@ public class GUIView implements View {
         backgroundPane.setStyle("-fx-background-color: white;");
         backgroundPane.setOpacity(0.9);
 
+        // Create label
+        Label choiceLabel = new Label("Choose your secret objective");
+        choiceLabel.setPrefSize(stageWidth, 50);
+        choiceLabel.setLayoutX(0);
+        choiceLabel.setLayoutY(50);
+        choiceLabel.setFont(new Font(ERAS_FONT, 24));
+        choiceLabel.setAlignment(Pos.CENTER);
+
         // Create secret objective panes
         Pane secretObjective1Pane = createCardPane(secretObjective1ID, CardSideType.FRONT, stageWidth * 0.5 - cardWidth - 50, (stageHeight - cardHeight) * 0.5, 1);
         Pane secretObjective2Pane = createCardPane(secretObjective2ID, CardSideType.FRONT, stageWidth * 0.5 + 50, (stageHeight - cardHeight) * 0.5, 1);
@@ -1094,6 +1240,7 @@ public class GUIView implements View {
         tempChoicePane.getChildren().add(backgroundPane);
         tempChoicePane.getChildren().add(secretObjective1Pane);
         tempChoicePane.getChildren().add(secretObjective2Pane);
+        tempChoicePane.getChildren().add(choiceLabel);
     }
 
     private void addDrawButtonToCard(Pane cardPane, int cardIndex, boolean isGolden, boolean isVisible){
@@ -1422,11 +1569,8 @@ public class GUIView implements View {
         cardPane.getChildren().add(cardImgV);
 
         // Create buttons to flip card
-        Button flipButton = new Button("Flip");
-        flipButton.setPrefSize(100, 50);
-        flipButton.setLayoutX((cardWidth - 100) / 2);
-        flipButton.setLayoutY(cardHeight + 10);
-        flipButton.setOnAction((_) -> flipCard(card, cardImgV));
+        Pane flipButton = createIconButton("/SquareButton.png", "/icons/Flip.png",
+                50, 50, (cardWidth - 50) / 2, cardHeight + 10, () -> flipCard(card, cardImgV));
 
         cardPane.getChildren().add(flipButton);
 
@@ -1484,7 +1628,7 @@ public class GUIView implements View {
         errorLabel.setPrefSize(stageWidth - 20, 50);
         errorLabel.setLayoutX(0);
         errorLabel.setLayoutY(0);
-        errorLabel.setFont(new Font(Font.getDefault().getName(), 24));
+        errorLabel.setFont(new Font(ERAS_FONT, 24));
         errorLabel.setTextFill(Color.RED);
 
         errorPane.getChildren().add(errorRect);
@@ -1518,7 +1662,7 @@ public class GUIView implements View {
         messageLabel.setPrefSize(stageWidth - 20, 50);
         messageLabel.setLayoutX(0);
         messageLabel.setLayoutY(0);
-        messageLabel.setFont(new Font(Font.getDefault().getName(), 24));
+        messageLabel.setFont(new Font(ERAS_FONT, 24));
         messageLabel.setTextFill(Color.BLUE);
 
         messagePane.getChildren().add(messageRect);
@@ -1619,6 +1763,10 @@ public class GUIView implements View {
                           int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                           int starterCardID) {
         Platform.runLater(() -> {
+            if (timeline != null){
+                timeline.stop();
+            }
+
             drawGameStart(IDToNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2,
                     goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID);
 
@@ -1742,6 +1890,7 @@ public class GUIView implements View {
         playerLabel.setPrefSize(300, 50);
         playerLabel.setLayoutX(30);
         playerLabel.setLayoutY(0);
+        playerLabel.setFont(new Font(ERAS_FONT, 24));
 
         nicknameToScoreLabel.put(playerNick, playerLabel);
 
@@ -1955,7 +2104,7 @@ public class GUIView implements View {
             chatLabel.setPrefSize(commonAreaWidth - 25, 25);
             chatLabel.setLayoutX(0);
             chatLabel.setLayoutY(0);
-            chatLabel.setFont(new Font(Font.getDefault().getName(), 16));
+            chatLabel.setFont(new Font(ERAS_FONT, 16));
             chatLabel.setTextFill(Color.BLACK);
 
             chatBox.getChildren().add(chatLabel);
@@ -2076,7 +2225,7 @@ public class GUIView implements View {
         rankingLabel.setPrefSize(stageWidth, 100);
         rankingLabel.setLayoutX(0);
         rankingLabel.setLayoutY(100);
-        rankingLabel.setFont(new Font(Font.getDefault().getName(), 32));
+        rankingLabel.setFont(new Font(ERAS_FONT, 32));
         rankingLabel.setTextFill(Color.BLACK);
         rankingLabel.setAlignment(Pos.CENTER);
 
@@ -2089,7 +2238,7 @@ public class GUIView implements View {
             playerLabel.setPrefSize(stageWidth, 50);
             playerLabel.setLayoutX(0);
             playerLabel.setLayoutY(200 + i * 50);
-            playerLabel.setFont(new Font(Font.getDefault().getName(), 24));
+            playerLabel.setFont(new Font(ERAS_FONT, 24));
             playerLabel.setTextFill(Color.BLACK);
             playerLabel.setAlignment(Pos.CENTER);
 
@@ -2153,11 +2302,8 @@ public class GUIView implements View {
         }
 
         // Create button to return to rankings
-        Button returnButton = new Button("<-");
-        returnButton.setPrefSize(50, 50);
-        returnButton.setLayoutX(0);
-        returnButton.setLayoutY(0);
-        returnButton.setOnAction((_) -> root.getChildren().remove(endgameMapsPane));
+        Pane returnButton = createIconButton("/SquareButton.png", "/icons/Back.png",
+                50, 50, 0, 0, () -> root.getChildren().remove(endgameMapsPane));
 
         endgameMapsPane.getChildren().add(returnButton);
     }
