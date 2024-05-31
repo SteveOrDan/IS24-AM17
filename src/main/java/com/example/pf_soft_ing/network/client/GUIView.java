@@ -1928,6 +1928,16 @@ public class GUIView implements View {
     }
 
     @Override
+    public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+
+    }
+
+    @Override
+    public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+
+    }
+
+    @Override
     public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
 
     }

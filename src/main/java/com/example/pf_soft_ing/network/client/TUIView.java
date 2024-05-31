@@ -447,6 +447,7 @@ public class TUIView implements View {
     @Override
     public void createMatch(int matchID, String hostNickname) {
         playerState = PlayerState.MATCH_LOBBY;
+        playerNickname = hostNickname;
         this.matchID = matchID;
 
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
@@ -469,6 +470,7 @@ public class TUIView implements View {
     @Override
     public void chooseNickname(String nickname) {
         playerState = PlayerState.MATCH_LOBBY;
+        playerNickname = nickname;
 
         System.out.println("Joined match with nickname: " + nickname);
     }
@@ -490,7 +492,7 @@ public class TUIView implements View {
                 opponents.add(opponent);
             }
             else {
-                playerNickname = IDToNicknameMap.get(playerID);
+                playerNickname = entry.getValue();
             }
         }
 
@@ -2084,6 +2086,104 @@ public class TUIView implements View {
     @Override
     public void showPlayerDisconnection(int playerID) {
         System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+    }
+
+    @Override
+    public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+        this.playerID = playerID;
+        playerState = PlayerState.PLACING_STARTER;
+        createInvalidCardLines();
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        for (Map.Entry<Integer, String> entry : IDToOpponentNickname.entrySet()) {
+            if (entry.getKey() != playerID){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setPlayerID(entry.getKey());
+                opponent.setNickname(entry.getValue());
+                opponents.add(opponent);
+            }
+            else {
+                playerNickname = entry.getValue();
+            }
+        }
+
+        GameResources.initializeAllDecks();
+
+        // Update draw area cards
+        setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+        // Print 4 visible cards, 2 deck top card and starter card
+        printDrawArea();
+
+        // Create and print starter card
+        printStarterCardChoice(gameSetupCards[6]);
+
+        // Print available commands
+        System.out.println("To view the other side of the starter card, type: fsc \n" +
+                "To place the starter card on the current side, type: psc");
+    }
+
+    @Override
+    public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        this.playerID = playerID;
+        playerState = PlayerState.CHOOSING_OBJECTIVE;
+        createInvalidCardLines();
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        for (Map.Entry<Integer, String> entry : IDToOpponentNickname.entrySet()) {
+            if (entry.getKey() != playerID){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setPlayerID(entry.getKey());
+                opponent.setNickname(entry.getValue());
+                opponents.add(opponent);
+            }
+            else {
+                playerNickname = entry.getValue();
+            }
+        }
+
+        GameResources.initializeAllDecks();
+
+        // Update draw area cards
+        setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+        // Print 4 visible cards, 2 deck top card and starter card
+        printDrawArea();
+
+        starterCard = GameResources.getPlaceableCardByID(gameSetupCards[13]);
+        starterCard.setCurrSideType(starterSide);
+
+        // Place the starter card in the play area and update all legal and illegal positions
+        starterCard.setPriority(priority);
+        playArea.put(new Position(0, 0), starterCard);
+        priority++;
+
+        updatePlacementPositions(new Position(0, 0));
+
+        // Set missing setup
+        playerState = PlayerState.CHOOSING_OBJECTIVE;
+
+        // Add cards to player hand ====================================================================================
+        createPlayerHand(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
+
+        // Print player hand
+        printPlayerHand();
+
+        // Create common objectives ====================================================================================
+        setCommonObjectives(gameSetupCards[9], gameSetupCards[10]);
+
+        // Print common objectives
+        printCommonObjectives();
+
+        // Set secret objective ========================================================================================
+        setSecretObjectives(gameSetupCards[11], gameSetupCards[12]);
+
+        // Print secret objective choice
+        printSecretObjectiveChoice();
     }
 
     @Override

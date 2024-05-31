@@ -203,6 +203,8 @@ public class MatchController {
         objectives.add(matchModel.drawObjectiveCard());
         objectives.add(matchModel.drawObjectiveCard());
 
+        matchModel.getIDToPlayerMap().get(playerID).setSecretObjectiveCardIDs(objectives.getFirst().getID(), objectives.get(1).getID());
+
         return List.of(objectives.get(0).getID(), objectives.get(1).getID());
     }
 
@@ -292,7 +294,10 @@ public class MatchController {
 
                 // Send new player 'extra' turn or ranking if game ended
                 if (matchModel.getGameState() == GameState.END_GAME){
-                    broadcastRanking(playerID, cardID, pos, chosenSide, deltaScore, matchModel.getNicknamesRanked(), matchModel.getScoresRanked(), matchModel.getNumOfCompletedObjectivesRanked());
+                    broadcastRanking(playerID, cardID, pos, chosenSide, deltaScore,
+                            matchModel.getNicknamesRanked(), matchModel.getScoresRanked(),
+                            matchModel.getNumOfCompletedObjectivesRanked());
+                    GameModel.removeMatch(this);
                 }
                 else {
                     broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, deltaScore);
@@ -569,9 +574,9 @@ public class MatchController {
         else if (oldGameState == GameState.SET_UP) {
             broadcastPlayerDisconnection(playerID);
         }
-        else if (oldGameState == GameState.PLAYING) {
-            // If the game is in the playing phase and the player disconnected after placing a card, undo the card placement
-            if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING){
+        else if (oldGameState == GameState.PLAYING || oldGameState == GameState.FINAL_ROUND || oldGameState == GameState.EXTRA_ROUND) {
+            // If the game is in the playing phase or the final round and the player disconnected after placing a card, undo the card placement
+            if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING) {
                 matchModel.undoCardPlacement(playerID);
                 if (matchModel.checkForLastPlayerStanding()) {
                     matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
@@ -583,7 +588,19 @@ public class MatchController {
                             getIDToPlayerMap().get(playerID).getCurrScore(), matchModel.getCurrPlayerID());
                 }
             }
+            // If the game is in the playing phase, the final or extra round and the player disconnected before placing a card, end the player's turn
+            else if(getCurrPlayerID() == playerID && oldPlayerState == PlayerState.PLACING) {
+                endTurn();
+            }
+            // If it isn't the player's turn, simply broadcast the disconnection to other players
+            else {
+                broadcastPlayerDisconnection(playerID);
+            }
         }
+    }
+
+    public void reconnectPlayer(String nickname, Sender newSender) throws NoPlayersDisconnected, NicknameNotInMatch {
+        matchModel.reconnectPlayer(nickname, newSender);
     }
 
     /**

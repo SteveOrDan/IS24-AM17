@@ -10,6 +10,7 @@ public interface ClientSender {
     void createMatch(int numberOfPlayers, String nickname);
     void selectMatch(int matchID);
     void chooseNickname(String nickname);
+    void reconnectToMatch(int matchID, String nickname);
 
     void placeStarterCard(CardSideType side);
     void chooseSecretObjective(int cardID);

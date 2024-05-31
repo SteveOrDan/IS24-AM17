@@ -140,6 +140,16 @@ public class SocketSender implements Sender {
     }
 
     @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
+        sendMessage(new ReOnStarterPlacementMsg(playerID, IDToNicknameMap,gameSetupCards));
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        sendMessage(new ReOnObjectiveChoiceMsg(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor));
+    }
+
+    @Override
     public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
         sendMessage(new UndoCardPlacementMsg(playerID, pos, score, nextPlayerID));
     }

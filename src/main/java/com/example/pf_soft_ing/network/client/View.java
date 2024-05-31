@@ -52,6 +52,10 @@ public interface View {
 
     void showPlayerDisconnection(int playerID);
 
+    void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards);
+
+    void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);
+
     void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
 
     void showSoleWinnerMessage();

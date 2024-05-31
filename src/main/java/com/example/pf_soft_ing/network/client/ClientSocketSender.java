@@ -52,6 +52,11 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
+    public void reconnectToMatch(int matchID, String nickname) {
+        sendMessage(new ReconnectToMatchMsg(matchID, nickname));
+    }
+
+    @Override
     public void placeStarterCard(CardSideType side) {
         sendMessage(new PlaceStarterCardMsg(side));
     }

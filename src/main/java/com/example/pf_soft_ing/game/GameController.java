@@ -51,9 +51,9 @@ public class GameController {
     public MatchController selectMatch(int playerID, int matchID) {
         // The player occupies a slot in the match (without a nickname)
         try {
-        MatchController matchController = gameModel.selectMatch(playerID, matchID);
-        getPlayerSender(playerID).selectMatchResult(matchController.getMatchID(), matchController.getNicknames());
-        return matchController;
+            MatchController matchController = gameModel.selectMatch(playerID, matchID);
+            getPlayerSender(playerID).selectMatchResult(matchController.getMatchID(), matchController.getNicknames());
+            return matchController;
         }
         catch (InvalidMatchIDException | GameIsFullException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -106,6 +106,16 @@ public class GameController {
             }
         }
         catch (InvalidMatchIDException | NicknameAlreadyExistsException | InvalidNicknameException e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
+    }
+
+    public void reconnectToMatch(int playerID, String nickname, int matchID) {
+        // The player reconnects to a match
+        try {
+            gameModel.reconnectToMatch(playerID, nickname, matchID);
+        }
+        catch (InvalidMatchIDException | NoPlayersDisconnected | NicknameNotInMatch e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
     }

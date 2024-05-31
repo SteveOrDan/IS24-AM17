@@ -58,6 +58,18 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
+    public void reconnectToMatch(int matchID, String nickname) {
+        new Thread(() -> {
+            try {
+                serverInterface.reconnectToMatch(playerID, nickname, matchID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        }).start();
+    }
+
+    @Override
     public void chooseNickname(String nickname) {
         new Thread(() -> {
             try {

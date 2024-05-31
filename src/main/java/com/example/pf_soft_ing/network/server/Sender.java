@@ -55,6 +55,10 @@ public interface Sender {
 
     void sendPlayerDisconnection(int playerID);
 
+    void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards);
+
+    void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);
+
     void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
 
     void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score);

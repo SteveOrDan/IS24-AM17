@@ -17,6 +17,8 @@ public interface RMIReceiverInterface extends Remote {
 
     void chooseNickname(int playerID, String nickname) throws RemoteException;
 
+    void reconnectToMatch(int playerID, String nickname, int matchID) throws RemoteException;
+
     void placeStarterCard(int playerID, CardSideType side) throws RemoteException;
 
     void chooseSecretObj(int playerID, int cardID) throws RemoteException;

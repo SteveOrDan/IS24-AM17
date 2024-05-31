@@ -9,7 +9,7 @@ import java.util.*;
 
 public class GameModel {
 
-    private final List<MatchController> matches = new ArrayList<>();
+    private final static List<MatchController> matches = new ArrayList<>();
     private final Map<Integer, PlayerModel> IDToPlayers = new HashMap<>();
 
     /**
@@ -143,6 +143,11 @@ public class GameModel {
         matchModel.addReadyPlayer();
     }
 
+    public void reconnectToMatch(int playerID, String nickname, int matchID) throws InvalidMatchIDException, NoPlayersDisconnected, NicknameNotInMatch {
+        Sender newSender = IDToPlayers.get(playerID).getSender();
+        getMatchByID(matchID).reconnectPlayer(nickname, newSender);
+    }
+
     /**
      * Creates a new player
      * @param sender Sender of the player
@@ -191,6 +196,16 @@ public class GameModel {
     public boolean containsMatch(MatchController matchController) {
         synchronized (matches) {
             return matches.contains(matchController);
+        }
+    }
+
+    /**
+     * Removes a match from the game model
+     * @param matchController MatchController of the match
+     */
+    public static void removeMatch(MatchController matchController) {
+        synchronized (matches) {
+            matches.remove(matchController);
         }
     }
 }

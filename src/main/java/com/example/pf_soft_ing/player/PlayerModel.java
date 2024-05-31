@@ -24,6 +24,7 @@ public class PlayerModel {
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
+    private final int[] secretObjectiveCardIDs = new int[2];
     private ObjectiveCard secretObjective;
 
     private PlaceableCard starterCard;
@@ -47,7 +48,7 @@ public class PlayerModel {
 
     private int currMaxPriority = 0;
 
-    private final Sender sender;
+    private Sender sender;
 
     public PlayerModel(int ID, Sender sender) {
         this.ID = ID;
@@ -60,6 +61,10 @@ public class PlayerModel {
      */
     public Sender getSender() {
         return sender;
+    }
+
+    public void setSender(Sender sender) {
+        this.sender = sender;
     }
 
     /**
@@ -108,6 +113,24 @@ public class PlayerModel {
      */
     public List<PlaceableCard> getHand() {
         return hand;
+    }
+
+    /**
+     * Setter
+     * @param firstObjectiveCardID ID of the first objective card
+     * @param secondObjectiveCardID ID of the second objective card
+     */
+    public void setSecretObjectiveCardIDs(int firstObjectiveCardID, int secondObjectiveCardID) {
+        secretObjectiveCardIDs[0] = firstObjectiveCardID;
+        secretObjectiveCardIDs[1] = secondObjectiveCardID;
+    }
+
+    /**
+     * Getter
+     * @return Array of secret objective card IDs
+     */
+    public int[] getSecretObjectiveCardIDs() {
+        return secretObjectiveCardIDs;
     }
 
     /**
@@ -201,6 +224,14 @@ public class PlayerModel {
 
     /**
      * Getter
+     * @return Player's token color
+     */
+    public TokenColors getTokenColor(){
+        return token.getColor();
+    }
+
+    /**
+     * Getter
      * @return If the player is the first player
      */
     public boolean isFirstPlayer(){
@@ -239,6 +270,14 @@ public class PlayerModel {
             lastPlayerState = this.state;
             this.state = state;
         }
+    }
+
+    /**
+     * Getter
+     * @return Player's last state
+     */
+    public PlayerState getLastPlayerState() {
+        return lastPlayerState;
     }
 
     /**

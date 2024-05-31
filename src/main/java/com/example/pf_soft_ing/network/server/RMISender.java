@@ -94,7 +94,7 @@ public class RMISender implements Sender {
                         starterCardID);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Game not started");
+                System.out.println("Error: " + e.getMessage() + ". Game start setup not sent");
             }
         }).start();
     }
@@ -110,7 +110,7 @@ public class RMISender implements Sender {
                         secretObjectiveCardID1, secretObjectiveCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Missing setup");
+                System.out.println("Error: " + e.getMessage() + ". Missing setup not sent");
             }
         }).start();
     }
@@ -226,6 +226,28 @@ public class RMISender implements Sender {
                 client.sendPlayerDisconnection(playerID);
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage() + ". Player disconnection not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
+        new Thread(() ->{
+            try {
+                client.sendReOnStarterPlacement(playerID, IDToNicknameMap, gameSetupCards);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Reconnection game start setup not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        new Thread(() ->{
+            try {
+                client.sendReOnObjectiveChoice(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Reconnection objective choice not sent");
             }
         }).start();
     }

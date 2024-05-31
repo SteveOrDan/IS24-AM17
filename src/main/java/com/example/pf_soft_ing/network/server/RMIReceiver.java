@@ -55,6 +55,7 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     @Override
     public void selectMatch(int playerID, int matchID) throws RemoteException {
         MatchController mc = gameController.selectMatch(playerID, matchID);
+
         if (mc != null) {
             synchronized (playerIDToMatch) {
                 playerIDToMatch.put(playerID, mc);
@@ -65,6 +66,11 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
             }
             discMan.startConnectionCheck();
         }
+    }
+
+    @Override
+    public void reconnectToMatch(int playerID, String nickname, int matchID) throws RemoteException {
+        gameController.reconnectToMatch(playerID, nickname, matchID);
     }
 
     @Override
