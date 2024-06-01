@@ -36,47 +36,52 @@ public class TestClientSender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(CardSideType side) {
+    public void reconnectToMatch(int matchID, String nickname) {
 
     }
 
     @Override
-    public void chooseSecretObjective(int cardID) {
+    public void placeStarterCard(int playerID, CardSideType side) {
 
     }
 
     @Override
-    public void placeCard(int cardID, CardSideType side, Position pos) {
+    public void chooseSecretObjective(int playerID, int cardID) {
 
     }
 
     @Override
-    public void drawResourceCard() {
+    public void placeCard(int playerID, int cardID, CardSideType side, Position pos) {
 
     }
 
     @Override
-    public void drawVisibleResourceCard(int index) {
+    public void drawResourceCard(int playerID) {
 
     }
 
     @Override
-    public void drawGoldenCard() {
+    public void drawVisibleResourceCard(int playerID, int index) {
 
     }
 
     @Override
-    public void drawVisibleGoldenCard(int index) {
+    public void drawGoldenCard(int playerID) {
 
     }
 
     @Override
-    public void sendChatMessage(String recipient, String message) {
+    public void drawVisibleGoldenCard(int playerID, int index) {
 
     }
 
     @Override
-    public void sendPong() {
+    public void sendChatMessage(int playerID, String recipient, String message) {
+
+    }
+
+    @Override
+    public void sendPong(int playerID) {
 
     }
 }

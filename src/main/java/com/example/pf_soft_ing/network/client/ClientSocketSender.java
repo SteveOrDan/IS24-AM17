@@ -78,22 +78,22 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
-    public void drawResourceCard() {
+    public void drawResourceCard(int playerID) {
         sendMessage(new DrawCardMsg(playerID, false, false, -1));
     }
 
     @Override
-    public void drawVisibleResourceCard(int index) {
+    public void drawVisibleResourceCard(int playerID, int index) {
         sendMessage(new DrawCardMsg(playerID, false, true, index));
     }
 
     @Override
-    public void drawGoldenCard() {
+    public void drawGoldenCard(int playerID) {
         sendMessage(new DrawCardMsg(playerID, true, false, -1));
     }
 
     @Override
-    public void drawVisibleGoldenCard(int index) {
+    public void drawVisibleGoldenCard(int playerID, int index) {
         sendMessage(new DrawCardMsg(playerID, true, true, index));
     }
 
@@ -105,10 +105,5 @@ public class ClientSocketSender implements ClientSender {
     @Override
     public void sendPong(int playerID) {
         sendMessage(new PongMsg(playerID));
-    }
-
-    @Override
-    public void sendPong() {
-        sendMessage(new PongMsg(this.playerID));
     }
 }

@@ -89,6 +89,36 @@ public class TestSender implements Sender {
     }
 
     @Override
+    public void sendPlayerDisconnection(int playerID) {
+
+    }
+
+    @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
+
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+
+    }
+
+    @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) {
+
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() {
+
+    }
+
+    @Override
     public void sendPing() {
 
     }
