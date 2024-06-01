@@ -680,6 +680,7 @@ public class GUIView implements View {
         playerField.getChildren().add(playerFieldGrid);
 
         playerFieldScroll.setContent(playerField);
+        playerFieldScroll.setStyle("-fx-background: #f5f3e5; -fx-background-color: #f5f3e5;");
 
         root.getChildren().add(playerFieldScroll);
         // endregion
@@ -700,6 +701,16 @@ public class GUIView implements View {
         playerHandPane.setLayoutX(0);
         playerHandPane.setLayoutY(0);
 
+        // Create background for hand Area
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundHandArea.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setLayoutY(0);
+        bgView.setLayoutX(0);
+        bgView.setFitHeight(playerHandHeight);
+        bgView.setFitWidth(playerHandWidth);
+
+        playerHandPane.getChildren().add(bgView);
+
         playerHandParentPane.getChildren().add(playerHandPane);
         root.getChildren().add(playerHandParentPane);
         // endregion
@@ -718,6 +729,16 @@ public class GUIView implements View {
         commonAreaPane.setPrefSize(commonAreaWidth, stageHeight);
         commonAreaPane.setLayoutX(0);
         commonAreaPane.setLayoutY(0);
+
+        // Create background
+        Image backgroundCommonArea = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundCommonArea.png")));
+        ImageView bgViewCommonArea = new ImageView(backgroundCommonArea);
+        bgViewCommonArea.setLayoutY(0);
+        bgViewCommonArea.setLayoutX(0);
+        bgViewCommonArea.setFitHeight(stageHeight);
+        bgViewCommonArea.setFitWidth(commonAreaWidth);
+
+        commonAreaPane.getChildren().add(bgViewCommonArea);
 
         // Create label for current player's turn
         currPlayerTurnLabel = new Label("Current player: None");
@@ -874,6 +895,16 @@ public class GUIView implements View {
         opponentHandPane.setPrefSize(playerHandWidth, playerHandHeight);
         opponentHandPane.setLayoutX(0);
         opponentHandPane.setLayoutY(0);
+
+        // Create background for opponent hand Area
+        Image background = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundHandArea.png")));
+        ImageView bgView = new ImageView(background);
+        bgView.setLayoutY(0);
+        bgView.setLayoutX(0);
+
+        bgView.setFitHeight(playerHandHeight);
+        bgView.setFitWidth(playerHandWidth);
+        opponentHandPane.getChildren().add(bgView);
 
         double cardsYPos = (opponentHandPane.getPrefHeight() - cardHeight) * 0.5;
 
