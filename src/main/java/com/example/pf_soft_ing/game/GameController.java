@@ -110,14 +110,15 @@ public class GameController {
         }
     }
 
-    public void reconnectToMatch(int playerID, String nickname, int matchID) {
+    public int reconnectToMatch(int playerID, String nickname, int matchID) {
         // The player reconnects to a match
         try {
-            gameModel.reconnectToMatch(playerID, nickname, matchID);
+            return gameModel.reconnectToMatch(playerID, nickname, matchID);
         }
-        catch (InvalidMatchIDException | NoPlayersDisconnected | NicknameNotInMatch e) {
+        catch (InvalidMatchIDException | SpecifiedPlayerNotDisconnected | NicknameNotInMatch e) {
             getPlayerSender(playerID).sendError(e.getMessage());
         }
+        return -1;
     }
 
     /**

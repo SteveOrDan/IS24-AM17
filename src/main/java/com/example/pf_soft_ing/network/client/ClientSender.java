@@ -12,14 +12,14 @@ public interface ClientSender {
     void chooseNickname(String nickname);
     void reconnectToMatch(int matchID, String nickname);
 
-    void placeStarterCard(CardSideType side);
-    void chooseSecretObjective(int cardID);
-    void placeCard(int cardID, CardSideType side, Position pos);
+    void placeStarterCard(int playerID, CardSideType side);
+    void chooseSecretObjective(int playerID, int cardID);
+    void placeCard(int playerID, int cardID, CardSideType side, Position pos);
     void drawResourceCard(int playerID);
     void drawVisibleResourceCard(int playerID, int index);
     void drawGoldenCard(int playerID);
     void drawVisibleGoldenCard(int playerID, int index);
 
-    void sendChatMessage(String recipient, String message);
-    void sendPong();
+    void sendChatMessage(int playerID, String recipient, String message);
+    void sendPong(int playerID);
 }

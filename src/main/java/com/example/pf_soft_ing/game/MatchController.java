@@ -599,8 +599,8 @@ public class MatchController {
         }
     }
 
-    public void reconnectPlayer(String nickname, Sender newSender) throws NoPlayersDisconnected, NicknameNotInMatch {
-        matchModel.reconnectPlayer(nickname, newSender);
+    public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
+        return matchModel.reconnectPlayer(nickname, newSender);
     }
 
     /**

@@ -143,9 +143,9 @@ public class GameModel {
         matchModel.addReadyPlayer();
     }
 
-    public void reconnectToMatch(int playerID, String nickname, int matchID) throws InvalidMatchIDException, NoPlayersDisconnected, NicknameNotInMatch {
+    public int reconnectToMatch(int playerID, String nickname, int matchID) throws InvalidMatchIDException, SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
         Sender newSender = IDToPlayers.get(playerID).getSender();
-        getMatchByID(matchID).reconnectPlayer(nickname, newSender);
+        return getMatchByID(matchID).reconnectPlayer(nickname, newSender);
     }
 
     /**

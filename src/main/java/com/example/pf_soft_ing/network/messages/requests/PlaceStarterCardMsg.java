@@ -5,10 +5,19 @@ import com.example.pf_soft_ing.network.messages.Message;
 
 public class PlaceStarterCardMsg extends Message {
 
+    private final int playerID;
     private final CardSideType side;
 
-    public PlaceStarterCardMsg(CardSideType side) {
+    public PlaceStarterCardMsg(int playerID, CardSideType side) {
+        this.playerID = playerID;
         this.side = side;
+    }
+
+    /**
+     * @return the playerID
+     */
+    public int getPlayerID() {
+        return playerID;
     }
 
     /**

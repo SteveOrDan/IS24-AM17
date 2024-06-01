@@ -840,14 +840,14 @@ public class GUIView implements View {
             if (chatInput.getText().startsWith("/")) {
                 String[] command = chatInput.getText().split(" ");
                 if (command[0].equals("/whisper") && command.length >= 3) {
-                    sender.sendChatMessage(command[1], chatInput.getText().substring(command[0].length() + command[1].length() + 2));
+                    sender.sendChatMessage(playerID, command[1], chatInput.getText().substring(command[0].length() + command[1].length() + 2));
                 }
                 else {
                     showError("Invalid chat format.");
                 }
             }
             else {
-                sender.sendChatMessage("all", chatInput.getText());
+                sender.sendChatMessage(playerID, "all", chatInput.getText());
             }
 
             chatInput.clear();
@@ -919,7 +919,7 @@ public class GUIView implements View {
         placeButton.setLayoutY((stageHeight + cardHeight) * 0.5);
         placeButton.setOnAction((_) -> {
             // Send the choice to the server
-            sender.placeStarterCard(starterCard.getCurrSideType());
+            sender.placeStarterCard(playerID, starterCard.getCurrSideType());
         });
 
         // Add all elements to the root
@@ -1035,7 +1035,7 @@ public class GUIView implements View {
         secretObjective1Button.setLayoutY(0);
         secretObjective1Button.setOnAction((_) -> {
             secretObjectiveCardID = secretObjective1ID;
-            sender.chooseSecretObjective(secretObjectiveCardID);
+            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
         });
         secretObjective1Button.setOpacity(0.1);
 
@@ -1046,7 +1046,7 @@ public class GUIView implements View {
         secretObjective2Button.setLayoutY(0);
         secretObjective2Button.setOnAction((_) -> {
             secretObjectiveCardID = secretObjective2ID;
-            sender.chooseSecretObjective(secretObjectiveCardID);
+            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
         });
         secretObjective2Button.setOpacity(0.1);
 
@@ -1155,7 +1155,7 @@ public class GUIView implements View {
         placeButton.setOpacity(0.6);
         placeButton.setOnAction((_) -> {
             System.out.println("Placing card at " + pos.getX() + " " + pos.getY());
-            sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos);
+            sender.placeCard(playerID, selectedCard.getID(), selectedCard.getCurrSideType(), pos);
         });
 
         positionPane.getChildren().add(placeButton);
@@ -1952,7 +1952,7 @@ public class GUIView implements View {
         synchronized (packetLossLock) {
             packetLoss = 0;
         }
-        sender.sendPong();
+        sender.sendPong(playerID);
     }
 
     private String getPlayerNickname(int playerID){

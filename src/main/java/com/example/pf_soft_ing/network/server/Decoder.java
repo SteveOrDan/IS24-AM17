@@ -4,6 +4,7 @@ import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.requests.*;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
+import com.example.pf_soft_ing.player.PlayerModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,10 +18,10 @@ public class Decoder {
     private static final Map<Integer, DisconnectionManager> playerIDToDiscMan = new HashMap<>();
 
     private static final long CLEANUP_PERIOD = 10000;
-    private static final long CLEANUP_DELAY = 300000;
 
     public static void finishedMatch(int playerID) {
-        if (! playerIDToDiscMan.containsKey(playerID)) return;
+        if (!playerIDToDiscMan.containsKey(playerID)) return;
+
         synchronized (playerIDToDiscMan) {
             playerIDToDiscMan.get(playerID).stopConnectionCheck();
         }
@@ -62,21 +63,36 @@ public class Decoder {
                 }
             }
 
+            case ReconnectToMatchMsg castedMsg -> {
+                int originalPlayerID = gameController.reconnectToMatch(playerID, castedMsg.getNickname(), castedMsg.getMatchID());
+
+                if (originalPlayerID != -1) {
+                    synchronized (playerIDToMatch) {
+                        Sender newSender = playerIDToMatch.get(originalPlayerID).getPlayerSender(originalPlayerID);
+                        synchronized (playerIDToDiscMan) {
+                            DisconnectionManager discMan = new DisconnectionManager(gameController, playerIDToMatch.get(originalPlayerID), newSender, originalPlayerID);
+                            playerIDToDiscMan.put(originalPlayerID, discMan);
+                            discMan.startConnectionCheck();
+                        }
+                    }
+                }
+            }
+
             case PlaceStarterCardMsg castedMsg -> {
                 synchronized (playerIDToMatch) {
-                    playerIDToMatch.get(playerID).placeStarterCardForPlayer(playerID, castedMsg.getSide());
+                    playerIDToMatch.get(castedMsg.getPlayerID()).placeStarterCardForPlayer(castedMsg.getPlayerID(), castedMsg.getSide());
                 }
             }
 
             case ChooseSecretObjMsg castedMsg -> {
                 synchronized (playerIDToMatch) {
-                    playerIDToMatch.get(playerID).setSecretObjectiveForPlayer(playerID, castedMsg.getCardID());
+                    playerIDToMatch.get(castedMsg.getPlayerID()).setSecretObjectiveForPlayer(castedMsg.getPlayerID(), castedMsg.getCardID());
                 }
             }
 
             case PlaceCardMsg castedMsg -> {
                 synchronized (playerIDToMatch) {
-                    playerIDToMatch.get(playerID).placeCard(playerID, castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
+                    playerIDToMatch.get(castedMsg.getPlayerID()).placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide());
                 }
             }
 
@@ -84,24 +100,24 @@ public class Decoder {
                 if (castedMsg.isGolden()) {
                     if (castedMsg.isVisible()) {
                         synchronized (playerIDToMatch) {
-                            playerIDToMatch.get(playerID).drawVisibleGoldenCard(playerID, castedMsg.getIndex());
+                            playerIDToMatch.get(castedMsg.getPlayerID()).drawVisibleGoldenCard(castedMsg.getPlayerID(), castedMsg.getIndex());
                         }
                     }
                     else {
                         synchronized (playerIDToMatch) {
-                            playerIDToMatch.get(playerID).drawGoldenCard(playerID);
+                            playerIDToMatch.get(castedMsg.getPlayerID()).drawGoldenCard(castedMsg.getPlayerID());
                         }
                     }
                 }
                 else {
                     if (castedMsg.isVisible()) {
                         synchronized (playerIDToMatch) {
-                            playerIDToMatch.get(playerID).drawVisibleResourceCard(playerID, castedMsg.getIndex());
+                            playerIDToMatch.get(castedMsg.getPlayerID()).drawVisibleResourceCard(castedMsg.getPlayerID(), castedMsg.getIndex());
                         }
                     }
                     else {
                         synchronized (playerIDToMatch) {
-                            playerIDToMatch.get(playerID).drawResourceCard(playerID);
+                            playerIDToMatch.get(castedMsg.getPlayerID()).drawResourceCard(castedMsg.getPlayerID());
                         }
                     }
                 }
@@ -109,13 +125,13 @@ public class Decoder {
 
             case ChatMessageMsg castedMsg -> {
                 synchronized (playerIDToMatch) {
-                    playerIDToMatch.get(playerID).chatMessage(playerID, castedMsg.getRecipient(), castedMsg.getMessage());
+                    playerIDToMatch.get(castedMsg.getPlayerID()).chatMessage(castedMsg.getPlayerID(), castedMsg.getRecipient(), castedMsg.getMessage());
                 }
             }
 
-            case PongMsg ignored -> {
+            case PongMsg castedMsg -> {
                 synchronized (playerIDToMatch) {
-                    playerIDToDiscMan.get(playerID).resetPacketLoss();
+                    playerIDToDiscMan.get(castedMsg.getPlayerID()).resetPacketLoss();
                 }
             }
 
@@ -149,6 +165,6 @@ public class Decoder {
             }
         };
 
-        timer.scheduleAtFixedRate(timerTaskCleanup, CLEANUP_DELAY, CLEANUP_PERIOD);
+        timer.scheduleAtFixedRate(timerTaskCleanup, 0, CLEANUP_PERIOD);
     }
 }

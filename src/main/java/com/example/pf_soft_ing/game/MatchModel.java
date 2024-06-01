@@ -539,12 +539,10 @@ public class MatchModel {
         playersReady--;
     }
 
-    public void reconnectPlayer(String nickname, Sender newSender) throws NoPlayersDisconnected, NicknameNotInMatch {
-        boolean nicknameFound = false;
+    public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
 
         for (PlayerModel player : IDToPlayerMap.values()){
             if (player.getNickname().equals(nickname)){
-                nicknameFound = true;
 
                 // If there is a disconnected player with the same nickname, reconnect him
                 if (player.getState() == PlayerState.DISCONNECTED){
@@ -615,16 +613,14 @@ public class MatchModel {
                             }
                         }
                     }
+                    return player.getID();
                 }
                 else {
-                    throw new NoPlayersDisconnected();
+                    throw new SpecifiedPlayerNotDisconnected();
                 }
             }
         }
-
-        if (!nicknameFound){
-            throw new NicknameNotInMatch();
-        }
+        throw new NicknameNotInMatch();
     }
 
     /**

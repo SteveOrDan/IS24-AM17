@@ -57,18 +57,18 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(CardSideType side) {
-        sendMessage(new PlaceStarterCardMsg(side));
+    public void placeStarterCard(int playerID, CardSideType side) {
+        sendMessage(new PlaceStarterCardMsg(playerID, side));
     }
 
     @Override
-    public void chooseSecretObjective(int cardID) {
-        sendMessage(new ChooseSecretObjMsg(cardID));
+    public void chooseSecretObjective(int playerID, int cardID) {
+        sendMessage(new ChooseSecretObjMsg(playerID, cardID));
     }
 
     @Override
-    public void placeCard(int cardID, CardSideType side, Position pos) {
-        sendMessage(new PlaceCardMsg(cardID, side, pos));
+    public void placeCard(int playerID, int cardID, CardSideType side, Position pos) {
+        sendMessage(new PlaceCardMsg(playerID, cardID, side, pos));
     }
 
     @Override
@@ -92,12 +92,12 @@ public class ClientSocketSender implements ClientSender {
     }
 
     @Override
-    public void sendChatMessage(String recipient, String message) {
-        sendMessage(new ChatMessageMsg(recipient, message));
+    public void sendChatMessage(int playerID, String recipient, String message) {
+        sendMessage(new ChatMessageMsg(playerID, recipient, message));
     }
 
     @Override
-    public void sendPong() {
-        sendMessage(new PongMsg(this.playerID));
+    public void sendPong(int playerID) {
+        sendMessage(new PongMsg(playerID));
     }
 }

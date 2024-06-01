@@ -82,7 +82,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(CardSideType side) {
+    public void placeStarterCard(int playerID, CardSideType side) {
         new Thread(() -> {
             try {
                 serverInterface.placeStarterCard(playerID, side);
@@ -94,7 +94,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void chooseSecretObjective(int cardID) {
+    public void chooseSecretObjective(int playerID, int cardID) {
         new Thread(() -> {
             try {
                 serverInterface.chooseSecretObj(playerID, cardID);
@@ -106,7 +106,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void placeCard(int cardID, CardSideType side, Position pos) {
+    public void placeCard(int playerID, int cardID, CardSideType side, Position pos) {
         new Thread(() -> {
             try {
                 serverInterface.placeCard(playerID, cardID, side, pos);
@@ -166,7 +166,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendChatMessage(String recipient, String message) {
+    public void sendChatMessage(int playerID, String recipient, String message) {
         new Thread(() -> {
             try {
                 serverInterface.sendChatMessage(playerID, recipient, message);
@@ -178,7 +178,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendPong() {
+    public void sendPong(int playerID) {
         new Thread(() -> {
             try {
                 serverInterface.sendPong(playerID);

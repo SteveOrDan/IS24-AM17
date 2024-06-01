@@ -166,20 +166,6 @@ public class TUIView implements View {
                     }
                     try {
                         sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
-                        packetLossTask = new TimerTask() {
-                            @Override
-                            public void run() {
-                                synchronized (packetLossLock) {
-                                    if (packetLoss >= MAX_PACKET_LOSS) {
-                                        playerState = PlayerState.DISCONNECTED;
-                                        showConnectionLoss();
-                                        cancel();
-                                    }
-                                    packetLoss++;
-                                }
-                            }
-                        };
-                        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
                     }
                     catch (NumberFormatException e){
                         System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -192,20 +178,6 @@ public class TUIView implements View {
                     }
                     try {
                         sender.selectMatch(Integer.parseInt(parts[1]));
-                        packetLossTask = new TimerTask() {
-                            @Override
-                            public void run() {
-                                synchronized (packetLossLock) {
-                                    if (packetLoss >= MAX_PACKET_LOSS) {
-                                        playerState = PlayerState.DISCONNECTED;
-                                        showConnectionLoss();
-                                        cancel();
-                                    }
-                                    packetLoss++;
-                                }
-                            }
-                        };
-                        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
                     }
                     catch (NumberFormatException e){
                         System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
@@ -218,6 +190,19 @@ public class TUIView implements View {
                     }
 
                     sender.chooseNickname(parts[1]);
+                }
+                case "reconnect" -> { // ReconnectToMatch
+                    if (parts.length != 3) {
+                        System.out.println("Error: Reconnect takes exactly 2 arguments (match ID and nickname). Please, try again");
+                        break;
+                    }
+
+                    try {
+                        sender.reconnectToMatch(Integer.parseInt(parts[1]), parts[2]);
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
                 }
                 case "fsc" -> { // FlipStarterCard
                     if (parts.length != 1) {
@@ -233,7 +218,7 @@ public class TUIView implements View {
                         break;
                     }
 
-                    sender.placeStarterCard(starterCard.getCurrSideType());
+                    sender.placeStarterCard(playerID, starterCard.getCurrSideType());
                 }
                 case "cso" -> { // ChooseSecretObjective
                     if (parts.length != 2) {
@@ -250,7 +235,7 @@ public class TUIView implements View {
 
                         secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
 
-                        sender.chooseSecretObjective(secretObjectiveCardID);
+                        sender.chooseSecretObjective(playerID, secretObjectiveCardID);
                     }
                     catch (Exception e) {
                         System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
@@ -293,7 +278,7 @@ public class TUIView implements View {
                             System.out.println("Error: " + parts[2] + " is not a valid position ID. Please, try again");
                             break;
                         }
-                        sender.placeCard(placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
+                        sender.placeCard(playerID, placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
                     }
                     catch (NumberFormatException e){
                         System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
@@ -373,7 +358,7 @@ public class TUIView implements View {
 
                     List<String> partsArray = new ArrayList<>(Arrays.asList(parts));
 
-                    sender.sendChatMessage(partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
+                    sender.sendChatMessage(playerID, partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
                 }
                 case "gmc" -> { // GetMatchChat
                     if (parts.length != 1) {
@@ -427,9 +412,10 @@ public class TUIView implements View {
     @Override
     public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
-            System.out.println("No matches available.");
-            System.out.println("To create a new match, type: cm <players_num> <nickname>");
-            System.out.println("To refresh the matches list, type: rml");
+            System.out.println("""
+                    No matches available.
+                    To create a new match, type: cm <players_num> <nickname>
+                    To refresh the matches list, type: rml""");
             return;
         }
 
@@ -441,11 +427,14 @@ public class TUIView implements View {
         System.out.println("""
                 To create a new match, type: cm <players_num> <nickname>
                 To join a match, type: sm <matchID>
-                To refresh the matches list, type: rml""");
+                To refresh the matches list, type: rml
+                To reconnect to a match, type: reconnect <matchID> <nickname>""");
     }
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
+        startConnectionCheck();
+
         playerState = PlayerState.MATCH_LOBBY;
         playerNickname = hostNickname;
         this.matchID = matchID;
@@ -458,6 +447,8 @@ public class TUIView implements View {
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
+        startConnectionCheck();
+
         playerState = PlayerState.CHOOSING_NICKNAME;
         this.matchID = matchID;
 
@@ -492,7 +483,7 @@ public class TUIView implements View {
                 opponents.add(opponent);
             }
             else {
-                playerNickname = entry.getValue();
+                playerNickname = IDToNicknameMap.get(playerID);
             }
         }
 
@@ -1888,7 +1879,7 @@ public class TUIView implements View {
 
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
-                new ArrayList<>(Arrays.asList("cm", "sm", "rml")));
+                new ArrayList<>(Arrays.asList("cm", "sm", "rml", "reconnect")));
 
         stateToCommands.put(PlayerState.MATCH_LOBBY,
                 new ArrayList<>(List.of("gmi")));
@@ -2090,7 +2081,9 @@ public class TUIView implements View {
 
     @Override
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
-        this.playerID = playerID;
+        startConnectionCheck();
+
+        setID(playerID);
         playerState = PlayerState.PLACING_STARTER;
         createInvalidCardLines();
 
@@ -2127,7 +2120,9 @@ public class TUIView implements View {
 
     @Override
     public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
-        this.playerID = playerID;
+        startConnectionCheck();
+        
+        setID(playerID);
         playerState = PlayerState.CHOOSING_OBJECTIVE;
         createInvalidCardLines();
 
@@ -2231,7 +2226,7 @@ public class TUIView implements View {
         synchronized (packetLossLock) {
             packetLoss = 0;
         }
-        sender.sendPong();
+        sender.sendPong(playerID);
     }
 
     /**
@@ -2325,6 +2320,26 @@ public class TUIView implements View {
         }
 
         return false;
+    }
+
+    /**
+     * Starts to check if the player has lost connection to the server.
+     */
+    private void startConnectionCheck() {
+        packetLossTask = new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (packetLossLock) {
+                    if (packetLoss >= MAX_PACKET_LOSS) {
+                        playerState = PlayerState.DISCONNECTED;
+                        showConnectionLoss();
+                        cancel();
+                    }
+                    packetLoss++;
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
     }
 
     /**

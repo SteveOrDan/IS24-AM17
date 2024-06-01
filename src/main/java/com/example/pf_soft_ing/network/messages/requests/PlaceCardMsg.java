@@ -6,14 +6,23 @@ import com.example.pf_soft_ing.network.messages.Message;
 
 public class PlaceCardMsg extends Message {
 
+    private final int playerID;
     private final int cardID;
     private final CardSideType side;
     private final Position pos;
 
-    public PlaceCardMsg(int cardID, CardSideType side, Position pos) {
+    public PlaceCardMsg(int playerID, int cardID, CardSideType side, Position pos) {
+        this.playerID = playerID;
         this.cardID = cardID;
         this.side = side;
         this.pos = pos;
+    }
+
+    /**
+     * @return the playerID
+     */
+    public int getPlayerID() {
+        return playerID;
     }
 
     /**
