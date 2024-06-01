@@ -1305,18 +1305,18 @@ public class GUIView implements View {
         drawButton.setOnAction((_) -> {
             if (isVisible){
                 if (isGolden){
-                    sender.drawVisibleGoldenCard(cardIndex);
+                    sender.drawVisibleGoldenCard(playerID, cardIndex);
                 }
                 else {
-                    sender.drawVisibleResourceCard(cardIndex);
+                    sender.drawVisibleResourceCard(playerID, cardIndex);
                 }
             }
             else {
                 if (isGolden){
-                    sender.drawGoldenCard();
+                    sender.drawGoldenCard(playerID);
                 }
                 else {
-                    sender.drawResourceCard();
+                    sender.drawResourceCard(playerID);
                 }
             }
         });

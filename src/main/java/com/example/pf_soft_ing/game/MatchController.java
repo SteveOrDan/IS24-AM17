@@ -173,7 +173,7 @@ public class MatchController {
                     playerIDs[i] = getIDToPlayerMap().get(id).getID();
                     starterCardIDs[i] = getIDToPlayerMap().get(id).getStarterCard().getID();
                     starterCardSides[i] = getIDToPlayerMap().get(id).getStarterCard().getCurrSideType();
-                    tokenColors[i] = getIDToPlayerMap().get(id).getToken();
+                    tokenColors[i] = getIDToPlayerMap().get(id).getTokenColor();
                     for (int j = 0; j < 3; j++) {
                         playerHands[i][j] = getIDToPlayerMap().get(id).getHand().get(j).getID();
                     }
