@@ -22,14 +22,12 @@ public class SocketSender implements Sender {
     }
 
     protected void sendMessage(Message output){
-        new Thread(() -> {
-            try {
-                out.writeObject(output);
-            }
-            catch (IOException e) {
-                System.out.println(e.getMessage());
-            }
-        }).start();
+        try {
+            out.writeObject(output);
+        }
+        catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -136,6 +134,36 @@ public class SocketSender implements Sender {
     @Override
     public void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side , int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         sendMessage(new RankingMsg(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives));
+    }
+
+    @Override
+    public void sendPlayerDisconnection(int playerID) {
+        sendMessage(new PlayerDisconnectionMsg(playerID));
+    }
+
+    @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
+        sendMessage(new ReOnStarterPlacementMsg(playerID, IDToNicknameMap,gameSetupCards));
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        sendMessage(new ReOnObjectiveChoiceMsg(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor));
+    }
+
+    @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        sendMessage(new UndoCardPlacementMsg(playerID, pos, score, nextPlayerID));
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) {
+        sendMessage(new UndoPlaceWithOnePlayerLeftMsg(playerID, pos, score));
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() {
+        sendMessage(new SoleWinnerMsg());
     }
 
     @Override

@@ -5,10 +5,10 @@ import com.example.pf_soft_ing.card.decks.ObjectiveCardsDeck;
 import com.example.pf_soft_ing.card.decks.StarterCardsDeck;
 import com.example.pf_soft_ing.card.decks.UsableCardsDeck;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.exceptions.GameIsFullException;
-import com.example.pf_soft_ing.exceptions.InvalidVisibleCardIndexException;
-import com.example.pf_soft_ing.exceptions.NicknameAlreadyExistsException;
-import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
+import com.example.pf_soft_ing.exceptions.*;
+import com.example.pf_soft_ing.network.server.Decoder;
+import com.example.pf_soft_ing.network.server.RMIReceiver;
+import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerRanker;
 import com.example.pf_soft_ing.player.PlayerState;
@@ -42,9 +42,12 @@ public class MatchModel {
     private int[] scoresRanked;
     private int[] numOfCompletedObjectivesRanked;
 
+    private final Timer timer = new Timer();
+    private TimerTask announceSoleWinner;
+    private final static int SOLE_WINNER_ANNOUNCE_DELAY = 3000;
+
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
-
         this.matchID = matchID;
     }
 
@@ -385,7 +388,9 @@ public class MatchModel {
      * the next player in the order
      */
     public void endTurn(){
-        IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
+        if (IDToPlayerMap.get(currPlayerID).getState() != PlayerState.DISCONNECTED) {
+            IDToPlayerMap.get(currPlayerID).setState(PlayerState.WAITING);
+        }
 
         int currPlayerIndex = 0;
         for (int i = 0; i < orderOfPlayersIDs.length; i++){
@@ -398,13 +403,27 @@ public class MatchModel {
         if (gameState == GameState.PLAYING){
             checkForEndGame();
         }
-        if (currPlayerIndex == orderOfPlayersIDs.length - 1){
-            currPlayerID = orderOfPlayersIDs[0];
+
+        boolean hasLooped = false;
+        boolean foundNextPlayer = false;
+        while (!foundNextPlayer){
+            if (currPlayerIndex == orderOfPlayersIDs.length - 1){
+                currPlayerIndex = 0;
+                hasLooped = true;
+            }
+            else {
+                currPlayerIndex++;
+            }
+
+            if (IDToPlayerMap.get(orderOfPlayersIDs[currPlayerIndex]).getState() != PlayerState.DISCONNECTED){
+                foundNextPlayer = true;
+            }
+        }
+
+        if (hasLooped){
             manageEndGame();
         }
-        else {
-            currPlayerID = orderOfPlayersIDs[currPlayerIndex + 1];
-        }
+        currPlayerID = orderOfPlayersIDs[currPlayerIndex];
 
         if (gameState != GameState.END_GAME){
             IDToPlayerMap.get(currPlayerID).setState(PlayerState.PLACING);
@@ -454,7 +473,9 @@ public class MatchModel {
             nicknamesRanked[players.indexOf(player)] = player.getNickname();
             scoresRanked[players.indexOf(player)] = player.getCurrScore();
             numOfCompletedObjectivesRanked[players.indexOf(player)] = player.getNumOfCompletedObjectives();
+            stopPinging(player);
         }
+
     }
 
     public boolean checkForTurnOrderPhase() {
@@ -495,6 +516,10 @@ public class MatchModel {
         }
     }
 
+    /**
+     * Getter
+     * @return Map of player IDs to their nicknames
+     */
     public Map<Integer, String> getIDtoNicknameMap() {
         Map<Integer, String> IDToNickname = new HashMap<>();
 
@@ -502,5 +527,185 @@ public class MatchModel {
             IDToNickname.put(player.getID(), player.getNickname());
         }
         return IDToNickname;
+    }
+
+    /**
+     * Removes the player with the given ID from the match
+     * @param playerID ID of the player to remove
+     */
+    public void removePlayer(int playerID) {
+        IDToPlayerMap.remove(playerID);
+        currPlayers--;
+        playersReady--;
+    }
+
+    public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
+
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getNickname().equals(nickname)){
+
+                // If there is a disconnected player with the same nickname, reconnect him
+                if (player.getState() == PlayerState.DISCONNECTED){
+                    if (announceSoleWinner != null){
+                        announceSoleWinner.cancel();
+                    }
+                    player.setSender(newSender);
+
+                    if (getGameState() == GameState.SET_UP) {
+                        if (player.getLastPlayerState() == PlayerState.PLACING_STARTER) {
+                            int[] gameSetupCards = new int[7];
+
+                            player.setState(PlayerState.PLACING_STARTER);
+
+                            // Add the IDs of the deck's cards to the array
+                            gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
+                            gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
+                            gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
+                            gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
+                            gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
+                            gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+                            // Add the ID of the player's starter card to the array
+                            try {
+                                gameSetupCards[6] = player.getStarterCard().getID();
+                            }
+                            // This exception should never be thrown
+                            catch (StarterCardNotSetException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
+                        }
+                        else if (player.getLastPlayerState() == PlayerState.CHOOSING_OBJECTIVE) {
+                            int[] gameSetupCards = new int[14];
+
+                            player.setState(PlayerState.CHOOSING_OBJECTIVE);
+
+                            // Add the IDs of the deck's cards to the array
+                            gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
+                            gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
+                            gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
+                            gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
+                            gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
+                            gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+
+                            // Add the IDs of the player's cards to the array
+                            gameSetupCards[6] = player.getHand().getFirst().getID();
+                            gameSetupCards[7] = player.getHand().get(1).getID();
+                            gameSetupCards[8] = player.getHand().get(2).getID();
+
+                            // Add the IDs of the common objective cards to the array
+                            gameSetupCards[9] = getObjectiveCardsDeck().getCommonObjectives().getFirst().getID();
+                            gameSetupCards[10] = getObjectiveCardsDeck().getCommonObjectives().get(1).getID();
+
+                            int[] objToChoose = player.getSecretObjectiveCardIDs();
+
+                            // Add the IDs of the secret objective cards to choose from to the array
+                            gameSetupCards[11] = objToChoose[0];
+                            gameSetupCards[12] = objToChoose[1];
+
+                            try {
+                                gameSetupCards[13] = player.getStarterCard().getID();
+                                player.getSender().sendReOnObjectiveChoice(player.getID(), getIDtoNicknameMap(), gameSetupCards, player.getStarterCard().getCurrSideType(), player.getTokenColor());
+                            }
+                            // This exception should never be thrown
+                            catch (StarterCardNotSetException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+                    return player.getID();
+                }
+                else {
+                    throw new SpecifiedPlayerNotDisconnected();
+                }
+            }
+        }
+        throw new NicknameNotInMatch();
+    }
+
+    /**
+     * Method to check if the match has no players
+     * @return true if the match has no players, false otherwise
+     */
+    public boolean hasNoPlayers() {
+        return currPlayers == 0;
+    }
+
+    /**
+     * Method to check if all players are disconnected
+     * @return true if the match has no players online, false otherwise
+     */
+    public boolean hasNoPlayersOnline() {
+        return IDToPlayerMap.values().stream().allMatch(player -> player.getState() == PlayerState.DISCONNECTED);
+    }
+
+//    /**
+//     * Method to check if all players are online
+//     * @return true if all players are online, false otherwise
+//     */
+//    private boolean allPlayersOnline() {
+//        for (PlayerModel player : IDToPlayerMap.values()){
+//            if (player.getState() == PlayerState.DISCONNECTED){
+//                return false;
+//            }
+//        }
+////        return true;
+//    }
+
+    public void undoCardPlacement(int playerID) {
+        IDToPlayerMap.get(playerID).undoCardPlacement();
+        endTurn();
+    }
+
+    /**
+     * Method to check if there is only one player left in the match
+     * and announce him as the sole winner after a delay
+     */
+    public boolean checkForLastPlayerStanding() {
+        int playersOnline = 0;
+
+        for (PlayerModel player : IDToPlayerMap.values()){
+            if (player.getState() != PlayerState.DISCONNECTED){
+                playersOnline++;
+            }
+        }
+
+        if (playersOnline == 1) {
+            announceSoleWinner = new TimerTask() {
+                @Override
+                public void run() {
+                    int playersOnline = 0;
+                    int lastPlayerID = -1;
+
+                    for (PlayerModel player : IDToPlayerMap.values()) {
+                        if (player.getState() != PlayerState.DISCONNECTED) {
+                            playersOnline++;
+                            lastPlayerID = player.getID();
+                        }
+                    }
+
+                    if (playersOnline == 1) {
+                        IDToPlayerMap.get(lastPlayerID).getSender().sendSoleWinnerMessage();
+                        gameState = GameState.END_GAME;
+                        IDToPlayerMap.get(lastPlayerID).setState(PlayerState.MAIN_MENU);
+                        stopPinging(IDToPlayerMap.get(lastPlayerID));
+                    }
+                }
+            };
+            // Announce the sole winner after a delay
+            timer.schedule(announceSoleWinner, SOLE_WINNER_ANNOUNCE_DELAY);
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isOver() {
+        return gameState == GameState.END_GAME;
+    }
+
+    private static void stopPinging(PlayerModel player) {
+        Decoder.finishedMatch(player.getID());
+        RMIReceiver.finishedMatch(player.getID());
     }
 }

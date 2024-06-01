@@ -63,6 +63,14 @@ public class TUIView implements View {
 
     private final List<String> chat = new ArrayList<>();
 
+    private static final int COUNT_DEC_PERIOD = 1000;
+    private static final int MAX_PACKET_LOSS = 3;
+    private int packetLoss = 0;
+    private final Object packetLossLock = new Object();
+
+    private final Timer timer = new Timer();
+    private TimerTask packetLossTask;
+
     public void start(String[] args) {
         createStateToCommandsMap();
         playerState = PlayerState.MAIN_MENU;
@@ -130,194 +138,212 @@ public class TUIView implements View {
 
         List<String> legalCommands = stateToCommands.get(playerState);
 
-            if (legalCommands.contains(command)) {
-                switch (command) {
-                    case "rml" -> { // RefreshMatchesList
-                        if (parts.length != 1) {
-                            System.out.println("Error: RefreshMatchesList does not take any arguments. Please, try again");
-                            break;
-                        }
+        if (playerState == PlayerState.DISCONNECTED) {
+            System.out.println("You are disconnected. Please, restart the game.");
+            return;
+        }
 
-                        sender.getMatches();
+        if (legalCommands.contains(command)) {
+            switch (command) {
+                case "rml" -> { // RefreshMatchesList
+                    if (parts.length != 1) {
+                        System.out.println("Error: RefreshMatchesList does not take any arguments. Please, try again");
+                        break;
                     }
 
-                    case "cm" -> { // CreateMatch
-                        if (parts.length != 3) {
-                            System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
-                            break;
-                        }
-                        try {
-                            sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
-                        }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
-                        }
+                    sender.getMatches();
+                }
+
+                case "cm" -> { // CreateMatch
+                    if (parts.length != 3) {
+                        System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
+                        break;
                     }
-                    case "sm" -> { // SelectMatch
-                        if (parts.length != 2) {
-                            System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
-                            break;
-                        }
-                        try {
-                            sender.selectMatch(Integer.parseInt(parts[1]));
-                        }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
-                        }
+                    try {
+                        sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
                     }
-                    case "cn" -> { // ChooseNickname
-                        if (parts.length != 2) {
-                            System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
-                            break;
-                        }
-
-                        sender.chooseNickname(parts[1]);
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
                     }
-                    case "fsc" -> { // FlipStarterCard
-                        if (parts.length != 1) {
-                            System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
-                            break;
-                        }
-
-                        flipStarterCard();
+                }
+                case "sm" -> { // SelectMatch
+                    if (parts.length != 2) {
+                        System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
+                        break;
                     }
-                    case "psc" -> { // PlaceStarterCard
-                        if (parts.length != 1) {
-                            System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
-                            break;
-                        }
-
-                        sender.placeStarterCard(starterCard.getCurrSideType());
+                    try {
+                        sender.selectMatch(Integer.parseInt(parts[1]));
                     }
-                    case "cso" -> { // ChooseSecretObjective
-                        if (parts.length != 2) {
-                            System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
-                            break;
-                        }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "cn" -> { // ChooseNickname
+                    if (parts.length != 2) {
+                        System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
+                        break;
+                    }
 
-                        try {
-                            int choice = Integer.parseInt(parts[1]);
-                            if (choice != 1 && choice != 2) {
-                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
-                                break;
-                            }
+                    sender.chooseNickname(parts[1]);
+                }
+                case "reconnect" -> { // ReconnectToMatch
+                    if (parts.length != 3) {
+                        System.out.println("Error: Reconnect takes exactly 2 arguments (match ID and nickname). Please, try again");
+                        break;
+                    }
 
-                            secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
+                    try {
+                        sender.reconnectToMatch(Integer.parseInt(parts[1]), parts[2]);
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "fsc" -> { // FlipStarterCard
+                    if (parts.length != 1) {
+                        System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
+                        break;
+                    }
 
-                            sender.chooseSecretObjective(secretObjectiveCardID);
-                        }
-                        catch (Exception e) {
+                    flipStarterCard();
+                }
+                case "psc" -> { // PlaceStarterCard
+                    if (parts.length != 1) {
+                        System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    sender.placeStarterCard(playerID, starterCard.getCurrSideType());
+                }
+                case "cso" -> { // ChooseSecretObjective
+                    if (parts.length != 2) {
+                        System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
+                        break;
+                    }
+
+                    try {
+                        int choice = Integer.parseInt(parts[1]);
+                        if (choice != 1 && choice != 2) {
                             System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
-                        }
-                    }
-                    case "fc" -> { // FlipCard
-                        if (parts.length != 2) {
-                            System.out.println("Error: FlipCard takes exactly 1 argument (card ID). Please, try again");
                             break;
                         }
 
-                        try {
-                            for (PlaceableCard card : playerHand) {
-                                if (card.getID() == Integer.parseInt(parts[1])) {
-                                    card.setCurrSideType(card.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
-                                    break;
-                                }
-                            }
-                            printPlayerHand();
-                        }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
-                        }
+                        secretObjectiveCardID = choice == 1 ? secretObjectiveCardID1 : secretObjectiveCardID2;
+
+                        sender.chooseSecretObjective(playerID, secretObjectiveCardID);
                     }
-                    case "pc" -> { // PlaceCard
-                        if (parts.length != 3) {
-                            System.out.println("Error: PlaceCard takes exactly 2 arguments (card ID and position ID). Please, try again");
-                            break;
-                        }
+                    catch (Exception e) {
+                        System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                    }
+                }
+                case "fc" -> { // FlipCard
+                    if (parts.length != 2) {
+                        System.out.println("Error: FlipCard takes exactly 1 argument (card ID). Please, try again");
+                        break;
+                    }
 
-                        try {
-                            PlaceableCard placingCard = GameResources.getPlaceableCardByID(Integer.parseInt(parts[1]));
-                            Position placingCardPos = posIDToValidPos.get(Integer.parseInt(parts[2]));
-
-                            if (placingCard == null) {
-                                System.out.println("Error: " + parts[1] + " is not a valid card ID. Please, try again");
+                    try {
+                        for (PlaceableCard card : playerHand) {
+                            if (card.getID() == Integer.parseInt(parts[1])) {
+                                card.setCurrSideType(card.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
                                 break;
                             }
-                            else if (placingCardPos == null) {
-                                System.out.println("Error: " + parts[2] + " is not a valid position ID. Please, try again");
-                                break;
-                            }
-                            sender.placeCard(placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
                         }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
-                        }
-                    }
-                    case "ddr" -> { // DrawDeckResourceCard
-                        if (parts.length != 1) {
-                            System.out.println("Error: DrawDeckResourceCard does not take any arguments. Please, try again");
-                            break;
-                        }
-
-                        sender.drawResourceCard();
-                    }
-                    case "dvr" -> { // DrawVisibleResourceCard
-                        if (parts.length != 2) {
-                            System.out.println("Error: DrawResourceCard takes exactly 1 argument (card index 0 or 1). Please, try again");
-                            break;
-                        }
-
-                        try {
-                            sender.drawVisibleResourceCard(Integer.parseInt(parts[1]));
-                        }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
-                        }
-                    }
-                    case "ddg" -> { // DrawDeckGoldCard
-                        if (parts.length != 1) {
-                            System.out.println("Error: DrawDeckGoldenCard does not take any arguments. Please, try again");
-                            break;
-                        }
-
-                        sender.drawGoldenCard();
-                    }
-                    case "dvg" -> { // DrawVisibleGoldCard
-                        if (parts.length != 2) {
-                            System.out.println("Error: DrawVisibleGoldenCard takes exactly 1 argument (card index 0 or 1). Please, try again");
-                            break;
-                        }
-                        try {
-                            int choice = Integer.parseInt(parts[1]);
-                            if (choice != 0 && choice != 1) {
-                                System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
-                                break;
-                            }
-                            sender.drawVisibleGoldenCard(choice);
-                        }
-                        catch (NumberFormatException e){
-                            System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
-                        }
-                    }
-                    case "gh" -> { // GetHand
-                        if (parts.length != 1) {
-                            System.out.println("Error: GetHand does not take any arguments. Please, try again");
-                            break;
-                        }
-
                         printPlayerHand();
                     }
-                    case "opa" -> { // PrintOpponentPlayArea
-                        if (parts.length != 2) {
-                            System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
-                            break;
-                        }
-                        if (parts[1].equals(playerNickname)) {
-                            System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
-                            break;
-                        }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "pc" -> { // PlaceCard
+                    if (parts.length != 3) {
+                        System.out.println("Error: PlaceCard takes exactly 2 arguments (card ID and position ID). Please, try again");
+                        break;
+                    }
 
-                        printOpponentPlayArea(parts[1]);
+                    try {
+                        PlaceableCard placingCard = GameResources.getPlaceableCardByID(Integer.parseInt(parts[1]));
+                        Position placingCardPos = posIDToValidPos.get(Integer.parseInt(parts[2]));
+
+                        if (placingCard == null) {
+                            System.out.println("Error: " + parts[1] + " is not a valid card ID. Please, try again");
+                            break;
+                        }
+                        else if (placingCardPos == null) {
+                            System.out.println("Error: " + parts[2] + " is not a valid position ID. Please, try again");
+                            break;
+                        }
+                        sender.placeCard(playerID, placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "ddr" -> { // DrawDeckResourceCard
+                    if (parts.length != 1) {
+                        System.out.println("Error: DrawDeckResourceCard does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    sender.drawResourceCard(playerID);
+                }
+                case "dvr" -> { // DrawVisibleResourceCard
+                    if (parts.length != 2) {
+                        System.out.println("Error: DrawResourceCard takes exactly 1 argument (card index 0 or 1). Please, try again");
+                        break;
+                    }
+
+                    try {
+                        sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "ddg" -> { // DrawDeckGoldCard
+                    if (parts.length != 1) {
+                        System.out.println("Error: DrawDeckGoldenCard does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    sender.drawGoldenCard(playerID);
+                }
+                case "dvg" -> { // DrawVisibleGoldCard
+                    if (parts.length != 2) {
+                        System.out.println("Error: DrawVisibleGoldenCard takes exactly 1 argument (card index 0 or 1). Please, try again");
+                        break;
+                    }
+                    try {
+                        int choice = Integer.parseInt(parts[1]);
+                        if (choice != 0 && choice != 1) {
+                            System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
+                            break;
+                        }
+                        sender.drawVisibleGoldenCard(playerID, choice);
+                    }
+                    catch (NumberFormatException e){
+                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                    }
+                }
+                case "gh" -> { // GetHand
+                    if (parts.length != 1) {
+                        System.out.println("Error: GetHand does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    printPlayerHand();
+                }
+                case "opa" -> { // PrintOpponentPlayArea
+                    if (parts.length != 2) {
+                        System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
+                        break;
+                    }
+                    if (parts[1].equals(playerNickname)) {
+                        System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
+                        break;
+                    }
+
+                    printOpponentPlayArea(parts[1]);
                 }
                 case "chat" -> { // Write a message in the chat
                     if (parts.length < 3) {
@@ -327,7 +353,7 @@ public class TUIView implements View {
 
                     List<String> partsArray = new ArrayList<>(Arrays.asList(parts));
 
-                    sender.sendChatMessage(partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
+                    sender.sendChatMessage(playerID, partsArray.get(1), String.join(" ", partsArray.subList(2, partsArray.size())));
                 }
                 case "gmc" -> { // GetMatchChat
                     if (parts.length != 1) {
@@ -353,6 +379,15 @@ public class TUIView implements View {
 
                     printAllScores();
                 }
+                case "mm" -> { // Main Menu
+                    if (parts.length != 1) {
+                        System.out.println("Error: MainMenu does not take any arguments. Please, try again");
+                        break;
+                    }
+                    resetPlayerModel();
+                    playerState = PlayerState.MAIN_MENU;
+                    sender.getMatches();
+                }
             }
         }
         else if (command.equals("exit") || command.equals("quit")) {
@@ -365,16 +400,17 @@ public class TUIView implements View {
 
     @Override
     public void setID(int playerID) {
-        this.playerID = playerID;
         sender.setPlayerID(playerID);
+        this.playerID = playerID;
     }
 
     @Override
     public void showMatches(Map<Integer, List<String>> matches) {
         if (matches.isEmpty()) {
-            System.out.println("No matches available.");
-            System.out.println("To create a new match, type: cm <players_num> <nickname>");
-            System.out.println("To refresh the matches list, type: rml");
+            System.out.println("""
+                    No matches available.
+                    To create a new match, type: cm <players_num> <nickname>
+                    To refresh the matches list, type: rml""");
             return;
         }
 
@@ -386,12 +422,16 @@ public class TUIView implements View {
         System.out.println("""
                 To create a new match, type: cm <players_num> <nickname>
                 To join a match, type: sm <matchID>
-                To refresh the matches list, type: rml""");
+                To refresh the matches list, type: rml
+                To reconnect to a match, type: reconnect <matchID> <nickname>""");
     }
 
     @Override
     public void createMatch(int matchID, String hostNickname) {
+        startConnectionCheck();
+
         playerState = PlayerState.MATCH_LOBBY;
+        playerNickname = hostNickname;
         this.matchID = matchID;
 
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
@@ -402,6 +442,8 @@ public class TUIView implements View {
 
     @Override
     public void selectMatch(int matchID, List<String> nicknames) {
+        startConnectionCheck();
+
         playerState = PlayerState.CHOOSING_NICKNAME;
         this.matchID = matchID;
 
@@ -414,6 +456,7 @@ public class TUIView implements View {
     @Override
     public void chooseNickname(String nickname) {
         playerState = PlayerState.MATCH_LOBBY;
+        playerNickname = nickname;
 
         System.out.println("Joined match with nickname: " + nickname);
     }
@@ -1618,7 +1661,7 @@ public class TUIView implements View {
         else {
             E1 = "│      ";
             E2 = "│      ";
-            E3 = "└──────"; 
+            E3 = "└──────";
         }
 
         if (cardSide.getBRCorner().isAvailable()) {
@@ -1637,7 +1680,7 @@ public class TUIView implements View {
         else {
             F1 = "      │";
             F2 = "      │";
-            F3 = "──────┘"; 
+            F3 = "──────┘";
         }
 
         if (sideType.equals(CardSideType.BACK)) {
@@ -1856,7 +1899,7 @@ public class TUIView implements View {
 
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
-                new ArrayList<>(Arrays.asList("cm", "sm", "rml")));
+                new ArrayList<>(Arrays.asList("cm", "sm", "rml", "reconnect")));
 
         stateToCommands.put(PlayerState.MATCH_LOBBY,
                 new ArrayList<>(List.of("gmi")));
@@ -1881,6 +1924,9 @@ public class TUIView implements View {
 
         stateToCommands.put(PlayerState.DRAWING,
                 new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "gs", "opa", "gmi")));
+
+        stateToCommands.put(PlayerState.GAME_OVER,
+                new ArrayList<>(Arrays.asList("opa", "mm")));
     }
 
     @Override
@@ -2039,8 +2085,158 @@ public class TUIView implements View {
     }
 
     @Override
+    public void showPlayerDisconnection(int playerID) {
+        System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+    }
+
+    @Override
+    public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+        startConnectionCheck();
+
+        setID(playerID);
+        playerState = PlayerState.PLACING_STARTER;
+        createInvalidCardLines();
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        for (Map.Entry<Integer, String> entry : IDToOpponentNickname.entrySet()) {
+            if (entry.getKey() != playerID){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setPlayerID(entry.getKey());
+                opponent.setNickname(entry.getValue());
+                opponents.add(opponent);
+            }
+            else {
+                playerNickname = entry.getValue();
+            }
+        }
+
+        GameResources.initializeAllDecks();
+
+        // Update draw area cards
+        setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+        // Print 4 visible cards, 2 deck top card and starter card
+        printDrawArea();
+
+        // Create and print starter card
+        printStarterCardChoice(gameSetupCards[6]);
+
+        // Print available commands
+        System.out.println("To view the other side of the starter card, type: fsc \n" +
+                "To place the starter card on the current side, type: psc");
+    }
+
+    @Override
+    public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        startConnectionCheck();
+
+        setID(playerID);
+        playerState = PlayerState.CHOOSING_OBJECTIVE;
+        createInvalidCardLines();
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        for (Map.Entry<Integer, String> entry : IDToOpponentNickname.entrySet()) {
+            if (entry.getKey() != playerID){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setPlayerID(entry.getKey());
+                opponent.setNickname(entry.getValue());
+                opponents.add(opponent);
+            }
+            else {
+                playerNickname = entry.getValue();
+            }
+        }
+
+        GameResources.initializeAllDecks();
+
+        // Update draw area cards
+        setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+        // Print 4 visible cards, 2 deck top card and starter card
+        printDrawArea();
+
+        starterCard = GameResources.getPlaceableCardByID(gameSetupCards[13]);
+        starterCard.setCurrSideType(starterSide);
+
+        // Place the starter card in the play area and update all legal and illegal positions
+        starterCard.setPriority(priority);
+        playArea.put(new Position(0, 0), starterCard);
+        priority++;
+
+        updatePlacementPositions(new Position(0, 0));
+
+        // Set missing setup
+        playerState = PlayerState.CHOOSING_OBJECTIVE;
+
+        // Add cards to player hand ====================================================================================
+        createPlayerHand(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
+
+        // Print player hand
+        printPlayerHand();
+
+        // Create common objectives ====================================================================================
+        setCommonObjectives(gameSetupCards[9], gameSetupCards[10]);
+
+        // Print common objectives
+        printCommonObjectives();
+
+        // Set secret objective ========================================================================================
+        setSecretObjectives(gameSetupCards[11], gameSetupCards[12]);
+
+        // Print secret objective choice
+        printSecretObjectiveChoice();
+    }
+
+    @Override
+    public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+
+        if (this.playerID == nextPlayerID) {
+            playerState = PlayerState.PLACING;
+            System.out.println("It's your turn.");
+        }
+        else if (nextPlayerID == -1) {
+            System.out.println("""
+                    You are the only player left in the game.
+                    
+                    While waiting for the others to reconnect you can flip a card in your hand by typing: fc <cardID>
+                    To check your hand, type: gh
+                    To check actual score, type: gs
+                    To check opponents play area: opa <opponentNickname>""");
+        }
+        else {
+            System.out.println("It's " + getPlayerNickname(nextPlayerID) + "'s turn.");
+            System.out.println("""
+                    While waiting you can flip a card in your hand by typing: fc <cardID>
+                    To check your hand, type: gh
+                    To check actual score, type: gs
+                    To check opponents play area: opa <opponentNickname>""");
+        }
+
+        getOpponentByID(playerID).removeCard(pos, score);
+    }
+
+    @Override
+    public void showSoleWinnerMessage() {
+        packetLossTask.cancel();
+        playerState = PlayerState.GAME_OVER;
+
+        System.out.println("""
+                Congratulations! You are the winner of the match.
+                You can view your opponents' play areas by typing: opa <opponentNickname>
+                To return to the main menu, type: mm""");
+    }
+
+    @Override
     public void receivePing() {
-        sender.sendPong();
+        synchronized (packetLossLock) {
+            packetLoss = 0;
+        }
+        sender.sendPong(playerID);
     }
 
     /**
@@ -2127,5 +2323,44 @@ public class TUIView implements View {
         }
 
         return false;
+    }
+
+    /**
+     * Starts to check if the player has lost connection to the server.
+     */
+    private void startConnectionCheck() {
+        packetLossTask = new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (packetLossLock) {
+                    if (packetLoss >= MAX_PACKET_LOSS) {
+                        playerState = PlayerState.DISCONNECTED;
+                        showConnectionLoss();
+                        cancel();
+                    }
+                    packetLoss++;
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
+    }
+
+    /**
+     * Notifies the player that he has lost connection to the server.
+     */
+    private void showConnectionLoss() {
+        System.out.println("Connection lost. Please restart the game to reconnect.");
+    }
+
+    /**
+     * Resets the attributes of the player.
+     */
+    private void resetPlayerModel() {
+        playerHand.clear();
+        playArea.clear();
+        opponents.clear();
+        chat.clear();
+        score = 0;
+        priority = 0;
     }
 }

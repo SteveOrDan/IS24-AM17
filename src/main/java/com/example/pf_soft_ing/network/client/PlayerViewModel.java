@@ -87,4 +87,15 @@ public class PlayerViewModel {
         PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
         playerHand.add(card);
     }
+
+    public void removeCard(Position pos, int score) {
+        PlaceableCard card = playArea.remove(pos);
+        priority--;
+
+        this.score = score;
+
+        card.setPriority(0);
+        card.setCurrSideType(CardSideType.FRONT);
+        playerHand.add(card);
+    }
 }

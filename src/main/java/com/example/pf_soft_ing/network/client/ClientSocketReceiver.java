@@ -18,7 +18,6 @@ public class ClientSocketReceiver {
 
     /**
      * Starts a new thread that listens for incoming messages from the server
-     * until it receives a CloseConnectionMsg
      * @param inputStream ObjectInputStream
      */
     public void startReceivingThread(ObjectInputStream inputStream){
@@ -39,7 +38,7 @@ public class ClientSocketReceiver {
                         decodeMessage(input);
                     }
                     catch (IOException | ClassNotFoundException e) {
-                        System.err.println(e.getMessage());
+                        System.out.println("Server is down!");
                         isRunning = false;
                     }
                 }
@@ -111,6 +110,18 @@ public class ClientSocketReceiver {
             case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
 
             case PingMsg ignored -> view.receivePing();
+
+            case PlayerDisconnectionMsg castedMsg -> view.showPlayerDisconnection(castedMsg.getPlayerID());
+
+            case ReOnStarterPlacementMsg castedMsg -> view.reconnectOnStarterPlacement(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards());
+
+            case ReOnObjectiveChoiceMsg castedMsg -> view.reconnectOnObjectiveChoice(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards(), castedMsg.getStarterSide(), castedMsg.getTokenColor());
+
+            case UndoCardPlacementMsg castedMsg -> view.undoCardPlacement(castedMsg.getPlayerID(), castedMsg.getPosition(), castedMsg.getScore(), castedMsg.getNextPlayerID());
+
+            case UndoPlaceWithOnePlayerLeftMsg castedMsg -> view.undoCardPlacement(castedMsg.getPlayerID(), castedMsg.getPos(), castedMsg.getScore(), -1);
+
+            case SoleWinnerMsg ignored -> view.showSoleWinnerMessage();
 
             case null, default -> System.out.println("Invalid message type");
         }

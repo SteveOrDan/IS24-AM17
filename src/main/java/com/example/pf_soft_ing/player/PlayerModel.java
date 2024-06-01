@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlayerModel {
+    private final static int NUM_OF_RESOURCES = 7;
 
     private String nickname = "";
     private final int ID;
@@ -23,12 +24,17 @@ public class PlayerModel {
 
     private final List<PlaceableCard> hand = new ArrayList<>();
 
+    private final int[] secretObjectiveCardIDs = new int[2];
     private ObjectiveCard secretObjective;
 
     private PlaceableCard starterCard;
 
     private final HashMap<Position, PlaceableCard> playArea = new HashMap<>();
-    private final int[] numOfResourcesArr = new int[7];
+    private int[] numOfResourcesArr = new int[NUM_OF_RESOURCES];
+
+    private Position lastCardPlacedPos = null;
+    private int lastScore = 0;
+    private int[] lastNumOfResources = new int[NUM_OF_RESOURCES];
 
     private int currScore = 0;
     private int numOfCompletedObjectives = 0;
@@ -36,11 +42,13 @@ public class PlayerModel {
     private Token token;
     private Token firstPlayerToken;
 
+    private PlayerState lastPlayerState = PlayerState.MAIN_MENU;
     private PlayerState state = PlayerState.MAIN_MENU;
+    private final Object stateLock = new Object();
 
     private int currMaxPriority = 0;
 
-    private final Sender sender;
+    private Sender sender;
 
     public PlayerModel(int ID, Sender sender) {
         this.ID = ID;
@@ -53,6 +61,10 @@ public class PlayerModel {
      */
     public Sender getSender() {
         return sender;
+    }
+
+    public void setSender(Sender sender) {
+        this.sender = sender;
     }
 
     /**
@@ -104,6 +116,24 @@ public class PlayerModel {
     }
 
     /**
+     * Setter
+     * @param firstObjectiveCardID ID of the first objective card
+     * @param secondObjectiveCardID ID of the second objective card
+     */
+    public void setSecretObjectiveCardIDs(int firstObjectiveCardID, int secondObjectiveCardID) {
+        secretObjectiveCardIDs[0] = firstObjectiveCardID;
+        secretObjectiveCardIDs[1] = secondObjectiveCardID;
+    }
+
+    /**
+     * Getter
+     * @return Array of secret objective card IDs
+     */
+    public int[] getSecretObjectiveCardIDs() {
+        return secretObjectiveCardIDs;
+    }
+
+    /**
      * Getter
      * @return List of objective cards to choose from
      */
@@ -122,6 +152,8 @@ public class PlayerModel {
             throw new InvalidObjectiveCardIDException();
         }
         secretObjective = GameResources.getObjectiveCardByID(cardID);
+
+        setState(PlayerState.COMPLETED_SETUP);
     }
 
     /**
@@ -139,6 +171,7 @@ public class PlayerModel {
 
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
+        setState(PlayerState.PLACING_STARTER);
     }
 
     /**
@@ -191,6 +224,14 @@ public class PlayerModel {
 
     /**
      * Getter
+     * @return Player's token color
+     */
+    public TokenColors getTokenColor(){
+        return token.getColor();
+    }
+
+    /**
+     * Getter
      * @return If the player is the first player
      */
     public boolean isFirstPlayer(){
@@ -215,7 +256,9 @@ public class PlayerModel {
      * @return Player's current state
      */
     public PlayerState getState() {
-        return state;
+        synchronized (stateLock) {
+            return state;
+        }
     }
 
     /**
@@ -223,7 +266,18 @@ public class PlayerModel {
      * @param state New state of the player
      */
     public void setState(PlayerState state){
-        this.state = state;
+        synchronized (stateLock) {
+            lastPlayerState = this.state;
+            this.state = state;
+        }
+    }
+
+    /**
+     * Getter
+     * @return Player's last state
+     */
+    public PlayerState getLastPlayerState() {
+        return lastPlayerState;
     }
 
     /**
@@ -256,6 +310,8 @@ public class PlayerModel {
         currMaxPriority++;
 
         playArea.put(new Position(0,0), starterCard);
+
+        setState(PlayerState.CHOOSING_OBJECTIVE);
     }
 
     /**
@@ -287,6 +343,12 @@ public class PlayerModel {
             throw new InvalidPlayerStateException(state.name(), PlayerState.PLACING.name());
         }
 
+        // Save the position of the last card placed for undo
+        lastCardPlacedPos = pos;
+        // Save the last score and the last number of resources for undo
+        lastScore = currScore;
+        lastNumOfResources = numOfResourcesArr.clone();
+
         ArrayList<CardCorner> adjacentCorners = getAdjacentCorners(pos);
 
         // Set chosen side
@@ -304,7 +366,7 @@ public class PlayerModel {
             numOfResourcesArr[resource.getValue()]++;
         }
 
-        // Add card points
+        // Calculate points and add to score
         currScore += card.calculatePlacementPoints(adjacentCorners.size(), numOfResourcesArr, card.getCurrSideType());
 
         // Set card priority
@@ -391,7 +453,28 @@ public class PlayerModel {
         hand.add(card);
     }
 
-    public TokenColors getToken() {
-        return token.getColor();
+    public Position getLastCardPlacedPos() {
+        return lastCardPlacedPos;
+    }
+
+    /**
+     * Undoes the last card placement
+     * Removes the card from the playArea
+     * Resets the player's resources and score to the last state
+     * Adds the card back to the player's hand after resetting its priority and side
+     */
+    public void undoCardPlacement() {
+        // Remove card from playArea
+        PlaceableCard lastCardPlaced = playArea.remove(lastCardPlacedPos);
+        currMaxPriority--;
+
+        // Reset resources and score to last state
+        numOfResourcesArr = lastNumOfResources.clone();
+        currScore = lastScore;
+
+        // Add card back to hand after resetting its priority and side
+        lastCardPlaced.setPriority(0);
+        lastCardPlaced.setCurrSideType(CardSideType.FRONT);
+        hand.add(lastCardPlaced);
     }
 }

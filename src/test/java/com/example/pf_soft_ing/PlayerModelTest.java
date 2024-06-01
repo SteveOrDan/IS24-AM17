@@ -16,6 +16,7 @@ import java.io.ObjectOutputStream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
+    // TODO: Fix the tests adding the necessary set state for the player model and using game resources to get the cards
 
     private PlayerModel playerModel;
 

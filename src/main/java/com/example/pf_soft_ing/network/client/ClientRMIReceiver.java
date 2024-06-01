@@ -122,4 +122,33 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
         view.receivePing();
     }
 
+    @Override
+    public void sendPlayerDisconnection(int playerID) throws RemoteException {
+        view.showPlayerDisconnection(playerID);
+    }
+
+    @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) throws RemoteException {
+        view.reconnectOnStarterPlacement(playerID, IDToNicknameMap, gameSetupCards);
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) throws RemoteException {
+        view.reconnectOnObjectiveChoice(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor);
+    }
+
+    @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) throws RemoteException {
+        view.undoCardPlacement(playerID, pos, score, nextPlayerID);
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) throws RemoteException {
+        view.undoCardPlacement(playerID, pos, score, -1);
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() throws RemoteException {
+        view.showSoleWinnerMessage();
+    }
 }

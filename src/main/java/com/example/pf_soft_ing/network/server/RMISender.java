@@ -94,7 +94,7 @@ public class RMISender implements Sender {
                         starterCardID);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Game not started");
+                System.out.println("Error: " + e.getMessage() + ". Game start setup not sent");
             }
         }).start();
     }
@@ -110,7 +110,7 @@ public class RMISender implements Sender {
                         secretObjectiveCardID1, secretObjectiveCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Missing setup");
+                System.out.println("Error: " + e.getMessage() + ". Missing setup not sent");
             }
         }).start();
     }
@@ -134,7 +134,7 @@ public class RMISender implements Sender {
                 client.placeCardResult(playerID, cardID, pos, chosenSide, score);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Place card not shown");
+                System.out.println("Error: " + e.getMessage() + ". Place card not sent");
             }
         }).start();
     }
@@ -151,7 +151,7 @@ public class RMISender implements Sender {
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New first player turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New first player turn not sent");
             }
         }).start();
     }
@@ -167,7 +167,7 @@ public class RMISender implements Sender {
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
             }
             catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's turn not sent");
             }
         }).start();
     }
@@ -178,7 +178,7 @@ public class RMISender implements Sender {
             try {
                 client.setNewPlayerExtraTurn(cardID, lastPlayerID, pos, side, newPlayerID, score);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's extra turn not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's extra turn not sent");
             }
         }).start();
     }
@@ -193,7 +193,7 @@ public class RMISender implements Sender {
                         resDeckCardID, visibleResCardID1, visibleResCardID2,
                         goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, gameState);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". New player's turn state not shown");
+                System.out.println("Error: " + e.getMessage() + ". New player's turn state not sent");
             }
         }).start();
     }
@@ -215,7 +215,84 @@ public class RMISender implements Sender {
             try {
                 client.showRanking(lastPlayerID, cardID, pos, side, deltaScore, nicknames, scores, numOfSecretObjectives);
             } catch (RemoteException e) {
-                System.out.println("Error: " + e.getMessage() + ". Ranking not shown");
+                System.out.println("Error: " + e.getMessage() + ". Ranking not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendPlayerDisconnection(int playerID) {
+        new Thread(() ->{
+            try {
+                client.sendPlayerDisconnection(playerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Player disconnection not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
+        new Thread(() ->{
+            try {
+                client.sendReOnStarterPlacement(playerID, IDToNicknameMap, gameSetupCards);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Reconnection game start setup not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        new Thread(() ->{
+            try {
+                client.sendReOnObjectiveChoice(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Reconnection objective choice not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        new Thread(() ->{
+            try {
+                client.sendUndoCardPlacement(playerID, pos, score, nextPlayerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Card placement undo not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) {
+        new Thread(() ->{
+            try {
+                client.sendUndoPlaceWithOnePlayerLeft(playerID, pos, score);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Undo place card with one player left not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendSoleWinnerMessage() {
+        new Thread(() ->{
+            try {
+                client.sendSoleWinnerMessage();
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Sole winner message not sent");
+            }
+        }).start();
+    }
+
+    @Override
+    public void sendPing() {
+        new Thread(() ->{
+            try {
+                client.sendPing();
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Ping not sent");
             }
         }).start();
     }

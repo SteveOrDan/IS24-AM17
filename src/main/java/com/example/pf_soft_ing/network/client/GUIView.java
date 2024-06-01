@@ -148,6 +148,25 @@ public class GUIView implements View {
 
     private final Stage stage;
 
+    private static final int COUNT_DEC_PERIOD = 1000;
+    private static final int MAX_PACKET_LOSS = 3;
+    private int packetLoss = 0;
+    private final Object packetLossLock = new Object();
+
+    private final Timer timer = new Timer();
+    private final TimerTask packetLossTask = new TimerTask() {
+        @Override
+        public void run() {
+            synchronized (packetLossLock) {
+                if (packetLoss >= MAX_PACKET_LOSS) {
+                    showConnectionLoss();
+                    cancel();
+                }
+                packetLoss++;
+            }
+        }
+    };
+
     public GUIView(Stage stage, String ip, String connectionType) {
         this.stage = stage;
         this.ip = ip;
@@ -404,6 +423,7 @@ public class GUIView implements View {
 
         selectButton.setOnAction((_) -> { // event
             sender.selectMatch(matchID);
+            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
         });
 
         matchPane.getChildren().add(matchInfo);
@@ -461,6 +481,7 @@ public class GUIView implements View {
             int numOfPlayers = playersField.getText().isEmpty() ? 0 : Integer.parseInt(playersField.getText());
 
             sender.createMatch(numOfPlayers, nameField.getText());
+            timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
         });
 
         createPane.getChildren().add(bgView);
@@ -1008,14 +1029,14 @@ public class GUIView implements View {
             if (chatInput.getText().startsWith("/")) {
                 String[] command = chatInput.getText().split(" ");
                 if (command[0].equals("/whisper") && command.length >= 3 && !command[1].equals(nickname)) {
-                    sender.sendChatMessage(command[1], chatInput.getText().substring(command[0].length() + command[1].length() + 2));
+                    sender.sendChatMessage(playerID, command[1], chatInput.getText().substring(command[0].length() + command[1].length() + 2));
                 }
                 else {
                     showError("Invalid chat format.");
                 }
             }
             else {
-                sender.sendChatMessage("all", chatInput.getText());
+                sender.sendChatMessage(playerID, "all", chatInput.getText());
             }
 
             chatInput.clear();
@@ -1092,7 +1113,7 @@ public class GUIView implements View {
         placeButton.setLayoutY((stageHeight + cardHeight) * 0.5);
         placeButton.setOnAction((_) -> {
             // Send the choice to the server
-            sender.placeStarterCard(starterCard.getCurrSideType());
+            sender.placeStarterCard(playerID, starterCard.getCurrSideType());
         });
 
         // Add all elements to the root
@@ -1217,7 +1238,7 @@ public class GUIView implements View {
         secretObjective1Button.setLayoutY(0);
         secretObjective1Button.setOnAction((_) -> {
             secretObjectiveCardID = secretObjective1ID;
-            sender.chooseSecretObjective(secretObjectiveCardID);
+            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
         });
         secretObjective1Button.setOpacity(0.1);
 
@@ -1228,7 +1249,7 @@ public class GUIView implements View {
         secretObjective2Button.setLayoutY(0);
         secretObjective2Button.setOnAction((_) -> {
             secretObjectiveCardID = secretObjective2ID;
-            sender.chooseSecretObjective(secretObjectiveCardID);
+            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
         });
         secretObjective2Button.setOpacity(0.1);
 
@@ -1336,7 +1357,7 @@ public class GUIView implements View {
         placeButton.setLayoutX(-cardWidth * cardCornerWidthProportion);
         placeButton.setLayoutY(-cardHeight * cardCornerHeightProportion);
         placeButton.setOpacity(0.6);
-        placeButton.setOnAction((_) -> sender.placeCard(selectedCard.getID(), selectedCard.getCurrSideType(), pos));
+        placeButton.setOnAction((_) -> sender.placeCard(playerID, selectedCard.getID(), selectedCard.getCurrSideType(), pos));
 
         positionPane.getChildren().add(placeButton);
         Position buttonGridPos = mapToGridPos(pos);
@@ -2479,10 +2500,36 @@ public class GUIView implements View {
     }
 
     @Override
+    public void showPlayerDisconnection(int playerID) {
+
+    }
+
+    @Override
+    public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+
+    }
+
+    @Override
+    public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+
+    }
+
+    @Override
+    public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+
+    }
+
+    @Override
+    public void showSoleWinnerMessage() {
+
+    }
+
+    @Override
     public void receivePing() {
-        Platform.runLater(() ->
-            sender.sendPong()
-        );
+        synchronized (packetLossLock) {
+            packetLoss = 0;
+        }
+        sender.sendPong(playerID);
     }
 
     private String getPlayerNickname(int playerID){
@@ -2524,5 +2571,12 @@ public class GUIView implements View {
                 .filter(opponent -> opponent.getNickname().equals(nickname))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Shows a message to the user that the connection has been lost.
+     */
+    private void showConnectionLoss() {
+        // TODO: implement showing connection loss
     }
 }

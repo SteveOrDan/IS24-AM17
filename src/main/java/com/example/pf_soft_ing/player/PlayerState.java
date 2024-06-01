@@ -10,5 +10,6 @@ public enum PlayerState {
     WAITING,
     PLACING,
     DRAWING,
+    GAME_OVER,
     DISCONNECTED
 }

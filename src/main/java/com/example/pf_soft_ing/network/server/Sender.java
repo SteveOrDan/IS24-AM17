@@ -54,5 +54,17 @@ public interface Sender {
 
     void sendRanking(int lastPlayerID, int cardID, Position pos, CardSideType side, int deltaScore, String[] nicknames, int[] scores, int[] numOfSecretObjectives);
 
+    void sendPlayerDisconnection(int playerID);
+
+    void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards);
+
+    void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);
+
+    void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
+
+    void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score);
+
+    void sendSoleWinnerMessage();
+
     void sendPing();
 }

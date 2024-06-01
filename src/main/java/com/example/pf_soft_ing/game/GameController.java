@@ -51,9 +51,9 @@ public class GameController {
     public MatchController selectMatch(int playerID, int matchID) {
         // The player occupies a slot in the match (without a nickname)
         try {
-        MatchController matchController = gameModel.selectMatch(playerID, matchID);
-        getPlayerSender(playerID).selectMatchResult(matchController.getMatchID(), matchController.getNicknames());
-        return matchController;
+            MatchController matchController = gameModel.selectMatch(playerID, matchID);
+            getPlayerSender(playerID).selectMatchResult(matchController.getMatchID(), matchController.getNicknames());
+            return matchController;
         }
         catch (InvalidMatchIDException | GameIsFullException e) {
             getPlayerSender(playerID).sendError(e.getMessage());
@@ -110,6 +110,17 @@ public class GameController {
         }
     }
 
+    public int reconnectToMatch(int playerID, String nickname, int matchID) {
+        // The player reconnects to a match
+        try {
+            return gameModel.reconnectToMatch(playerID, nickname, matchID);
+        }
+        catch (InvalidMatchIDException | SpecifiedPlayerNotDisconnected | NicknameNotInMatch e) {
+            getPlayerSender(playerID).sendError(e.getMessage());
+        }
+        return -1;
+    }
+
     /**
      * Creates a new player in the game model
      * @param sender Sender of the player
@@ -135,5 +146,15 @@ public class GameController {
      */
     public Sender getPlayerSender(int playerID) {
         return gameModel.getIDToPlayers().get(playerID).getSender();
+    }
+
+    public void checkMatchState(MatchController matchController) {
+        if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline() || matchController.isOver()) {
+            gameModel.removeMatch(matchController.getMatchID());
+        }
+    }
+
+    public boolean matchNotPresent(MatchController matchController) {
+        return !gameModel.containsMatch(matchController);
     }
 }

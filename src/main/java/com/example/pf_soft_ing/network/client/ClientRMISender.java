@@ -70,6 +70,18 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
+    public void reconnectToMatch(int matchID, String nickname) {
+        new Thread(() -> {
+            try {
+                serverInterface.reconnectToMatch(playerID, nickname, matchID);
+            }
+            catch (RemoteException e) {
+                System.out.println("Connection to server lost");
+            }
+        }).start();
+    }
+
+    @Override
     public void chooseNickname(String nickname) {
         new Thread(() -> {
             try {
@@ -82,7 +94,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void placeStarterCard(CardSideType side) {
+    public void placeStarterCard(int playerID, CardSideType side) {
         new Thread(() -> {
             try {
                 serverInterface.placeStarterCard(playerID, side);
@@ -94,7 +106,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void chooseSecretObjective(int cardID) {
+    public void chooseSecretObjective(int playerID, int cardID) {
         new Thread(() -> {
             try {
                 serverInterface.chooseSecretObj(playerID, cardID);
@@ -106,7 +118,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void placeCard(int cardID, CardSideType side, Position pos) {
+    public void placeCard(int playerID, int cardID, CardSideType side, Position pos) {
         new Thread(() -> {
             try {
                 serverInterface.placeCard(playerID, cardID, side, pos);
@@ -118,7 +130,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawResourceCard() {
+    public void drawResourceCard(int playerID) {
         new Thread(() -> {
             try {
                 serverInterface.drawResourceCard(playerID);
@@ -130,7 +142,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawVisibleResourceCard(int index) {
+    public void drawVisibleResourceCard(int playerID, int index) {
         new Thread(() -> {
             try {
                 serverInterface.drawVisibleResourceCard(playerID, index);
@@ -142,7 +154,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawGoldenCard() {
+    public void drawGoldenCard(int playerID) {
         new Thread(() -> {
             try {
                 serverInterface.drawGoldenCard(playerID);
@@ -154,7 +166,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void drawVisibleGoldenCard(int index) {
+    public void drawVisibleGoldenCard(int playerID, int index) {
         new Thread(() -> {
             try {
                 serverInterface.drawVisibleGoldenCard(playerID, index);
@@ -166,7 +178,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendChatMessage(String recipient, String message) {
+    public void sendChatMessage(int playerID, String recipient, String message) {
         new Thread(() -> {
             try {
                 serverInterface.sendChatMessage(playerID, recipient, message);
@@ -178,7 +190,7 @@ public class ClientRMISender implements ClientSender {
     }
 
     @Override
-    public void sendPong() {
+    public void sendPong(int playerID) {
         new Thread(() -> {
             try {
                 serverInterface.sendPong(playerID);

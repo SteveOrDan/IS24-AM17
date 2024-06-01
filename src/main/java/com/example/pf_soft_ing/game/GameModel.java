@@ -9,7 +9,7 @@ import java.util.*;
 
 public class GameModel {
 
-    private final List<MatchController> matches = new ArrayList<>();
+    private final static List<MatchController> matches = new ArrayList<>();
     private final Map<Integer, PlayerModel> IDToPlayers = new HashMap<>();
 
     /**
@@ -25,8 +25,10 @@ public class GameModel {
         }
 
         for (MatchController match : matchesCopy){
-            List<String> nicknames = new ArrayList<>(match.getNicknames());
-            allMatches.put(match.getMatchID(), nicknames);
+            if (match.getGameState() != GameState.END_GAME) {
+                List<String> nicknames = new ArrayList<>(match.getNicknames());
+                allMatches.put(match.getMatchID(), nicknames);
+            }
         }
         return allMatches;
     }
@@ -114,7 +116,7 @@ public class GameModel {
 
         getMatchByID(matchID).addCurrPlayer(player);
 
-        player.setState(PlayerState.MATCH_LOBBY);
+        player.setState(PlayerState.CHOOSING_NICKNAME);
         player.setMatchID(matchID);
 
         return getMatchByID(matchID);
@@ -136,7 +138,14 @@ public class GameModel {
 
         IDToPlayers.get(playerID).setNickname(nickname);
 
+        IDToPlayers.get(playerID).setState(PlayerState.MATCH_LOBBY);
+
         matchController.addReadyPlayer();
+    }
+
+    public int reconnectToMatch(int playerID, String nickname, int matchID) throws InvalidMatchIDException, SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
+        Sender newSender = IDToPlayers.get(playerID).getSender();
+        return getMatchByID(matchID).reconnectPlayer(nickname, newSender);
     }
 
     /**
@@ -167,5 +176,36 @@ public class GameModel {
      */
     public void startGame(MatchController matchController){
         matchController.setUpGame();
+    }
+
+    /**
+     * Removes a match from the game model
+     * @param matchID ID of the match
+     */
+    public void removeMatch(int matchID) {
+        synchronized (matches) {
+            matches.removeIf(match -> match.getMatchID() == matchID);
+        }
+    }
+
+    /**
+     * Checks if a match is in the game model
+     * @param matchController MatchController of the match
+     * @return True if the match is in the game model, false otherwise
+     */
+    public boolean containsMatch(MatchController matchController) {
+        synchronized (matches) {
+            return matches.contains(matchController);
+        }
+    }
+
+    /**
+     * Removes a match from the game model
+     * @param matchController MatchController of the match
+     */
+    public static void removeMatch(MatchController matchController) {
+        synchronized (matches) {
+            matches.remove(matchController);
+        }
     }
 }

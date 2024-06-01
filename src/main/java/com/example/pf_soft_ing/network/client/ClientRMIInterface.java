@@ -48,11 +48,24 @@ public interface ClientRMIInterface extends Remote {
     void confirmSecretObjective() throws RemoteException;
 
     void sendChatMessage(String senderNickname, String recipientNickname, String message) throws RemoteException;
+
     void setNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID,
                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, GameState gameState) throws RemoteException;
 
     void setNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int score) throws RemoteException;
+
+    void sendPlayerDisconnection(int playerID) throws RemoteException;
+
+    void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) throws RemoteException;
+
+    void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) throws RemoteException;
+
+    void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) throws RemoteException;
+
+    void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score) throws RemoteException;
+
+    void sendSoleWinnerMessage() throws RemoteException;
 
     void sendPing() throws RemoteException;
 }

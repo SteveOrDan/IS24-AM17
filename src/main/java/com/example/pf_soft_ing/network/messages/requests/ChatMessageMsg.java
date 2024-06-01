@@ -4,12 +4,18 @@ import com.example.pf_soft_ing.network.messages.Message;
 
 public class ChatMessageMsg extends Message {
 
+    private final int playerID;
     private final String recipient;
     private final String message;
 
-    public ChatMessageMsg(String recipient, String message) {
+    public ChatMessageMsg(int playerID, String recipient, String message) {
+        this.playerID = playerID;
         this.recipient = recipient;
         this.message = message;
+    }
+
+    public int getPlayerID() {
+        return playerID;
     }
 
     public String getMessage() {
