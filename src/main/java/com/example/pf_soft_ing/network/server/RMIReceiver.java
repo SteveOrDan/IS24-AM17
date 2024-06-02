@@ -2,6 +2,7 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
+import com.example.pf_soft_ing.exceptions.InvalidMatchIDException;
 import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.network.client.ClientRMIInterface;
@@ -82,7 +83,13 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
 
         if (originalPlayerID != -1) {
             synchronized (playerIDToMatch) {
-                Sender newSender = playerIDToMatch.get(originalPlayerID).getPlayerSender(originalPlayerID);
+                Sender newSender = gameController.getPlayerSender(playerID);
+                try {
+                    playerIDToMatch.put(originalPlayerID, gameController.getMatchByID(matchID));
+                } // This exception should never be thrown
+                catch (InvalidMatchIDException e) {
+                    throw new RuntimeException(e);
+                }
                 synchronized (playerIDToDiscMan) {
                     DisconnectionManager discMan = new DisconnectionManager(gameController, playerIDToMatch.get(originalPlayerID), newSender, originalPlayerID);
                     playerIDToDiscMan.put(originalPlayerID, discMan);
@@ -156,6 +163,10 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
     @Override
     public void sendPong(int playerID) throws RemoteException {
         synchronized (playerIDToMatch) {
+            if (!playerIDToDiscMan.containsKey(playerID)) {
+                System.out.println("PlayerID not found in playerIDToDiscMan: " + playerID);
+                return;
+            }
             playerIDToDiscMan.get(playerID).resetPacketLoss();
         }
     }
@@ -182,6 +193,6 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         };
 
         long CLEANUP_PERIOD = 10000;
-        timer.scheduleAtFixedRate(timerTaskCleanup, 0, CLEANUP_PERIOD);
+        timer.scheduleAtFixedRate(timerTaskCleanup, 300000, CLEANUP_PERIOD);
     }
 }

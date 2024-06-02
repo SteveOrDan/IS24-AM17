@@ -615,7 +615,12 @@ public class MatchController {
     }
 
     public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
-        return matchModel.reconnectPlayer(nickname, newSender);
+        int playerID = matchModel.reconnectPlayer(nickname, newSender);
+
+        if (playerID != -1) {
+            broadcastPlayerReconnection(playerID);
+        }
+        return playerID;
     }
 
     /**
@@ -788,6 +793,19 @@ public class MatchController {
             // Broadcast the undo card placement to all players online excluding the player that disconnected
             if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
                 getPlayerSender(broadcastID).sendUndoCardPlacement(playerID, pos, score, nextPlayerID);
+            }
+        }
+    }
+
+    /**
+     * Broadcast the reconnection of a player to all other online players
+     * @param playerID ID of the player that reconnected
+     */
+    private void broadcastPlayerReconnection(int playerID) {
+        for (Integer broadcastID : getIDToPlayerMap().keySet()) {
+            // Broadcast the reconnection to all players online excluding the reconnected player
+            if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED && broadcastID != playerID) {
+                getPlayerSender(broadcastID).sendPlayerReconnection(playerID);
             }
         }
     }

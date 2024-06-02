@@ -114,6 +114,11 @@ public class TestSender implements Sender {
     }
 
     @Override
+    public void sendPlayerReconnection(int playerID) {
+
+    }
+
+    @Override
     public void sendSoleWinnerMessage() {
 
     }

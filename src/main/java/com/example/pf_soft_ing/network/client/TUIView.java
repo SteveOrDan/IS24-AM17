@@ -2093,7 +2093,10 @@ public class TUIView implements View {
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
         startConnectionCheck();
 
+        System.out.println("You have successfully reconnected to the match with ID " + this.playerID + ".");
         setID(playerID);
+        System.out.println("You have successfully reconnected to the match with ID " + this.playerID + ".");
+
         playerState = PlayerState.PLACING_STARTER;
         createInvalidCardLines();
 
@@ -2189,6 +2192,11 @@ public class TUIView implements View {
 
         // Print secret objective choice
         printSecretObjectiveChoice();
+    }
+
+    @Override
+    public void showPlayerReconnection(int playerID) {
+        System.out.println(getPlayerNickname(playerID) + " has reconnected.");
     }
 
     @Override

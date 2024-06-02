@@ -162,6 +162,11 @@ public class SocketSender implements Sender {
     }
 
     @Override
+    public void sendPlayerReconnection(int playerID) {
+        sendMessage(new PlayerReconnectionMsg(playerID));
+    }
+
+    @Override
     public void sendSoleWinnerMessage() {
         sendMessage(new SoleWinnerMsg());
     }

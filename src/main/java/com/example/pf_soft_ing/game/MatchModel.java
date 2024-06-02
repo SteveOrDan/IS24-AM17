@@ -572,7 +572,7 @@ public class MatchModel {
                             catch (StarterCardNotSetException e) {
                                 throw new RuntimeException(e);
                             }
-
+                            System.out.println("Reconnecting player " + player.getID());
                             player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
                         }
                         else if (player.getLastPlayerState() == PlayerState.CHOOSING_OBJECTIVE) {
@@ -613,6 +613,7 @@ public class MatchModel {
                             }
                         }
                     }
+
                     return player.getID();
                 }
                 else {

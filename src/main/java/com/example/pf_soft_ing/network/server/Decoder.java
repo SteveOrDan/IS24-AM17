@@ -1,5 +1,6 @@
 package com.example.pf_soft_ing.network.server;
 
+import com.example.pf_soft_ing.exceptions.InvalidMatchIDException;
 import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.answers.PongMsg;
 import com.example.pf_soft_ing.network.messages.requests.*;
@@ -68,7 +69,13 @@ public class Decoder {
 
                 if (originalPlayerID != -1) {
                     synchronized (playerIDToMatch) {
-                        Sender newSender = playerIDToMatch.get(originalPlayerID).getPlayerSender(originalPlayerID);
+                        Sender newSender = gameController.getPlayerSender(playerID);
+                        try {
+                            playerIDToMatch.put(originalPlayerID, gameController.getMatchByID(castedMsg.getMatchID()));
+                        } // This exception should never be thrown
+                        catch (InvalidMatchIDException e) {
+                            throw new RuntimeException(e);
+                        }
                         synchronized (playerIDToDiscMan) {
                             DisconnectionManager discMan = new DisconnectionManager(gameController, playerIDToMatch.get(originalPlayerID), newSender, originalPlayerID);
                             playerIDToDiscMan.put(originalPlayerID, discMan);
@@ -165,6 +172,6 @@ public class Decoder {
             }
         };
 
-        timer.scheduleAtFixedRate(timerTaskCleanup, 0, CLEANUP_PERIOD);
+        timer.scheduleAtFixedRate(timerTaskCleanup, 300000, CLEANUP_PERIOD);
     }
 }

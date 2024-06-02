@@ -121,6 +121,8 @@ public class ClientSocketReceiver {
 
             case UndoPlaceWithOnePlayerLeftMsg castedMsg -> view.undoCardPlacement(castedMsg.getPlayerID(), castedMsg.getPos(), castedMsg.getScore(), -1);
 
+            case PlayerReconnectionMsg castedMsg -> view.showPlayerReconnection(castedMsg.getPlayerID());
+
             case SoleWinnerMsg ignored -> view.showSoleWinnerMessage();
 
             case null, default -> System.out.println("Invalid message type");

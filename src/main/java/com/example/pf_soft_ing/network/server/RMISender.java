@@ -276,6 +276,17 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendPlayerReconnection(int playerID) {
+        new Thread(() ->{
+            try {
+                client.sendPlayerReconnection(playerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Player reconnection not sent");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendSoleWinnerMessage() {
         new Thread(() ->{
             try {

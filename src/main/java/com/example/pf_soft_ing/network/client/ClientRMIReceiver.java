@@ -148,6 +148,11 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
+    public void sendPlayerReconnection(int playerID) throws RemoteException {
+        view.showPlayerReconnection(playerID);
+    }
+
+    @Override
     public void sendSoleWinnerMessage() throws RemoteException {
         view.showSoleWinnerMessage();
     }

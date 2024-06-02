@@ -11,6 +11,7 @@ public class DisconnectionManager {
     private static final int MAX_PACKET_LOSS = 3;
     private static final int PING_PERIOD = 1000;
     private static final int COUNT_DEC_PERIOD = 1000;
+    private static final int PING_TASK_DELAY = 1000;
 
     private final GameController gameController;
     private final MatchController matchController;
@@ -40,7 +41,7 @@ public class DisconnectionManager {
             }
         };
         // Send ping to player every second
-        timer.scheduleAtFixedRate(pingClientTask, 0, PING_PERIOD);
+        timer.scheduleAtFixedRate(pingClientTask, PING_TASK_DELAY, PING_PERIOD);
 
         packetLossTask = new TimerTask() {
             @Override
@@ -58,7 +59,7 @@ public class DisconnectionManager {
             }
         };
         // Start checking for packet loss
-        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
+        timer.scheduleAtFixedRate(packetLossTask, PING_TASK_DELAY, COUNT_DEC_PERIOD);
     }
 
     public void resetPacketLoss() {

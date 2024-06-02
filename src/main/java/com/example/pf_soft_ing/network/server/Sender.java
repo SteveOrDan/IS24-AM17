@@ -64,6 +64,8 @@ public interface Sender {
 
     void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score);
 
+    void sendPlayerReconnection(int playerID);
+
     void sendSoleWinnerMessage();
 
     void sendPing();
