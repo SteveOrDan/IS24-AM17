@@ -154,7 +154,9 @@ public class GUIView implements View {
     private final Object packetLossLock = new Object();
 
     private final Timer timer = new Timer();
-    private final TimerTask packetLossTask = new TimerTask() {
+
+    // TODO: Not good... needs to be in a "Platform.runLater"
+    private TimerTask packetLossTask = new TimerTask() {
         @Override
         public void run() {
             synchronized (packetLossLock) {
@@ -217,6 +219,7 @@ public class GUIView implements View {
         IPField.setLayoutX((stageWidth - 200) * 0.5);
         IPField.setLayoutY((stageHeight - 50) * 0.5);
         IPField.setPromptText("Enter port number...");
+        IPField.setFont(new Font(ERAS_FONT, 24));
 
         Pane confirmIP = createTextButton("Confirm", 20, "/RectButton200x50.png",
                 200, 50, (stageWidth - 200) * 0.5, (stageHeight + 150) * 0.5,
@@ -355,27 +358,107 @@ public class GUIView implements View {
                 200, 50, (stageWidth - 200) * 0.5, stageHeight - 75, this::openCreateMatchWindow);
 
         // Create button to refresh matches
-        Pane refreshButton = createIconButton("/SquareButton.png", "/icons/Refresh.png",
-                50, 50, 55, stageHeight - 90, () -> sender.getMatches());
+        Pane refreshButton = createIconButton("/icons/Refresh.png",
+                55, stageHeight - 90, () -> sender.getMatches());
+
+        // Create button for reconnection
+        Pane reconnectButton = createTextButton("Reconnect", 20, "/RectButton200x50.png",
+                200, 50, (stageWidth - 200) * 0.75, stageHeight - 75, this::createReconnectionPopup);
 
         mainMenu.getChildren().add(refreshButton);
         mainMenu.getChildren().add(addMatchButton);
+        mainMenu.getChildren().add(reconnectButton);
 
         root.getChildren().add(mainMenu);
     }
 
-    private Pane createIconButton(String buttonImagePath, String iconImagePath, double width, double height, double x, double y, Runnable action) {
+    private void createReconnectionPopup() {
+        // Create Popup anchor pane
+        AnchorPane popup = new AnchorPane();
+        popup.setPrefSize(500, 300);
+        popup.setLayoutX(stageWidth - 625);
+        popup.setLayoutY(stageHeight - 400);
+
+        // Create background
+        Rectangle bgRectangle = new Rectangle();
+        bgRectangle.setWidth(500);
+        bgRectangle.setHeight(300);
+        bgRectangle.setFill(Color.WHITESMOKE);
+        bgRectangle.setStroke(Color.BLACK);
+        bgRectangle.setStrokeWidth(4);
+        bgRectangle.setArcWidth(20);
+        bgRectangle.setArcHeight(20);
+
+        // Create insert match ID label
+        Label matchIDLabel = new Label("Match ID:");
+        matchIDLabel.setPrefSize(400, 50);
+        matchIDLabel.setLayoutX(25);
+        matchIDLabel.setLayoutY(10);
+        matchIDLabel.setFont(new Font(ERAS_FONT, 24));
+
+        // Create match ID text field
+        TextField matchIDField = new TextField();
+        matchIDField.setPrefSize(400, 50);
+        matchIDField.setLayoutX(25);
+        matchIDField.setLayoutY(60);
+        matchIDField.setPromptText("Enter match ID...");
+        matchIDField.setFont(new Font(ERAS_FONT, 24));
+
+        // Create insert nickname label
+        Label nicknameLabel = new Label("Nickname:");
+        nicknameLabel.setPrefSize(400, 50);
+        nicknameLabel.setLayoutX(25);
+        nicknameLabel.setLayoutY(160);
+        nicknameLabel.setFont(new Font(ERAS_FONT, 24));
+
+        // Create nickname text field
+        TextField nicknameField = new TextField();
+        nicknameField.setPrefSize(400, 50);
+        nicknameField.setLayoutX(25);
+        nicknameField.setLayoutY(210);
+        nicknameField.setPromptText("Enter nickname...");
+        nicknameField.setFont(new Font(ERAS_FONT, 24));
+
+        // Create confirm button
+        Pane confirmReconnect = createIconButton("/icons/Confirm.png",
+                437.5, 210, () -> {
+            try {
+                int matchID = Integer.parseInt(matchIDField.getText());
+                String nickname = nicknameField.getText();
+                sender.reconnectToMatch(matchID, nickname);
+            }
+            catch (Exception e) {
+                showError(e.getMessage());
+            }
+        });
+
+        // Create close button
+        Pane closeButton = createIconButton("/icons/Close.png",
+                440, 10, () -> root.getChildren().remove(popup));
+
+        // Fill hierarchy
+        popup.getChildren().add(bgRectangle);
+        popup.getChildren().add(matchIDLabel);
+        popup.getChildren().add(matchIDField);
+        popup.getChildren().add(nicknameLabel);
+        popup.getChildren().add(nicknameField);
+        popup.getChildren().add(confirmReconnect);
+        popup.getChildren().add(closeButton);
+        root.getChildren().add(popup);
+    }
+
+    private Pane createIconButton(String iconImagePath, double x, double y, Runnable action) {
         // Create Pane
         Pane button = new Pane();
-        button.setPrefSize(width, height);
+        button.setPrefSize(50, 50);
         button.setLayoutX(x);
         button.setLayoutY(y);
 
         // Create image button
-        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream(buttonImagePath)));
+        Image image = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SquareButton.png")));
         ImageView imageView = new ImageView(image);
-        imageView.setFitWidth(width);
-        imageView.setFitHeight(height);
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
         imageView.setLayoutX(0);
         imageView.setLayoutY(0);
         imageView.setOnMouseClicked((_) -> action.run());
@@ -383,10 +466,10 @@ public class GUIView implements View {
         // Create icon
         Image icon = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconImagePath)));
         ImageView iconView = new ImageView(icon);
-        iconView.setFitWidth(width * 0.8);
-        iconView.setFitHeight(height * 0.8);
-        iconView.setLayoutX(width * 0.1);
-        iconView.setLayoutY(height * 0.1);
+        iconView.setFitWidth((double) 50 * 0.8);
+        iconView.setFitHeight((double) 50 * 0.8);
+        iconView.setLayoutX((double) 50 * 0.1);
+        iconView.setLayoutY((double) 50 * 0.1);
         iconView.setMouseTransparent(true);
 
         button.getChildren().add(imageView);
@@ -467,6 +550,7 @@ public class GUIView implements View {
         playersField.setLayoutX((stageWidth - 300) * 0.5);
         playersField.setLayoutY(200);
         playersField.setPromptText("Enter number of players...");
+        playersField.setFont(new Font(ERAS_FONT, 24));
 
         // Create text field for nickname
         TextField nameField = new TextField();
@@ -474,6 +558,7 @@ public class GUIView implements View {
         nameField.setLayoutX((stageWidth - 300) * 0.5);
         nameField.setLayoutY(450);
         nameField.setPromptText("Enter nickname...");
+        nameField.setFont(new Font(ERAS_FONT, 24));
 
         // Create confirm button
         Pane confirmMatch = createTextButton("Create", 20, "/RectButton200x50.png",
@@ -521,12 +606,12 @@ public class GUIView implements View {
         nameField.setPrefSize(200, 50);
         nameField.setLayoutX((stageWidth - 200) * 0.5);
         nameField.setLayoutY(150);
+        nameField.setPromptText("Enter nickname...");
+        nameField.setFont(new Font(ERAS_FONT, 24));
 
         // Create confirm button
         Pane confirmNick = createTextButton("Join", 20, "/RectButton200x50.png",
-                200, 50, (stageWidth - 200) * 0.5, 200, () -> {
-            sender.chooseNickname(nameField.getText());
-        });
+                200, 50, (stageWidth - 200) * 0.5, 200, () -> sender.chooseNickname(nameField.getText()));
 
         // Create IP label
         Label IPLabel = new Label("IP: " + ip);
@@ -771,8 +856,8 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(currPlayerTurnLabel);
 
         // Create chat button
-        Pane openChatButton = createIconButton("/SquareButton.png", "/icons/Chat.png",
-                50, 50, 0, stageHeight / 2 - 25, this::openCloseChat);
+        Pane openChatButton = createIconButton("/icons/Chat.png",
+                0, stageHeight / 2 - 25, this::openCloseChat);
 
         commonAreaPane.getChildren().add(openChatButton);
 
@@ -850,8 +935,8 @@ public class GUIView implements View {
         zoomHelpLabel.setAlignment(Pos.CENTER);
 
         // Create close button
-        Pane closeButton = createIconButton("/SquareButton.png", "/icons/Close.png",
-                50, 50, stageWidth - 100, 0, () -> root.getChildren().remove(helpPane));
+        Pane closeButton = createIconButton("/icons/Close.png",
+                stageWidth - 100, 0, () -> root.getChildren().remove(helpPane));
 
         // Add to hierarchy
         helpBackground.getChildren().add(foregroundRect);
@@ -865,8 +950,8 @@ public class GUIView implements View {
         helpPane.getChildren().add(closeButton);
 
         // Create help button
-        Pane helpButton = createIconButton("/SquareButton.png", "/icons/Help.png",
-                50, 50, commonAreaWidth - 50, 0, () -> root.getChildren().add(helpPane));
+        Pane helpButton = createIconButton("/icons/Help.png",
+                commonAreaWidth - 50, 0, () -> root.getChildren().add(helpPane));
 
         commonAreaPane.getChildren().add(helpButton);
     }
@@ -1049,10 +1134,11 @@ public class GUIView implements View {
         chatInput.setLayoutX(0);
         chatInput.setLayoutY(0);
         chatInput.setPromptText("Enter message...");
+        chatInput.setFont(new Font(ERAS_FONT, 18));
 
         // Create send button
-        Pane sendButton = createIconButton("/SquareButton.png", "/icons/Send.png",
-                50, 50, commonAreaWidth - 75, 0, () -> {
+        Pane sendButton = createIconButton("/icons/Send.png",
+                commonAreaWidth - 75, 0, () -> {
             if (chatInput.getText().isEmpty() || chatInput.getText().isBlank()) {
                 return;
             }
@@ -1074,8 +1160,8 @@ public class GUIView implements View {
         });
 
         // Create close chat button
-        Pane closeChatButton = createIconButton("/SquareButton.png", "/icons/Close.png",
-                50, 50, commonAreaWidth - 50, 0, this::openCloseChat);
+        Pane closeChatButton = createIconButton("/icons/Close.png",
+                commonAreaWidth - 50, 0, this::openCloseChat);
 
         chatInputPane.getChildren().add(chatInput);
         chatInputPane.getChildren().add(sendButton);
@@ -1621,8 +1707,8 @@ public class GUIView implements View {
         cardPane.getChildren().add(cardImgV);
 
         // Create buttons to flip card
-        Pane flipButton = createIconButton("/SquareButton.png", "/icons/Flip.png",
-                50, 50, (cardWidth - 50) / 2, cardHeight + 10, () -> flipCard(card, cardImgV));
+        Pane flipButton = createIconButton("/icons/Flip.png",
+                (cardWidth - 50) / 2, cardHeight + 10, () -> flipCard(card, cardImgV));
 
         cardPane.getChildren().add(flipButton);
 
@@ -2354,8 +2440,8 @@ public class GUIView implements View {
         }
 
         // Create button to return to rankings
-        Pane returnButton = createIconButton("/SquareButton.png", "/icons/Back.png",
-                50, 50, 0, 0, () -> root.getChildren().remove(endgameMapsPane));
+        Pane returnButton = createIconButton("/icons/Back.png",
+                0, 0, () -> root.getChildren().remove(endgameMapsPane));
 
         endgameMapsPane.getChildren().add(returnButton);
     }
@@ -2532,40 +2618,171 @@ public class GUIView implements View {
 
     @Override
     public void showPlayerDisconnection(int playerID) {
-
+        Platform.runLater(() -> showSystemMessage(getPlayerNickname(playerID) + " has disconnected."));
     }
 
     @Override
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+        Platform.runLater(() -> {
+            startConnectionCheck();
 
+            drawGameStart(IDToOpponentNickname, gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                    gameSetupCards[3], gameSetupCards[4], gameSetupCards[5], gameSetupCards[6]);
+        });
+    }
+
+    /**
+     * Starts to check if the player has lost connection to the server.
+     */
+    private void startConnectionCheck() {
+        packetLossTask = new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (packetLossLock) {
+                    if (packetLoss >= MAX_PACKET_LOSS) {
+                        showConnectionLoss();
+                        cancel();
+                    }
+                    packetLoss++;
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(packetLossTask, 0, COUNT_DEC_PERIOD);
     }
 
     @Override
     public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        Platform.runLater(() -> {
+            startConnectionCheck();
 
+            setID(playerID);
+
+            // Draw game start
+            GameResources.initializeAllDecks();
+
+            root.getChildren().clear();
+
+            for (Map.Entry<Integer, String> entry : IDToOpponentNickname.entrySet()){
+                if (entry.getKey() != playerID){
+                    PlayerViewModel opponent = new PlayerViewModel();
+                    opponent.setPlayerID(entry.getKey());
+                    opponent.setNickname(entry.getValue());
+
+                    opponents.add(opponent);
+                }
+                else {
+                    nickname = entry.getValue();
+                }
+            }
+
+            // Calculate all dimensions and creates all panes needed for the game
+            setPlayArea();
+
+            // Add common cards to the stage
+            renderCommonCards(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2], gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+            // Add vertical and horizontal lines to separate player field, hand and common view
+            drawSeparationLines();
+
+
+            // Set missing set up
+            tempChoicePane.getChildren().clear();
+            this.tokenColor = tokenColor;
+
+            starterCard = GameResources.getPlaceableCardByID(gameSetupCards[13]);
+            starterCard.setCurrSideType(starterSide);
+
+            starterCard.setPriority(priority);
+            priority++;
+
+            placeCardAction(starterCard, new Position(0, 0));
+
+            drawMissingSetUp(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8], tokenColor, gameSetupCards[9], gameSetupCards[10], gameSetupCards[11], gameSetupCards[12]);
+        });
     }
 
     @Override
     public void showPlayerReconnection(int playerID) {
-
+        Platform.runLater(() -> showSystemMessage(getPlayerNickname(playerID) + " has reconnected."));
     }
 
     @Override
     public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        Platform.runLater(() -> {
+            showSystemMessage(getPlayerNickname(playerID) + " has disconnected.");
 
+            if (this.playerID == nextPlayerID) {
+                showSystemMessage("It's your turn.");
+            }
+            else if (nextPlayerID == -1) {
+                showSystemMessage("You are the only player left in the game. Please wait...");
+            }
+            else {
+                showSystemMessage("It's " + getPlayerNickname(nextPlayerID) + "'s turn.");
+            }
+
+            getOpponentByID(playerID).removeCard(pos, score);
+        });
     }
 
     @Override
     public void showSoleWinnerMessage() {
+        Platform.runLater(() -> {
+            root.getChildren().clear();
 
+            // Create winner message window
+            AnchorPane winnerPane = new AnchorPane();
+            winnerPane.setPrefSize(stageWidth, stageHeight);
+            winnerPane.setLayoutX(0);
+            winnerPane.setLayoutY(0);
+
+            // Create BG image
+            ImageView bgImage = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/SecondBG.png"))));
+            bgImage.setFitWidth(stageWidth);
+            bgImage.setFitHeight(stageHeight);
+
+            // Create winner message
+            Label winnerLabel = new Label("Congratulations! You are the winner!");
+            winnerLabel.setPrefSize(stageWidth, 100);
+            winnerLabel.setLayoutX(0);
+            winnerLabel.setLayoutY(100);
+            winnerLabel.setFont(new Font(ERAS_FONT, 32));
+            winnerLabel.setTextFill(Color.BLACK);
+            winnerLabel.setAlignment(Pos.CENTER);
+
+            // Create winner message
+            Label subtitle = new Label("No, you are not that good... you were just alone for too long.");
+            subtitle.setPrefSize(stageWidth, 100);
+            subtitle.setLayoutX(0);
+            subtitle.setLayoutY(200);
+            subtitle.setFont(new Font(ERAS_FONT, 20));
+            subtitle.setTextFill(Color.BLACK);
+            subtitle.setAlignment(Pos.CENTER);
+
+            // Create button to return to main menu
+            Button returnButton = new Button("Return to main menu");
+            returnButton.setPrefSize(200, 50);
+            returnButton.setLayoutX(stageWidth / 2 - 100);
+            returnButton.setLayoutY(stageHeight - 200);
+            returnButton.setOnAction((_) -> sender.getMatches());
+
+            // Create hierarchy
+            winnerPane.getChildren().add(bgImage);
+            winnerPane.getChildren().add(winnerLabel);
+            winnerPane.getChildren().add(subtitle);
+            winnerPane.getChildren().add(returnButton);
+            root.getChildren().add(winnerPane);
+        });
     }
 
     @Override
     public void receivePing() {
-        synchronized (packetLossLock) {
-            packetLoss = 0;
-        }
-        sender.sendPong(playerID);
+        Platform.runLater(() -> {
+            synchronized (packetLossLock) {
+                packetLoss = 0;
+            }
+            sender.sendPong(playerID);
+        });
     }
 
     private String getPlayerNickname(int playerID){
@@ -2613,6 +2830,43 @@ public class GUIView implements View {
      * Shows a message to the user that the connection has been lost.
      */
     private void showConnectionLoss() {
-        // TODO: implement showing connection loss
+        Platform.runLater(() -> {
+            AnchorPane connectionLostPane = new AnchorPane();
+            connectionLostPane.setPrefSize(stageWidth, stageHeight);
+            connectionLostPane.setLayoutX(0);
+            connectionLostPane.setLayoutY(0);
+
+            // Create background rectangle
+            Rectangle backgroundRect = new Rectangle();
+            backgroundRect.setX((stageWidth - 500) / 2);
+            backgroundRect.setY((stageHeight - 300) / 2);
+            backgroundRect.setWidth(500);
+            backgroundRect.setHeight(300);
+            backgroundRect.setFill(Color.WHITESMOKE);
+            backgroundRect.setStroke(Color.BLACK);
+            backgroundRect.setStrokeWidth(6);
+
+            // Add connection lost icon
+            ImageView connectionLostIcon = new ImageView(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/icons/ConnectionLost.png"))));
+            connectionLostIcon.setFitWidth(200);
+            connectionLostIcon.setFitHeight(200);
+            connectionLostIcon.setLayoutX(150);
+            connectionLostIcon.setLayoutY(50);
+
+            // Create disconnection text
+            Label disconnectionLabel = new Label("Connection lost! Restart the game.");
+            disconnectionLabel.setPrefSize(500, 50);
+            disconnectionLabel.setLayoutX(0);
+            disconnectionLabel.setLayoutY(250);
+            disconnectionLabel.setFont(new Font(ERAS_FONT, 24));
+            disconnectionLabel.setTextFill(Color.RED);
+            disconnectionLabel.setAlignment(Pos.CENTER);
+
+            // Create hierarchy
+            connectionLostPane.getChildren().add(backgroundRect);
+            connectionLostPane.getChildren().add(connectionLostIcon);
+            connectionLostPane.getChildren().add(disconnectionLabel);
+            root.getChildren().add(connectionLostPane);
+        });
     }
 }
