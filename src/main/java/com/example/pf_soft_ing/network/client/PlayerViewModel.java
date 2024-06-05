@@ -83,6 +83,11 @@ public class PlayerViewModel {
         playerHand.remove(card);
     }
 
+    public void addCardToPlayArea(PlaceableCard card, Position pos) {
+        playArea.put(pos, card);
+        priority++;
+    }
+
     public void drawCard(int cardID) {
         PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
         playerHand.add(card);

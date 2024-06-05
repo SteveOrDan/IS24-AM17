@@ -1,10 +1,12 @@
 package com.example.pf_soft_ing.game;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
+import com.example.pf_soft_ing.card.Position;
 import com.example.pf_soft_ing.card.decks.ObjectiveCardsDeck;
 import com.example.pf_soft_ing.card.decks.StarterCardsDeck;
 import com.example.pf_soft_ing.card.decks.UsableCardsDeck;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.*;
 import com.example.pf_soft_ing.network.server.Decoder;
 import com.example.pf_soft_ing.network.server.RMIReceiver;
@@ -475,7 +477,6 @@ public class MatchModel {
             numOfCompletedObjectivesRanked[players.indexOf(player)] = player.getNumOfCompletedObjectives();
             stopPinging(player);
         }
-
     }
 
     public boolean checkForTurnOrderPhase() {
@@ -551,67 +552,19 @@ public class MatchModel {
                     }
                     player.setSender(newSender);
 
-                    if (getGameState() == GameState.SET_UP) {
+                    if (gameState == GameState.SET_UP) {
                         if (player.getLastPlayerState() == PlayerState.PLACING_STARTER) {
-                            int[] gameSetupCards = new int[7];
-
-                            player.setState(PlayerState.PLACING_STARTER);
-
-                            // Add the IDs of the deck's cards to the array
-                            gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
-                            gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
-                            gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
-                            gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
-                            gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
-                            gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
-                            // Add the ID of the player's starter card to the array
-                            try {
-                                gameSetupCards[6] = player.getStarterCard().getID();
-                            }
-                            // This exception should never be thrown
-                            catch (StarterCardNotSetException e) {
-                                throw new RuntimeException(e);
-                            }
-                            System.out.println("Reconnecting player " + player.getID());
-                            player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
+                            reconnectOnStarterPlacement(player);
                         }
                         else if (player.getLastPlayerState() == PlayerState.CHOOSING_OBJECTIVE) {
-                            int[] gameSetupCards = new int[14];
-
-                            player.setState(PlayerState.CHOOSING_OBJECTIVE);
-
-                            // Add the IDs of the deck's cards to the array
-                            gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
-                            gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
-                            gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
-                            gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
-                            gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
-                            gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
-
-                            // Add the IDs of the player's cards to the array
-                            gameSetupCards[6] = player.getHand().getFirst().getID();
-                            gameSetupCards[7] = player.getHand().get(1).getID();
-                            gameSetupCards[8] = player.getHand().get(2).getID();
-
-                            // Add the IDs of the common objective cards to the array
-                            gameSetupCards[9] = getObjectiveCardsDeck().getCommonObjectives().getFirst().getID();
-                            gameSetupCards[10] = getObjectiveCardsDeck().getCommonObjectives().get(1).getID();
-
-                            int[] objToChoose = player.getSecretObjectiveCardIDs();
-
-                            // Add the IDs of the secret objective cards to choose from to the array
-                            gameSetupCards[11] = objToChoose[0];
-                            gameSetupCards[12] = objToChoose[1];
-
-                            try {
-                                gameSetupCards[13] = player.getStarterCard().getID();
-                                player.getSender().sendReOnObjectiveChoice(player.getID(), getIDtoNicknameMap(), gameSetupCards, player.getStarterCard().getCurrSideType(), player.getTokenColor());
-                            }
-                            // This exception should never be thrown
-                            catch (StarterCardNotSetException e) {
-                                throw new RuntimeException(e);
-                            }
+                            reconnectOnObjectiveChoice(player);
                         }
+                    }
+                    else if (gameState == GameState.PLAYING || gameState == GameState.FINAL_ROUND || gameState == GameState.EXTRA_ROUND) {
+                        reconnect(player);
+                    }
+                    else if (gameState == GameState.END_GAME){
+                        player.getSender().sendError("The match has already ended. You cannot reconnect.");
                     }
 
                     return player.getID();
@@ -690,6 +643,7 @@ public class MatchModel {
                         gameState = GameState.END_GAME;
                         IDToPlayerMap.get(lastPlayerID).setState(PlayerState.MAIN_MENU);
                         stopPinging(IDToPlayerMap.get(lastPlayerID));
+                        GameModel.removeMatch(matchID);
                     }
                 }
             };
@@ -708,5 +662,156 @@ public class MatchModel {
     private static void stopPinging(PlayerModel player) {
         Decoder.finishedMatch(player.getID());
         RMIReceiver.finishedMatch(player.getID());
+    }
+
+    /**
+     * Method to reconnect a player that was disconnected during the match
+     * @param player Player to reconnect
+     */
+    private void reconnect(PlayerModel player) {
+        player.setState(PlayerState.WAITING);
+
+        int[] playersIDs = new int[IDToPlayerMap.size()];
+        String[] playersNicknames = new String[IDToPlayerMap.size()];
+        TokenColors[] playersTokenColors = new TokenColors[IDToPlayerMap.size()];
+        int[][] playersHands = new int[IDToPlayerMap.size()][];
+        int[] playersScores = new int[IDToPlayerMap.size()];
+
+        List<Position[]> playersPlacedCardsPos = new ArrayList<>();
+        List<int[]> playersPlacedCardsIDs = new ArrayList<>();
+        List<CardSideType[]> playersPlacedCardsSides = new ArrayList<>();
+        List<int[]> playersPlacedCardsPriorities = new ArrayList<>();
+
+        int i = 0;
+
+        // For each player in the match
+        for (PlayerModel otherPlayer : IDToPlayerMap.values()){
+            // Add the player's ID, nickname and token color to the arrays
+            playersIDs[i] = otherPlayer.getID();
+            playersNicknames[i] = otherPlayer.getNickname();
+            playersTokenColors[i] = otherPlayer.getTokenColor();
+
+            // Add the player's cards' IDs to the array
+            List<PlaceableCard> hand = otherPlayer.getHand();
+            playersHands[i] = new int[hand.size()];
+
+            for (int j = 0; j < hand.size(); j++) {
+                playersHands[i][j] = hand.get(j).getID();
+            }
+
+            int playAreaSize = otherPlayer.getPlayArea().size();
+            Position[] playerPlacedCardsPos = new Position[playAreaSize];
+            int[] playerPlacedCardsIDs = new int[playAreaSize];
+            CardSideType[] playerPlacedCardsSides = new CardSideType[playAreaSize];
+            int[] playerPlacedCardsPriorities = new int[playAreaSize];
+            int k = 0;
+
+            // Add the player's placed cards' positions, IDs, sides and priority to the arrays
+            for (Map.Entry<Position, PlaceableCard> entry : otherPlayer.getPlayArea().entrySet()) {
+                playerPlacedCardsPos[k] = entry.getKey();
+                playerPlacedCardsIDs[k] = entry.getValue().getID();
+                playerPlacedCardsSides[k] = entry.getValue().getCurrSideType();
+                playerPlacedCardsPriorities[k] = entry.getValue().getPriority();
+                k++;
+            }
+            playersPlacedCardsPos.add(playerPlacedCardsPos);
+            playersPlacedCardsIDs.add(playerPlacedCardsIDs);
+            playersPlacedCardsSides.add(playerPlacedCardsSides);
+            playersPlacedCardsPriorities.add(playerPlacedCardsPriorities);
+
+            // Add the player's score to the array
+            playersScores[i] = otherPlayer.getCurrScore();
+
+            i++;
+        }
+        int[] gameSetupCards = new int[9];
+        int currPlayerID = getCurrPlayerID();
+
+        // Add the IDs of the player's secret objective card and the common objective cards to the array
+        gameSetupCards[0] = player.getSecretObjective().getID();
+        gameSetupCards[1] = objectiveCardsDeck.getCommonObjectives().getFirst().getID();
+        gameSetupCards[2] = objectiveCardsDeck.getCommonObjectives().get(1).getID();
+
+        // Add the IDs of the draw area's cards to the array
+        gameSetupCards[3] = getResourceCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[4] = getVisibleResourceCards().getFirst().getID();
+        gameSetupCards[5] = getVisibleResourceCards().get(1).getID();
+        gameSetupCards[6] = getGoldenCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[7] = getVisibleGoldenCards().getFirst().getID();
+        gameSetupCards[8] = getVisibleGoldenCards().get(1).getID();
+
+        player.getSender().sendNormalReconnect(player.getID(), playersIDs, playersNicknames,playersTokenColors, playersHands,
+                playersPlacedCardsPos, playersPlacedCardsIDs, playersPlacedCardsSides, playersPlacedCardsPriorities,
+                playersScores, gameSetupCards, currPlayerID);
+    }
+
+    /**
+     * Method to reconnect a player that was disconnected during the objective choice phase
+     * @param player Player to reconnect
+     */
+    private void reconnectOnObjectiveChoice(PlayerModel player) {
+        int[] gameSetupCards = new int[14];
+
+        player.setState(PlayerState.CHOOSING_OBJECTIVE);
+
+        // Add the IDs of the deck's cards to the array
+        gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
+        gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
+        gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
+        gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+
+        // Add the IDs of the player's cards to the array
+        gameSetupCards[6] = player.getHand().getFirst().getID();
+        gameSetupCards[7] = player.getHand().get(1).getID();
+        gameSetupCards[8] = player.getHand().get(2).getID();
+
+        // Add the IDs of the common objective cards to the array
+        gameSetupCards[9] = getObjectiveCardsDeck().getCommonObjectives().getFirst().getID();
+        gameSetupCards[10] = getObjectiveCardsDeck().getCommonObjectives().get(1).getID();
+
+        int[] objToChoose = player.getSecretObjectiveCardIDs();
+
+        // Add the IDs of the secret objective cards to choose from to the array
+        gameSetupCards[11] = objToChoose[0];
+        gameSetupCards[12] = objToChoose[1];
+
+        try {
+            gameSetupCards[13] = player.getStarterCard().getID();
+            player.getSender().sendReOnObjectiveChoice(player.getID(), getIDtoNicknameMap(), gameSetupCards, player.getStarterCard().getCurrSideType(), player.getTokenColor());
+        }
+        // This exception should never be thrown
+        catch (StarterCardNotSetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Method to reconnect a player that was disconnected during the starter card placement phase
+     * @param player Player to reconnect
+     */
+    private void reconnectOnStarterPlacement(PlayerModel player) {
+        int[] gameSetupCards = new int[7];
+
+        player.setState(PlayerState.PLACING_STARTER);
+
+        // Add the IDs of the deck's cards to the array
+        gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
+        gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
+        gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
+        gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+        // Add the ID of the player's starter card to the array
+        try {
+            gameSetupCards[6] = player.getStarterCard().getID();
+        }
+        // This exception should never be thrown
+        catch (StarterCardNotSetException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Reconnecting player " + player.getID());
+        player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
     }
 }

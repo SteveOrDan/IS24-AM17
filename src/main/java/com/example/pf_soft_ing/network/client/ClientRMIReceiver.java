@@ -138,6 +138,15 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
+    public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                                    List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                                    int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        view.reconnect(playerID, playersIDs, playersNicknames, playersTokenColors, playersHands,
+                playersPlacedCardsPos, playersPlacedCardsIDs, playersPlacedCardsSides, playersPlacedCardsPriorities,
+                playersScores, gameSetupCards, currPlayerID);
+    }
+
+    @Override
     public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) throws RemoteException {
         view.undoCardPlacement(playerID, pos, score, nextPlayerID);
     }

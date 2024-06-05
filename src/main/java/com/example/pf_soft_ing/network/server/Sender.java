@@ -60,6 +60,10 @@ public interface Sender {
 
     void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);
 
+    void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                             List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                             int[] playersScores, int[] gameSetupCards, int currPlayerID);
+
     void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);
 
     void sendUndoPlaceWithOnePlayerLeft(int playerID, Position pos, int score);

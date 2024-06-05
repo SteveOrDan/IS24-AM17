@@ -104,6 +104,11 @@ public class TestSender implements Sender {
     }
 
     @Override
+    public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands, List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities, int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+
+    }
+
+    @Override
     public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
 
     }

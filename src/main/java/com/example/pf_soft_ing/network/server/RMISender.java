@@ -254,6 +254,21 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                                    List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                                    int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        new Thread(() -> {
+            try {
+                client.sendNormalReconnect(playerID, playersIDs, playersNicknames, playersTokenColors, playersHands,
+                        playersPlacedCardsPos, playersPlacedCardsIDs, playersPlacedCardsSides, playersPlacedCardsPriorities,
+                        playersScores, gameSetupCards, currPlayerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Normal reconnection not sent");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
         new Thread(() ->{
             try {

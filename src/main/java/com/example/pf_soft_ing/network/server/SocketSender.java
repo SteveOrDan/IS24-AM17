@@ -152,6 +152,15 @@ public class SocketSender implements Sender {
     }
 
     @Override
+    public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                                    List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                                    int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        sendMessage(new NormalReconnectMsg(playerID, playersIDs, playersNicknames, playersTokenColors, playersHands,
+                playersPlacedCardsPos, playersPlacedCardsIDs, playersPlacedCardsSides, playersPlacedCardsPriorities,
+                playersScores, gameSetupCards, currPlayerID));
+    }
+
+    @Override
     public void sendUndoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
         sendMessage(new UndoCardPlacementMsg(playerID, pos, score, nextPlayerID));
     }

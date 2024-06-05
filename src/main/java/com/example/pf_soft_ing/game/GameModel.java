@@ -182,7 +182,7 @@ public class GameModel {
      * Removes a match from the game model
      * @param matchID ID of the match
      */
-    public void removeMatch(int matchID) {
+    public static void removeMatch(int matchID) {
         synchronized (matches) {
             matches.removeIf(match -> match.getMatchID() == matchID);
         }

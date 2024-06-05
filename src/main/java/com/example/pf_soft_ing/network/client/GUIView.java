@@ -155,7 +155,6 @@ public class GUIView implements View {
 
     private final Timer timer = new Timer();
 
-    // TODO: Not good... needs to be in a "Platform.runLater"
     private TimerTask packetLossTask = new TimerTask() {
         @Override
         public void run() {
@@ -2702,6 +2701,13 @@ public class GUIView implements View {
     }
 
     @Override
+    public void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                          List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                          int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+
+    }
+
+    @Override
     public void showPlayerReconnection(int playerID) {
         Platform.runLater(() -> showSystemMessage(getPlayerNickname(playerID) + " has reconnected."));
     }
@@ -2728,6 +2734,7 @@ public class GUIView implements View {
     @Override
     public void showSoleWinnerMessage() {
         Platform.runLater(() -> {
+            packetLossTask.cancel();
             root.getChildren().clear();
 
             // Create winner message window

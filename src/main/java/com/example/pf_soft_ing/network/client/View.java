@@ -58,6 +58,10 @@ public interface View {
 
     void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);
 
+    void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                   List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                   int[] playersScores, int[] gameSetupCards, int currPlayerID);
+
     void showPlayerReconnection(int playerID);
 
     void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID);

@@ -24,6 +24,7 @@ public class TUIView implements View {
     private int playerID;
     private String playerNickname;
     private int matchID;
+    private TokenColors tokenColor;
     private int score = 0;
 
     private final Map<Integer, List<String>> cardIDToCardFrontTUILines = new HashMap<>();
@@ -345,6 +346,14 @@ public class TUIView implements View {
 
                     printOpponentPlayArea(parts[1]);
                 }
+                case "pa" -> { // PrintPlayArea
+                    if (parts.length != 1) {
+                        System.out.println("Error: PlayArea does not take any arguments. Please, try again");
+                        break;
+                    }
+
+                    printPlayArea();
+                }
                 case "chat" -> { // Write a message in the chat
                     if (parts.length < 3) {
                         System.out.println("Error: Chat takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
@@ -526,6 +535,9 @@ public class TUIView implements View {
         // Set missing setup
         playerState = PlayerState.CHOOSING_OBJECTIVE;
 
+        // Set token color
+        setTokenColor(tokenColor);
+
         // Add cards to player hand ====================================================================================
         createPlayerHand(resourceCardID1, resourceCardID2, goldenCardID);
 
@@ -580,13 +592,16 @@ public class TUIView implements View {
 
         // Add starter card to opponents' play areas
         for (int i = 0; i < playerIDs.length; i++){
-            if (playerIDs[i] != this.playerID){
+            if (playerIDs[i] != this.playerID) {
                 getOpponentByID(playerIDs[i]).setTokenColor(tokenColors[i]);
                 getOpponentByID(playerIDs[i]).placeCardInPlayArea(starterCardIDs[i], starterCardSides[i], new Position(0, 0), 0);
 
                 for (int cardID : playerHands[i]) {
                     getOpponentByID(playerIDs[i]).drawCard(cardID);
                 }
+            }
+            else {
+                setTokenColor(tokenColors[i]);
             }
         }
 
@@ -921,6 +936,15 @@ public class TUIView implements View {
         }
     }
 
+    private void printSecretObjective() {
+        List<String> secretObjectiveCardFront = cardIDToCardFrontTUILines.get(secretObjectiveCardID);
+
+        System.out.println("Secret objective:");
+        for (String s : secretObjectiveCardFront) {
+            System.out.println(s);
+        }
+    }
+
     private void setSecretObjectives(int secretObjectiveCardID1, int secretObjectiveCardID2) {
         this.secretObjectiveCardID1 = secretObjectiveCardID1;
         this.secretObjectiveCardID2 = secretObjectiveCardID2;
@@ -1161,6 +1185,10 @@ public class TUIView implements View {
     private void printPlayArea() {
         String[][] playAreaArr = createPlayerArr(playArea);
 
+        // Print the token color and score
+        System.out.println("Your token color: " + tokenColor + "\n" +
+                "Your score: " + score + "\n");
+
         if (playAreaArr == null) {
             System.out.println("No cards in play area");
             return;
@@ -1213,6 +1241,10 @@ public class TUIView implements View {
         Map<Position, PlaceableCard> oppPlayArea = getOpponentByID(opponentID).getPlayArea();
 
         String[][] playAreaArr = createPlayerArr(oppPlayArea);
+
+        // Print the token color and score
+        System.out.println(opponentNick + "'s token color: " + getOpponentByID(opponentID).getTokenColor() + "\n"
+        + opponentNick + "'s score: " + getOpponentByID(opponentID).getScore() + "\n");
 
         if (playAreaArr == null) {
             System.out.println("No cards in " + opponentNick + "'s play area");
@@ -1914,19 +1946,19 @@ public class TUIView implements View {
                 new ArrayList<>(List.of("cso", "gmi")));
 
         stateToCommands.put(PlayerState.COMPLETED_SETUP,
-                new ArrayList<>(List.of("chat", "gmc", "gs", "opa", "gmi")));
+                new ArrayList<>(List.of("chat", "gmc", "gs", "opa", "gmi", "pa")));
 
         stateToCommands.put(PlayerState.WAITING,
-                new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "gs", "opa", "gmi")));
+                new ArrayList<>(List.of("fc", "gh", "chat", "gmc", "gs", "opa", "gmi", "pa")));
 
         stateToCommands.put(PlayerState.PLACING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "gs", "opa", "gmi")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "pc", "chat", "gmc", "gs", "opa", "gmi", "pa")));
 
         stateToCommands.put(PlayerState.DRAWING,
-                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "gs", "opa", "gmi")));
+                new ArrayList<>(Arrays.asList("fc", "gh", "ddr", "dvr", "ddg", "dvg", "chat", "gmc", "gs", "opa", "gmi", "pa")));
 
         stateToCommands.put(PlayerState.GAME_OVER,
-                new ArrayList<>(Arrays.asList("opa", "mm")));
+                new ArrayList<>(Arrays.asList("opa", "pa", "mm")));
     }
 
     @Override
@@ -2093,10 +2125,8 @@ public class TUIView implements View {
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
         startConnectionCheck();
 
-        System.out.println("You have successfully reconnected to the match with ID " + this.playerID + ".");
         setID(playerID);
-        System.out.println("You have successfully reconnected to the match with ID " + this.playerID + ".");
-
+        setTokenColor(tokenColor);
         playerState = PlayerState.PLACING_STARTER;
         createInvalidCardLines();
 
@@ -2136,6 +2166,7 @@ public class TUIView implements View {
         startConnectionCheck();
 
         setID(playerID);
+        setTokenColor(tokenColor);
         playerState = PlayerState.CHOOSING_OBJECTIVE;
         createInvalidCardLines();
 
@@ -2192,6 +2223,97 @@ public class TUIView implements View {
 
         // Print secret objective choice
         printSecretObjectiveChoice();
+    }
+
+    @Override
+    public void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
+                          List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+                          int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        GameResources.initializeAllDecks();
+
+        // Set the player ID and state
+        setID(playerID);
+        playerState = PlayerState.WAITING;
+        int numOfPlayers = playersIDs.length;
+
+        // For all players in the match
+        for (int i = 0; i < numOfPlayers; i++) {
+            // If the ID is the same as the player's ID
+            if (playersIDs[i] == playerID) {
+                // Set the player's nickname
+                playerNickname = playersNicknames[i];
+                // Set the player's token color
+                setTokenColor(playersTokenColors[i]);
+
+                // Set the player's hand
+                for (int cardID : playersHands[i]) {
+                    PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+                    createPlaceableCardLines(cardID, CardSideType.FRONT);
+                    createPlaceableCardLines(cardID, CardSideType.BACK);
+                    this.playerHand.add(card);
+                }
+
+                priority = 0;
+                // Set the player's play area
+                for (int j = 0; j < playersPlacedCardsIDs.get(i).length; j++) {
+                    PlaceableCard card = GameResources.getPlaceableCardByID(playersPlacedCardsIDs.get(i)[j]);
+                    createPlaceableCardLines(playersPlacedCardsIDs.get(i)[j], CardSideType.FRONT);
+                    createPlaceableCardLines(playersPlacedCardsIDs.get(i)[j], CardSideType.BACK);
+                    card.setCurrSideType(playersPlacedCardsSides.get(i)[j]);
+                    card.setPriority(playersPlacedCardsPriorities.get(i)[j]);
+                    playArea.put(playersPlacedCardsPos.get(i)[j], card);
+                    priority++;
+                    updatePlacementPositions(playersPlacedCardsPos.get(i)[j]);
+                }
+                // Set the player's score
+                score = playersScores[i];
+
+                // Set the secret objective, the common objectives and the draw area
+                secretObjectiveCardID = gameSetupCards[0];
+                createObjectiveCardLines(secretObjectiveCardID);
+                createObjectiveCardLines(secretObjectiveCardID);
+                setCommonObjectives(gameSetupCards[1], gameSetupCards[2]);
+                setDrawArea(gameSetupCards[3], gameSetupCards[4], gameSetupCards[5], gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
+            }
+            else {
+                PlayerViewModel opponent = new PlayerViewModel();
+                // Set the opponent's ID, nickname and token color
+                opponent.setPlayerID(playersIDs[i]);
+                opponent.setNickname(playersNicknames[i]);
+                opponent.setTokenColor(playersTokenColors[i]);
+
+                // Set the opponent's hand
+                for (int cardID : playersHands[i]) {
+                    PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+                    createPlaceableCardLines(cardID, CardSideType.FRONT);
+                    createPlaceableCardLines(cardID, CardSideType.BACK);
+                    opponent.getPlayerHand().add(card);
+                }
+
+                // Set the opponent's play area
+                for (int j = 0; j < playersPlacedCardsIDs.get(i).length; j++) {
+                    PlaceableCard card = GameResources.getPlaceableCardByID(playersPlacedCardsIDs.get(i)[j]);
+                    card.setCurrSideType(playersPlacedCardsSides.get(i)[j]);
+                    card.setPriority(playersPlacedCardsPriorities.get(i)[j]);
+                    opponent.addCardToPlayArea(card, playersPlacedCardsPos.get(i)[j]);
+                }
+                // Set the opponent's score
+                opponent.setScore(playersScores[i]);
+
+                // Add the opponent to the list of opponents
+                opponents.add(opponent);
+            }
+        }
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        // Print the secret objective, common objectives, draw area and the player's hand
+        printSecretObjective();
+        System.out.println();
+        printCommonObjectives();
+        printDrawArea();
+        printPlayerHand();
+        System.out.println("It's " + getPlayerNickname(currPlayerID) + "'s turn.");
     }
 
     @Override
@@ -2370,5 +2492,13 @@ public class TUIView implements View {
         chat.clear();
         score = 0;
         priority = 0;
+    }
+
+    /**
+     * Sets the Token Color of the player.
+     * @param tokenColor The Token Color to set.
+     */
+    private void setTokenColor(TokenColors tokenColor) {
+        this.tokenColor = tokenColor;
     }
 }

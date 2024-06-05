@@ -269,62 +269,64 @@ public class MatchController {
      * @param pos Position to place the card
      */
     public void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide) {
-        try {
-            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
+        synchronized (this) {
+            try {
+                if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
+                    // Invalid player ID
+                    throw new InvalidPlayerIDException();
+                }
 
-            if (matchModel.getCurrPlayerID() != playerID){
-                // Not player's turn
-                throw new NotPlayerTurnException();
-            }
+                if (matchModel.getCurrPlayerID() != playerID){
+                    // Not player's turn
+                    throw new NotPlayerTurnException();
+                }
 
-            if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
-                // Invalid card ID
-                throw new InvalidCardIDException();
-            }
+                if (!GameResources.getIDToPlaceableCardMap().containsKey(cardID)){
+                    // Invalid card ID
+                    throw new InvalidCardIDException();
+                }
 
-            if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
-                // Card not in player's hand
-                throw new CardNotInHandException();
-            }
+                if (!matchModel.getIDToPlayerMap().get(playerID).getHand().contains(GameResources.getPlaceableCardByID(cardID))){
+                    // Card not in player's hand
+                    throw new CardNotInHandException();
+                }
 
-            if (matchModel.getGameState() != GameState.PLAYING &&
-                    matchModel.getGameState() != GameState.FINAL_ROUND &&
-                    matchModel.getGameState() != GameState.EXTRA_ROUND){
-                // Not playing game state
-                throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
-            }
+                if (matchModel.getGameState() != GameState.PLAYING &&
+                        matchModel.getGameState() != GameState.FINAL_ROUND &&
+                        matchModel.getGameState() != GameState.EXTRA_ROUND){
+                    // Not playing game state
+                    throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.PLAYING + " or " + GameState.FINAL_ROUND + " or " + GameState.EXTRA_ROUND);
+                }
 
-            int oldScore = getIDToPlayerMap().get(playerID).getCurrScore();
+                int oldScore = getIDToPlayerMap().get(playerID).getCurrScore();
 
-            PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
+                PlayerModel player = matchModel.getIDToPlayerMap().get(playerID);
 
-            player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
+                player.placeCard(GameResources.getPlaceableCardByID(cardID), pos, chosenSide);
 
-            int deltaScore = getIDToPlayerMap().get(playerID).getCurrScore() - oldScore;
+                int deltaScore = getIDToPlayerMap().get(playerID).getCurrScore() - oldScore;
 
-            if (matchModel.getGameState() == GameState.EXTRA_ROUND){
-                endTurn();
+                if (matchModel.getGameState() == GameState.EXTRA_ROUND){
+                    endTurn();
 
-                // Send new player 'extra' turn or ranking if game ended
-                if (matchModel.getGameState() == GameState.END_GAME){
-                    broadcastRanking(playerID, cardID, pos, chosenSide, deltaScore,
-                            matchModel.getNicknamesRanked(), matchModel.getScoresRanked(),
-                            matchModel.getNumOfCompletedObjectivesRanked());
-                    GameModel.removeMatch(this);
+                    // Send new player 'extra' turn or ranking if game ended
+                    if (matchModel.getGameState() == GameState.END_GAME){
+                        broadcastRanking(playerID, cardID, pos, chosenSide, deltaScore,
+                                matchModel.getNicknamesRanked(), matchModel.getScoresRanked(),
+                                matchModel.getNumOfCompletedObjectivesRanked());
+                        GameModel.removeMatch(this);
+                    }
+                    else {
+                        broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, deltaScore);
+                    }
                 }
                 else {
-                    broadcastNewPlayerExtraTurn(playerID, cardID, pos, chosenSide, deltaScore);
+                    broadcastPlaceCard(playerID, cardID, pos, chosenSide, deltaScore);
                 }
             }
-            else {
-                broadcastPlaceCard(playerID, cardID, pos, chosenSide, deltaScore);
+            catch (Exception e) {
+                getPlayerSender(playerID).sendError(e.getMessage());
             }
-        }
-        catch (Exception e) {
-            getPlayerSender(playerID).sendError(e.getMessage());
         }
     }
 
@@ -391,21 +393,23 @@ public class MatchController {
      * @param playerID ID of the player
      */
     public void drawResourceCard(int playerID) {
-        try {
-            checkPlayerDrawExceptions(playerID);
+        synchronized (this) {
+            try {
+                checkPlayerDrawExceptions(playerID);
 
-            PlaceableCard drawnCard = matchModel.drawResourceCard();
+                PlaceableCard drawnCard = matchModel.drawResourceCard();
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
+                matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-            GameState oldGameState = matchModel.getGameState();
-            endTurn();
-            GameState currGameState = matchModel.getGameState();
+                GameState oldGameState = matchModel.getGameState();
+                endTurn();
+                GameState currGameState = matchModel.getGameState();
 
-            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
-        }
-        catch (Exception e) {
-            getPlayerSender(playerID).sendError(e.getMessage());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
+            }
+            catch (Exception e) {
+                getPlayerSender(playerID).sendError(e.getMessage());
+            }
         }
     }
 
@@ -416,23 +420,25 @@ public class MatchController {
      * @param index index of the visible resource card (either 0 or 1)
      */
     public void drawVisibleResourceCard(int playerID, int index){
-        try {
-            checkPlayerDrawExceptions(playerID);
+        synchronized (this) {
+            try {
+                checkPlayerDrawExceptions(playerID);
 
-            PlaceableCard drawnCard = matchModel.drawVisibleResourceCard(index);
+                PlaceableCard drawnCard = matchModel.drawVisibleResourceCard(index);
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
+                matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-            matchModel.restoreVisibleResourceCard();
+                matchModel.restoreVisibleResourceCard();
 
-            GameState oldGameState = matchModel.getGameState();
-            endTurn();
-            GameState currGameState = matchModel.getGameState();
+                GameState oldGameState = matchModel.getGameState();
+                endTurn();
+                GameState currGameState = matchModel.getGameState();
 
-            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
-        }
-        catch (Exception e) {
-            getPlayerSender(playerID).sendError(e.getMessage());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
+            }
+            catch (Exception e) {
+                getPlayerSender(playerID).sendError(e.getMessage());
+            }
         }
     }
 
@@ -442,21 +448,23 @@ public class MatchController {
      * @param playerID ID of the player
      */
     public void drawGoldenCard(int playerID) {
-        try {
-            checkPlayerDrawExceptions(playerID);
+        synchronized (this) {
+            try {
+                checkPlayerDrawExceptions(playerID);
 
-            PlaceableCard drawnCard = matchModel.drawGoldenCard();
+                PlaceableCard drawnCard = matchModel.drawGoldenCard();
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
+                matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-            GameState oldGameState = matchModel.getGameState();
-            endTurn();
-            GameState currGameState = matchModel.getGameState();
+                GameState oldGameState = matchModel.getGameState();
+                endTurn();
+                GameState currGameState = matchModel.getGameState();
 
-            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
-        }
-        catch (Exception e) {
-            getPlayerSender(playerID).sendError(e.getMessage());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
+            }
+            catch (Exception e) {
+                getPlayerSender(playerID).sendError(e.getMessage());
+            }
         }
     }
 
@@ -467,26 +475,29 @@ public class MatchController {
      * @param index index of the visible resource card (either 0 or 1)
      */
     public void drawVisibleGoldenCard(int playerID, int index){
-        try {
-            checkPlayerDrawExceptions(playerID);
+        synchronized (this) {
+            try {
+                checkPlayerDrawExceptions(playerID);
 
-            PlaceableCard drawnCard = matchModel.drawVisibleGoldenCard(index);
+                PlaceableCard drawnCard = matchModel.drawVisibleGoldenCard(index);
 
-            matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
+                matchModel.getIDToPlayerMap().get(playerID).drawCard(drawnCard);
 
-            matchModel.restoreVisibleGoldenCard();
+                matchModel.restoreVisibleGoldenCard();
 
-            GameState oldGameState = matchModel.getGameState();
-            endTurn();
-            GameState currGameState = matchModel.getGameState();
+                GameState oldGameState = matchModel.getGameState();
+                endTurn();
+                GameState currGameState = matchModel.getGameState();
 
-            broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
-        }
-        catch (Exception e) {
-            getPlayerSender(playerID).sendError(e.getMessage());
+                broadcastNewPlayerTurn(drawnCard.getID(), playerID, currGameState != oldGameState);
+            }
+            catch (Exception e) {
+                getPlayerSender(playerID).sendError(e.getMessage());
+            }
         }
     }
 
+    // TODO: Remove this method
     /**
      * Draw a starter card from the deck and set it as the player's starter card
      * Handles exceptions for invalid game state, invalid player ID
@@ -576,51 +587,56 @@ public class MatchController {
      * @param playerID ID of the player that disconnected
      */
     public void disconnectPlayer(int playerID) {
-        GameState oldGameState = getGameState();
-        PlayerState oldPlayerState = getIDToPlayerMap().get(playerID).getState();
-        // Set the player's state to "disconnected"
-        getIDToPlayerMap().get(playerID).setState(PlayerState.DISCONNECTED);
+        synchronized (this) {
+            GameState oldGameState = getGameState();
+            PlayerState oldPlayerState = getIDToPlayerMap().get(playerID).getState();
+            // Set the player's state to "disconnected"
+            getIDToPlayerMap().get(playerID).setState(PlayerState.DISCONNECTED);
 
-        // If the game is in the pre-game phase, remove the player from the game
-        if (oldGameState == GameState.PREGAME) {
-            matchModel.removePlayer(playerID);
-        }
-        // If the game is in the set-up phase, simply broadcast the disconnection to other players
-        else if (oldGameState == GameState.SET_UP) {
-            broadcastPlayerDisconnection(playerID);
-        }
-        else if (oldGameState == GameState.PLAYING || oldGameState == GameState.FINAL_ROUND || oldGameState == GameState.EXTRA_ROUND) {
-            // If the game is in the playing phase or the final round and the player disconnected after placing a card, undo the card placement
-            if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING) {
-                matchModel.undoCardPlacement(playerID);
-                if (matchModel.checkForLastPlayerStanding()) {
-                    matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
-                    matchModel.getIDToPlayerMap().get(getCurrPlayerID()).getSender().sendUndoPlaceWithOnePlayerLeft(playerID,
-                            getIDToPlayerMap().get(playerID).getLastCardPlacedPos(), getIDToPlayerMap().get(playerID).getCurrScore());
-                }
-                else {
-                    broadcastUndoCardPlacement(playerID, getIDToPlayerMap().get(playerID).getLastCardPlacedPos(),
-                            getIDToPlayerMap().get(playerID).getCurrScore(), matchModel.getCurrPlayerID());
-                }
+            // If the game is in the pre-game phase, remove the player from the game
+            if (oldGameState == GameState.PREGAME) {
+                matchModel.removePlayer(playerID);
             }
-            // If the game is in the playing phase, the final or extra round and the player disconnected before placing a card, end the player's turn
-            else if(getCurrPlayerID() == playerID && oldPlayerState == PlayerState.PLACING) {
-                endTurn();
-            }
-            // If it isn't the player's turn, simply broadcast the disconnection to other players
-            else {
+            // If the game is in the set-up phase, simply broadcast the disconnection to other players
+            else if (oldGameState == GameState.SET_UP) {
                 broadcastPlayerDisconnection(playerID);
+            }
+            else if (oldGameState == GameState.PLAYING || oldGameState == GameState.FINAL_ROUND || oldGameState == GameState.EXTRA_ROUND) {
+                // If the game is in the playing phase or the final round and the player disconnected after placing a card, undo the card placement
+                if (getCurrPlayerID() == playerID && oldPlayerState == PlayerState.DRAWING) {
+                    matchModel.undoCardPlacement(playerID);
+                    // If there is only one player online remaining, send a special message to the last player standing
+                    if (matchModel.checkForLastPlayerStanding()) {
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).getSender().sendUndoPlaceWithOnePlayerLeft(playerID,
+                                getIDToPlayerMap().get(playerID).getLastCardPlacedPos(), getIDToPlayerMap().get(playerID).getCurrScore());
+                    }
+                    else {
+                        broadcastUndoCardPlacement(playerID, getIDToPlayerMap().get(playerID).getLastCardPlacedPos(),
+                                getIDToPlayerMap().get(playerID).getCurrScore(), matchModel.getCurrPlayerID());
+                    }
+                }
+                // If the game is in the playing phase, the final or extra round and the player disconnected before placing a card, end the player's turn
+                else if(getCurrPlayerID() == playerID && oldPlayerState == PlayerState.PLACING) {
+                    endTurn();
+                }
+                // If it isn't the player's turn, simply broadcast the disconnection to other players
+                else {
+                    broadcastPlayerDisconnection(playerID);
+                }
             }
         }
     }
 
     public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
-        int playerID = matchModel.reconnectPlayer(nickname, newSender);
+        synchronized (this) {
+            int playerID = matchModel.reconnectPlayer(nickname, newSender);
 
-        if (playerID != -1) {
-            broadcastPlayerReconnection(playerID);
+            if (playerID != -1) {
+                broadcastPlayerReconnection(playerID);
+            }
+            return playerID;
         }
-        return playerID;
     }
 
     /**
@@ -709,17 +725,21 @@ public class MatchController {
 
         if (changedState){
             for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurnNewState(drawnCardID, playerID, newPlayerID,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
-                        matchModel.getGameState());
+                if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED) {
+                    getPlayerSender(broadcastID).sendNewPlayerTurnNewState(drawnCardID, playerID, newPlayerID,
+                            resDeckCardID, visibleResCardID1, visibleResCardID2,
+                            goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
+                            matchModel.getGameState());
+                }
             }
         }
         else {
             for (Integer broadcastID : getIDToPlayerMap().keySet()) {
-                getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
-                        resDeckCardID, visibleResCardID1, visibleResCardID2,
-                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+                if (getIDToPlayerMap().get(broadcastID).getState() != PlayerState.DISCONNECTED) {
+                    getPlayerSender(broadcastID).sendNewPlayerTurn(drawnCardID, playerID, newPlayerID,
+                            resDeckCardID, visibleResCardID1, visibleResCardID2,
+                            goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+                }
             }
         }
     }
