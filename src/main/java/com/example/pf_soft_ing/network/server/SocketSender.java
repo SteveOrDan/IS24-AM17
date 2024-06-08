@@ -142,6 +142,11 @@ public class SocketSender implements Sender {
     }
 
     @Override
+    public void sendPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+        sendMessage(new PlayerDisconnectionWithOnePlayerLeftMsg(playerID));
+    }
+
+    @Override
     public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
         sendMessage(new ReOnStarterPlacementMsg(playerID, IDToNicknameMap,gameSetupCards));
     }

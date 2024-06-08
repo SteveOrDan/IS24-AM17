@@ -616,13 +616,28 @@ public class MatchController {
                                 getIDToPlayerMap().get(playerID).getCurrScore(), matchModel.getCurrPlayerID());
                     }
                 }
-                // If the game is in the playing phase, the final or extra round and the player disconnected before placing a card, end the player's turn
+                // If the game is in the playing phase, the final or extra round and the player disconnected before placing a card
                 else if(getCurrPlayerID() == playerID && oldPlayerState == PlayerState.PLACING) {
                     endTurn();
+                    // If there is only one player online remaining, send a special message to the last player standing
+                    if (matchModel.checkForLastPlayerStanding()) {
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).getSender().sendPlayerDisconnectionWithOnePlayerLeft(playerID);
+                    }
+                    else {
+                        broadcastPlayerDisconnection(playerID);
+                    }
                 }
                 // If it isn't the player's turn, simply broadcast the disconnection to other players
                 else {
-                    broadcastPlayerDisconnection(playerID);
+                    // If there is only one player online remaining, send a special message to the last player standing
+                    if (matchModel.checkForLastPlayerStanding()) {
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.WAITING);
+                        matchModel.getIDToPlayerMap().get(getCurrPlayerID()).getSender().sendPlayerDisconnectionWithOnePlayerLeft(playerID);
+                    }
+                    else {
+                        broadcastPlayerDisconnection(playerID);
+                    }
                 }
             }
         }

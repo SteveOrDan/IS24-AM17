@@ -2122,6 +2122,18 @@ public class TUIView implements View {
     }
 
     @Override
+    public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+        System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+        System.out.println("""
+                    You are the only player left in the game.
+                    
+                    While waiting for the others to reconnect you can flip a card in your hand by typing: fc <cardID>
+                    To check your hand, type: gh
+                    To check actual score, type: gs
+                    To check opponents play area: opa <opponentNickname>""");
+    }
+
+    @Override
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
         startConnectionCheck();
 

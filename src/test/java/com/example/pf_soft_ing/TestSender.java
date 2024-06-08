@@ -94,6 +94,11 @@ public class TestSender implements Sender {
     }
 
     @Override
+    public void sendPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+
+    }
+
+    @Override
     public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
 
     }

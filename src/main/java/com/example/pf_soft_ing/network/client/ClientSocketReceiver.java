@@ -113,6 +113,8 @@ public class ClientSocketReceiver {
 
             case PlayerDisconnectionMsg castedMsg -> view.showPlayerDisconnection(castedMsg.getPlayerID());
 
+            case PlayerDisconnectionWithOnePlayerLeftMsg castedMsg -> view.showPlayerDisconnectionWithOnePlayerLeft(castedMsg.getPlayerID());
+
             case ReOnStarterPlacementMsg castedMsg -> view.reconnectOnStarterPlacement(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards());
 
             case ReOnObjectiveChoiceMsg castedMsg -> view.reconnectOnObjectiveChoice(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards(), castedMsg.getStarterSide(), castedMsg.getTokenColor());

@@ -232,6 +232,17 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+        new Thread(() ->{
+            try {
+                client.sendPlayerDisconnectionWithOnePlayerLeft(playerID);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Player disconnection with one player left not sent");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) {
         new Thread(() ->{
             try {

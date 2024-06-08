@@ -57,6 +57,8 @@ public interface ClientRMIInterface extends Remote {
 
     void sendPlayerDisconnection(int playerID) throws RemoteException;
 
+    void sendPlayerDisconnectionWithOnePlayerLeft(int playerID) throws RemoteException;
+
     void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) throws RemoteException;
 
     void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) throws RemoteException;

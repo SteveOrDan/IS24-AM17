@@ -56,6 +56,8 @@ public interface Sender {
 
     void sendPlayerDisconnection(int playerID);
 
+    void sendPlayerDisconnectionWithOnePlayerLeft(int playerID);
+
     void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards);
 
     void sendReOnObjectiveChoice(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor);

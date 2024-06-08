@@ -128,6 +128,11 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
+    public void sendPlayerDisconnectionWithOnePlayerLeft(int playerID) throws RemoteException {
+        view.showPlayerDisconnectionWithOnePlayerLeft(playerID);
+    }
+
+    @Override
     public void sendReOnStarterPlacement(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards) throws RemoteException {
         view.reconnectOnStarterPlacement(playerID, IDToNicknameMap, gameSetupCards);
     }

@@ -2628,6 +2628,11 @@ public class GUIView implements View {
     }
 
     @Override
+    public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+
+    }
+
+    @Override
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
         Platform.runLater(() -> {
             startConnectionCheck();
