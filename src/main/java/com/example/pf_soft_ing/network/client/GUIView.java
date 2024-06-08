@@ -140,6 +140,7 @@ public class GUIView implements View {
     private AnchorPane commonAreaPane;
     private AnchorPane helpPane;
     private AnchorPane endgameMapsPane;
+    private AnchorPane reconnectionPopup;
 
     private final Map<String, Label> nicknameToScoreLabel = new HashMap<>();
 
@@ -360,23 +361,28 @@ public class GUIView implements View {
         Pane refreshButton = createIconButton("/icons/Refresh.png",
                 55, stageHeight - 90, () -> sender.getMatches());
 
+        // Create reconnection popup
+        createReconnectionPopup();
+
         // Create button for reconnection
         Pane reconnectButton = createTextButton("Reconnect", 20, "/RectButton200x50.png",
-                200, 50, (stageWidth - 200) * 0.75, stageHeight - 75, this::createReconnectionPopup);
+                200, 50, (stageWidth - 200) * 0.75, stageHeight - 75, () -> reconnectionPopup.setVisible(true));
 
         mainMenu.getChildren().add(refreshButton);
         mainMenu.getChildren().add(addMatchButton);
         mainMenu.getChildren().add(reconnectButton);
 
         root.getChildren().add(mainMenu);
+
+        root.getChildren().add(reconnectionPopup);
     }
 
     private void createReconnectionPopup() {
         // Create Popup anchor pane
-        AnchorPane popup = new AnchorPane();
-        popup.setPrefSize(500, 300);
-        popup.setLayoutX(stageWidth - 625);
-        popup.setLayoutY(stageHeight - 400);
+        reconnectionPopup = new AnchorPane();
+        reconnectionPopup.setPrefSize(500, 300);
+        reconnectionPopup.setLayoutX(stageWidth - 625);
+        reconnectionPopup.setLayoutY(stageHeight - 400);
 
         // Create background
         Rectangle bgRectangle = new Rectangle();
@@ -390,7 +396,7 @@ public class GUIView implements View {
 
         // Create insert match ID label
         Label matchIDLabel = new Label("Match ID:");
-        matchIDLabel.setPrefSize(400, 50);
+        matchIDLabel.setPrefSize(300, 50);
         matchIDLabel.setLayoutX(25);
         matchIDLabel.setLayoutY(10);
         matchIDLabel.setFont(new Font(ERAS_FONT, 24));
@@ -405,7 +411,7 @@ public class GUIView implements View {
 
         // Create insert nickname label
         Label nicknameLabel = new Label("Nickname:");
-        nicknameLabel.setPrefSize(400, 50);
+        nicknameLabel.setPrefSize(300, 50);
         nicknameLabel.setLayoutX(25);
         nicknameLabel.setLayoutY(160);
         nicknameLabel.setFont(new Font(ERAS_FONT, 24));
@@ -433,17 +439,18 @@ public class GUIView implements View {
 
         // Create close button
         Pane closeButton = createIconButton("/icons/Close.png",
-                440, 10, () -> root.getChildren().remove(popup));
+                440, 10, () -> reconnectionPopup.setVisible(false));
 
         // Fill hierarchy
-        popup.getChildren().add(bgRectangle);
-        popup.getChildren().add(matchIDLabel);
-        popup.getChildren().add(matchIDField);
-        popup.getChildren().add(nicknameLabel);
-        popup.getChildren().add(nicknameField);
-        popup.getChildren().add(confirmReconnect);
-        popup.getChildren().add(closeButton);
-        root.getChildren().add(popup);
+        reconnectionPopup.getChildren().add(bgRectangle);
+        reconnectionPopup.getChildren().add(matchIDLabel);
+        reconnectionPopup.getChildren().add(matchIDField);
+        reconnectionPopup.getChildren().add(nicknameLabel);
+        reconnectionPopup.getChildren().add(nicknameField);
+        reconnectionPopup.getChildren().add(confirmReconnect);
+        reconnectionPopup.getChildren().add(closeButton);
+
+        reconnectionPopup.setVisible(false);
     }
 
     private Pane createIconButton(String iconImagePath, double x, double y, Runnable action) {
