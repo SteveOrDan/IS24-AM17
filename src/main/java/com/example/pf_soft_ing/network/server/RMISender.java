@@ -265,6 +265,17 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendReAfterSetup(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        new Thread(() ->{
+            try {
+                client.sendReAfterSetup(playerID, IDToNicknameMap, gameSetupCards, starterSide, tokenColor);
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". Reconnection after setup not sent");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
                                     List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
                                     int[] playersScores, int[] gameSetupCards, int currPlayerID) {

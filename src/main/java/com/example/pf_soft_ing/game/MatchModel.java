@@ -46,7 +46,7 @@ public class MatchModel {
 
     private final Timer timer = new Timer();
     private TimerTask announceSoleWinner;
-    private final static int SOLE_WINNER_ANNOUNCE_DELAY = 3000;
+    private final static int SOLE_WINNER_ANNOUNCE_DELAY = 30000;
 
     public MatchModel(int maxPlayers, int matchID){
         this.maxPlayers = maxPlayers;
@@ -547,9 +547,6 @@ public class MatchModel {
 
                 // If there is a disconnected player with the same nickname, reconnect him
                 if (player.getState() == PlayerState.DISCONNECTED){
-                    if (announceSoleWinner != null){
-                        announceSoleWinner.cancel();
-                    }
                     player.setSender(newSender);
 
                     if (gameState == GameState.SET_UP) {
@@ -559,8 +556,15 @@ public class MatchModel {
                         else if (player.getLastPlayerState() == PlayerState.CHOOSING_OBJECTIVE) {
                             reconnectOnObjectiveChoice(player);
                         }
+                        else if (player.getLastPlayerState() == PlayerState.COMPLETED_SETUP) {
+                            reconnectPlayerAfterSetup(player);
+                        }
                     }
                     else if (gameState == GameState.PLAYING || gameState == GameState.FINAL_ROUND || gameState == GameState.EXTRA_ROUND) {
+                        if (announceSoleWinner != null){
+                            announceSoleWinner.cancel();
+                            getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.PLACING);
+                        }
                         reconnect(player);
                     }
                     else if (gameState == GameState.END_GAME){
@@ -746,6 +750,33 @@ public class MatchModel {
     }
 
     /**
+     * Method to reconnect a player that was disconnected during the starter card placement phase
+     * @param player Player to reconnect
+     */
+    private void reconnectOnStarterPlacement(PlayerModel player) {
+        int[] gameSetupCards = new int[7];
+
+        player.setState(PlayerState.PLACING_STARTER);
+
+        // Add the IDs of the deck's cards to the array
+        gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[1] = getVisibleResourceCards().getFirst().getID();
+        gameSetupCards[2] = getVisibleResourceCards().get(1).getID();
+        gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
+        gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
+        gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+        // Add the ID of the player's starter card to the array
+        try {
+            gameSetupCards[6] = player.getStarterCard().getID();
+        }
+        // This exception should never be thrown
+        catch (StarterCardNotSetException e) {
+            throw new RuntimeException(e);
+        }
+        player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
+    }
+
+    /**
      * Method to reconnect a player that was disconnected during the objective choice phase
      * @param player Player to reconnect
      */
@@ -788,13 +819,13 @@ public class MatchModel {
     }
 
     /**
-     * Method to reconnect a player that was disconnected during the starter card placement phase
+     * Method to reconnect a player that was disconnected after the setup phase
      * @param player Player to reconnect
      */
-    private void reconnectOnStarterPlacement(PlayerModel player) {
-        int[] gameSetupCards = new int[7];
+    private void reconnectPlayerAfterSetup(PlayerModel player) {
+        int[] gameSetupCards = new int[13];
 
-        player.setState(PlayerState.PLACING_STARTER);
+        player.setState(PlayerState.COMPLETED_SETUP);
 
         // Add the IDs of the deck's cards to the array
         gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();
@@ -803,15 +834,27 @@ public class MatchModel {
         gameSetupCards[3] = getGoldenCardsDeck().getDeck().getFirst().getID();
         gameSetupCards[4] = getVisibleGoldenCards().getFirst().getID();
         gameSetupCards[5] = getVisibleGoldenCards().get(1).getID();
+
+        // Add the IDs of the player's cards to the array
+        gameSetupCards[6] = player.getHand().getFirst().getID();
+        gameSetupCards[7] = player.getHand().get(1).getID();
+        gameSetupCards[8] = player.getHand().get(2).getID();
+
+        // Add the IDs of the common objective cards to the array
+        gameSetupCards[9] = getObjectiveCardsDeck().getCommonObjectives().getFirst().getID();
+        gameSetupCards[10] = getObjectiveCardsDeck().getCommonObjectives().get(1).getID();
+
+        // Add the ID of the player's secret objective card to the array
+        gameSetupCards[11] = player.getSecretObjective().getID();
+
         // Add the ID of the player's starter card to the array
         try {
-            gameSetupCards[6] = player.getStarterCard().getID();
+            gameSetupCards[12] = player.getStarterCard().getID();
+            player.getSender().sendReAfterSetup(player.getID(), getIDtoNicknameMap(), gameSetupCards, player.getStarterCard().getCurrSideType(), player.getTokenColor());
         }
         // This exception should never be thrown
         catch (StarterCardNotSetException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Reconnecting player " + player.getID());
-        player.getSender().sendReOnStarterPlacement(player.getID(), getIDtoNicknameMap(), gameSetupCards);
     }
 }

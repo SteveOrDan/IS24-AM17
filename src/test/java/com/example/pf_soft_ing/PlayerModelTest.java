@@ -68,6 +68,7 @@ class PlayerModelTest {
 
         //Now place a card in a valid position
         Position pos = new Position(1,1);
+        playerModel.setState(PlayerState.PLACING);
         assertDoesNotThrow(() -> playerModel.placeCard(resourceCard, pos, CardSideType.FRONT));
 
         assertTrue(playerModel.getPlayArea().containsKey(pos));
@@ -86,7 +87,7 @@ class PlayerModelTest {
 
         createPlayerModel();
 
-        playerModel.setState(PlayerState.PLACING);
+        playerModel.setState(PlayerState.PLACING_STARTER);
 
         //Start by placing a starter card in the play area
         playerModel.setStarterCard(starterCard);
@@ -98,6 +99,7 @@ class PlayerModelTest {
         Position pos2 = new Position(1,0);
         Position pos3 = new Position(-1,-1);
 
+        playerModel.setState(PlayerState.PLACING);
         assertThrows(PositionAlreadyTakenException.class, () -> playerModel.placeCard(resourceCard, pos1, CardSideType.FRONT));
         assertThrows(NoAdjacentCardsException.class, () -> playerModel.placeCard(resourceCard, pos2, CardSideType.FRONT));
         assertThrows(PlacingOnInvalidCornerException.class, () -> playerModel.placeCard(resourceCard, pos3, CardSideType.FRONT));

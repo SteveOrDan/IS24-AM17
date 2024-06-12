@@ -497,31 +497,6 @@ public class MatchController {
         }
     }
 
-    // TODO: Remove this method
-    /**
-     * Draw a starter card from the deck and set it as the player's starter card
-     * Handles exceptions for invalid game state, invalid player ID
-     * @param playerID ID of the player
-     */
-    public void drawStarterCard(int playerID){
-        try {
-            if (matchModel.getGameState() != GameState.SET_UP){
-                // Not in game set up
-                throw new InvalidGameStateException(matchModel.getGameState().toString(), GameState.SET_UP.toString());
-            }
-
-            if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
-                // Invalid player ID
-                throw new InvalidPlayerIDException();
-            }
-
-            matchModel.getIDToPlayerMap().get(playerID).setStarterCard(matchModel.drawStarterCard());
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
     /**
      * End the game set up and set the game state to "playing"
      */

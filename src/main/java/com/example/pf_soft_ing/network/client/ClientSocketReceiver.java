@@ -107,7 +107,8 @@ public class ClientSocketReceiver {
 
             case ReceiveChatMessageMsg castedMsg -> view.receiveChatMessage(castedMsg.getSenderNickname(), castedMsg.getRecipientNickname(), castedMsg.getMessage());
 
-            case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
+            case RankingMsg castedMsg -> view.showRanking(castedMsg.getLastPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(),
+                    castedMsg.getDeltaScore(), castedMsg.getNicknames(), castedMsg.getScores(), castedMsg.getNumOfSecretObjectives());
 
             case PingMsg ignored -> view.receivePing();
 
@@ -117,7 +118,11 @@ public class ClientSocketReceiver {
 
             case ReOnStarterPlacementMsg castedMsg -> view.reconnectOnStarterPlacement(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards());
 
-            case ReOnObjectiveChoiceMsg castedMsg -> view.reconnectOnObjectiveChoice(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(), castedMsg.getGameSetupCards(), castedMsg.getStarterSide(), castedMsg.getTokenColor());
+            case ReOnObjectiveChoiceMsg castedMsg -> view.reconnectOnObjectiveChoice(castedMsg.getPlayerID(), castedMsg.getIDToOpponentNickname(),
+                    castedMsg.getGameSetupCards(), castedMsg.getStarterSide(), castedMsg.getTokenColor());
+
+            case ReAfterSetupMsg castedMsg -> view.reconnectAfterSetup(castedMsg.getPlayerID(), castedMsg.getIdToNicknameMap(),
+                    castedMsg.getGameSetupCards(), castedMsg.getStarterSide(), castedMsg.getTokenColor());
 
             case NormalReconnectMsg castedMsg -> view.reconnect(castedMsg.getPlayerID(), castedMsg.getPlayersIDs(), castedMsg.getPlayersNicknames(), castedMsg.getPlayersTokenColors(), castedMsg.getPlayersHands(),
                     castedMsg.getPlayersPlacedCardsPos(), castedMsg.getPlayersPlacedCardsIDs(), castedMsg.getPlayersPlacedCardsSides(), castedMsg.getPlayersPlacedCardsPriorities(),

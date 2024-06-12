@@ -109,6 +109,11 @@ public class TestSender implements Sender {
     }
 
     @Override
+    public void sendReAfterSetup(int playerID, Map<Integer, String> IDToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+
+    }
+
+    @Override
     public void sendNormalReconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands, List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities, int[] playersScores, int[] gameSetupCards, int currPlayerID) {
 
     }

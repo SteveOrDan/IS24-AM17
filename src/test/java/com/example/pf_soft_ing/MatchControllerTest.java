@@ -8,7 +8,6 @@ import com.example.pf_soft_ing.game.GameController;
 import com.example.pf_soft_ing.game.GameResources;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.network.server.SocketSender;
 import com.example.pf_soft_ing.player.PlayerModel;
 import com.example.pf_soft_ing.player.PlayerState;
 import com.example.pf_soft_ing.player.TokenColors;
@@ -29,8 +28,6 @@ class MatchControllerTest {
     private final MatchController matchController = new MatchController(numOfPlayers, 1);
     private final GameController gameController = new GameController();
 
-
-
     @Test
     void checkResources(){
         matchController.initializeDecks();
@@ -50,6 +47,14 @@ class MatchControllerTest {
         gameController.chooseNickname(player2.getID(), "player2",matchController1);
 
         matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
+
+        matchController1.disconnectPlayer(player1.getID()); // Disconnect player1
+        assertThrows(NicknameNotInMatch.class, () -> matchController1.reconnectPlayer("Random", new TestSender())); // Nickname not in match
+        assertThrows(SpecifiedPlayerNotDisconnected.class, () -> matchController1.reconnectPlayer(player2.getNickname(), new TestSender())); // Player not disconnected
+        assertDoesNotThrow(() -> matchController1.reconnectPlayer(player1.getNickname(), new TestSender()));
+
+        matchController1.disconnectPlayer(player2.getID()); // Disconnect player2
+        assertDoesNotThrow(() -> matchController1.reconnectPlayer(player2.getNickname(), new TestSender()));
         matchController1.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
 
         try {
@@ -72,6 +77,10 @@ class MatchControllerTest {
         matchController1.placeStarterCardForPlayer(player1.getID(), CardSideType.BACK);
         matchController2.placeStarterCardForPlayer(player2.getID(), CardSideType.BACK);
         matchController1.setSecretObjectiveForPlayer(player1.getID(), 86);
+
+        matchController1.disconnectPlayer(player1.getID()); // Disconnect player1
+        assertDoesNotThrow(() -> matchController1.reconnectPlayer(player1.getNickname(), new TestSender())); // Reconnect player1
+
         matchController2.setSecretObjectiveForPlayer(player2.getID(), 87);
 
         if (player1.getState() == PlayerState.PLACING){
@@ -87,13 +96,15 @@ class MatchControllerTest {
             matchController2.placeCard(player2.getID(), card2.getID(), new Position(0, 0), CardSideType.FRONT);
             assertEquals(PlayerState.PLACING, player1.getState());
 
-            // Current player tries to place a invalid card
+            // Current player tries to place an invalid card
             matchController1.placeCard(player1.getID(), 100, new Position(0, 0), CardSideType.FRONT);
             assertEquals(PlayerState.PLACING, player1.getState());
 
             // Game State is in Extra Round
             matchController1.setGameState(GameState.EXTRA_ROUND);
             matchController1.placeCard(player1.getID(), card1.getID(), new Position(1, 1), CardSideType.FRONT);
+            matchController1.disconnectPlayer(player1.getID()); // Disconnect player1
+            assertDoesNotThrow(() -> matchController1.reconnectPlayer(player1.getNickname(), new TestSender())); // Reconnect player1
             assertEquals(PlayerState.WAITING, player1.getState());
 
         } else {
@@ -169,7 +180,7 @@ class MatchControllerTest {
     }
 
     private void addPlayers(String name) throws GameIsFullException, NicknameAlreadyExistsException, IOException {
-        PlayerModel player = gameController.createPlayer(new SocketSender(new ObjectOutputStream(System.out)));
+        PlayerModel player = gameController.createPlayer(new TestSender());
         matchController.checkNickname(name);
         matchController.addCurrPlayer(player);
         matchController.addReadyPlayer();
@@ -197,7 +208,8 @@ class MatchControllerTest {
             PlayerModel player = matchController.getIDToPlayerMap().get(i);
 
             // Set starter card
-            matchController.drawStarterCard(i);
+            PlaceableCard starterCard = matchController.drawStarterCard();
+            matchController.getIDToPlayerMap().get(i).setStarterCard(starterCard);
 
             player.placeStarterCard(CardSideType.FRONT);
 
@@ -717,13 +729,11 @@ class MatchControllerTest {
         matchController.setUpGame();
 
         matchController.setGameState(GameState.PREGAME);
-        matchController.drawStarterCard(-1); // Invalid game state
 
         assertThrows(InvalidGameStateException.class, () -> matchController.fillPlayerHand(-1)); // Invalid game state
 
 
         matchController.setGameState(GameState.SET_UP);
-        matchController.drawStarterCard(-1); // Invalid id
 
         assertThrows(InvalidPlayerIDException.class, () -> matchController.fillPlayerHand(-1)); // Invalid player id
 
@@ -732,7 +742,8 @@ class MatchControllerTest {
             PlayerModel player = matchController.getIDToPlayerMap().get(i);
 
             // Set starter card
-            matchController.drawStarterCard(i);
+            PlaceableCard starterCard = matchController.drawStarterCard();
+            matchController.getIDToPlayerMap().get(i).setStarterCard(starterCard);
 
             assertDoesNotThrow(player::getStarterCard);
 
@@ -836,7 +847,8 @@ class MatchControllerTest {
             PlayerModel player = matchController.getIDToPlayerMap().get(i);
 
             // Set starter card
-            matchController.drawStarterCard(i);
+            PlaceableCard starterCard = matchController.drawStarterCard();
+            matchController.getIDToPlayerMap().get(i).setStarterCard(starterCard);
 
             try {
                 player.getStarterCard();

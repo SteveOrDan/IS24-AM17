@@ -623,9 +623,13 @@ public class TUIView implements View {
 
             // Print available commands
             System.out.println("""
-                    To check your hand, type: gh
-                    To flip a card, type: fc <cardID>
-                    To place a card, type: pc <cardID> <posID>""");
+                    These are the available commands:
+                    Check your hand: gh
+                    Flip a card: fc <cardID>
+                    Place a card: pc <cardID> <posID>
+                    Check actual score: gs
+                    Check opponent's play area: opa <opponent nickname>
+                    Check your own play area: pa""");
         }
         else {
             playerState = PlayerState.WAITING;
@@ -2123,6 +2127,8 @@ public class TUIView implements View {
 
     @Override
     public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+        playerState = PlayerState.ALONE;
+
         System.out.println(getPlayerNickname(playerID) + " has disconnected.");
         System.out.println("""
                     You are the only player left in the game.
@@ -2202,7 +2208,7 @@ public class TUIView implements View {
         setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
                 gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
 
-        // Print 4 visible cards, 2 deck top card and starter card
+        // Print 4 visible cards, 2 deck top card
         printDrawArea();
 
         starterCard = GameResources.getPlaceableCardByID(gameSetupCards[13]);
@@ -2214,9 +2220,6 @@ public class TUIView implements View {
         priority++;
 
         updatePlacementPositions(new Position(0, 0));
-
-        // Set missing setup
-        playerState = PlayerState.CHOOSING_OBJECTIVE;
 
         // Add cards to player hand ====================================================================================
         createPlayerHand(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
@@ -2235,6 +2238,75 @@ public class TUIView implements View {
 
         // Print secret objective choice
         printSecretObjectiveChoice();
+    }
+
+    @Override
+    public void reconnectAfterSetup(int playerID, Map<Integer, String> idToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        startConnectionCheck();
+
+        setID(playerID);
+        setTokenColor(tokenColor);
+        playerState = PlayerState.COMPLETED_SETUP;
+        createInvalidCardLines();
+
+        System.out.println("You have successfully reconnected to the match.");
+
+        for (Map.Entry<Integer, String> entry : idToNicknameMap.entrySet()) {
+            if (entry.getKey() != playerID){
+                PlayerViewModel opponent = new PlayerViewModel();
+                opponent.setPlayerID(entry.getKey());
+                opponent.setNickname(entry.getValue());
+                opponents.add(opponent);
+            }
+            else {
+                playerNickname = entry.getValue();
+            }
+        }
+
+        GameResources.initializeAllDecks();
+
+        // Update draw area cards
+        setDrawArea(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+
+        // Print 4 visible cards, 2 deck top card
+        printDrawArea();
+
+        starterCard = GameResources.getPlaceableCardByID(gameSetupCards[12]);
+        starterCard.setCurrSideType(starterSide);
+
+        // Place the starter card in the play area and update all legal and illegal positions
+        starterCard.setPriority(priority);
+        playArea.put(new Position(0, 0), starterCard);
+        priority++;
+
+        updatePlacementPositions(new Position(0, 0));
+
+        // Add cards to player hand ====================================================================================
+        createPlayerHand(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
+
+        // Print player hand
+        printPlayerHand();
+
+        // Create common objectives ====================================================================================
+        setCommonObjectives(gameSetupCards[9], gameSetupCards[10]);
+
+        // Print common objectives
+        printCommonObjectives();
+
+        // Set secret objective ========================================================================================
+        secretObjectiveCardID = gameSetupCards[11];
+        createObjectiveCardLines(secretObjectiveCardID);
+
+        // Print secret objective
+        printSecretObjective();
+
+        // Print available commands
+        System.out.println("""
+                To chat with other players, type: chat <message>
+                To get the match info, type: gmi
+                To see the actual score, type: gs
+                To see the opponents play area, type: opa <opponentNickname>""");
     }
 
     @Override
@@ -2330,7 +2402,26 @@ public class TUIView implements View {
 
     @Override
     public void showPlayerReconnection(int playerID) {
-        System.out.println(getPlayerNickname(playerID) + " has reconnected.");
+        if (playerState == PlayerState.ALONE) {
+            playerState = PlayerState.PLACING;
+            System.out.println(getPlayerNickname(playerID) + " has reconnected.");
+            System.out.println("It's your turn.");
+
+            // Print player hand
+            printPlayerHand();
+
+            // Print play area
+            printPlayArea();
+
+            // Print available commands
+            System.out.println("""
+                        To check your hand, type: gh
+                        To flip a card, type: fc <cardID>
+                        To place a card, type: pc <cardID> <posID>""");
+        }
+        else {
+            System.out.println(getPlayerNickname(playerID) + " has reconnected.");
+        }
     }
 
     @Override
@@ -2342,6 +2433,7 @@ public class TUIView implements View {
             System.out.println("It's your turn.");
         }
         else if (nextPlayerID == -1) {
+            playerState = PlayerState.ALONE;
             System.out.println("""
                     You are the only player left in the game.
                     
