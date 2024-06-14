@@ -20,6 +20,10 @@ public class Decoder {
 
     private static final long CLEANUP_PERIOD = 10000;
 
+    /**
+     * Stops all threads related to a player in a match when the match is over
+     * @param playerID ID of the player
+     */
     public static void finishedMatch(int playerID) {
         if (!playerIDToDiscMan.containsKey(playerID)) return;
 
@@ -28,6 +32,11 @@ public class Decoder {
         }
     }
 
+    /**
+     * Decodes the message and calls the appropriate method in the GameController
+     * @param message Message to decode
+     * @param playerID ID of the player
+     */
     public static void decode(Message message, int playerID) {
         switch (message) {
             case GetMatchesMsg ignored -> gameController.getMatches(playerID);
@@ -146,6 +155,10 @@ public class Decoder {
         }
     }
 
+    /**
+     * Setter
+     * @param gameController GameController object
+     */
     public static void setGameController(GameController gameController) {
         Decoder.gameController = gameController;
         startPeriodicCleanup();

@@ -15,6 +15,10 @@ public class RMIServer {
         this.gameController = gameController;
     }
 
+    /**
+     * Starts the RMI receiver
+     * @param portNumber Port number to start the RMI receiver on
+     */
     public void startRMIReceiver(int portNumber){
         Registry registry;
         RMIReceiverInterface rmiReceiver;

@@ -47,6 +47,10 @@ public class ClientSocketReceiver {
         }.start();
     }
 
+    /**
+     * Decodes the incoming message and calls the appropriate method in the view
+     * @param message Message received
+     */
     private void decodeMessage(Message message){
         switch (message) {
 

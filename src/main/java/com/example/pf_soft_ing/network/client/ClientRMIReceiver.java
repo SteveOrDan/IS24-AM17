@@ -19,6 +19,10 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
         this.view = view;
     }
 
+    /**
+     * Getter
+     * @return ClientRMIInterface
+     */
     public ClientRMIInterface getClient(){
         return this;
     }

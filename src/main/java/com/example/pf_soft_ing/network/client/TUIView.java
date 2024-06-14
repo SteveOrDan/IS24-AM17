@@ -72,6 +72,10 @@ public class TUIView implements View {
     private final Timer timer = new Timer();
     private TimerTask packetLossTask;
 
+    /**
+     * Launches the game with text interface
+     * @param args The arguments required to start the game
+     */
     public void start(String[] args) {
         createStateToCommandsMap();
         playerState = PlayerState.MAIN_MENU;
@@ -116,6 +120,9 @@ public class TUIView implements View {
         startInputReading();
     }
 
+    /**
+     * Starts the thread that reads the input from the user
+     */
     private void startInputReading() {
         new Thread(() -> {
             while (true) {
@@ -133,6 +140,10 @@ public class TUIView implements View {
         }).start();
     }
 
+    /**
+     * Interprets the input from the user and calls the appropriate method
+     * @param userInput The input from the user
+     */
     private void interpretInput(String userInput) {
         String[] parts = userInput.split(" ");
         String command = parts[0].toLowerCase();
@@ -517,6 +528,9 @@ public class TUIView implements View {
                 "To place the starter card on the current side, type: psc");
     }
 
+    /**
+     * Creates the lines for an invalid card and adds them to the cardIDToCardFrontTUILines and cardIDToCardBackTUILines maps.
+     */
     private void createInvalidCardLines() {
         List<String> invalidCardLines = new ArrayList<>();
 
@@ -768,7 +782,7 @@ public class TUIView implements View {
     }
 
     /**
-     * Set the class attributes for the 6 cards in the draw area.
+     * Sets the class attributes for the 6 cards in the draw area.
      * Creates the TUI lines (front and back) for the given cards if they are not already created.
      * @param resDeckCardID The ID of the resource deck card.
      * @param visibleResCardID1 The ID of the first visible resource card.
@@ -849,6 +863,10 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Prints the message for the choice of the starter card
+     * @param starterCardID ID of the starter card to print
+     */
     private void printStarterCardChoice(int starterCardID) {
         makeSpace();
         starterCard = GameResources.getPlaceableCardByID(starterCardID);
@@ -865,6 +883,9 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Flips the starter card and prints the new side
+     */
     private void flipStarterCard() {
         List<String> starterCardLines;
 
@@ -888,6 +909,12 @@ public class TUIView implements View {
                 "To place the starter card on the current side, type: psc");
     }
 
+    /**
+     * Setter
+     * @param resourceCardID1 ID of the first resource card
+     * @param resourceCardID2 ID of the second resource card
+     * @param goldenCardID ID of the golden card
+     */
     private void createPlayerHand(int resourceCardID1, int resourceCardID2, int goldenCardID) {
         makeSpace();
         PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(resourceCardID1);
@@ -909,6 +936,9 @@ public class TUIView implements View {
         createGoldCardLines(goldenCardID, CardSideType.BACK);
     }
 
+    /**
+     * Prints the player's hand
+     */
     private void printPlayerHand() {
         List<List<String>> handToPrint = new ArrayList<>();
         StringBuilder cardIDs = new StringBuilder("Your hand:");
@@ -936,6 +966,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Setter
+     * @param commonObjectiveCardID1 ID of the first common objective card
+     * @param commonObjectiveCardID2 ID of the second common objective card
+     */
     private void setCommonObjectives(int commonObjectiveCardID1, int commonObjectiveCardID2) {
         this.commonObjectiveCardID1 = commonObjectiveCardID1;
         this.commonObjectiveCardID2 = commonObjectiveCardID2;
@@ -944,6 +979,9 @@ public class TUIView implements View {
         createObjectiveCardLines(commonObjectiveCardID2);
     }
 
+    /**
+     * Prints the common objectives
+     */
     private void printCommonObjectives() {
         List<String> commonObjectiveCard1Front = cardIDToCardFrontTUILines.get(commonObjectiveCardID1);
         List<String> commonObjectiveCard2Front = cardIDToCardFrontTUILines.get(commonObjectiveCardID2);
@@ -954,6 +992,9 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Prints the player's secret objective
+     */
     private void printSecretObjective() {
         List<String> secretObjectiveCardFront = cardIDToCardFrontTUILines.get(secretObjectiveCardID);
 
@@ -963,6 +1004,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Setter
+     * @param secretObjectiveCardID1 ID of the first secret objective card
+     * @param secretObjectiveCardID2 ID of the second secret objective card
+     */
     private void setSecretObjectives(int secretObjectiveCardID1, int secretObjectiveCardID2) {
         this.secretObjectiveCardID1 = secretObjectiveCardID1;
         this.secretObjectiveCardID2 = secretObjectiveCardID2;
@@ -971,6 +1017,9 @@ public class TUIView implements View {
         createObjectiveCardLines(secretObjectiveCardID2);
     }
 
+    /**
+     * Prints the choice of the secret objective
+     */
     private void printSecretObjectiveChoice() {
         List<String> secretObjectiveCard1Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID1);
         List<String> secretObjectiveCard2Front = cardIDToCardFrontTUILines.get(secretObjectiveCardID2);
@@ -984,6 +1033,11 @@ public class TUIView implements View {
         System.out.println("To choose one of the secret objectives, type: cso <1 or 2>.");
     }
 
+    /**
+     * Create the matrix containing al characters representing the play area
+     * @param playArea The map containing the cards in the play area
+     * @return The matrix calculated
+     */
     private String[][] createPlayerArr(Map<Position, PlaceableCard> playArea) {
         if (playArea.isEmpty()) {
             return null;
@@ -1200,6 +1254,9 @@ public class TUIView implements View {
         return playAreaArr;
     }
 
+    /**
+     * Prints the play area of the player.
+     */
     private void printPlayArea() {
         String[][] playAreaArr = createPlayerArr(playArea);
 
@@ -1307,6 +1364,10 @@ public class TUIView implements View {
         makeSpace();
     }
 
+    /**
+     * Updates the legal and illegal positions for the placement of a card.
+     * @param pos The position of the card that was just placed.
+     */
     private void updatePlacementPositions(Position pos) {
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
@@ -1369,6 +1430,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for a placeable card.
+     * @param cardID The ID of the card to create the TUI lines for.
+     * @param sideType The side of the card to create the TUI lines for.
+     */
     private void createPlaceableCardLines(int cardID, CardSideType sideType){
         PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
 
@@ -1383,6 +1449,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for a resource card.
+     * @param cardID The ID of the card to create the TUI lines for.
+     * @param sideType The side of the card to create the TUI lines for.
+     */
     private void createResCardLines(int cardID, CardSideType sideType) {
         ResourceCard card = (ResourceCard) GameResources.getPlaceableCardByID(cardID);
 
@@ -1480,6 +1551,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for a golden card.
+     * @param cardID The ID of the card to create the TUI lines for.
+     * @param sideType The side of the card to create the TUI lines for.
+     */
     private void createGoldCardLines(int cardID, CardSideType sideType) {
         GoldenCard card = (GoldenCard) GameResources.getPlaceableCardByID(cardID);
 
@@ -1640,6 +1716,11 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for a starter card.
+     * @param cardID The ID of the card to create the TUI lines for.
+     * @param sideType The side of the card to create the TUI lines for.
+     */
     private void createStarterCardLines(int cardID, CardSideType sideType) {
         StarterCard card = (StarterCard) GameResources.getPlaceableCardByID(cardID);
 
@@ -1780,6 +1861,10 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for an objective card.
+     * @param cardID The ID of the card to create the TUI lines for.
+     */
     private void createObjectiveCardLines(int cardID) {
         ObjectiveCard card = GameResources.getObjectiveCardByID(cardID);
 
@@ -1804,6 +1889,10 @@ public class TUIView implements View {
         }
     }
 
+    /**
+     * Creates the TUI lines for a BL L objective card.
+     * @param card The BL L objective card to create the TUI lines for.
+     */
     private void createBLLShapeObjectiveCardLines(BLLShapeObjectiveCard card) {
         String mainColor = card.getMainElementType().getBgColor();
         String secColor = card.getSecondaryElementType().getBgColor();
@@ -1821,6 +1910,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a BR L objective card.
+     * @param card The BR L objective card to create the TUI lines for.
+     */
     private void createBRLShapeObjectiveCardLines(BRLShapeObjectiveCard card) {
         String mainColor = card.getMainElementType().getBgColor();
         String secColor = card.getSecondaryElementType().getBgColor();
@@ -1838,6 +1931,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a resources count objective card.
+     * @param card The resources count objective card to create the TUI lines for.
+     */
     private void createResourcesCountObjectiveCardLines(ResourcesCountObjectiveCard card) {
         List<String> lines = new ArrayList<>();
 
@@ -1867,6 +1964,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a TLBR diagonal objective card.
+     * @param card The TLBR diagonal objective card to create the TUI lines for.
+     */
     private void createTLBRDiagonalObjectiveCardLines(TLBRDiagonalObjectiveCard card) {
         String color = card.getElementType().getBgColor();
 
@@ -1883,6 +1984,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a TL L shape objective card.
+     * @param card The TL L shape objective card to create the TUI lines for.
+     */
     private void createTLLShapeObjectiveCardLines(TLLShapeObjectiveCard card) {
         String mainColor = card.getMainElementType().getBgColor();
         String secColor = card.getSecondaryElementType().getBgColor();
@@ -1900,6 +2005,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a TRBL diagonal objective card.
+     * @param card The TRBL diagonal objective card to create the TUI lines for.
+     */
     private void createTRBLDiagonalObjectiveCardLines(TRBLDiagonalObjectiveCard card) {
         String color = card.getElementType().getBgColor();
 
@@ -1916,6 +2025,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a trinity objective card.
+     * @param card The trinity objective card to create the TUI lines for.
+     */
     private void createTrinityObjectiveCardLines(TrinityObjectiveCard card) {
         List<String> lines = new ArrayList<>();
 
@@ -1930,6 +2043,10 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the TUI lines for a TR L shape objective card.
+     * @param card The TR L shape objective card to create the TUI lines for.
+     */
     private void createTRLShapeObjectiveCardLines(TRLShapeObjectiveCard card) {
         String mainColor = card.getMainElementType().getBgColor();
         String secColor = card.getSecondaryElementType().getBgColor();
@@ -1947,6 +2064,9 @@ public class TUIView implements View {
         cardIDToCardFrontTUILines.put(card.getID(), lines);
     }
 
+    /**
+     * Creates the map of allowed commands for each player state.
+     */
     private void createStateToCommandsMap() {
         stateToCommands.put(PlayerState.MAIN_MENU,
                 new ArrayList<>(Arrays.asList("cm", "sm", "rml", "reconnect")));
@@ -2524,6 +2644,9 @@ public class TUIView implements View {
         makeSpace();
     }
 
+    /**
+     * Prints the scores of all players.
+     */
     private void printAllScores() {
         System.out.println("Your score: " + score);
 
@@ -2638,6 +2761,9 @@ public class TUIView implements View {
         this.tokenColor = tokenColor;
     }
 
+    /**
+     * Prints a "divider" to make the output more readable.
+     */
     private void makeSpace(){
         System.out.println("\n-------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     }

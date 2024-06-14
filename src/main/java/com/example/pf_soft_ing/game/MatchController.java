@@ -22,6 +22,11 @@ public class MatchController {
         matchModel = new MatchModel(maxPlayers, matchID);
     }
 
+    /**
+     * Getter
+     * @param playerID ID of the player
+     * @return Sender object of the player
+     */
     public Sender getPlayerSender(int playerID){
         return matchModel.getIDToPlayerMap().get(playerID).getSender();
     }
@@ -34,22 +39,42 @@ public class MatchController {
         return matchModel.getIDToPlayerMap();
     }
 
+    /**
+     * Getter
+     * @return IDToNicknameMap with keys as player IDs and values as player nicknames
+     */
     public Map<Integer, String> getIDToNicknameMap() {
         return matchModel.getIDtoNicknameMap();
     }
 
+    /**
+     * Getter
+     * @return ID of the match
+     */
     public int getMatchID(){
         return matchModel.getMatchID();
     }
 
+    /**
+     * Getter
+     * @return List of player nicknames
+     */
     public List<String> getNicknames() {
         return matchModel.getNicknames();
     }
 
+    /**
+     * Adds the first player to the match as the host
+     * @param host Player model of the host to add
+     */
     public void addHost(PlayerModel host){
         matchModel.addHost(host);
     }
 
+    /**
+     * Checks if the match can start. Match needs to be full and all players need to be ready
+     * @return True if the match can start, false otherwise
+     */
     public boolean checkForGameStart() {
         return matchModel.getPlayersReady() == matchModel.getMaxPlayers();
     }
@@ -66,21 +91,21 @@ public class MatchController {
     }
 
     /**
-     * Initialize all decks
+     * Initializes all decks
      */
     public void initializeDecks(){
         matchModel.initializeDecks();
     }
 
     /**
-     * Shuffle all decks
+     * Shuffles all decks
      */
     public void shuffleAllDecks(){
         matchModel.shuffleAllDecks();
     }
 
     /**
-     * Set visible cards for the game
+     * Sets visible cards for the game
      */
     public void setVisibleCards(){
         matchModel.setVisibleCards();
@@ -119,7 +144,7 @@ public class MatchController {
     }
 
     /**
-     * Place the starter card for the player
+     * Places the starter card for the player
      * @param playerID ID of the player
      * @param side Side of the card to place
      */
@@ -198,14 +223,14 @@ public class MatchController {
     }
 
     /**
-     * Set the common objective cards for the game
+     * Sets the common objective cards for the game
      */
     public void setCommonObjectives(){
         matchModel.getObjectiveCardsDeck().setCommonObjectives();
     }
 
     /**
-     * Set the objectives to choose for the player
+     * Sets the objectives to choose for the player
      * @param playerID ID of the player
      * @return List of objective card IDs to choose from
      */
@@ -224,6 +249,12 @@ public class MatchController {
         return List.of(objectives.get(0).getID(), objectives.get(1).getID());
     }
 
+    /**
+     * Set the player's token color and returns it
+     * @param playerID ID of the player
+     * @return Token color of the player
+     * @throws InvalidPlayerIDException If the player ID is invalid
+     */
     public TokenColors setPlayerToken(int playerID) throws InvalidPlayerIDException {
         if (!matchModel.getIDToPlayerMap().containsKey(playerID)){
             // Invalid player ID
@@ -239,6 +270,10 @@ public class MatchController {
         return color;
     }
 
+    /**
+     * Getter
+     * @return List of common objective card IDs
+     */
     public List<Integer> getCommonObjectivesID(){
         List<Integer> commonObjectivesID = new ArrayList<>();
         for (ObjectiveCard objectiveCard : matchModel.getObjectiveCardsDeck().getCommonObjectives()){
@@ -248,21 +283,21 @@ public class MatchController {
     }
 
     /**
-     * Set the first player randomly
+     * Sets the first player randomly
      */
     public void setRandomFirstPlayer(){
         matchModel.setRandomFirstPlayer();
     }
 
     /**
-     * Calculate the order of the players based on the first player
+     * Calculates the order of the players based on the first player
      */
     public void calculateOrderOfPlayers(){
         matchModel.calculateOrderOfPlayers();
     }
 
     /**
-     * Place a card on player's play area
+     * Places a card on player's play area
      * Handles exceptions for invalid player ID, not player's turn, invalid card ID, card not in player's hand
      * @param playerID ID of the player
      * @param cardID ID of the card
@@ -332,8 +367,11 @@ public class MatchController {
 
     /**
      * Fill player's hand with 2 resource cards and 1 golden card
-     * Handles exceptions for invalid game state, invalid player ID
      * @param playerID ID of the player
+     * @return List of card IDs of the drawn cards
+     * @throws InvalidGameStateException If the game state is not "set-up"
+     * @throws InvalidPlayerIDException If the player ID is invalid
+     * @throws NotEnoughCardsException If there are not enough cards in the deck
      */
     public List<Integer> fillPlayerHand(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotEnoughCardsException {
         if (matchModel.getGameState() != GameState.SET_UP){
@@ -365,7 +403,7 @@ public class MatchController {
     }
 
     /**
-     * Check if all players have completed the set-up
+     * Checks if all players have completed the set-up
      * @return true if all players have completed the set-up, false otherwise
      */
     public boolean checkForTurnOrderPhase(){
@@ -373,22 +411,30 @@ public class MatchController {
     }
 
     /**
-     * Start the turn order phase
+     * Starts the turn order phase
      */
     public void startTurnOrderPhase(){
         matchModel.startTurnOrderPhase();
     }
 
+    /**
+     * Getter
+     * @return ID of the current player
+     */
     public int getCurrPlayerID(){
         return matchModel.getCurrPlayerID();
     }
 
+    /**
+     * Draws the starter card for the player
+     * @return PlaceableCard object of the drawn card
+     */
     public PlaceableCard drawStarterCard() {
         return matchModel.drawStarterCard();
     }
 
     /**
-     * Draw a resource card from the deck and add to the player's hand
+     * Draws a resource card from the deck and add to the player's hand
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
@@ -414,7 +460,7 @@ public class MatchController {
     }
 
     /**
-     * Draw a visible resource card
+     * Draws a visible resource card
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, card not visible
      * @param playerID ID of the player
      * @param index index of the visible resource card (either 0 or 1)
@@ -443,7 +489,7 @@ public class MatchController {
     }
 
     /**
-     * Draw a golden card from the deck and add to the player's hand
+     * Draws a golden card from the deck and add to the player's hand
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state
      * @param playerID ID of the player
      */
@@ -469,7 +515,7 @@ public class MatchController {
     }
 
     /**
-     * Draw a visible resource card
+     * Draws a visible resource card
      * Handles exceptions for invalid game state, invalid player ID, not player's turn, not in drawing state, card not visible
      * @param playerID ID of the player
      * @param index index of the visible resource card (either 0 or 1)
@@ -498,14 +544,14 @@ public class MatchController {
     }
 
     /**
-     * End the game set up and set the game state to "playing"
+     * Ends the game set-up phase and set the game state to "playing"
      */
     public void endGameSetUp(){
         matchModel.setGameState(GameState.PLAYING);
     }
 
     /**
-     * End the current player's turn
+     * Ends the current player's turn
      */
     public void endTurn(){
         matchModel.endTurn();
@@ -537,28 +583,49 @@ public class MatchController {
         }
     }
 
+    /**
+     * Checks if the nicknames is valid
+     * @param nickname Nickname to check
+     * @throws NicknameAlreadyExistsException If the nickname is invalid
+     */
     public void checkNickname(String nickname) throws NicknameAlreadyExistsException {
         matchModel.checkNickname(nickname);
     }
 
+    /**
+     * Adds 1 to the counter of ready players
+     */
     public void addReadyPlayer() {
         matchModel.addReadyPlayer();
     }
 
+    /**
+     * Adds a player to the match
+     * @param player Player to add
+     * @throws GameIsFullException If the game is full
+     */
     public void addCurrPlayer(PlayerModel player) throws GameIsFullException {
         matchModel.addCurrPlayer(player);
     }
 
+    /**
+     * Getter
+     * @return Current state of the game
+     */
     public GameState getGameState() {
         return matchModel.getGameState();
     }
 
+    /**
+     * Setter
+     * @param gameState New state of the game
+     */
     public void setGameState(GameState gameState) {
         matchModel.setGameState(gameState);
     }
 
     /**
-     * Method to handle player disconnection
+     * Handles player disconnection
      * @param playerID ID of the player that disconnected
      */
     public void disconnectPlayer(int playerID) {
@@ -618,6 +685,14 @@ public class MatchController {
         }
     }
 
+    /**
+     * Handles the reconnection of a player
+     * @param nickname Nickname of the player
+     * @param newSender New sender of the player
+     * @return ID of the player that reconnected if the operation was successful, -1 otherwise
+     * @throws SpecifiedPlayerNotDisconnected If the player with the given nickname is not disconnected
+     * @throws NicknameNotInMatch If the nickname is not in the match
+     */
     public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
         synchronized (this) {
             int playerID = matchModel.reconnectPlayer(nickname, newSender);
@@ -630,7 +705,7 @@ public class MatchController {
     }
 
     /**
-     * Method to send a chat message to a player (or all players)
+     * Sends a chat message to a player (or all players)
      * @param senderID ID of the sender
      * @param recipient Recipient of the message
      * @param message Message to send
@@ -670,7 +745,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the new player's turn to all players
+     * Broadcasts the new player's turn to all players
      * @param drawnCardID ID of the drawn card
      * @param playerID ID of the player that drew the card
      * @param changedState true if the game state changed, false otherwise
@@ -735,7 +810,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the new player's extra turn to all players
+     * Broadcasts the new player's extra turn to all players
      * @param playerID ID of the player that drew the card
      * @param cardID ID of the drawn card
      * @param pos Position to place the card
@@ -750,7 +825,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the player's placed card
+     * Broadcasts the player's placed card
      * @param playerID ID of the player that placed the card
      * @param cardID ID of the placed card
      * @param pos Position of the placed card
@@ -765,7 +840,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the ranking of the players to all players
+     * Broadcasts the ranking of the players to all players
      * @param nicknames Array of nicknames of the players in the ranking order
      * @param scores Array of scores of the players in the ranking order
      * @param numOfSecretObjectives Array of the number of secret objectives completed by the players in the ranking order
@@ -779,7 +854,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the player disconnection to all players
+     * Broadcasts the player disconnection to all players
      * @param playerID ID of the player that disconnected
      */
     private void broadcastPlayerDisconnection(int playerID) {
@@ -792,7 +867,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the disconnection of all players to all players
+     * Broadcasts the disconnection of all players to all players
      * @param playerID ID of the player that disconnected
      * @param pos Position of the last card placed by the player
      * @param score new score of the player
@@ -808,7 +883,7 @@ public class MatchController {
     }
 
     /**
-     * Broadcast the reconnection of a player to all other online players
+     * Broadcasts the reconnection of a player to all other online players
      * @param playerID ID of the player that reconnected
      */
     private void broadcastPlayerReconnection(int playerID) {
@@ -820,14 +895,26 @@ public class MatchController {
         }
     }
 
+    /**
+     * Getter
+     * @return True if the match has no players, false otherwise
+     */
     public boolean hasNoPlayers() {
         return matchModel.hasNoPlayers();
     }
 
+    /**
+     * Getter
+     * @return True if the match has no players online, false otherwise
+     */
     public boolean hasNoPlayersOnline() {
         return matchModel.hasNoPlayersOnline();
     }
 
+    /**
+     * Getter
+     * @return True if the match is already over, false otherwise
+     */
     public boolean isOver() {
         return matchModel.isOver();
     }

@@ -41,6 +41,10 @@ public enum CardElementType {
         return bgColor;
     }
 
+    /**
+     * @param cardElementType String representation of card element type
+     * @return CardElementType enum value
+     */
     public static CardElementType cardElementTypeFromString(String cardElementType) {
 
         cardElementType = cardElementType.toLowerCase();

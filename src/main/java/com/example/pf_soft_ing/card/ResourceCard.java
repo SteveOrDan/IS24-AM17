@@ -16,7 +16,7 @@ public class ResourceCard extends PlaceableCard{
 
     /**
      * Getter
-     * @return Points given when placing the card
+     * @return Standard points given when placing the card
      */
     public int getPoints() {
         return points;
@@ -24,8 +24,8 @@ public class ResourceCard extends PlaceableCard{
 
     /**
      * Checks if the player has enough resources to place the card
-     * @param numOfResourcesArr Number of resources in the player area
-     * @return True since a resource card doesn't require any resources to be placed
+     * @param numOfResourcesArr Array containing the number of resources of the player ordered by type
+     * @return Always true, since a resource card doesn't require any resources to be placed
      */
     @Override
     public boolean hasEnoughRequiredResources(int[] numOfResourcesArr, CardSideType chosenSide){
@@ -34,8 +34,8 @@ public class ResourceCard extends PlaceableCard{
 
     /**
      * Calculates the points given by the card when placed
-     * @param numOfCoveredCorners Number of corners covered by the card
-     * @param numOfResourcesArr Array containing the number of resources of the player per type
+     * @param numOfCoveredCorners Number of corners covered when placing the card
+     * @param numOfResourcesArr Array containing the number of resources of the player ordered by type
      * @return Points given by the card
      */
     @Override

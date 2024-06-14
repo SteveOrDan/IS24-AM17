@@ -20,7 +20,6 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -178,6 +177,9 @@ public class GUIView implements View {
         launchApp();
     }
 
+    /**
+     * Launches the application
+     */
     private void launchApp(){
         stage.setTitle("Codex Naturalis");
         root = new Group();
@@ -194,6 +196,9 @@ public class GUIView implements View {
         drawConnectionChoiceScene();
     }
 
+    /**
+     * Draws the connection choice scene
+     */
     private void drawConnectionChoiceScene(){
         // Create connection choice scene
         AnchorPane connectionChoice = new AnchorPane();
@@ -234,6 +239,18 @@ public class GUIView implements View {
         root.getChildren().add(connectionChoice);
     }
 
+    /**
+     * Creates a button with a text a background image and an action
+     * @param text Text of the button
+     * @param fontSize Font size of the text
+     * @param imagePath Path to the background image
+     * @param width Width of the button
+     * @param height Height of the button
+     * @param x X position of the button
+     * @param y Y position of the button
+     * @param action Action to be executed when the button is clicked
+     * @return The created button
+     */
     public Pane createTextButton(String text, int fontSize, String imagePath, double width, double height, double x, double y, Runnable action) {
         // Create Pane
         Pane button = new Pane();
@@ -265,6 +282,10 @@ public class GUIView implements View {
         return button;
     }
 
+    /**
+     * Tries to connect to the server
+     * @param port Port to connect to
+     */
     private void tryConnect(String port){
         boolean connected = false;
         String errorMessage = "";
@@ -295,6 +316,10 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * Draws the main menu scene
+     * @param matches List of available matches
+     */
     private void drawMainMenuScene(Map<Integer, List<String>> matches){
         root.getChildren().clear();
 
@@ -378,6 +403,9 @@ public class GUIView implements View {
         root.getChildren().add(reconnectionPopup);
     }
 
+    /**
+     * Creates the popup for reconnection button
+     */
     private void createReconnectionPopup() {
         // Create Popup anchor pane
         reconnectionPopup = new AnchorPane();
@@ -454,6 +482,14 @@ public class GUIView implements View {
         reconnectionPopup.setVisible(false);
     }
 
+    /**
+     * Creates a 50 x 50 button with an icon and an action
+     * @param iconImagePath Path to the icon image
+     * @param x X position of the button
+     * @param y Y position of the button
+     * @param action Action to be executed when the button is clicked
+     * @return The created button
+     */
     private Pane createIconButton(String iconImagePath, double x, double y, Runnable action) {
         // Create Pane
         Pane button = new Pane();
@@ -485,6 +521,12 @@ public class GUIView implements View {
         return button;
     }
 
+    /**
+     * Creates a pane with the information of a match
+     * @param matchID ID of the match
+     * @param players List of players in the match
+     * @return The created pane
+     */
     private Pane createMatchPane(int matchID, List<String> players){
         Pane matchPane = new Pane();
         matchPane.setPrefSize(stageWidth - 50, (players.size() + 1) * 50);
@@ -522,6 +564,9 @@ public class GUIView implements View {
         return matchPane;
     }
 
+    /**
+     * Opens the window that allows the user to create a match
+     */
     private void openCreateMatchWindow(){
         root.getChildren().clear();
 
@@ -586,6 +631,10 @@ public class GUIView implements View {
         root.getChildren().add(createPane);
     }
 
+    /**
+     * Opens the window that allows the user to select a nickname when entering a match
+     * @param players List of players in the match
+     */
     private void openSelectNickWindow(List<String> players){
         root.getChildren().clear();
 
@@ -663,6 +712,10 @@ public class GUIView implements View {
         root.getChildren().add(joinPane);
     }
 
+    /**
+     * Updates the window: if the match is full it will start the game, else it will show a loading screen
+     * @param nick Nickname chosen by the player
+     */
     private void selectNickname(String nick){
         root.getChildren().clear();
 
@@ -700,6 +753,17 @@ public class GUIView implements View {
         root.getChildren().add(anchorPane);
     }
 
+    /**
+     * Shows the game start screen
+     * @param IDToNicknameMap Map of player IDs to nicknames
+     * @param resDeckCardID ID of the resource deck card
+     * @param visibleResCardID1 ID of the first visible resource card
+     * @param visibleResCardID2 ID of the second visible resource card
+     * @param goldDeckCardID ID of the gold deck card
+     * @param visibleGoldCardID1 ID of the first visible gold card
+     * @param visibleGoldCardID2 ID of the second visible gold card
+     * @param starterCardID ID of the starter card
+     */
     private void drawGameStart(Map<Integer, String> IDToNicknameMap,
                                int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
@@ -734,6 +798,9 @@ public class GUIView implements View {
         renderStarterCardChoice(starterCardID);
     }
 
+    /**
+     * Calculates all the dimensions and creates all the panes needed for the game
+     */
     private void setPlayArea(){
         cardWidth = (stageWidth - (9 * defaultElementsOffset)) / 7;
         cardHeight = cardWidth / 1.5;
@@ -881,6 +948,9 @@ public class GUIView implements View {
         // endregion
     }
 
+    /**
+     * Creates the help pane
+     */
     private void createHelpSection() {
         helpPane = new AnchorPane();
         helpPane.setPrefSize(stageWidth, stageHeight);
@@ -976,6 +1046,12 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(helpButton);
     }
 
+    /**
+     * Updates the window to show the field of the other player
+     * @param playerNickname Nickname of the player
+     * @param playerCircle Circle representing the player
+     * @param playerRectangle Rectangle representing the player
+     */
     private void switchToPlayerField(String playerNickname, Circle playerCircle, Rectangle playerRectangle) {
         for (Shape circle : playersCircles) {
             circle.setVisible(true);
@@ -1013,6 +1089,12 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * Create the hand pane of the other player
+     * @param opponentHand List of cards in the hand of the opponent
+     * @param color Color of the opponent
+     * @return The created pane
+     */
     private AnchorPane createOpponentHandPane(List<PlaceableCard> opponentHand, TokenColors color) {
         double playerHandWidth = playerHandPane.getPrefWidth();
         double playerHandHeight = playerHandPane.getPrefHeight();
@@ -1064,6 +1146,11 @@ public class GUIView implements View {
         return opponentHandPane;
     }
 
+    /**
+     * Creates the play area of the other player
+     * @param playArea Map of the play area of the opponent
+     * @return The created pane
+     */
     private AnchorPane createEnemyPlayField(Map<Position, PlaceableCard> playArea) {
         // Calculate number of rows and columns
         int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
@@ -1124,6 +1211,9 @@ public class GUIView implements View {
         return scrollContent;
     }
 
+    /**
+     * Creates the chat pane
+     */
     private void createChatPane() {
         chatPane = new AnchorPane();
         chatPane.setPrefSize(commonAreaWidth - 100, stageHeight - 100);
@@ -1213,6 +1303,9 @@ public class GUIView implements View {
         chatOpen = false;
     }
 
+    /**
+     * Opens or closes the chat
+     */
     private void openCloseChat() {
         if (chatOpen) {
             commonAreaPane.getChildren().remove(chatPane);
@@ -1224,6 +1317,10 @@ public class GUIView implements View {
         chatOpen = !chatOpen;
     }
 
+    /**
+     * Shows the choice of the starter card side
+     * @param starterCardID ID of the starter card
+     */
     private void renderStarterCardChoice(int starterCardID){
         starterCard = GameResources.getPlaceableCardByID(starterCardID);
 
@@ -1299,6 +1396,10 @@ public class GUIView implements View {
         root.getChildren().add(tempChoicePane);
     }
 
+    /**
+     * Flips the starter card
+     * @param starterCardPane Pane of the starter card
+     */
     private void flipStarterCard(Pane starterCardPane){
         starterCard.setCurrSideType(starterCard.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
 
@@ -1308,6 +1409,15 @@ public class GUIView implements View {
         tempChoicePane.getChildren().remove(starterCardPane);
     }
 
+    /**
+     * Shows the cards in the common area (or draw area)
+     * @param resDeckCardID ID of the resource deck card
+     * @param resVisibleCard1ID ID of the first visible resource card
+     * @param resVisibleCard2ID ID of the second visible resource card
+     * @param goldDeckCardID ID of the gold deck card
+     * @param goldVisibleCard1ID ID of the first visible gold card
+     * @param goldVisibleCard2ID ID of the second visible gold card
+     */
     private void renderCommonCards(int resDeckCardID, int resVisibleCard1ID, int resVisibleCard2ID,
                                    int goldDeckCardID, int goldVisibleCard1ID, int goldVisibleCard2ID){
         double resourceCardsY = stageHeight - (2 * cardHeight) - 2 * defaultElementsOffset;
@@ -1356,6 +1466,17 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(goldVisible2Pane);
     }
 
+    /**
+     * Draws the player's hand, the common objectives and the secret objective choice
+     * @param resourceCardID1 ID of the first resource card
+     * @param resourceCardID2 ID of the second resource card
+     * @param goldenCardID ID of the golden card
+     * @param tokenColor Color of the player
+     * @param commonObjectiveCardID1 ID of the first common objective card
+     * @param commonObjectiveCardID2 ID of the second common objective card
+     * @param secretObjectiveCardID1 ID of the first secret objective card
+     * @param secretObjectiveCardID2 ID of the second secret objective card
+     */
     private void drawMissingSetUp(int resourceCardID1, int resourceCardID2, int goldenCardID,
                                   TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2,
                                   int secretObjectiveCardID1, int secretObjectiveCardID2){
@@ -1369,6 +1490,11 @@ public class GUIView implements View {
         renderSecretObjectiveChoice(secretObjectiveCardID1, secretObjectiveCardID2);
     }
 
+    /**
+     * Draws the common objectives
+     * @param objective1ID ID of the first objective
+     * @param objective2ID ID of the second objective
+     */
     private void renderCommonObjectives(int objective1ID, int objective2ID){
         Pane objective1Pane = createCardPane(objective1ID, CardSideType.FRONT, commonAreaWidth / 2 - cardWidth - 30, 350, 1);
         Pane objective2Pane = createCardPane(objective2ID, CardSideType.FRONT, commonAreaWidth / 2 + 30, 350, 1);
@@ -1377,6 +1503,11 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(objective2Pane);
     }
 
+    /**
+     * Draws the secret objective choice
+     * @param secretObjective1ID ID of the first secret objective
+     * @param secretObjective2ID ID of the second secret objective
+     */
     private void renderSecretObjectiveChoice(int secretObjective1ID, int secretObjective2ID){
         Rectangle paneRect = new Rectangle();
         paneRect.setWidth(stageWidth);
@@ -1448,6 +1579,13 @@ public class GUIView implements View {
         tempChoicePane.getChildren().add(secretObjective2Button);
     }
 
+    /**
+     * Adds a button the card to draw it
+     * @param cardPane Pane of the card
+     * @param cardIndex Index of the card
+     * @param isGolden True if the card is golden, false otherwise
+     * @param isVisible True if the card is visible, false otherwise
+     */
     private void addDrawButtonToCard(Pane cardPane, int cardIndex, boolean isGolden, boolean isVisible){
         Button drawButton = new Button();
         drawButton.setPrefSize(cardPane.getPrefWidth(), cardPane.getPrefHeight());
@@ -1477,6 +1615,15 @@ public class GUIView implements View {
         cardPane.getChildren().add(drawButton);
     }
 
+    /**
+     * Creates a card's pane
+     * @param cardID ID of the card
+     * @param side Side of the card
+     * @param xPos X position of the card
+     * @param yPos Y position of the card
+     * @param scale Scale of the card
+     * @return The created pane
+     */
     private Pane createCardPane(int cardID, CardSideType side, double xPos, double yPos, double scale){
         // Create Pane for card
         Pane cardPane = new Pane();
@@ -1502,14 +1649,29 @@ public class GUIView implements View {
         return cardPane;
     }
 
+    /**
+     * Calculates the X offset of the card by the scale
+     * @param scale Scale of the card
+     * @return The offset
+     */
     private double xOffsetByScale(double scale){
         return (1 - scale) * cardWidth / 2;
     }
 
+    /**
+     * Calculates the Y offset of the card by the scale
+     * @param scale Scale of the card
+     * @return The offset
+     */
     private double yOffsetByScale(double scale){
         return (1 - scale) * cardHeight / 2;
     }
 
+    /**
+     * Draws the buttons that allow the player to place a card in the play area
+     * @param ID ID of the placed card
+     * @param pos Position of the card
+     */
     private void addPlaceButtons(int ID, Position pos){
         PlaceableCard card = GameResources.getPlaceableCardByID(ID);
 
@@ -1532,6 +1694,10 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * Adds a place button at a given position
+     * @param pos Position of the button
+     */
     private void addPlaceButtonAtPos(Position pos) {
         Pane positionPane = new Pane();
         positionPane.setPrefSize(gridCellWidth, gridCellHeight);
@@ -1549,6 +1715,10 @@ public class GUIView implements View {
         validPosToButtonPane.put(pos, positionPane);
     }
 
+    /**
+     * Updates the list of legal and illegal positions after a card has been placed
+     * @param pos Position of the placed card
+     */
     private void updatePlacementPositions(Position pos){
         ArrayList<Position> newLegalPos = new ArrayList<>();
         ArrayList<Position> newIllegalPos = new ArrayList<>();
@@ -1612,10 +1782,20 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * Calculates the grid position from the map position
+     * @param mapPos Position on the map
+     * @return Position on the grid
+     */
     private Position mapToGridPos(Position mapPos){
         return new Position(mapPos.getX() + gridRows / 2, gridColumns / 2 - mapPos.getY());
     }
 
+    /**
+     * Places a card in the play area
+     * @param card Card to place
+     * @param pos Position to place the card
+     */
     private void placeCardAction(PlaceableCard card, Position pos){
         if (pos.getX() <= -gridColumns / 2 || pos.getX() >= gridColumns / 2 ||
                 pos.getY() <= -gridRows / 2 || pos.getY() >= gridRows / 2){
@@ -1668,6 +1848,9 @@ public class GUIView implements View {
 //        playerField.setLayoutY((playerFieldRectHeight - playerField.getPrefHeight()) / 2);
     }
 
+    /**
+     * Updates the dimensions of the grid
+     */
     private void updateGridDimension(){
         gridRows += 2;
         gridColumns += 2;
@@ -1697,6 +1880,10 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * The player draws a card
+     * @param drawnCardID ID of the drawn card
+     */
     private void drawCard(int drawnCardID) {
         PlaceableCard drawnCard = GameResources.getPlaceableCardByID(drawnCardID);
 
@@ -1709,6 +1896,13 @@ public class GUIView implements View {
         playerHandPane.getChildren().add(cardPane);
     }
 
+    /**
+     * Draws the player's hand
+     * @param card1ID ID of the first card
+     * @param card2ID ID of the second card
+     * @param card3ID ID of the third card
+     * @param playerColor Color of the player
+     */
     private void drawPlayerHand(int card1ID, int card2ID, int card3ID, Color playerColor){
         PlaceableCard card1 = GameResources.getPlaceableCardByID(card1ID);
         PlaceableCard card2 = GameResources.getPlaceableCardByID(card2ID);
@@ -1749,6 +1943,12 @@ public class GUIView implements View {
         playerHandPane.getChildren().add(card3Pane);
     }
 
+    /**
+     * Creates a pane for a card in the player's hand
+     * @param card Card to create the pane for
+     * @param index Index of the card
+     * @return The created pane
+     */
     private Pane createCardInHandPane(PlaceableCard card, int index) {
         double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
 
@@ -1782,6 +1982,11 @@ public class GUIView implements View {
         return cardPane;
     }
 
+    /**
+     * Flips a card
+     * @param card Card to flip
+     * @param imageView Image view of the card
+     */
     private void flipCard(PlaceableCard card, ImageView imageView) {
         // Flip placeable card
         card.setCurrSideType(card.getCurrSideType() == CardSideType.FRONT ? CardSideType.BACK : CardSideType.FRONT);
@@ -1793,6 +1998,12 @@ public class GUIView implements View {
         imageView.setImage(cardImg);
     }
 
+    /**
+     * Creates a button that allows the player to select a card
+     * @param cardPane Pane of the card
+     * @param card Card to select
+     * @param index Index of the card
+     */
     private void addSelectButtonToCard(Pane cardPane, PlaceableCard card, int index){
         Button selectButton = new Button();
         selectButton.setPrefSize(cardPane.getPrefWidth(), cardPane.getPrefHeight());
@@ -1815,6 +2026,10 @@ public class GUIView implements View {
         cardPane.getChildren().add(selectButton);
     }
 
+    /**
+     * Shows an error message
+     * @param errorMessage Error message to show
+     */
     private void showError(String errorMessage){
         AnchorPane errorPane = new AnchorPane();
         errorPane.setPrefSize(stageWidth - 20, 50);
@@ -1849,6 +2064,10 @@ public class GUIView implements View {
         }, 4000);
     }
 
+    /**
+     * Shows a system message
+     * @param systemMessage System message to show
+     */
     private void showSystemMessage(String systemMessage){
         AnchorPane messagePane = new AnchorPane();
         messagePane.setPrefSize(stageWidth - 20, 50);
@@ -1883,6 +2102,9 @@ public class GUIView implements View {
         }, 4000);
     }
 
+    /**
+     * Draws some lines in the stage to separate the different areas
+     */
     private void drawSeparationLines(){
         Line lineV = new Line();
         lineV.setStartX(3 * (defaultElementsOffset + cardWidth) + 10);
@@ -1902,6 +2124,10 @@ public class GUIView implements View {
         root.getChildren().add(lineH);
     }
 
+    /**
+     * Detects if the player is pressing some keys
+     * @param key Key event
+     */
     void keyPressed(KeyEvent key){
         if (key.getCode() == KeyCode.CONTROL) {
             pressingCtrl = true;
@@ -1929,6 +2155,10 @@ public class GUIView implements View {
         }
     }
 
+    /**
+     * Detects if the player has released some keys
+     * @param key Key event
+     */
     void keyReleased(KeyEvent key){
         if (Objects.requireNonNull(key.getCode()) == KeyCode.CONTROL) {
             pressingCtrl = false;
@@ -2063,6 +2293,9 @@ public class GUIView implements View {
         });
     }
 
+    /**
+     * Creates the section of the common area that shows the other players information
+     */
     private void createOtherPlayerSection() {
         AnchorPane playersSection = new AnchorPane();
         playersSection.setPrefSize(commonAreaWidth - 100, 200);
@@ -2083,6 +2316,13 @@ public class GUIView implements View {
         commonAreaPane.getChildren().add(playersSection);
     }
 
+    /**
+     * Creates the label for a player in the common area
+     * @param playerNick Nickname of the player
+     * @param color Color of the player
+     * @param posMultiplier Multiplier for the position
+     * @return The created pane
+     */
     private Pane createPlayerLabel(String playerNick, TokenColors color, int posMultiplier){
         Pane playerPane = new Pane();
         playerPane.setPrefSize(300, 50);
@@ -2401,6 +2641,12 @@ public class GUIView implements View {
         drawMatchRanking(players, scores, numOfSecretObjectives);
     }
 
+    /**
+     * Draws the match ranking
+     * @param nicknames Nicknames of the players
+     * @param scores Scores of the players
+     * @param numOfSecretObjectives Number of secret objectives completed by the players
+     */
     private void drawMatchRanking(String[] nicknames, int[] scores, int[] numOfSecretObjectives) {
         root.getChildren().clear();
 
@@ -2471,6 +2717,10 @@ public class GUIView implements View {
         root.getChildren().add(rankingPane);
     }
 
+    /**
+     * Shows the maps of the players at the end of the game
+     * @param playersNum Number of players
+     */
     private void showEndgameMaps(int playersNum) {
         // Create window for watching players' maps
         endgameMapsPane = new AnchorPane();
@@ -2513,6 +2763,15 @@ public class GUIView implements View {
         endgameMapsPane.getChildren().add(returnButton);
     }
 
+    /**
+     * Renders the play area of a player
+     * @param playArea Play area of the player
+     * @param colors Colors of the player
+     * @param xPos X position of the play area
+     * @param yPos Y position of the play area
+     * @param width Width of the play area
+     * @param height Height of the play area
+     */
     private void renderPlayArea(Map<Position, PlaceableCard> playArea, TokenColors colors,
                                 double xPos, double yPos, double width, double height) {
         // Create anchor pane to store scroll
@@ -2690,7 +2949,7 @@ public class GUIView implements View {
 
     @Override
     public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
-
+        // TODO: Implement?
     }
 
     @Override
@@ -2870,6 +3129,11 @@ public class GUIView implements View {
         });
     }
 
+    /**
+     * Gets the nickname of the player by the player ID
+     * @param playerID ID of the player
+     * @return Nickname of the player
+     */
     private String getPlayerNickname(int playerID){
         for (PlayerViewModel p : opponents){
             if (p.getPlayerID() == playerID){
@@ -2880,6 +3144,11 @@ public class GUIView implements View {
         return nickname;
     }
 
+    /**
+     * Gets the opponent by the player ID
+     * @param playerID ID of the player
+     * @return Opponent object with the given ID
+     */
     private PlayerViewModel getOpponentByID(int playerID){
         return opponents.stream()
                 .filter(opponent -> opponent.getPlayerID() == playerID)
@@ -2887,6 +3156,11 @@ public class GUIView implements View {
                 .orElse(null);
     }
 
+    /**
+     * Sorts the map by the priority of the cards
+     * @param map Map to be sorted
+     * @return Sorted map
+     */
     private Map<Position, PlaceableCard> sortByPriority(Map<Position, PlaceableCard> map) {
         List<Map.Entry<Position, PlaceableCard>> list = new ArrayList<>(map.entrySet());
         list.sort((o1, o2) -> {
@@ -2904,6 +3178,11 @@ public class GUIView implements View {
         return result;
     }
 
+    /**
+     * Returns the opponent by the nickname
+     * @param nickname Nickname of the opponent
+     * @return Opponent object with the given nickname
+     */
     private PlayerViewModel getOpponentByNickname(String nickname) {
         return opponents.stream()
                 .filter(opponent -> opponent.getNickname().equals(nickname))

@@ -18,6 +18,10 @@ public class ClientSocketSender implements ClientSender {
         this.out = out;
     }
 
+    /**
+     * Sends a message to the server
+     * @param output Message to send
+     */
     public void sendMessage(Message output){
         try {
             out.writeObject(output);

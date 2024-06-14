@@ -9,6 +9,11 @@ public enum TokenColors {
     YELLOW,
     BLACK;
 
+    /**
+     * Get the color from the ordinal
+     * @param n ordinal
+     * @return TokenColors
+     */
     public static TokenColors getColorFromInt(int n) {
         for (TokenColors color : TokenColors.values()) {
             if (color.ordinal() == n) {
@@ -18,6 +23,11 @@ public enum TokenColors {
         return null;
     }
 
+    /**
+     * Get the color corresponding to the token
+     * @param token TokenColors object
+     * @return Color
+     */
     public static Color getColorFromToken(TokenColors token) {
         return switch (token) {
             case RED -> Color.RED;

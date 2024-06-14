@@ -33,6 +33,9 @@ public class DisconnectionManager {
         this.playerID = playerID;
     }
 
+    /**
+     * Starts the connection check
+     */
     public void startConnectionCheck() {
         pingClientTask = new TimerTask() {
             @Override
@@ -62,12 +65,18 @@ public class DisconnectionManager {
         timer.scheduleAtFixedRate(packetLossTask, PING_TASK_DELAY, COUNT_DEC_PERIOD);
     }
 
+    /**
+     * Resets the packet loss counter
+     */
     public void resetPacketLoss() {
         synchronized (packetLossLock) {
             packetLoss = 0;
         }
     }
 
+    /**
+     * Stops the connection checks
+     */
     public void stopConnectionCheck() {
         pingClientTask.cancel();
         packetLossTask.cancel();

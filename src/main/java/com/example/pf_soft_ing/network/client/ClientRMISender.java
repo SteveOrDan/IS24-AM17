@@ -17,6 +17,10 @@ public class ClientRMISender implements ClientSender {
         this.client = client;
     }
 
+    /**
+     * Setter
+     * @param playerID ID of the player
+     */
     public void setPlayerID(int playerID) {
         this.playerID = playerID;
     }

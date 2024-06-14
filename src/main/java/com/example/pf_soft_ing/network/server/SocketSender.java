@@ -21,6 +21,10 @@ public class SocketSender implements Sender {
         this.out = out;
     }
 
+    /**
+     * Sends a message to the client
+     * @param output Message to send
+     */
     protected void sendMessage(Message output){
         try {
             out.writeObject(output);
@@ -30,9 +34,6 @@ public class SocketSender implements Sender {
         }
     }
 
-    /**
-     * Method to requestError to the Player
-     */
     @Override
     public void sendError(String errorMsg){
         sendMessage(new ErrorMessage(errorMsg));

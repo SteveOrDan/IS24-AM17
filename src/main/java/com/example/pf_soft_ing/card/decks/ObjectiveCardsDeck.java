@@ -34,15 +34,15 @@ public class ObjectiveCardsDeck {
     }
 
     /**
-     * Method to shuffle the deck
+     * Shuffles the deck
      */
     public void shuffleDeck(){
         Collections.shuffle(deck);
     }
 
     /**
-     * Get the top card in the deck and returns it
-     * @return the top card in the deck
+     * Gets the top card in the deck, removes it from the deck and returns it
+     * @return The top card in the deck
      */
     public ObjectiveCard drawCard(){
         try{

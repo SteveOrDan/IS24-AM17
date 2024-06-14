@@ -21,22 +21,42 @@ public abstract class Side {
         this.TRCorner = TRCorner;
     }
 
+    /**
+     * Getter
+     * @return Bottom left corner of the card
+     */
     public CardCorner getBLCorner() {
         return BLCorner;
     }
 
+    /**
+     * Getter
+     * @return Bottom right corner of the card
+     */
     public CardCorner getBRCorner() {
         return BRCorner;
     }
 
+    /**
+     * Getter
+     * @return Top left corner of the card
+     */
     public CardCorner getTLCorner() {
         return TLCorner;
     }
 
+    /**
+     * Getter
+     * @return Top right corner of the card
+     */
     public CardCorner getTRCorner() {
         return TRCorner;
     }
 
+    /**
+     * Checks all corners of the card and returns the resources on the side
+     * @return List of resources on the side
+     */
     public List<ResourceType> getResources(){
         List<ResourceType> res = new ArrayList<>();
 

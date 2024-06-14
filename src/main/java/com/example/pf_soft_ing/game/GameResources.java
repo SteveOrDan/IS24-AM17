@@ -43,6 +43,10 @@ public class GameResources {
     private static Map<Integer, PlaceableCard> IDToPlaceableCardMap;
     private static Map<Integer, ObjectiveCard> IDToObjectiveCardMap;
 
+    /**
+     * Deserialize the corner of a card
+     * @return CardCorner object
+     */
     public static CardCorner deserializeCorner() {
         try {
             JsonReader cornerReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Corner.json"));
@@ -58,6 +62,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize the front side of a card
+     * @return Front object as Side
+     */
     public static Side deserializeFront() {
         try {
             JsonReader frontReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Front.json"));
@@ -73,6 +81,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize the back side of a card
+     * @return Back object as Side
+     */
     public static Side deserializeBack() {
         try {
             JsonReader backReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/Back.json"));
@@ -88,6 +100,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize a resource card
+     * @return PlaceableCard object
+     */
     public static PlaceableCard deserializeResourceCard() {
         try {
             JsonReader resourceCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/ResourceCard.json"));
@@ -103,6 +119,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize a golden card
+     * @return PlaceableCard object
+     */
     public static PlaceableCard deserializeGoldenCard() {
         try {
             JsonReader goldenCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/GoldenCard.json"));
@@ -118,6 +138,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize a starter card
+     * @return PlaceableCard object
+     */
     public static PlaceableCard deserializeStarterCard() {
         try {
             JsonReader starterCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/StarterCard.json"));
@@ -133,6 +157,10 @@ public class GameResources {
         }
     }
 
+    /**
+     * Deserialize an objective card
+     * @return ObjectiveCard object
+     */
     public static ObjectiveCard deserializeObjectiveCard() {
         try {
             JsonReader objectiveCardReader = new JsonReader(new FileReader("src/main/resources/JsonFiles/Exports/ObjectiveCard.json"));
@@ -148,6 +176,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Initializes the resource deck
+     */
     public static void initializeResourceDeck() {
         try {
             JsonReader resourceCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(resourceCardsFilename))));
@@ -167,6 +198,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Initializes the golden deck
+     */
     public static void initializeGoldenDeck() {
         try {
             JsonReader goldenCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(goldenCardsFilename))));
@@ -186,6 +220,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Initializes the starter deck
+     */
     public static void initializeStarterDeck() {
         try {
             JsonReader starterCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(starterCardsFilename))));
@@ -205,6 +242,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Initializes the objective deck
+     */
     public static void initializeObjectiveDeck() {
         try {
             JsonReader objectiveCardsReader = new JsonReader(new InputStreamReader(Objects.requireNonNull(Main.class.getResourceAsStream(objectiveCardsFilename))));
@@ -224,6 +264,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Fills the maps with IDs to cards
+     */
     public static void fillCardMaps(){
         IDToPlaceableCardMap = new HashMap<>();
         IDToObjectiveCardMap = new HashMap<>();
@@ -245,6 +288,9 @@ public class GameResources {
         }
     }
 
+    /**
+     * Initializes all the decks and fills the maps
+     */
     public static void initializeAllDecks() {
         initializeResourceDeck();
         initializeGoldenDeck();
@@ -254,10 +300,20 @@ public class GameResources {
         fillCardMaps();
     }
 
+    /**
+     * Getter
+     * @param ID ID of the card
+     * @return PlaceableCard with the given ID
+     */
     public static PlaceableCard getPlaceableCardByID(int ID) {
         return IDToPlaceableCardMap.get(ID);
     }
 
+    /**
+     * Getter
+     * @param ID ID of the card
+     * @return ObjectiveCard with the given ID
+     */
     public static ObjectiveCard getObjectiveCardByID(int ID) {
         return IDToObjectiveCardMap.get(ID);
     }

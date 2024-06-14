@@ -18,6 +18,9 @@ public class SocketServer {
         this.gameController = gameController;
     }
 
+    /**
+     * Starts the socket server
+     */
     public void startServer() {
         ExecutorService executor = Executors.newCachedThreadPool();
 

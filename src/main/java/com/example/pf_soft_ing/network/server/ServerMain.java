@@ -11,11 +11,19 @@ public class ServerMain {
         startSocketServer(args);
     }
 
+    /**
+     * Starts the RMI server
+     * @param args Arguments
+     */
     public static void startRMIServer(String[] args){
         RMIServer rmiServer = new RMIServer(gameController);
         rmiServer.startRMIReceiver(Integer.parseInt(args[0]));
     }
 
+    /**
+     * Starts the socket server
+     * @param args Arguments
+     */
     public static void startSocketServer(String[] args){
         SocketServer server = new SocketServer(Integer.parseInt(args[0]), gameController);
         Decoder.setGameController(gameController);

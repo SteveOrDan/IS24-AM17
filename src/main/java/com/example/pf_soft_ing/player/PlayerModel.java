@@ -64,6 +64,10 @@ public class PlayerModel {
         return sender;
     }
 
+    /**
+     * Setter
+     * @param sender Player's sender
+     */
     public void setSender(Sender sender) {
         this.sender = sender;
     }
@@ -143,7 +147,7 @@ public class PlayerModel {
     }
 
     /**
-     * Sets the player's secret objective card
+     * Setter
      * @param cardID ID of the card to set as the secret objective
      */
     public void setSecretObjective(int cardID) throws InvalidObjectiveCardIDException {
@@ -170,6 +174,10 @@ public class PlayerModel {
         }
     }
 
+    /**
+     * Setter
+     * @param sCard Starter card to set for the player
+     */
     public void setStarterCard(PlaceableCard sCard){
         starterCard = sCard;
         setState(PlayerState.PLACING_STARTER);
@@ -454,6 +462,10 @@ public class PlayerModel {
         hand.add(card);
     }
 
+    /**
+     * Getter
+     * @return Position of the last card placed
+     */
     public Position getLastCardPlacedPos() {
         return lastCardPlacedPos;
     }

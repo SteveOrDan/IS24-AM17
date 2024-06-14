@@ -54,7 +54,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to get a random token color
+     * Selects a random token color
      * @return Token color
      */
     public TokenColors getTokenColor(){
@@ -171,6 +171,10 @@ public class MatchModel {
         this.gameState = gameState;
     }
 
+    /**
+     * Adds the first player to the match as the host
+     * @param playerModel PlayerModel of the host
+     */
     public void addHost(PlayerModel playerModel){
         IDToPlayerMap.put(playerModel.getID(), playerModel);
 
@@ -210,7 +214,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to shuffle all decks
+     * Shuffles all decks
      */
     public void shuffleAllDecks(){
         resourceCardsDeck.shuffleDeck();
@@ -268,7 +272,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the first resource card of the deck
+     * Draws the first resource card of the deck
      * @return First resource card of the deck
      */
     public PlaceableCard drawResourceCard() throws NotEnoughCardsException {
@@ -276,7 +280,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the first golden card of the deck
+     * Draws the first golden card of the deck
      * @return First golden card of the deck
      */
     public PlaceableCard drawGoldenCard() throws NotEnoughCardsException {
@@ -284,7 +288,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the first starter card of the deck
+     * Draws the first starter card of the deck
      * @return First starter card of the deck
      */
     public PlaceableCard drawStarterCard(){
@@ -292,7 +296,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the first objective card of the deck
+     * Draws the first objective card of the deck
      * @return First objective card of the deck
      */
     public ObjectiveCard drawObjectiveCard(){
@@ -300,7 +304,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the visible resource card of the deck with the given ID
+     * Draws the visible resource card of the deck with the given ID
      * @param index index of the card to draw (either 0 or 1)
      * @return Visible resource card of the deck with the given ID
      */
@@ -309,7 +313,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to draw the visible golden card of the deck with the given ID
+     * Draws the visible golden card of the deck with the given ID
      * @param index index of the card to draw (either 0 or 1)
      * @return Visible golden card of the deck with the given ID
      */
@@ -318,7 +322,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to restore the visible resource cards
+     * Restore the visible resource cards
      */
     public void restoreVisibleResourceCard (){
         if (!resourceCardsDeck.isDeckEmpty()){
@@ -334,7 +338,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to restore the visible golden cards
+     * Restore the visible golden cards
      */
     public void restoreVisibleGoldenCard (){
         if (!goldenCardsDeck.isDeckEmpty()){
@@ -350,7 +354,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to randomly choose the first player and give him the black token
+     * Randomly chooses the first player and gives him the black token
      */
     public void setRandomFirstPlayer(){
         for (Integer i : IDToPlayerMap.keySet()){
@@ -369,7 +373,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to calculate the order of the players based on the first player
+     * Calculates the order of the players based on the first player
      */
     public void calculateOrderOfPlayers() {
         orderOfPlayersIDs = new int[IDToPlayerMap.size()];
@@ -386,7 +390,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to end the turn of the current player and pass the turn to
+     * Ends the turn of the current player and passes the turn to
      * the next player in the order
      */
     public void endTurn(){
@@ -433,7 +437,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to manage game state transitions
+     * Manages game state transitions
      */
     public void checkForEndGame(){
         if (IDToPlayerMap.get(currPlayerID).getCurrScore() >= 20 || (resourceCardsDeck.isDeckEmpty() && goldenCardsDeck.isDeckEmpty())){
@@ -442,7 +446,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to manage the final rounds of the game
+     * Manages the final rounds of the game
      */
     public void manageEndGame() {
         if (gameState == GameState.FINAL_ROUND){
@@ -455,7 +459,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to determine the ranking of the players based on their final scores
+     * Determines the ranking of the players based on their final scores
      */
     public void determineRanking() {
         List<PlayerModel> players = new LinkedList<>(IDToPlayerMap.values());
@@ -479,6 +483,10 @@ public class MatchModel {
         }
     }
 
+    /**
+     * Checks if all players have completed their setup
+     * @return true if all players have completed their setup, false otherwise
+     */
     public boolean checkForTurnOrderPhase() {
         for (PlayerModel player : IDToPlayerMap.values()){
             if (player.getState() != PlayerState.COMPLETED_SETUP){
@@ -488,6 +496,9 @@ public class MatchModel {
         return true;
     }
 
+    /**
+     * Starts the turn order phase of the game
+     */
     public void startTurnOrderPhase() {
         for (PlayerModel player : IDToPlayerMap.values()){
             player.setState(PlayerState.WAITING);
@@ -501,7 +512,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to check if the nickname is already taken by another player
+     * Checks if the nickname is already taken by another player
      * @param nickname Nickname to check
      * @throws NicknameAlreadyExistsException if the nickname is already taken or "all"
      */
@@ -540,6 +551,14 @@ public class MatchModel {
         playersReady--;
     }
 
+    /**
+     * Handles the reconnection of a player that was disconnected during the match
+     * @param nickname Nickname of the player to reconnect
+     * @param newSender New sender of the player
+     * @return ID of the player that reconnected
+     * @throws SpecifiedPlayerNotDisconnected If the player is not disconnected
+     * @throws NicknameNotInMatch If the nickname is not in the match
+     */
     public int reconnectPlayer(String nickname, Sender newSender) throws SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
 
         for (PlayerModel player : IDToPlayerMap.values()){
@@ -582,41 +601,32 @@ public class MatchModel {
     }
 
     /**
-     * Method to check if the match has no players
-     * @return true if the match has no players, false otherwise
+     * Checks if the match has no players
+     * @return True if the match has no players, false otherwise
      */
     public boolean hasNoPlayers() {
         return currPlayers == 0;
     }
 
     /**
-     * Method to check if all players are disconnected
-     * @return true if the match has no players online, false otherwise
+     * Checks if all players are disconnected
+     * @return True if the match has no players online, false otherwise
      */
     public boolean hasNoPlayersOnline() {
         return IDToPlayerMap.values().stream().allMatch(player -> player.getState() == PlayerState.DISCONNECTED);
     }
 
-//    /**
-//     * Method to check if all players are online
-//     * @return true if all players are online, false otherwise
-//     */
-//    private boolean allPlayersOnline() {
-//        for (PlayerModel player : IDToPlayerMap.values()){
-//            if (player.getState() == PlayerState.DISCONNECTED){
-//                return false;
-//            }
-//        }
-////        return true;
-//    }
-
+    /**
+     * Undo the last card placement of the player with the given ID
+     * @param playerID ID of the player to undo the card placement
+     */
     public void undoCardPlacement(int playerID) {
         IDToPlayerMap.get(playerID).undoCardPlacement();
         endTurn();
     }
 
     /**
-     * Method to check if there is only one player left in the match
+     * Checks if there is only one player left in the match
      * and announce him as the sole winner after a delay
      */
     public boolean checkForLastPlayerStanding() {
@@ -659,17 +669,25 @@ public class MatchModel {
         return false;
     }
 
+    /**
+     * Checks if the match is over
+     * @return True if the match is over, false otherwise
+     */
     public boolean isOver() {
         return gameState == GameState.END_GAME;
     }
 
+    /**
+     * Stop the pinging process of the given player
+     * @param player Player to stop pinging
+     */
     private static void stopPinging(PlayerModel player) {
         Decoder.finishedMatch(player.getID());
         RMIReceiver.finishedMatch(player.getID());
     }
 
     /**
-     * Method to reconnect a player that was disconnected during the match
+     * Reconnects a player that was disconnected during the match
      * @param player Player to reconnect
      */
     private void reconnect(PlayerModel player) {
@@ -750,7 +768,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to reconnect a player that was disconnected during the starter card placement phase
+     * Reconnects a player that was disconnected during the starter card placement phase
      * @param player Player to reconnect
      */
     private void reconnectOnStarterPlacement(PlayerModel player) {
@@ -777,7 +795,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to reconnect a player that was disconnected during the objective choice phase
+     * Reconnects a player that was disconnected during the objective choice phase
      * @param player Player to reconnect
      */
     private void reconnectOnObjectiveChoice(PlayerModel player) {
@@ -819,7 +837,7 @@ public class MatchModel {
     }
 
     /**
-     * Method to reconnect a player that was disconnected after the setup phase
+     * Reconnects a player that was disconnected after the setup phase
      * @param player Player to reconnect
      */
     private void reconnectPlayerAfterSetup(PlayerModel player) {

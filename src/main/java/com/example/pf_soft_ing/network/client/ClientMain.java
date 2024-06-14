@@ -27,6 +27,14 @@ public class ClientMain {
         }
     }
 
+    /**
+     * Starts a socket connection with the server
+     * @param hostName IP address of the server
+     * @param portNumber Port number of the server
+     * @param view View of the client
+     * @return ClientSender object
+     * @throws IOException If the connection fails
+     */
     public static ClientSender startSocket(String hostName, int portNumber, View view) throws IOException {
         Socket echoSocket = new Socket(hostName, portNumber);
 
@@ -39,6 +47,15 @@ public class ClientMain {
         return new ClientSocketSender(out);
     }
 
+    /**
+     * Starts an RMI connection with the server
+     * @param hostName IP address of the server
+     * @param portNumber Port number of the server
+     * @param view View of the client
+     * @return ClientSender object
+     * @throws RemoteException If the connection fails
+     * @throws NotBoundException If the connection fails
+     */
     public static ClientSender startRMI(String hostName, int portNumber, View view) throws RemoteException, NotBoundException {
         Registry registry = LocateRegistry.getRegistry(hostName, portNumber);
         RMIReceiverInterface serverInterface = (RMIReceiverInterface) registry.lookup("RMIReceiver");

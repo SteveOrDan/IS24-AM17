@@ -9,25 +9,14 @@ public enum ResourceType {
     INKWELL(5, "K", CC.YELLOW, CC.YELLOW_BG),
     MANUSCRIPT(6, "M", CC.YELLOW, CC.YELLOW_BG);
 
-    /**
-     * index for playerModel resource array
-     */
     private final int value;
 
-    /**
-     * string value for TUI output
-     */
     private final String str;
 
     private final String color;
 
     private final String bgColor;
 
-    /**
-     * Constructor for ResourceType enum
-     * @param value Initialize value as resource arr index
-     * @param str Initialize value as TUI string output
-     */
     ResourceType(int value, String str, String color, String bgColor){
         this.value = value;
         this.str = str;
@@ -36,14 +25,16 @@ public enum ResourceType {
     }
 
     /**
-     * @return Index value
+     * Getter
+     * @return Index for playerModel resource array
      */
     public int getValue(){
         return value;
     }
 
     /**
-     * @return String value to display in TUI
+     * Getter
+     * @return String value for TUI output
      */
     @Override
     public String toString() {
@@ -51,6 +42,7 @@ public enum ResourceType {
     }
 
     /**
+     * Getter
      * @return Color value to display in TUI
      */
     public String getColor() {
@@ -58,7 +50,8 @@ public enum ResourceType {
     }
 
     /**
-     * @return Bg color to display in TUI
+     * Getter
+     * @return Background color to display in TUI
      */
     public String getBgColor() {
         return bgColor;

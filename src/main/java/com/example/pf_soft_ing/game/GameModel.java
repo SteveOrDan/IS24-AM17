@@ -143,6 +143,16 @@ public class GameModel {
         matchController.addReadyPlayer();
     }
 
+    /**
+     *
+     * @param playerID ID of the player
+     * @param nickname Nickname of the player
+     * @param matchID ID of the match
+     * @return Old ID of the player in the match
+     * @throws InvalidMatchIDException If the match ID doesn't exists
+     * @throws SpecifiedPlayerNotDisconnected If the player is not disconnected
+     * @throws NicknameNotInMatch If the nickname is not in the match
+     */
     public int reconnectToMatch(int playerID, String nickname, int matchID) throws InvalidMatchIDException, SpecifiedPlayerNotDisconnected, NicknameNotInMatch {
         Sender newSender = IDToPlayers.get(playerID).getSender();
         return getMatchByID(matchID).reconnectPlayer(nickname, newSender);

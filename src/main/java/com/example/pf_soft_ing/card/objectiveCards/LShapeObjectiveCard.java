@@ -38,7 +38,7 @@ public abstract class LShapeObjectiveCard extends ObjectiveCard {
     }
 
     /**
-     * Function to calculate points given by an L shape type objective card
+     * Calculates points given by an L shape type objective card
      * @param playArea Player's play area to get placed cards from
      * @param xDirection X direction of the card of the main element type
      * @param yDirection Y direction of the card of the main element type

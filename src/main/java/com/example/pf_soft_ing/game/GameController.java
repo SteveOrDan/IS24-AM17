@@ -110,6 +110,13 @@ public class GameController {
         }
     }
 
+    /**
+     * Allows a player to disconnect from a match
+     * @param playerID ID of the player
+     * @param nickname Nickname of the player
+     * @param matchID ID of the match
+     * @return ID of the player that disconnected if the operation was successful, -1 otherwise
+     */
     public int reconnectToMatch(int playerID, String nickname, int matchID) {
         // The player reconnects to a match
         try {
@@ -148,12 +155,21 @@ public class GameController {
         return gameModel.getIDToPlayers().get(playerID).getSender();
     }
 
+    /**
+     * Removes a match from the game model if needed
+     * @param matchController MatchController of the match to check
+     */
     public void checkMatchState(MatchController matchController) {
         if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline() || matchController.isOver()) {
             gameModel.removeMatch(matchController.getMatchID());
         }
     }
 
+    /**
+     * Checks if a match is not in the game model
+     * @param matchController MatchController of the match
+     * @return True if the match is not in the game model, false otherwise
+     */
     public boolean matchNotPresent(MatchController matchController) {
         return !gameModel.containsMatch(matchController);
     }

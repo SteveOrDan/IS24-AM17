@@ -28,21 +28,21 @@ public class UsableCardsDeck {
 
     /**
      * Getter
-     * @return List of visible PlaceableCards
+     * @return List of visible PlaceableCards in the deck
      */
     public List<PlaceableCard> getVisibleCards() {
         return visibleCards;
     }
 
     /**
-     * Method to shuffle the deck
+     * Shuffles the deck
      */
     public void shuffleDeck(){
         Collections.shuffle(deck);
     }
 
     /**
-     * Method to show the first two cards in the deck at the start of the game
+     * Moves the first two cards in the deck to the list of visible cards
      */
     public void restoreInitialVisibleCards () {
         PlaceableCard card1 = deck.getFirst();
@@ -55,8 +55,8 @@ public class UsableCardsDeck {
     }
 
     /**
-     * Get the top card in the deck and returns it
-     * @return the top card in the deck
+     * Gets the top card in the deck, removes it from the deck and returns it
+     * @return The top card in the deck
      */
     public PlaceableCard drawCard() throws NotEnoughCardsException {
         if (!deck.isEmpty()){
@@ -72,9 +72,9 @@ public class UsableCardsDeck {
     }
 
     /**
-     * The method returns one of the cards in the visibleCards list based on the index passed as a parameter
-     * @param index of visible card in the array (either 0 or 1)
-     * @return the card that has been drawn
+     * Returns one of the cards in the visibleCards list based on the index passed as a parameter
+     * @param index Index of visible card in the array (either 0 or 1)
+     * @return The card that has been drawn
      */
     public PlaceableCard drawVisibleCard(int index) throws InvalidVisibleCardIndexException{
         if (!visibleCards.isEmpty() && index >= 0 && index < visibleCards.size()) {
@@ -86,7 +86,7 @@ public class UsableCardsDeck {
     }
 
     /**
-     * Changes the values inside the visibleCards list so that it only contains 2 cards
+     * Moves the first card in the deck to the list of visible cards
      */
     public void restoreVisibleCard() {
         visibleCards.add(deck.getFirst());
@@ -95,7 +95,7 @@ public class UsableCardsDeck {
     }
 
     /**
-     * Changes the values inside the visibleCards list so that it only contains 2 cards
+     * Moves the card passed as a parameter to the list of visible cards
      */
     public void restoreVisibleCardWithOtherDeck(PlaceableCard card) {
         visibleCards.add(card);

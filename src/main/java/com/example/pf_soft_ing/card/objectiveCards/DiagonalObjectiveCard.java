@@ -26,7 +26,7 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
     }
 
     /**
-     * Function to calculate points given by a diagonal shape type objective card
+     * Calculates points given by a diagonal shape type objective card
      * @param playArea Player's play area to get placed cards from
      * @param direction Direction of the diagonal
      * @return Number of points given by the objective card

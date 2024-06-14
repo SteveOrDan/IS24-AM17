@@ -27,6 +27,10 @@ public class RMIReceiver extends UnicastRemoteObject implements RMIReceiverInter
         startPeriodicCleanup();
     }
 
+    /**
+     * Stops all threads related to a player in a match when the match is over
+     * @param playerID ID of the player
+     */
     public static void finishedMatch(int playerID) {
         if (! playerIDToDiscMan.containsKey(playerID)) return;
         synchronized (playerIDToDiscMan) {

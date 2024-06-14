@@ -32,6 +32,10 @@ public abstract class PlaceableCard {
         return "Placeable card";
     }
 
+    /**
+     * Setter
+     * @param cardType Card's type
+     */
     public void setCardType(String cardType) {
         this.cardType = cardType;
     }
@@ -70,7 +74,7 @@ public abstract class PlaceableCard {
 
     /**
      * Getter
-     * @return the chosen side of the card for the placement in the play area
+     * @return Current side type of the card for the placement in the play area
      */
     public CardSideType getCurrSideType() {
         return currSide;
@@ -86,7 +90,7 @@ public abstract class PlaceableCard {
     }
 
     /**
-     * Returns the correct side of the card based on the chosen side
+     * Getter
      * @return Current side of the card
      */
     public Side getCurrSide(){
@@ -127,7 +131,20 @@ public abstract class PlaceableCard {
         return chosenSide.getResources();
     }
 
+    /**
+     * Checks if the player has enough resources to place the card
+     * @param numOfResourcesArr Array containing the number of resources of the player ordered by type
+     * @param chosenSide Side of the card to check the resources
+     * @return True if the player has enough resources to place the card
+     */
     public abstract boolean hasEnoughRequiredResources(int[] numOfResourcesArr, CardSideType chosenSide);
 
+    /**
+     * Calculates the points given by the placement of the card
+     * @param numOfCoveredCorners Number of corners covered when placing the card
+     * @param numOfResourcesArr Array containing the number of resources of the player ordered by type
+     * @param chosenSide Side of the card to calculate the points
+     * @return Number of points given by the card
+     */
     public abstract int calculatePlacementPoints(int numOfCoveredCorners, int[] numOfResourcesArr, CardSideType chosenSide);
 }
