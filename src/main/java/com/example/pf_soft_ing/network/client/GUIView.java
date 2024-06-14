@@ -20,6 +20,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -897,19 +898,31 @@ public class GUIView implements View {
         helpBackground.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
         helpBackground.setLayoutX(stageWidth * 0.25);
         helpBackground.setLayoutY(stageHeight * 0.25);
-        helpBackground.setOpacity(0.9);
+        helpBackground.setOpacity(1);
 
-        // Black background
-        Rectangle foregroundRect = new Rectangle();
-        foregroundRect.setWidth(stageWidth * 0.5);
-        foregroundRect.setHeight(stageHeight * 0.5);
-        foregroundRect.setFill(Color.rgb(255, 255, 255, 1));
+        // Create background for help Area
+        Image backgroundHelp = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundHandArea.png")));
+        ImageView bgHelpView = new ImageView(backgroundHelp);
+        bgHelpView.setLayoutY(0);
+        bgHelpView.setLayoutX(0);
+        bgHelpView.setFitHeight(stageHeight * 0.5);
+        bgHelpView.setFitWidth(stageWidth * 0.5);
+
+        // Black edge background
+        Rectangle edgeRect = new Rectangle();
+        edgeRect.setWidth(stageWidth * 0.5);
+        edgeRect.setHeight(stageHeight * 0.5);
+        edgeRect.setArcWidth(10);
+        edgeRect.setArcHeight(10);
+        edgeRect.setFill(Color.TRANSPARENT);
+        edgeRect.setStrokeWidth(4);
+        edgeRect.setStroke(Color.BLACK);
 
         // Create title label
         Label helpLabel = new Label("Help");
         helpLabel.setPrefSize(stageWidth * 0.5, 50);
         helpLabel.setLayoutX(0);
-        helpLabel.setLayoutY(0);
+        helpLabel.setLayoutY(10);
         helpLabel.setFont(new Font(ERAS_FONT, 24));
         helpLabel.setAlignment(Pos.CENTER);
 
@@ -945,11 +958,12 @@ public class GUIView implements View {
                 stageWidth - 100, 0, () -> root.getChildren().remove(helpPane));
 
         // Add to hierarchy
-        helpBackground.getChildren().add(foregroundRect);
+        helpBackground.getChildren().add(bgHelpView);
         helpBackground.getChildren().add(helpLabel);
         helpBackground.getChildren().add(globalChatHelpLabel);
         helpBackground.getChildren().add(privateChatHelpLabel);
         helpBackground.getChildren().add(zoomHelpLabel);
+        helpBackground.getChildren().add(edgeRect);
 
         helpPane.getChildren().add(backgroundRect);
         helpPane.getChildren().add(helpBackground);
@@ -1113,7 +1127,7 @@ public class GUIView implements View {
     private void createChatPane() {
         chatPane = new AnchorPane();
         chatPane.setPrefSize(commonAreaWidth - 100, stageHeight - 100);
-        chatPane.setLayoutX(0);
+        chatPane.setLayoutX(1);
         chatPane.setLayoutY(50);
 
         ScrollPane chatScroll = new ScrollPane();
@@ -1128,6 +1142,24 @@ public class GUIView implements View {
         chatBox.setPrefSize(commonAreaWidth - 110, stageHeight - 150);
         chatBox.setLayoutX(0);
         chatBox.setLayoutY(0);
+
+        // Background
+        Rectangle chatBG = new Rectangle();
+        chatBG.setWidth(commonAreaWidth - 110);
+        chatBG.setHeight(stageHeight - 150);
+        chatBG.setFill(Color.web("#f5f3e5"));
+
+        chatBox.getChildren().add(chatBG);
+
+        // Black edge
+        Rectangle chatEdge = new Rectangle();
+        chatEdge.setWidth(commonAreaWidth - 100);
+        chatEdge.setHeight(stageHeight - 150);
+        chatEdge.setArcWidth(10);
+        chatEdge.setArcHeight(10);
+        chatEdge.setFill(Color.TRANSPARENT);
+        chatEdge.setStrokeWidth(2);
+        chatEdge.setStroke(Color.BLACK);
 
         AnchorPane chatInputPane = new AnchorPane();
         chatInputPane.setPrefSize(commonAreaWidth - 100, 50);
@@ -1176,6 +1208,7 @@ public class GUIView implements View {
         chatPane.getChildren().add(chatScroll);
         chatPane.getChildren().add(chatInputPane);
         chatPane.getChildren().add(closeChatButton);
+        chatPane.getChildren().add(chatEdge);
 
         chatOpen = false;
     }
@@ -1204,48 +1237,64 @@ public class GUIView implements View {
         backgroundPane.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
         backgroundPane.setLayoutX(stageWidth * 0.25);
         backgroundPane.setLayoutY(stageHeight * 0.25);
-        backgroundPane.setStyle("-fx-background-color: white;");
-        backgroundPane.setOpacity(0.9);
+        backgroundPane.setOpacity(1);
+
+        // Create background for starter card area
+        Image starterCardBG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundHandArea.png")));
+        ImageView bgView = new ImageView(starterCardBG);
+        bgView.setLayoutX(2);
+        bgView.setLayoutY(2);
+        bgView.setFitHeight(stageHeight * 0.5 - 3);
+        bgView.setFitWidth(stageWidth * 0.5 - 3);
+
+        // Black edge
+        Rectangle edgeRect = new Rectangle();
+        edgeRect.setWidth(stageWidth * 0.5);
+        edgeRect.setHeight(stageHeight * 0.5);
+        edgeRect.setArcWidth(10);
+        edgeRect.setArcHeight(10);
+        edgeRect.setFill(Color.TRANSPARENT);
+        edgeRect.setStrokeWidth(4);
+        edgeRect.setStroke(Color.BLACK);
 
         // Create label
         Label choiceLabel = new Label("Choose the side of the starter card");
-        choiceLabel.setPrefSize(stageWidth, 50);
+        choiceLabel.setPrefSize(stageWidth * 0.5, 50);
         choiceLabel.setLayoutX(0);
-        choiceLabel.setLayoutY(50);
+        choiceLabel.setLayoutY(30);
         choiceLabel.setFont(new Font(ERAS_FONT, 24));
         choiceLabel.setAlignment(Pos.CENTER);
 
         // Render starter card
-        Pane starterCardPane = createCardPane(starterCardID, CardSideType.FRONT, (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5 - 100, 1);
+        Pane starterCardPane = createCardPane(starterCardID, CardSideType.FRONT, (stageWidth - cardWidth) * 0.5, (stageHeight - cardHeight) * 0.5 - 25, 1);
         starterCard.setCurrSideType(CardSideType.FRONT);
 
         // Render a button to flip the card
-        Button flipButton = new Button("Flip");
-        flipButton.setPrefSize(100, 50);
-        flipButton.setLayoutX((stageWidth - 100) * 0.5);
-        flipButton.setLayoutY((stageHeight + cardHeight) * 0.5 - 75);
-        flipButton.setOnAction((_) -> {
-            // Flip the card
-            flipStarterCard(starterCardPane);
-        });
+        Pane flipButton = createTextButton("Flip", 20, "/RectButton200x50.png",
+                100, 50, ((stageWidth - 100) * 0.5 - 120), ((stageHeight + cardHeight) * 0.5 + 30),
+                () -> {
+                    // Flip the card
+                    flipStarterCard(starterCardPane);
+                });
 
         // Render a button to place the starter card
-        Button placeButton = new Button("Place");
-        placeButton.setPrefSize(100, 50);
-        placeButton.setLayoutX((stageWidth - 100) * 0.5);
-        placeButton.setLayoutY((stageHeight + cardHeight) * 0.5);
-        placeButton.setOnAction((_) -> {
-            // Send the choice to the server
-            sender.placeStarterCard(playerID, starterCard.getCurrSideType());
-        });
+        Pane placeButton = createTextButton("Place", 20, "/RectButton200x50.png",
+                100, 50, ((stageWidth - 100) * 0.5 + 120), ((stageHeight + cardHeight) * 0.5 + 30),
+                () -> {
+                    // Flip the card
+                    sender.placeStarterCard(playerID, starterCard.getCurrSideType());
+                });
+
+        backgroundPane.getChildren().add(bgView);
+        backgroundPane.getChildren().add(edgeRect);
+        backgroundPane.getChildren().add(choiceLabel);
 
         // Add all elements to the root
         tempChoicePane.getChildren().add(paneRect);
         tempChoicePane.getChildren().add(backgroundPane);
-        tempChoicePane.getChildren().add(starterCardPane);
         tempChoicePane.getChildren().add(flipButton);
         tempChoicePane.getChildren().add(placeButton);
-        tempChoicePane.getChildren().add(choiceLabel);
+        tempChoicePane.getChildren().add(starterCardPane);
 
         root.getChildren().add(tempChoicePane);
     }
@@ -1332,21 +1381,38 @@ public class GUIView implements View {
         Rectangle paneRect = new Rectangle();
         paneRect.setWidth(stageWidth);
         paneRect.setHeight(stageHeight);
-        paneRect.setFill(Color.rgb(0, 0, 0, 0.2));
+        paneRect.setFill(Color.rgb(0, 0, 0, 0.3));
 
         // Create white background anchor pane
         AnchorPane backgroundPane = new AnchorPane();
         backgroundPane.setPrefSize(stageWidth * 0.5, stageHeight * 0.5);
         backgroundPane.setLayoutX(stageWidth * 0.25);
         backgroundPane.setLayoutY(stageHeight * 0.25);
-        backgroundPane.setStyle("-fx-background-color: white;");
-        backgroundPane.setOpacity(0.9);
+        backgroundPane.setOpacity(1);
+
+        // Create background for starter card area
+        Image starterCardBG = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/BackgroundHandArea.png")));
+        ImageView bgView = new ImageView(starterCardBG);
+        bgView.setLayoutX(2);
+        bgView.setLayoutY(2);
+        bgView.setFitHeight(stageHeight * 0.5 - 3);
+        bgView.setFitWidth(stageWidth * 0.5 - 3);
+
+        // Black edge
+        Rectangle edgeRect = new Rectangle();
+        edgeRect.setWidth(stageWidth * 0.5);
+        edgeRect.setHeight(stageHeight * 0.5);
+        edgeRect.setArcWidth(10);
+        edgeRect.setArcHeight(10);
+        edgeRect.setFill(Color.TRANSPARENT);
+        edgeRect.setStrokeWidth(4);
+        edgeRect.setStroke(Color.BLACK);
 
         // Create label
         Label choiceLabel = new Label("Choose your secret objective");
-        choiceLabel.setPrefSize(stageWidth, 50);
+        choiceLabel.setPrefSize(stageWidth * 0.5, 50);
         choiceLabel.setLayoutX(0);
-        choiceLabel.setLayoutY(50);
+        choiceLabel.setLayoutY(30);
         choiceLabel.setFont(new Font(ERAS_FONT, 24));
         choiceLabel.setAlignment(Pos.CENTER);
 
@@ -1354,37 +1420,32 @@ public class GUIView implements View {
         Pane secretObjective1Pane = createCardPane(secretObjective1ID, CardSideType.FRONT, stageWidth * 0.5 - cardWidth - 50, (stageHeight - cardHeight) * 0.5, 1);
         Pane secretObjective2Pane = createCardPane(secretObjective2ID, CardSideType.FRONT, stageWidth * 0.5 + 50, (stageHeight - cardHeight) * 0.5, 1);
 
-        // Create buttons to select secret objectives
-        Button secretObjective1Button = new Button();
-        secretObjective1Button.setPrefSize(cardWidth, cardHeight);
-        secretObjective1Button.setLayoutX(0);
-        secretObjective1Button.setLayoutY(0);
-        secretObjective1Button.setOnAction((_) -> {
-            secretObjectiveCardID = secretObjective1ID;
-            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
-        });
-        secretObjective1Button.setOpacity(0.1);
+        // Create button to select 1st secret objective
+        Pane secretObjective1Button = createTextButton("1st objective", 20, "/RectButton200x50.png",
+                cardWidth - 26, 50, (stageWidth * 0.5 - ((cardWidth - 26) * 0.5)) - 50 - (cardWidth *0.5), ((stageHeight - cardHeight) * 0.5) + 200,
+                () -> {
+                    secretObjectiveCardID = secretObjective1ID;
+                    sender.chooseSecretObjective(playerID, secretObjectiveCardID);
+                });
 
-        // Create button to confirm choice
-        Button secretObjective2Button = new Button();
-        secretObjective2Button.setPrefSize(cardWidth, cardHeight);
-        secretObjective2Button.setLayoutX(0);
-        secretObjective2Button.setLayoutY(0);
-        secretObjective2Button.setOnAction((_) -> {
-            secretObjectiveCardID = secretObjective2ID;
-            sender.chooseSecretObjective(playerID, secretObjectiveCardID);
-        });
-        secretObjective2Button.setOpacity(0.1);
+        // Create button to select 2nd secret objective
+        Pane secretObjective2Button = createTextButton("2nd objective", 20, "/RectButton200x50.png",
+                cardWidth - 26, 50, (stageWidth * 0.5 - ((cardWidth - 26) * 0.5)) + 50 + (cardWidth *0.5), ((stageHeight - cardHeight) * 0.5) + 200,
+                () -> {
+                    secretObjectiveCardID = secretObjective2ID;
+                    sender.chooseSecretObjective(playerID, secretObjectiveCardID);
+                });
 
-        // Add everything to the root
-        secretObjective1Pane.getChildren().add(secretObjective1Button);
-        secretObjective2Pane.getChildren().add(secretObjective2Button);
+        backgroundPane.getChildren().add(bgView);
+        backgroundPane.getChildren().add(edgeRect);
+        backgroundPane.getChildren().add(choiceLabel);
 
         tempChoicePane.getChildren().add(paneRect);
         tempChoicePane.getChildren().add(backgroundPane);
         tempChoicePane.getChildren().add(secretObjective1Pane);
         tempChoicePane.getChildren().add(secretObjective2Pane);
-        tempChoicePane.getChildren().add(choiceLabel);
+        tempChoicePane.getChildren().add(secretObjective1Button);
+        tempChoicePane.getChildren().add(secretObjective2Button);
     }
 
     private void addDrawButtonToCard(Pane cardPane, int cardIndex, boolean isGolden, boolean isVisible){
