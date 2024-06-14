@@ -85,7 +85,7 @@ public class TUIView implements View {
             try {
                 String connectionType = args[1];
 
-                System.out.println("Enter the port number for " + connectionType + " connection:");
+                System.out.println("\nEnter the port number for " + connectionType + " connection:");
                 boolean hasPort = false;
 
                 while (!hasPort) {
@@ -94,7 +94,7 @@ public class TUIView implements View {
                         hasPort = true;
                     }
                     catch (Exception e) {
-                        System.out.println("Please insert a valid number.");
+                        System.out.println("\nPlease insert a valid number.");
                     }
                 }
 
@@ -107,7 +107,7 @@ public class TUIView implements View {
                 connected = true;
             }
             catch (Exception e) {
-                System.out.println("Error: " + e.getMessage());
+                System.out.println("\nError: " + e.getMessage());
             }
         }
 
@@ -140,6 +140,7 @@ public class TUIView implements View {
         List<String> legalCommands = stateToCommands.get(playerState);
 
         if (playerState == PlayerState.DISCONNECTED) {
+            makeSpace();
             System.out.println("You are disconnected. Please, restart the game.");
             return;
         }
@@ -148,7 +149,7 @@ public class TUIView implements View {
             switch (command) {
                 case "rml" -> { // RefreshMatchesList
                     if (parts.length != 1) {
-                        System.out.println("Error: RefreshMatchesList does not take any arguments. Please, try again");
+                        System.out.println("\nError: RefreshMatchesList does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -157,31 +158,31 @@ public class TUIView implements View {
 
                 case "cm" -> { // CreateMatch
                     if (parts.length != 3) {
-                        System.out.println("Error: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
+                        System.out.println("\nError: CreateMatch takes exactly 2 arguments (num of players, nickname). Please, try again");
                         break;
                     }
                     try {
                         sender.createMatch(Integer.parseInt(parts[1]), parts[2]);
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "sm" -> { // SelectMatch
                     if (parts.length != 2) {
-                        System.out.println("Error: SelectMatch takes exactly 1 argument (match ID). Please, try again");
+                        System.out.println("\nError: SelectMatch takes exactly 1 argument (match ID). Please, try again");
                         break;
                     }
                     try {
                         sender.selectMatch(Integer.parseInt(parts[1]));
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "cn" -> { // ChooseNickname
                     if (parts.length != 2) {
-                        System.out.println("Error: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
+                        System.out.println("\nError: ChooseNickname takes exactly 1 argument (nickname). Please, try again");
                         break;
                     }
 
@@ -189,7 +190,7 @@ public class TUIView implements View {
                 }
                 case "reconnect" -> { // ReconnectToMatch
                     if (parts.length != 3) {
-                        System.out.println("Error: Reconnect takes exactly 2 arguments (match ID and nickname). Please, try again");
+                        System.out.println("\nError: Reconnect takes exactly 2 arguments (match ID and nickname). Please, try again");
                         break;
                     }
 
@@ -197,12 +198,12 @@ public class TUIView implements View {
                         sender.reconnectToMatch(Integer.parseInt(parts[1]), parts[2]);
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "fsc" -> { // FlipStarterCard
                     if (parts.length != 1) {
-                        System.out.println("Error: FlipStarterCard does not take any arguments. Please, try again");
+                        System.out.println("\nError: FlipStarterCard does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -210,7 +211,7 @@ public class TUIView implements View {
                 }
                 case "psc" -> { // PlaceStarterCard
                     if (parts.length != 1) {
-                        System.out.println("Error: PlaceStarterCard does not take any arguments. Please, try again");
+                        System.out.println("\nError: PlaceStarterCard does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -218,14 +219,14 @@ public class TUIView implements View {
                 }
                 case "cso" -> { // ChooseSecretObjective
                     if (parts.length != 2) {
-                        System.out.println("Error: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
+                        System.out.println("\nError: ChooseSecretObjective takes exactly 1 argument (card ID). Please, try again");
                         break;
                     }
 
                     try {
                         int choice = Integer.parseInt(parts[1]);
                         if (choice != 1 && choice != 2) {
-                            System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                            System.out.println("\nError: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
                             break;
                         }
 
@@ -234,12 +235,12 @@ public class TUIView implements View {
                         sender.chooseSecretObjective(playerID, secretObjectiveCardID);
                     }
                     catch (Exception e) {
-                        System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
+                        System.out.println("\nError: " + parts[1] + " is not a valid choice. Please choose either 1 or 2.");
                     }
                 }
                 case "fc" -> { // FlipCard
                     if (parts.length != 2) {
-                        System.out.println("Error: FlipCard takes exactly 1 argument (card ID). Please, try again");
+                        System.out.println("\nError: FlipCard takes exactly 1 argument (card ID). Please, try again");
                         break;
                     }
 
@@ -253,12 +254,12 @@ public class TUIView implements View {
                         printPlayerHand();
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "pc" -> { // PlaceCard
                     if (parts.length != 3) {
-                        System.out.println("Error: PlaceCard takes exactly 2 arguments (card ID and position ID). Please, try again");
+                        System.out.println("\nError: PlaceCard takes exactly 2 arguments (card ID and position ID). Please, try again");
                         break;
                     }
 
@@ -267,22 +268,22 @@ public class TUIView implements View {
                         Position placingCardPos = posIDToValidPos.get(Integer.parseInt(parts[2]));
 
                         if (placingCard == null) {
-                            System.out.println("Error: " + parts[1] + " is not a valid card ID. Please, try again");
+                            System.out.println("\nError: " + parts[1] + " is not a valid card ID. Please, try again");
                             break;
                         }
                         else if (placingCardPos == null) {
-                            System.out.println("Error: " + parts[2] + " is not a valid position ID. Please, try again");
+                            System.out.println("\nError: " + parts[2] + " is not a valid position ID. Please, try again");
                             break;
                         }
                         sender.placeCard(playerID, placingCard.getID(), placingCard.getCurrSideType(), placingCardPos);
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " or " + parts[2] + " is not a valid number. Please, try again");
                     }
                 }
                 case "ddr" -> { // DrawDeckResourceCard
                     if (parts.length != 1) {
-                        System.out.println("Error: DrawDeckResourceCard does not take any arguments. Please, try again");
+                        System.out.println("\nError: DrawDeckResourceCard does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -290,7 +291,7 @@ public class TUIView implements View {
                 }
                 case "dvr" -> { // DrawVisibleResourceCard
                     if (parts.length != 2) {
-                        System.out.println("Error: DrawResourceCard takes exactly 1 argument (card index 0 or 1). Please, try again");
+                        System.out.println("\nError: DrawResourceCard takes exactly 1 argument (card index 0 or 1). Please, try again");
                         break;
                     }
 
@@ -298,12 +299,12 @@ public class TUIView implements View {
                         sender.drawVisibleResourceCard(playerID, Integer.parseInt(parts[1]));
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "ddg" -> { // DrawDeckGoldCard
                     if (parts.length != 1) {
-                        System.out.println("Error: DrawDeckGoldenCard does not take any arguments. Please, try again");
+                        System.out.println("\nError: DrawDeckGoldenCard does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -311,24 +312,24 @@ public class TUIView implements View {
                 }
                 case "dvg" -> { // DrawVisibleGoldCard
                     if (parts.length != 2) {
-                        System.out.println("Error: DrawVisibleGoldenCard takes exactly 1 argument (card index 0 or 1). Please, try again");
+                        System.out.println("\nError: DrawVisibleGoldenCard takes exactly 1 argument (card index 0 or 1). Please, try again");
                         break;
                     }
                     try {
                         int choice = Integer.parseInt(parts[1]);
                         if (choice != 0 && choice != 1) {
-                            System.out.println("Error: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
+                            System.out.println("\nError: " + parts[1] + " is not a valid choice. Please choose either 0 or 1.");
                             break;
                         }
                         sender.drawVisibleGoldenCard(playerID, choice);
                     }
                     catch (NumberFormatException e){
-                        System.out.println("Error: " + parts[1] + " is not a valid number. Please, try again");
+                        System.out.println("\nError: " + parts[1] + " is not a valid number. Please, try again");
                     }
                 }
                 case "gh" -> { // GetHand
                     if (parts.length != 1) {
-                        System.out.println("Error: GetHand does not take any arguments. Please, try again");
+                        System.out.println("\nError: GetHand does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -336,11 +337,11 @@ public class TUIView implements View {
                 }
                 case "opa" -> { // PrintOpponentPlayArea
                     if (parts.length != 2) {
-                        System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
+                        System.out.println("\nError: OpponentPlayArea takes exactly 1 argument (opponent nickname). Please, try again");
                         break;
                     }
                     if (parts[1].equals(playerNickname)) {
-                        System.out.println("Error: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
+                        System.out.println("\nError: OpponentPlayArea takes exactly 1 argument (opponent nickname, not your name). Please, try again");
                         break;
                     }
 
@@ -348,7 +349,7 @@ public class TUIView implements View {
                 }
                 case "pa" -> { // PrintPlayArea
                     if (parts.length != 1) {
-                        System.out.println("Error: PlayArea does not take any arguments. Please, try again");
+                        System.out.println("\nError: PlayArea does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -356,7 +357,7 @@ public class TUIView implements View {
                 }
                 case "chat" -> { // Write a message in the chat
                     if (parts.length < 3) {
-                        System.out.println("Error: Chat takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
+                        System.out.println("\nError: Chat takes at least 2 argument (recipient nickname (or all) and message). Please, try again");
                         break;
                     }
 
@@ -366,7 +367,7 @@ public class TUIView implements View {
                 }
                 case "gmc" -> { // GetMatchChat
                     if (parts.length != 1) {
-                        System.out.println("Error: GetMatchChat does not take any arguments. Please, try again");
+                        System.out.println("\nError: GetMatchChat does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -374,15 +375,16 @@ public class TUIView implements View {
                 }
                 case "gmi" -> { //GetMatchID
                     if (parts.length != 1) {
-                        System.out.println("Error: GetMatchID does not take any arguments. Please, try again");
+                        System.out.println("\nError: GetMatchID does not take any arguments. Please, try again");
                         break;
                     }
 
-                    System.out.println("Match ID: " + matchID);
+                    System.out.println("\nMatch ID: " + matchID);
+                    makeSpace();
                 }
                 case "gs" -> { // GetScore
                     if (parts.length != 1) {
-                        System.out.println("Error: GetScore does not take any arguments. Please, try again");
+                        System.out.println("\nError: GetScore does not take any arguments. Please, try again");
                         break;
                     }
 
@@ -390,7 +392,7 @@ public class TUIView implements View {
                 }
                 case "mm" -> { // Main Menu
                     if (parts.length != 1) {
-                        System.out.println("Error: MainMenu does not take any arguments. Please, try again");
+                        System.out.println("\nError: MainMenu does not take any arguments. Please, try again");
                         break;
                     }
                     resetPlayerModel();
@@ -403,7 +405,7 @@ public class TUIView implements View {
             System.exit(0);
         }
         else {
-            System.out.println("Error: " + command + " is not a valid command. Please, try again");
+            System.out.println("\nError: " + command + " is not a valid command. Please, try again");
         }
     }
 
@@ -415,6 +417,7 @@ public class TUIView implements View {
 
     @Override
     public void showMatches(Map<Integer, List<String>> matches) {
+        makeSpace();
         if (matches.isEmpty()) {
             System.out.println("""
                     No matches available.
@@ -429,7 +432,7 @@ public class TUIView implements View {
             System.out.println("\t\t- " + entry.getValue());
         }
         System.out.println("""
-                To create a new match, type: cm <players_num> <nickname>
+                \nTo create a new match, type: cm <players_num> <nickname>
                 To join a match, type: sm <matchID>
                 To refresh the matches list, type: rml
                 To reconnect to a match, type: reconnect <matchID> <nickname>""");
@@ -443,6 +446,7 @@ public class TUIView implements View {
         playerNickname = hostNickname;
         this.matchID = matchID;
 
+        makeSpace();
         System.out.println("Match created with ID: " + matchID + " and host nickname: " + hostNickname);
         System.out.println("""
                 Waiting for players to join...
@@ -456,6 +460,7 @@ public class TUIView implements View {
         playerState = PlayerState.CHOOSING_NICKNAME;
         this.matchID = matchID;
 
+        makeSpace();
         System.out.println("Match selected with ID: " + matchID);
         System.out.println("""
                 To choose the nickname, type: cn <nickname>
@@ -467,6 +472,7 @@ public class TUIView implements View {
         playerState = PlayerState.MATCH_LOBBY;
         playerNickname = nickname;
 
+        makeSpace();
         System.out.println("Joined match with nickname: " + nickname);
     }
 
@@ -477,6 +483,7 @@ public class TUIView implements View {
                           int starterCardID) {
         createInvalidCardLines();
 
+        makeSpace();
         System.out.println("Game started.");
 
         for (Map.Entry<Integer, String> entry : IDToNicknameMap.entrySet()) {
@@ -506,7 +513,7 @@ public class TUIView implements View {
         printStarterCardChoice(starterCardID);
 
         // Print available commands
-        System.out.println("To view the other side of the starter card, type: fsc \n" +
+        System.out.println("\nTo view the other side of the starter card, type: fsc \n" +
                 "To place the starter card on the current side, type: psc");
     }
 
@@ -566,6 +573,7 @@ public class TUIView implements View {
 
         cardIDToCardFrontTUILines.remove(otherSecretObjectiveCardID);
 
+        makeSpace();
         System.out.println("Secret objective chosen:");
 
         List<String> secretObjectiveCardFront = cardIDToCardFrontTUILines.get(secretObjectiveCardID);
@@ -605,6 +613,7 @@ public class TUIView implements View {
             }
         }
 
+        makeSpace();
         System.out.println("""
                 Now you can use the chat.
                 To view the match chat, type: gmc
@@ -613,7 +622,7 @@ public class TUIView implements View {
 
         if (playerID == this.playerID) {
             playerState = PlayerState.PLACING;
-            System.out.println("It's your turn.");
+            System.out.println("\nIt's your turn.");
 
             // Print player hand
             printPlayerHand();
@@ -635,7 +644,7 @@ public class TUIView implements View {
             playerState = PlayerState.WAITING;
             String playerNickname = getPlayerNickname(playerID);
 
-            System.out.println("It's " + playerNickname + "'s turn.\n" +
+            System.out.println("\nIt's " + playerNickname + "'s turn.\n" +
                     "While waiting you can: \n" +
                     "\t- Flip a card in your hand by typing: fc <cardID>\n" +
                     "\t- Check your hand by typing: gh");
@@ -644,6 +653,7 @@ public class TUIView implements View {
 
     @Override
     public void placeCard(int playerID, int cardID, Position pos, CardSideType side, int deltaScore) {
+        makeSpace();
         if (this.playerID == playerID) {
             playerState = PlayerState.DRAWING;
 
@@ -694,6 +704,7 @@ public class TUIView implements View {
 
     @Override
     public void showNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID) {
+        makeSpace();
         String playerNickname = getPlayerNickname(newPlayerID);
 
         if (lastPlayerID == playerID) {
@@ -815,6 +826,7 @@ public class TUIView implements View {
      *  - 3 golden cards (1 deck card and 2 visible cards)
      */
     private void printDrawArea() {
+        makeSpace();
         System.out.println("Draw area:");
 
         // Print TUI lines for cards in the draw area
@@ -838,6 +850,7 @@ public class TUIView implements View {
     }
 
     private void printStarterCardChoice(int starterCardID) {
+        makeSpace();
         starterCard = GameResources.getPlaceableCardByID(starterCardID);
         starterCard.setCurrSideType(CardSideType.FRONT);
 
@@ -866,7 +879,7 @@ public class TUIView implements View {
             starterCardLines = cardIDToCardFrontTUILines.get(starterCard.getID());
         }
 
-        System.out.println("Current starter card side:");
+        System.out.println("\nCurrent starter card side:");
         for (String s : starterCardLines) {
             System.out.println(s);
         }
@@ -876,6 +889,7 @@ public class TUIView implements View {
     }
 
     private void createPlayerHand(int resourceCardID1, int resourceCardID2, int goldenCardID) {
+        makeSpace();
         PlaceableCard resourceCard1 = GameResources.getPlaceableCardByID(resourceCardID1);
         PlaceableCard resourceCard2 = GameResources.getPlaceableCardByID(resourceCardID2);
         PlaceableCard goldenCard = GameResources.getPlaceableCardByID(goldenCardID);
@@ -1233,7 +1247,6 @@ public class TUIView implements View {
      * @param opponentNick The nickname of the opponent.
      */
     private void printOpponentPlayArea(String opponentNick) {
-
         // Check if the opponent nickname exists
         if (!nicknameExists(opponentNick)) {
             System.out.println("No opponent with nickname " + opponentNick + " found. Please, try again.");
@@ -1247,7 +1260,7 @@ public class TUIView implements View {
         String[][] playAreaArr = createPlayerArr(oppPlayArea);
 
         // Print the token color and score
-        System.out.println(opponentNick + "'s token color: " + getOpponentByID(opponentID).getTokenColor() + "\n"
+        System.out.println("\n" + opponentNick + "'s token color: " + getOpponentByID(opponentID).getTokenColor() + "\n"
         + opponentNick + "'s score: " + getOpponentByID(opponentID).getScore() + "\n");
 
         if (playAreaArr == null) {
@@ -1291,6 +1304,7 @@ public class TUIView implements View {
 
             System.out.println(line);
         }
+        makeSpace();
     }
 
     private void updatePlacementPositions(Position pos) {
@@ -1967,6 +1981,7 @@ public class TUIView implements View {
 
     @Override
     public void receiveChatMessage(String senderNickname, String recipientNickname, String message) {
+        makeSpace();
         String fullMessage;
         String actualSender = senderNickname;
 
@@ -1986,6 +2001,7 @@ public class TUIView implements View {
         synchronized (chat) {
             chat.add(fullMessage);
         }
+        makeSpace();
     }
 
     @Override
@@ -2032,10 +2048,12 @@ public class TUIView implements View {
         for (int i = 0; i < nicknames.length; i++) {
             System.out.println((i + 1) + ". " + nicknames[i] + " with " + scores[i] + " points and " + numOfObjectives[i] + " objectives completed.");
         }
+        makeSpace();
     }
 
     @Override
     public void showNewPlayerTurnNewState(int drawnCardID, int lastPlayerID, int newPlayerID, GameState gameState) {
+        makeSpace();
         if (gameState == GameState.FINAL_ROUND) {
             System.out.println("The game entered the final round state.");
         }
@@ -2048,6 +2066,7 @@ public class TUIView implements View {
 
     @Override
     public void showNewPlayerExtraTurn(int cardID, int lastPlayerID, Position pos, CardSideType side, int newPlayerID, int deltaScore) {
+        makeSpace();
         if (playerID == lastPlayerID){
             playerState = PlayerState.WAITING;
 
@@ -2122,11 +2141,14 @@ public class TUIView implements View {
 
     @Override
     public void showPlayerDisconnection(int playerID) {
+        makeSpace();
         System.out.println(getPlayerNickname(playerID) + " has disconnected.");
+        makeSpace();
     }
 
     @Override
     public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
+        makeSpace();
         playerState = PlayerState.ALONE;
 
         System.out.println(getPlayerNickname(playerID) + " has disconnected.");
@@ -2141,6 +2163,7 @@ public class TUIView implements View {
 
     @Override
     public void reconnectOnStarterPlacement(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
+        makeSpace();
         startConnectionCheck();
 
         setID(playerID);
@@ -2181,6 +2204,7 @@ public class TUIView implements View {
 
     @Override
     public void reconnectOnObjectiveChoice(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        makeSpace();
         startConnectionCheck();
 
         setID(playerID);
@@ -2242,6 +2266,7 @@ public class TUIView implements View {
 
     @Override
     public void reconnectAfterSetup(int playerID, Map<Integer, String> idToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
+        makeSpace();
         startConnectionCheck();
 
         setID(playerID);
@@ -2313,6 +2338,7 @@ public class TUIView implements View {
     public void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
                           List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
                           int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        makeSpace();
         GameResources.initializeAllDecks();
 
         // Set the player ID and state
@@ -2402,6 +2428,7 @@ public class TUIView implements View {
 
     @Override
     public void showPlayerReconnection(int playerID) {
+        makeSpace();
         if (playerState == PlayerState.ALONE) {
             playerState = PlayerState.PLACING;
             System.out.println(getPlayerNickname(playerID) + " has reconnected.");
@@ -2426,6 +2453,7 @@ public class TUIView implements View {
 
     @Override
     public void undoCardPlacement(int playerID, Position pos, int score, int nextPlayerID) {
+        makeSpace();
         System.out.println(getPlayerNickname(playerID) + " has disconnected.");
 
         if (this.playerID == nextPlayerID) {
@@ -2456,6 +2484,7 @@ public class TUIView implements View {
 
     @Override
     public void showSoleWinnerMessage() {
+        makeSpace();
         packetLossTask.cancel();
         playerState = PlayerState.GAME_OVER;
 
@@ -2492,6 +2521,7 @@ public class TUIView implements View {
         else {
             System.out.println("No messages in chat.");
         }
+        makeSpace();
     }
 
     private void printAllScores() {
@@ -2500,6 +2530,7 @@ public class TUIView implements View {
         for (PlayerViewModel p : opponents){
             System.out.println(p.getNickname() + "'s score: " + p.getScore());
         }
+        makeSpace();
     }
 
     /**
@@ -2583,6 +2614,7 @@ public class TUIView implements View {
      * Notifies the player that he has lost connection to the server.
      */
     private void showConnectionLoss() {
+        makeSpace();
         System.out.println("Connection lost. Please restart the game to reconnect.");
     }
 
@@ -2604,5 +2636,9 @@ public class TUIView implements View {
      */
     private void setTokenColor(TokenColors tokenColor) {
         this.tokenColor = tokenColor;
+    }
+
+    private void makeSpace(){
+        System.out.println("\n-------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n");
     }
 }
