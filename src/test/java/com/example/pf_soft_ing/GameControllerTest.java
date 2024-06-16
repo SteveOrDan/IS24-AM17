@@ -1,10 +1,16 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.InvalidMatchIDException;
+import com.example.pf_soft_ing.exceptions.InvalidPlayerIDException;
+import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerModel;
 import org.junit.jupiter.api.Test;
 import com.example.pf_soft_ing.game.GameController;
+
+import java.rmi.RemoteException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -138,5 +144,62 @@ class GameControllerTest {
 
         gameController.getMatches(player1.getID());
         assertNotNull(gameController.getPlayerSender(player1.getID()));
+    }
+
+    @Test
+    void reconnection() throws RemoteException, InterruptedException, InvalidPlayerIDException, InvalidMatchIDException {
+        GameController gameController = new GameController();
+
+        PlayerModel player1 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player1.getID());
+        MatchController mc1 = gameController.createMatch(player1.getID(), 2, "Player1");
+
+        PlayerModel player2 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player2.getID());
+        MatchController mc2 = gameController.selectMatch(player2.getID(), mc1.getMatchID());
+
+        mc1.disconnectPlayer(player1.getID());
+        gameController.checkMatchState(mc1);
+
+        assertEquals(1, mc1.getIDToPlayerMap().size());
+
+        gameController.chooseNickname(player2.getID(), "Player2", mc2);
+
+        PlayerModel player3 = gameController.createPlayer(new TestSender());
+        gameController.getMatches(player3.getID());
+        MatchController mc3 = gameController.selectMatch(player3.getID(), mc1.getMatchID());
+        gameController.chooseNickname(player3.getID(), "Player3", mc3);
+
+        mc2.placeStarterCardForPlayer(player2.getID(), CardSideType.FRONT);
+        mc3.placeStarterCardForPlayer(player3.getID(), CardSideType.BACK);
+
+        mc2.disconnectPlayer(player2.getID());
+        gameController.checkMatchState(mc2);
+        gameController.reconnectToMatch(player2.getID(), "Player2", mc1.getMatchID());
+
+        mc2.setSecretObjectiveForPlayer(player2.getID(), 86);
+        assertEquals(GameState.SET_UP, mc2.getGameState());
+
+        mc3.setSecretObjectiveForPlayer(player3.getID(), 87);
+
+        if(mc2.getCurrPlayerID() == player2.getID()) {
+            mc2.disconnectPlayer(player2.getID());
+            gameController.checkMatchState(mc2);
+            gameController.reconnectToMatch(player2.getID(), "Player2", mc3.getMatchID());
+
+            mc2.disconnectPlayer(player2.getID());
+            gameController.checkMatchState(mc2);
+        } else {
+            mc3.disconnectPlayer(player3.getID());
+            gameController.checkMatchState(mc3);
+            gameController.reconnectToMatch(player3.getID(), "Player3", mc3.getMatchID());
+        }
+
+        mc2.disconnectPlayer(player2.getID());
+        mc3.disconnectPlayer(player3.getID());
+        gameController.checkMatchState(mc3);
+
+        assertTrue(mc2.hasNoPlayersOnline());
+
     }
 }
