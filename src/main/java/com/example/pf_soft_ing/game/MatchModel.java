@@ -582,6 +582,7 @@ public class MatchModel {
                     else if (gameState == GameState.PLAYING || gameState == GameState.FINAL_ROUND || gameState == GameState.EXTRA_ROUND) {
                         if (announceSoleWinner != null){
                             announceSoleWinner.cancel();
+                            announceSoleWinner = null;
                             getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.PLACING);
                         }
                         reconnect(player);
