@@ -16,14 +16,26 @@ public abstract class ObjectiveCard {
         this.points = points;
     }
 
+    /**
+     * Getter
+     * @return ID of the objective card
+     */
     public int getID() {
         return id;
     }
 
+    /**
+     * Getter
+     * @return Points given by the objective card
+     */
     public int getPoints() {
         return points;
     }
 
+    /**
+     * Setter
+     * @param objectiveType New objective type
+     */
     public void setObjectiveType(String objectiveType) {
         this.objectiveType = objectiveType;
     }
