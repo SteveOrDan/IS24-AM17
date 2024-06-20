@@ -83,6 +83,16 @@ public class ClientRMIReceiver extends UnicastRemoteObject implements ClientRMII
     }
 
     @Override
+    public void sendFirstPlayerTurn(int playerID, int[] playerIDs, int[] starterCardIDs,
+                                    CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands,
+                                    int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                    int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException {
+        view.updateDrawArea(resDeckCardID, visibleResCardID1, visibleResCardID2,
+                goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+        view.showFirstPlayerTurnAfterRec(playerID, playerIDs, starterCardIDs, starterCardSides, tokenColors, playerHands);
+    }
+
+    @Override
     public void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException {
         view.setMissingSetUp(resourceCardID1, resourceCardID2, goldenCardID, tokenColor, commonObjectiveCardID1, commonObjectiveCardID2, secretObjectiveCardID1, secretObjectiveCardID2);
     }

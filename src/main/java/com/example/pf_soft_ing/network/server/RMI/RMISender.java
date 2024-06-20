@@ -158,6 +158,20 @@ public class RMISender implements Sender {
     }
 
     @Override
+    public void sendFirstPlayerTurn(int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {
+        new Thread(() -> {
+            try {
+                client.sendFirstPlayerTurn(playerID, playerIDs, starterCardIDs, starterCardSides, tokenColors, playerHands,
+                        resDeckCardID, visibleResCardID1, visibleResCardID2,
+                        goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2);
+            }
+            catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage() + ". New first player turn not sent");
+            }
+        }).start();
+    }
+
+    @Override
     public void sendNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID,
                                   int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                                   int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) {

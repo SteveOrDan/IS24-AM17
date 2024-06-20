@@ -107,6 +107,27 @@ public interface ClientRMIInterface extends Remote {
                              int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
 
     /**
+     * Sends a message to the player regarding the first player's turn
+     * @param playerID ID of the player that has the turn
+     * @param playerIDs IDs of the players
+     * @param starterCardIDs IDs of the starter cards
+     * @param starterCardSides Sides of the starter cards
+     * @param tokenColors Token colors of the players
+     * @param playerHands Hands of the players
+     * @param resDeckCardID ID of the resource deck card
+     * @param visibleResCardID1 ID of the first visible resource card
+     * @param visibleResCardID2 ID of the second visible resource card
+     * @param goldDeckCardID ID of the gold deck card
+     * @param visibleGoldCardID1 ID of the first visible gold card
+     * @param visibleGoldCardID2 ID of the second visible gold card
+     * @throws RemoteException if there is a problem with the connection
+     */
+    void sendFirstPlayerTurn(int playerID, int[] playerIDs, int[] starterCardIDs,
+                             CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands,
+                             int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                             int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException;
+
+    /**
      * Sends the missing setup to the player
      * @param resourceCardID1 ID of the first resource card
      * @param resourceCardID2 ID of the second resource card

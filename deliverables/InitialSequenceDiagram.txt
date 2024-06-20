@@ -102,7 +102,7 @@ sequenceDiagram
 
     participant C as ClientController
     participant Cn as Client Decoder/Encoder
-    participant Sn as RMIreceiver
+    participant Sn as RMIReceiver
     participant G as GameController
     participant S as ServerMain
 
