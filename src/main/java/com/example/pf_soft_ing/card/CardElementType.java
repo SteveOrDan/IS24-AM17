@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.card;
 
+import com.example.pf_soft_ing.utils.CC;
+
 public enum CardElementType {
     STARTER("S", CC.YELLOW, CC.YELLOW_BG),
     ANIMAL("A", CC.BLUE, CC.BLUE_BG),

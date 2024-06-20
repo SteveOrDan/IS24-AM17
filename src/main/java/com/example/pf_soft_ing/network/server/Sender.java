@@ -1,9 +1,9 @@
 package com.example.pf_soft_ing.network.server;
 
-import com.example.pf_soft_ing.card.Position;
+import com.example.pf_soft_ing.utils.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.game.GameState;
-import com.example.pf_soft_ing.player.TokenColors;
+import com.example.pf_soft_ing.MVC.model.game.GameState;
+import com.example.pf_soft_ing.MVC.model.player.TokenColors;
 
 import java.util.List;
 import java.util.Map;

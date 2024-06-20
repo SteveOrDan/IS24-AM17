@@ -1,8 +1,8 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.game.GameController;
-import com.example.pf_soft_ing.game.MatchController;
-import com.example.pf_soft_ing.player.PlayerModel;
+import com.example.pf_soft_ing.MVC.controller.GameController;
+import com.example.pf_soft_ing.MVC.controller.MatchController;
+import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

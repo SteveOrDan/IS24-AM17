@@ -1,12 +1,19 @@
 package com.example.pf_soft_ing;
 
+import com.example.pf_soft_ing.MVC.model.game.GameResources;
+import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
+import com.example.pf_soft_ing.MVC.model.player.PlayerState;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.exceptions.*;
-import com.example.pf_soft_ing.game.*;
-import com.example.pf_soft_ing.network.server.SocketSender;
+import com.example.pf_soft_ing.exceptions.cards.NoAdjacentCardsException;
+import com.example.pf_soft_ing.exceptions.cards.PlacingOnInvalidCornerException;
+import com.example.pf_soft_ing.exceptions.cards.PositionAlreadyTakenException;
+import com.example.pf_soft_ing.exceptions.match.MissingResourcesException;
+import com.example.pf_soft_ing.exceptions.player.InvalidPlayerStateException;
+import com.example.pf_soft_ing.network.server.socket.SocketSender;
 import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
+import com.example.pf_soft_ing.utils.Position;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

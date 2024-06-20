@@ -1,6 +1,9 @@
 package com.example.pf_soft_ing.network.server;
 
-import com.example.pf_soft_ing.game.GameController;
+import com.example.pf_soft_ing.MVC.controller.GameController;
+import com.example.pf_soft_ing.network.server.RMI.RMIServer;
+import com.example.pf_soft_ing.network.server.socket.Decoder;
+import com.example.pf_soft_ing.network.server.socket.SocketServer;
 
 public class ServerMain {
 

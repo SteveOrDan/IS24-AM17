@@ -2,8 +2,8 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
-import com.example.pf_soft_ing.game.MatchModel;
+import com.example.pf_soft_ing.exceptions.cards.NotEnoughCardsException;
+import com.example.pf_soft_ing.MVC.model.game.MatchModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

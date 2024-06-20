@@ -1,7 +1,7 @@
 package com.example.pf_soft_ing.card.decks;
 
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
-import com.example.pf_soft_ing.exceptions.NotEnoughCardsException;
+import com.example.pf_soft_ing.exceptions.cards.NotEnoughCardsException;
 
 import java.util.ArrayList;
 import java.util.Collections;

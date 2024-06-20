@@ -1,5 +1,7 @@
 package com.example.pf_soft_ing.card;
 
+import com.example.pf_soft_ing.utils.CC;
+
 public enum ResourceType {
     ANIMAL(0, "A", CC.BLUE, CC.BLUE_BG),
     PLANT(1, "P", CC.GREEN, CC.GREEN_BG),
