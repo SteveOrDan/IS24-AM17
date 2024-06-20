@@ -5,9 +5,9 @@ import com.example.pf_soft_ing.network.messages.Message;
 import java.util.Map;
 
 public class ReOnStarterPlacementMsg extends Message {
-    int playerID;
-    Map<Integer, String> IDToOpponentNickname;
-    int[] gameSetupCards;
+    private final int playerID;
+    private final Map<Integer, String> IDToOpponentNickname;
+    private final int[] gameSetupCards;
 
     public ReOnStarterPlacementMsg(int playerID, Map<Integer, String> IDToOpponentNickname, int[] gameSetupCards) {
         this.playerID = playerID;

@@ -58,7 +58,6 @@ public class GUIView implements View {
     private final List<Shape> playersCircles = new ArrayList<>();
     private final List<Shape> playersRectangles = new ArrayList<>();
 
-    private final List<String> chatMessages = new ArrayList<>();
     private VBox chatBox;
     private double chatBoxHeight = 0;
 
@@ -111,7 +110,6 @@ public class GUIView implements View {
 
     private double commonAreaWidth;
 
-    private double playerFieldRectWidth;
     private double playerFieldRectHeight;
 
     private double gridCellWidth;
@@ -802,12 +800,13 @@ public class GUIView implements View {
      * Calculates all the dimensions and creates all the panes needed for the game
      */
     private void setPlayArea(){
+        // Calculate card dimensions
         cardWidth = (stageWidth - (9 * defaultElementsOffset)) / 7;
         cardHeight = cardWidth / 1.5;
 
         commonAreaWidth = 3 * (defaultElementsOffset + cardWidth) + 10;
 
-        playerFieldRectWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
+        double playerFieldRectWidth = stageWidth - (3 * (defaultElementsOffset + cardWidth) + 10);
         playerFieldRectHeight = stageHeight - (2 * cardHeight) - (3 * defaultElementsOffset);
 
         // Calculate grid cell dimensions
@@ -831,8 +830,8 @@ public class GUIView implements View {
         playerFieldScroll.setLayoutY(0);
 
         // Create player field anchor pane
-        double playerFieldWidth = gridCellWidth * gridColumns + 3 * cardCornerWidthProportion * cardWidth; // gridCellWidth * gridColumns + 2 * cardCornerWidthProportion * cardWidth;
-        double playerFieldHeight = gridCellHeight * gridRows + 3 * cardCornerHeightProportion * cardHeight; // gridCellHeight * gridRows + 2 * cardCornerHeightProportion * cardHeight;
+        double playerFieldWidth = gridCellWidth * gridColumns + 3 * cardCornerWidthProportion * cardWidth;
+        double playerFieldHeight = gridCellHeight * gridRows + 3 * cardCornerHeightProportion * cardHeight;
 
         playerField = new AnchorPane();
         playerField.setPrefSize(playerFieldWidth, playerFieldHeight);
@@ -1841,11 +1840,6 @@ public class GUIView implements View {
 
         // Add card to the grid
         playerFieldGrid.add(cardPane, gridPos.getX(), gridPos.getY());
-
-        // playerFieldRectWidth, playerFieldRectHeight
-        // TODO: Check how it works
-//        playerField.setLayoutX((playerFieldRectWidth - playerField.getPrefWidth()) / 2);
-//        playerField.setLayoutY((playerFieldRectHeight - playerField.getPrefHeight()) / 2);
     }
 
     /**
@@ -2209,15 +2203,6 @@ public class GUIView implements View {
             stage.addEventHandler(KeyEvent.KEY_PRESSED, this::keyPressed);
             stage.addEventHandler(KeyEvent.KEY_RELEASED, this::keyReleased);
         });
-
-//        stage.widthProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-//            root.getChildren().clear();
-//            updateWindow();
-//        });
-//        stage.heightProperty().addListener((_, _, _) -> { // obs, oldVal, newVal
-//            root.getChildren().clear();
-//            updateWindow();
-//        });
     }
 
     @Override
@@ -2543,8 +2528,6 @@ public class GUIView implements View {
                 fullMessage = actualSender + " -> " + recipientNickname + ": " + message;
             }
 
-            chatMessages.add(fullMessage);
-
             Label chatLabel = new Label(fullMessage);
             chatLabel.setPrefSize(commonAreaWidth - 25, 25);
             chatLabel.setLayoutX(0);
@@ -2592,53 +2575,6 @@ public class GUIView implements View {
 
             drawMatchRanking(nicknames, scores, numOfObjectives);
         });
-    }
-
-    private void testShowRanking() {
-        int playersNum = 4;
-
-        GameResources.initializeAllDecks();
-
-        PlaceableCard starter = GameResources.getPlaceableCardByID(81);
-        starter.setCurrSideType(CardSideType.BACK);
-        starter.setPriority(0);
-        playArea.put(new Position(0, 0), starter);
-        tokenColor = TokenColors.YELLOW;
-
-        Random rng = new Random();
-
-        for (int i = 1; i <= 10; i++) {
-            int rand = rng.nextInt(80);
-            PlaceableCard card = GameResources.getPlaceableCardByID(rand);
-            card.setCurrSideType(rand % 2 == 0 ? CardSideType.FRONT : CardSideType.BACK);
-            card.setPriority(i);
-            playArea.put(new Position(i, i), card);
-        }
-
-        for (int i = 0; i < playersNum - 1; i++) {
-            PlayerViewModel opp = new PlayerViewModel();
-            opp.setTokenColor(TokenColors.values()[i]);
-
-            opponents.add(opp);
-
-            for (int j = 1; j <= 10; j++) {
-                int rand = rng.nextInt(80);
-
-                opp.placeCardInPlayArea(rand, rand % 2 == 0 ? CardSideType.FRONT : CardSideType.BACK, new Position(j, j), 0);
-            }
-        }
-
-        String[] players = new String[playersNum];
-        int[] scores = new int[playersNum];
-        int[] numOfSecretObjectives = new int[playersNum];
-
-        for (int i = 0; i < playersNum; i++) {
-            players[i] = "Player " + i;
-            scores[i] = i;
-            numOfSecretObjectives[i] = i;
-        }
-
-        drawMatchRanking(players, scores, numOfSecretObjectives);
     }
 
     /**
@@ -2949,7 +2885,7 @@ public class GUIView implements View {
 
     @Override
     public void showPlayerDisconnectionWithOnePlayerLeft(int playerID) {
-        // TODO: Implement?
+        showSystemMessage(getPlayerNickname(playerID) + " has disconnected. You are the only player left in the game.");
     }
 
     @Override
@@ -3033,15 +2969,167 @@ public class GUIView implements View {
     }
 
     @Override
-    public void reconnectAfterSetup(int playerID, Map<Integer, String> idToNicknameMap, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
-        // TODO: Implement
+    public void reconnectAfterSetup(int playerID, Map<Integer, String> idToNicknameMap, int[] gameSetupCards,
+                                    CardSideType starterSide, TokenColors tokenColor) {
+        Platform.runLater(() -> {
+            startConnectionCheck();
+
+            GameResources.initializeAllDecks();
+
+            setID(playerID);
+            this.tokenColor = tokenColor;
+
+            for (Map.Entry<Integer, String> entry : idToNicknameMap.entrySet()) {
+                if (entry.getKey() != playerID){
+                    PlayerViewModel opponent = new PlayerViewModel();
+                    opponent.setPlayerID(entry.getKey());
+                    opponent.setNickname(entry.getValue());
+                    opponents.add(opponent);
+                }
+                else {
+                    nickname = entry.getValue();
+                }
+            }
+
+            // Create the player's view
+            root.getChildren().clear();
+            setPlayArea();
+
+            // Create common cards section (and common objectives)
+            renderCommonCards(gameSetupCards[0], gameSetupCards[1], gameSetupCards[2],
+                    gameSetupCards[3], gameSetupCards[4], gameSetupCards[5]);
+            renderCommonObjectives(gameSetupCards[9], gameSetupCards[10]);
+
+            // Place starter card
+            PlaceableCard starterCard = GameResources.getPlaceableCardByID(gameSetupCards[12]);
+
+            starterCard.setCurrSideType(starterSide);
+            starterCard.setPriority(priority);
+            priority++;
+
+            placeCardAction(starterCard, new Position(0, 0));
+
+            // Create player hand's section
+            drawPlayerHand(gameSetupCards[6], gameSetupCards[7], gameSetupCards[8], TokenColors.getColorFromToken(tokenColor));
+
+            // Place secret objective in player hand
+            secretObjectiveCardID = gameSetupCards[11];
+            double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
+            Pane secretObjectivePane = createCardPane(secretObjectiveCardID, CardSideType.FRONT, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+
+            playerHandPane.getChildren().add(secretObjectivePane);
+
+            // Create separator lines
+            drawSeparationLines();
+
+            showSystemMessage("You have successfully reconnected to the match.");
+        });
     }
 
     @Override
-    public void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors, int[][] playersHands,
-                          List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs, List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
+    public void reconnect(int playerID, int[] playersIDs, String[] playersNicknames, TokenColors[] playersTokenColors,
+                          int[][] playersHands, List<Position[]> playersPlacedCardsPos, List<int[]> playersPlacedCardsIDs,
+                          List<CardSideType[]> playersPlacedCardsSides, List<int[]> playersPlacedCardsPriorities,
                           int[] playersScores, int[] gameSetupCards, int currPlayerID) {
+        Platform.runLater(() -> {
+            startConnectionCheck();
 
+            GameResources.initializeAllDecks();
+
+            // Set the player ID
+            setID(playerID);
+            int numOfPlayers = playersIDs.length;
+
+            // Create the player's view
+            root.getChildren().clear();
+            setPlayArea();
+
+            // For all players in the match
+            for (int i = 0; i < numOfPlayers; i++) {
+                // If the ID is the same as the player's ID
+                if (playersIDs[i] == playerID) {
+                    // Set the player's nickname
+                    nickname = playersNicknames[i];
+                    // Set the player's token color
+                    tokenColor = playersTokenColors[i];
+
+                    // Set the player's hand
+                    for (int cardID : playersHands[i]) {
+                        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+                        this.playerHand.add(card);
+                    }
+
+                    priority = 0;
+                    // Set the player's play area
+                    for (int j = 0; j < playersPlacedCardsIDs.get(i).length; j++) {
+                        PlaceableCard card = GameResources.getPlaceableCardByID(playersPlacedCardsIDs.get(i)[j]);
+
+                        card.setCurrSideType(playersPlacedCardsSides.get(i)[j]);
+                        card.setPriority(playersPlacedCardsPriorities.get(i)[j]);
+
+                        placeCardAction(card, playersPlacedCardsPos.get(i)[j]);
+
+                        priority++;
+                    }
+                    // Set the player's score
+                    score = playersScores[i];
+                }
+                else {
+                    PlayerViewModel opponent = new PlayerViewModel();
+
+                    // Set the opponent's ID, nickname and token color
+                    opponent.setPlayerID(playersIDs[i]);
+                    opponent.setNickname(playersNicknames[i]);
+                    opponent.setTokenColor(playersTokenColors[i]);
+
+                    // Set the opponent's hand
+                    for (int cardID : playersHands[i]) {
+                        PlaceableCard card = GameResources.getPlaceableCardByID(cardID);
+                        opponent.getPlayerHand().add(card);
+                    }
+
+                    // Set the opponent's play area
+                    for (int j = 0; j < playersPlacedCardsIDs.get(i).length; j++) {
+                        PlaceableCard card = GameResources.getPlaceableCardByID(playersPlacedCardsIDs.get(i)[j]);
+                        card.setCurrSideType(playersPlacedCardsSides.get(i)[j]);
+                        card.setPriority(playersPlacedCardsPriorities.get(i)[j]);
+                        opponent.addCardToPlayArea(card, playersPlacedCardsPos.get(i)[j]);
+                    }
+                    // Set the opponent's score
+                    opponent.setScore(playersScores[i]);
+
+                    // Add the opponent to the list of opponents
+                    opponents.add(opponent);
+                }
+            }
+
+            // Create other players' section
+            createOtherPlayerSection();
+
+            // Update players scores
+            for (PlayerViewModel opponent : opponents) {
+                nicknameToScoreLabel.get(opponent.getNickname()).setText(opponent.getNickname() + ": " + opponent.getScore() + " points");
+            }
+
+            // Create common cards' section
+            renderCommonCards(gameSetupCards[3], gameSetupCards[4], gameSetupCards[5], gameSetupCards[6], gameSetupCards[7], gameSetupCards[8]);
+            renderCommonObjectives(gameSetupCards[1], gameSetupCards[2]);
+
+            // Create player's hand section
+            drawPlayerHand(playerHand.getFirst().getID(), playerHand.get(1).getID(), playerHand.get(2).getID(), TokenColors.getColorFromToken(tokenColor));
+
+            // Place secret objective in player hand
+            secretObjectiveCardID = gameSetupCards[0];
+            double cardsYPos = (playerHandPane.getPrefHeight() - cardHeight) * 0.5;
+            Pane secretObjectivePane = createCardPane(secretObjectiveCardID, CardSideType.FRONT, defaultElementsOffset + xOffsetByScale(0.9), cardsYPos + yOffsetByScale(0.9), 0.9);
+
+            playerHandPane.getChildren().add(secretObjectivePane);
+
+            // Create separator lines
+            drawSeparationLines();
+
+            showSystemMessage("You have successfully reconnected to the match.");
+        });
     }
 
     @Override

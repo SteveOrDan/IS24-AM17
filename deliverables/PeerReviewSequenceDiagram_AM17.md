@@ -33,7 +33,7 @@ Valutazione del sequence diagram del gruppo AM17.
   - Perché in questo documento sparisce l'entità `ServerDecoder/Encoder`? È solo una rappresentazione grafica di comodo per altri oggetti?
   - Perché la comunicazione di rete è gestita sia da `RMIreceiver` che da `GameController` (entrambi possono e comunicano con `ClientDecoder/Encoder`)?
 - Rispetto a come avviene nello *Start socket connection sequence diagram*, a seguito della chiamata al metodo `startRMI(...)`, `ServerMain` non manda a `RMIreceiver` un'istanza di `GameController`.
-- Non viene mai inviato al `CientController` un oggetto remoto attraverso cui comunicare col server: in tal caso la comunicazione RMI da client a server non può avvenre.
+- Non viene mai inviato al `CientController` un oggetto remoto attraverso cui comunicare col server: in tal caso la comunicazione RMI da client a server non può avvenire.
 
 
 ## Confronto tra le architetture

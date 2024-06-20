@@ -18,11 +18,8 @@ class SideTest {
     private final CardCorner hiddenCorner = new HiddenCorner();
     private final CardCorner aCorner = new ResourceCorner(ResourceType.ANIMAL);
     private final CardCorner fCorner = new ResourceCorner(ResourceType.FUNGI);
-    private final CardCorner iCorner = new ResourceCorner(ResourceType.INSECT);
     private final CardCorner pCorner = new ResourceCorner(ResourceType.PLANT);
     private final CardCorner kCorner = new ResourceCorner(ResourceType.INKWELL);
-    private final CardCorner mCorner = new ResourceCorner(ResourceType.MANUSCRIPT);
-    private final CardCorner qCorner = new ResourceCorner(ResourceType.QUILL);
     private final Side front = new Front(emptyCorner, hiddenCorner, aCorner, kCorner);
     private final List<ResourceType> allResourceTypesFront= new ArrayList<>() {{
         add(ResourceType.ANIMAL);

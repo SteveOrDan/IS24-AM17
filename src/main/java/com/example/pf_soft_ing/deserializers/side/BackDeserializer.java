@@ -35,9 +35,7 @@ public class BackDeserializer implements JsonDeserializer<Back> {
 
         List<ResourceType> permanentResources = new ArrayList<>();
 
-        permanentResourcesElement.getAsJsonArray().forEach(jsonArrayElement -> {
-            permanentResources.add(ResourceType.resourceTypeFromString(jsonArrayElement.getAsString()));
-        });
+        permanentResourcesElement.getAsJsonArray().forEach(jsonArrayElement -> permanentResources.add(ResourceType.resourceTypeFromString(jsonArrayElement.getAsString())));
 
         return new Back(BLCorner, BRCorner, TLCorner, TRCorner, permanentResources);
     }

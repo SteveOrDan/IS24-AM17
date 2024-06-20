@@ -17,7 +17,7 @@ sequenceDiagram
 
     S->>Sn: startInteraction(in, out, gameController)
 
-    Note left of C: Client: If there is a failure thow exception
+    Note left of C: Client: If there is a failure throw exception
 
     C->>Cn: getMatches()
 
@@ -114,7 +114,7 @@ sequenceDiagram
 
     C->>S: startRMI(hostName, port)
 
-    Note left of C: Client: If there is a failure thow exception
+    Note left of C: Client: If there is a failure throw exception
 
     C->>Cn: getMatches(client)
 

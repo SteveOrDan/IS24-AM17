@@ -161,7 +161,7 @@ public class GameController {
      */
     public void checkMatchState(MatchController matchController) {
         if (matchController.hasNoPlayers() || matchController.hasNoPlayersOnline() || matchController.isOver()) {
-            gameModel.removeMatch(matchController.getMatchID());
+            GameModel.removeMatch(matchController.getMatchID());
         }
     }
 

@@ -34,7 +34,7 @@
 
 ## Setup
 
-- In the [Deliverables](deliverables) folder there is a jar file that can be exceute as both Server and Client.
+- In the [Deliverables](deliverables) folder there is a jar file that can be executed as both Server and Client.
 - To run as the Server execute the following command:
     ```shell
     > java --enable-preview -jar PF_Soft_Ing.jar server <port_number>

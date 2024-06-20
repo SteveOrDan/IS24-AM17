@@ -28,8 +28,6 @@ module com.example.pf_soft_ing {
     exports com.example.pf_soft_ing.exceptions;
     exports com.example.pf_soft_ing.game;
     opens com.example.pf_soft_ing.game to javafx.fxml;
-    exports com.example.pf_soft_ing.deserializers;
-    opens com.example.pf_soft_ing.deserializers to javafx.fxml;
     exports com.example.pf_soft_ing.player;
     opens com.example.pf_soft_ing.player to javafx.fxml;
     exports com.example.pf_soft_ing.card.decks;

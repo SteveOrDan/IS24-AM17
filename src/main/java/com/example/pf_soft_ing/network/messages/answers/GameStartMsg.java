@@ -2,7 +2,6 @@ package com.example.pf_soft_ing.network.messages.answers;
 
 import com.example.pf_soft_ing.network.messages.Message;
 
-import java.util.List;
 import java.util.Map;
 
 public class GameStartMsg extends Message {

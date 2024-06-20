@@ -524,8 +524,9 @@ public class TUIView implements View {
         printStarterCardChoice(starterCardID);
 
         // Print available commands
-        System.out.println("\nTo view the other side of the starter card, type: fsc \n" +
-                "To place the starter card on the current side, type: psc");
+        System.out.println("""
+                To view the other side of the starter card, type: fsc
+                To place the starter card on the current side, type: psc""");
     }
 
     /**

@@ -42,6 +42,6 @@ public class RMIServer {
                 portNumber++;
             }
         }
-        System.out.println(STR."RMI port: \{portNumber}");
+        System.out.println("RMI port: " + portNumber);
     }
 }

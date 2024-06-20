@@ -7,11 +7,11 @@ import com.example.pf_soft_ing.player.TokenColors;
 import java.util.Map;
 
 public class ReOnObjectiveChoiceMsg extends Message {
-    int playerID;
-    Map<Integer, String> IDToOpponentNickname;
-    int[] gameSetupCards;
-    CardSideType starterSide;
-    TokenColors tokenColor;
+    private final int playerID;
+    private final Map<Integer, String> IDToOpponentNickname;
+    private final int[] gameSetupCards;
+    private final CardSideType starterSide;
+    private final TokenColors tokenColor;
 
     public ReOnObjectiveChoiceMsg(int playerID, Map<Integer, String> idToOpponentNickname, int[] gameSetupCards, CardSideType starterSide, TokenColors tokenColor) {
         this.playerID = playerID;

@@ -2,14 +2,11 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.InvalidMatchIDException;
-import com.example.pf_soft_ing.exceptions.InvalidPlayerIDException;
 import com.example.pf_soft_ing.game.GameState;
 import com.example.pf_soft_ing.game.MatchController;
 import com.example.pf_soft_ing.player.PlayerModel;
 import org.junit.jupiter.api.Test;
 import com.example.pf_soft_ing.game.GameController;
-
-import java.rmi.RemoteException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -147,7 +144,7 @@ class GameControllerTest {
     }
 
     @Test
-    void reconnection() throws RemoteException, InterruptedException, InvalidPlayerIDException, InvalidMatchIDException {
+    void reconnection() {
         GameController gameController = new GameController();
 
         PlayerModel player1 = gameController.createPlayer(new TestSender());
