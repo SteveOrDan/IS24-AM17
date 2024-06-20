@@ -2281,6 +2281,11 @@ public class GUIView implements View {
         });
     }
 
+    @Override
+    public void showFirstPlayerTurnAfterRec(int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands) {
+        // TODO: Implement
+    }
+
     /**
      * Creates the section of the common area that shows the other players information
      */

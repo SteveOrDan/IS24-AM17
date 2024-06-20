@@ -10,7 +10,6 @@ import com.example.pf_soft_ing.exceptions.cards.PositionAlreadyTakenException;
 import com.example.pf_soft_ing.exceptions.match.MissingResourcesException;
 import com.example.pf_soft_ing.exceptions.player.InvalidPlayerStateException;
 import com.example.pf_soft_ing.network.server.socket.SocketSender;
-import com.example.pf_soft_ing.player.*;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.utils.Position;
@@ -28,12 +27,7 @@ class PlayerModelTest {
     private PlayerModel playerModel;
 
     public void createPlayerModel(){
-        try {
-            playerModel = new PlayerModel(34, new SocketSender(new ObjectOutputStream(System.out)));
-        }
-        catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        playerModel = new PlayerModel(34, new TestSender());
     }
 
     @DisplayName("Test for placing a starter card in the player area")

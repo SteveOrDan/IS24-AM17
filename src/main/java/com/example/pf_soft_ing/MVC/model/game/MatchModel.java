@@ -76,7 +76,6 @@ public class MatchModel {
         return tokenColor;
     }
 
-    // TODO: get rid of getIDToPlayerMap() and create the necessary methods
     /**
      * Getter
      * @return Map of player IDs to player models
@@ -582,14 +581,23 @@ public class MatchModel {
                             reconnectOnObjectiveChoice(player);
                         }
                         else if (player.getLastPlayerState() == PlayerState.COMPLETED_SETUP) {
-                            reconnectPlayerAfterSetup(player);
+                            player.setState(PlayerState.COMPLETED_SETUP);
+
+                            // Check if all players have completed their setup
+                            if (checkForTurnOrderPhase()) {
+                                reconnectPlayerAtGameStart(player);
+                            }
+                            else // If not, reconnect the player after the setup phase (other players are still setting up)
+                            {
+                                reconnectPlayerAfterSetup(player);
+                            }
                         }
                     }
                     else if (gameState == GameState.PLAYING || gameState == GameState.FINAL_ROUND || gameState == GameState.EXTRA_ROUND) {
                         if (announceSoleWinner != null){
                             announceSoleWinner.cancel();
                             announceSoleWinner = null;
-                            getIDToPlayerMap().get(getCurrPlayerID()).setState(PlayerState.PLACING);
+                            IDToPlayerMap.get(getCurrPlayerID()).setState(PlayerState.PLACING);
                         }
                         reconnect(player);
                     }
@@ -605,6 +613,83 @@ public class MatchModel {
             }
         }
         throw new NicknameNotInMatch();
+    }
+
+    /**
+     * Reconnects a player that has completed his setup given that other players already finished theirs while he was disconnected
+     * @param player Player to reconnect
+     */
+    private void reconnectPlayerAtGameStart(PlayerModel player) {
+        try {
+            int playerID = player.getID();
+
+            startGame(playerID, true);
+        }
+        // This exception should never be thrown
+        catch (StarterCardNotSetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Starts the game after all players have completed their setup
+     * @param playerID ID of the player that reconnected or was last to complete his setup
+     * @param isReconnecting True if the player is reconnecting, false otherwise
+     * @throws StarterCardNotSetException If the starter card of the player is not set
+     */
+    public void startGame(int playerID, boolean isReconnecting) throws StarterCardNotSetException {
+        PlayerModel player = IDToPlayerMap.get(playerID);
+
+        startTurnOrderPhase();
+
+        int currPlayerID = getCurrPlayerID();
+
+        List<PlaceableCard> visibleResCards = getVisibleResourceCards();
+        List<PlaceableCard> visibleGoldCards = getVisibleGoldenCards();
+
+        PlaceableCard resDeckCardID = getResourceCardsDeck().getDeck().getFirst();
+        PlaceableCard goldDeckCardID = getGoldenCardsDeck().getDeck().getFirst();
+
+        int[] playerIDs = new int[IDToPlayerMap.size()];
+        int[] starterCardIDs = new int[IDToPlayerMap.size()];
+        CardSideType[] starterCardSides = new CardSideType[IDToPlayerMap.size()];
+        TokenColors[] tokenColors = new TokenColors[IDToPlayerMap.size()];
+        int[][] playerHands = new int[IDToPlayerMap.size()][3];
+
+        int i = 0;
+        for (int id : IDToPlayerMap.keySet()) {
+            playerIDs[i] = IDToPlayerMap.get(id).getID();
+            starterCardIDs[i] = IDToPlayerMap.get(id).getStarterCard().getID();
+            starterCardSides[i] = IDToPlayerMap.get(id).getStarterCard().getCurrSideType();
+            tokenColors[i] = IDToPlayerMap.get(id).getTokenColor();
+            for (int j = 0; j < 3; j++) {
+                playerHands[i][j] = IDToPlayerMap.get(id).getHand().get(j).getID();
+            }
+
+            i++;
+        }
+
+        if (isReconnecting) {
+            for (Integer ID : IDToPlayerMap.keySet()) {
+                if (ID != playerID) {
+                    IDToPlayerMap.get(ID).getSender().sendFirstPlayerTurn(currPlayerID, playerIDs, starterCardIDs, starterCardSides,
+                            tokenColors, playerHands,
+                            resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                            goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
+                }
+                else {
+                    reconnect(player);
+                }
+            }
+        }
+        else {
+            for (Integer ID : getIDToPlayerMap().keySet()) {
+                IDToPlayerMap.get(ID).getSender().sendFirstPlayerTurn(playerID, currPlayerID, playerIDs, starterCardIDs, starterCardSides,
+                        tokenColors, playerHands,
+                        resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
+                        goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
+            }
+        }
     }
 
     /**
@@ -849,8 +934,6 @@ public class MatchModel {
      */
     private void reconnectPlayerAfterSetup(PlayerModel player) {
         int[] gameSetupCards = new int[13];
-
-        player.setState(PlayerState.COMPLETED_SETUP);
 
         // Add the IDs of the deck's cards to the array
         gameSetupCards[0] = getResourceCardsDeck().getDeck().getFirst().getID();

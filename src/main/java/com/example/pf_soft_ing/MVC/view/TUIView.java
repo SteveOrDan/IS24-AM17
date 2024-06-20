@@ -672,6 +672,11 @@ public class TUIView implements View {
     }
 
     @Override
+    public void showFirstPlayerTurnAfterRec(int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands) {
+        // TODO: Implement this method
+    }
+
+    @Override
     public void placeCard(int playerID, int cardID, Position pos, CardSideType side, int deltaScore) {
         makeSpace();
         if (this.playerID == playerID) {
@@ -2541,15 +2546,38 @@ public class TUIView implements View {
             }
         }
 
-        System.out.println("You have successfully reconnected to the match.");
+        System.out.println("""
+                You have successfully reconnected to the match.
+                
+                Now you can use the chat.
+                To view the match chat, type: gmc
+                To send a message in the chat, type: chat <recipient nickname> <message>
+                    recipient nickname can be 'all' to send a message to all players.
+
+                These are the available commands:
+                    Check your hand: gh
+                    Flip a card: fc <cardID>
+                    Check actual score: gs
+                    Check opponent's play area: opa <opponent nickname>
+                    Check your own play area: pa""");
 
         // Print the secret objective, common objectives, draw area and the player's hand
         printSecretObjective();
         System.out.println();
         printCommonObjectives();
         printDrawArea();
+
+        if (this.playerID == currPlayerID) {
+            playerState = PlayerState.PLACING;
+
+            System.out.println("""
+                    It's your turn.
+                    To place a card, type: pc <cardID> <posID>""");
+
+            // Print play area
+            printPlayArea();
+        }
         printPlayerHand();
-        System.out.println("It's " + getPlayerNickname(currPlayerID) + "'s turn.");
     }
 
     @Override

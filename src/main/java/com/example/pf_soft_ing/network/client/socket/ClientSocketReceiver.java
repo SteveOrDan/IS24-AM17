@@ -92,6 +92,16 @@ public class ClientSocketReceiver {
                         castedMsg.getTokenColors(), castedMsg.getPlayerHands());
             }
 
+            case FirstPlayerTurnAfterRecMsg castedMsg -> {
+                view.updateDrawArea(
+                        castedMsg.getResDeckCardID(), castedMsg.getVisibleResCardID1(), castedMsg.getVisibleResCardID2(),
+                        castedMsg.getGoldDeckCardID(), castedMsg.getVisibleGoldCardID1(), castedMsg.getVisibleGoldCardID2()
+                );
+                view.showFirstPlayerTurnAfterRec(castedMsg.getPlayerID(), castedMsg.getPlayerIDs(),
+                        castedMsg.getStarterCardIDs(), castedMsg.getStarterCardSides(),
+                        castedMsg.getTokenColors(), castedMsg.getPlayerHands());
+            }
+
             case ConfirmPlaceCardMsg castedMsg -> view.placeCard(castedMsg.getPlayerID(), castedMsg.getCardID(), castedMsg.getPos(), castedMsg.getSide(), castedMsg.getDeltaScore()) ;
 
             case NewPlayerTurnMsg castedMsg -> {

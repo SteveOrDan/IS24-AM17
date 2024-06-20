@@ -184,41 +184,7 @@ public class MatchController {
 
             // If all players are ready, start the turn order phase
             if (checkForTurnOrderPhase()) {
-                startTurnOrderPhase();
-
-                int currPlayerID = getCurrPlayerID();
-
-                List<PlaceableCard> visibleResCards = getVisibleResourceCards();
-                List<PlaceableCard> visibleGoldCards = getVisibleGoldenCards();
-
-                PlaceableCard resDeckCardID = checkFirstResDeckCard();
-                PlaceableCard goldDeckCardID = checkFirstGoldDeckCard();
-
-                int[] playerIDs = new int[getIDToPlayerMap().size()];
-                int[] starterCardIDs = new int[getIDToPlayerMap().size()];
-                CardSideType[] starterCardSides = new CardSideType[getIDToPlayerMap().size()];
-                TokenColors[] tokenColors = new TokenColors[getIDToPlayerMap().size()];
-                int[][] playerHands = new int[getIDToPlayerMap().size()][3];
-
-                int i = 0;
-                for (int id : getIDToPlayerMap().keySet()) {
-                    playerIDs[i] = getIDToPlayerMap().get(id).getID();
-                    starterCardIDs[i] = getIDToPlayerMap().get(id).getStarterCard().getID();
-                    starterCardSides[i] = getIDToPlayerMap().get(id).getStarterCard().getCurrSideType();
-                    tokenColors[i] = getIDToPlayerMap().get(id).getTokenColor();
-                    for (int j = 0; j < 3; j++) {
-                        playerHands[i][j] = getIDToPlayerMap().get(id).getHand().get(j).getID();
-                    }
-
-                    i++;
-                }
-
-                for (Integer ID : getIDToPlayerMap().keySet()) {
-                    getPlayerSender(ID).sendFirstPlayerTurn(playerID, currPlayerID, playerIDs, starterCardIDs, starterCardSides,
-                            tokenColors, playerHands,
-                            resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(),
-                            goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID());
-                }
+                matchModel.startGame(playerID, false);
             }
             else {
                 getPlayerSender(playerID).confirmSecretObjective();
@@ -720,7 +686,6 @@ public class MatchController {
     public void chatMessage(int senderID, String recipient, String message) {
         try {
             String senderNickname = matchModel.getIDToPlayerMap().get(senderID).getNickname();
-            System.out.println(senderNickname + " sent a message to " + recipient + ": " + message);
 
             if (recipient.equals("all")) {
                 for (int broadcastID : getIDToPlayerMap().keySet()) {
@@ -791,9 +756,6 @@ public class MatchController {
         if (matchModel.getVisibleGoldenCards().size() > 1) {
             visibleGoldCardID2 = matchModel.getVisibleGoldenCards().get(1).getID();
         }
-
-        System.out.println("New common res cards: " + resDeckCardID + " " + visibleResCardID1 + " " + visibleResCardID2);
-        System.out.println("New common gold cards: " + goldDeckCardID + " " + visibleGoldCardID1 + " " + visibleGoldCardID2);
 
         if (changedState){
             for (Integer broadcastID : getIDToPlayerMap().keySet()) {

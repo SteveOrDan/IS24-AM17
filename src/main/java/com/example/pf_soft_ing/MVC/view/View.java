@@ -93,6 +93,19 @@ public interface View {
                              TokenColors[] tokenColors, int[][] playerHands);
 
     /**
+     * Shows the first player's turn after a reconnection
+     * @param playerID ID of the player who reconnected
+     * @param playerIDs IDs of the players
+     * @param starterCardIDs IDs of the starter cards
+     * @param starterCardSides Sides of the starter cards
+     * @param tokenColors Token colors of the players
+     * @param playerHands Hands of the players
+     */
+    void showFirstPlayerTurnAfterRec(int playerID, int[] playerIDs,
+                                     int[] starterCardIDs, CardSideType[] starterCardSides,
+                                     TokenColors[] tokenColors, int[][] playerHands);
+
+    /**
      * Shows the new player's turn.
      * @param drawnCardID ID of the drawn card
      * @param lastPlayerID ID of the last player

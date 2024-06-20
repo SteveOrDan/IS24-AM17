@@ -112,6 +112,26 @@ public interface Sender {
                              int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
 
     /**
+     * Notifies all players of the first turn of the game, when the game starts after a player reconnection.
+     * @param playerID ID of the player that starts the game
+     * @param playerIDs IDs of all players in the game
+     * @param starterCardIDs IDs of the starter cards of each player
+     * @param starterCardSides Sides of the starter cards of each player
+     * @param tokenColors Token colors of each player
+     * @param playerHands Hands of each player
+     * @param resDeckCardID ID of the resource deck card
+     * @param visibleResCardID1 ID of the first visible resource card
+     * @param visibleResCardID2 ID of the second visible resource card
+     * @param goldDeckCardID ID of the gold deck card
+     * @param visibleGoldCardID1 ID of the first visible gold card
+     * @param visibleGoldCardID2 ID of the second visible gold card
+     */
+    void sendFirstPlayerTurn(int playerID, int[] playerIDs, int[] starterCardIDs,
+                                     CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands,
+                                     int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
+                                     int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2);
+
+    /**
      * Notifies all players of the new turn of a player.
      * @param drawnCardID ID of the drawn card
      * @param lastPlayerID ID of the last player acting
