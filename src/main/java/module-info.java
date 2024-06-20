@@ -25,8 +25,6 @@ module com.example.pf_soft_ing {
     exports com.example.pf_soft_ing.JSONDeserializers.corner;
     opens com.example.pf_soft_ing.JSONDeserializers.corner to javafx.fxml;
 
-    exports com.example.pf_soft_ing.game;
-    opens com.example.pf_soft_ing.game to javafx.fxml;
     exports com.example.pf_soft_ing.MVC.model.player;
     opens com.example.pf_soft_ing.MVC.model.player to javafx.fxml;
     exports com.example.pf_soft_ing.card.decks;
