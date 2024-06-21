@@ -613,7 +613,8 @@ public class TUIView implements View {
 
     @Override
     public void showFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs,
-                                    int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands) {
+                                    int[] starterCardIDs, CardSideType[] starterCardSides,
+                                    TokenColors[] tokenColors, int[][] playerHands) {
         if (this.playerID == lastPlayerID) {
             confirmSecretObjective();
         }
@@ -672,8 +673,60 @@ public class TUIView implements View {
     }
 
     @Override
-    public void showFirstPlayerTurnAfterRec(int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands) {
-        // TODO: Implement this method
+    public void showFirstPlayerTurnAfterRec(int playerID, int[] playerIDs,
+                                            int[] starterCardIDs, CardSideType[] starterCardSides,
+                                            TokenColors[] tokenColors, int[][] playerHands) {
+        // Add starter card to opponents' play areas
+        for (int i = 0; i < playerIDs.length; i++){
+            if (playerIDs[i] != this.playerID) {
+                getOpponentByID(playerIDs[i]).setTokenColor(tokenColors[i]);
+                getOpponentByID(playerIDs[i]).placeCardInPlayArea(starterCardIDs[i], starterCardSides[i], new Position(0, 0), 0);
+
+                for (int cardID : playerHands[i]) {
+                    getOpponentByID(playerIDs[i]).drawCard(cardID);
+                }
+            }
+            else {
+                setTokenColor(tokenColors[i]);
+            }
+        }
+
+        makeSpace();
+        System.out.println("""
+                Now you can use the chat.
+                To view the match chat, type: gmc
+                To send a message in the chat, type: chat <recipient nickname> <message>
+                    recipient nickname can be 'all' to send a message to all players.""");
+
+        if (playerID == this.playerID) {
+            playerState = PlayerState.PLACING;
+            System.out.println("\nIt's your turn.");
+
+            // Print player hand
+            printPlayerHand();
+
+            // Print play area
+            printPlayArea();
+
+            // Print available commands
+            System.out.println("""
+                    These are the available commands:
+                    Check your hand: gh
+                    Flip a card: fc <cardID>
+                    Place a card: pc <cardID> <posID>
+                    Check actual score: gs
+                    Check opponent's play area: opa <opponent nickname>
+                    Check your own play area: pa""");
+        }
+        else {
+            playerState = PlayerState.WAITING;
+            String playerNickname = getPlayerNickname(playerID);
+
+            System.out.println("\nIt's " + playerNickname + "'s turn.\n" +
+                    "While waiting you can: \n" +
+                    "\t- Flip a card in your hand by typing: fc <cardID>\n" +
+                    "\t- Check your hand by typing: gh");
+        }
     }
 
     @Override
@@ -1055,10 +1108,10 @@ public class TUIView implements View {
         }
 
         // Get the max and min values of x and y
-        int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
-        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
-        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
-        int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
+        int maxX = playArea.keySet().stream().map(Position::x).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::x).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::y).max(Integer::compareTo).orElse(0);
+        int minY = playArea.keySet().stream().map(Position::y).min(Integer::compareTo).orElse(0);
 
         // +3 because of the starter card and the 1 extra space on each border (for the validPosIDs)
         PlaceableCard[][] cardArr = new PlaceableCard[maxY - minY + 3][maxX - minX + 3];
@@ -1069,7 +1122,7 @@ public class TUIView implements View {
 
         // Fill the array with elements from the playArea map
         for (Position pos : playArea.keySet()) {
-            cardArr[-pos.getY() + maxY + 1][pos.getX() - minX + 1] = playArea.get(pos);
+            cardArr[-pos.y() + maxY + 1][pos.x() - minX + 1] = playArea.get(pos);
         }
 
         // Fill array of characters to print
@@ -1280,20 +1333,20 @@ public class TUIView implements View {
             return;
         }
 
-        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
-        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::x).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::y).max(Integer::compareTo).orElse(0);
 
         // Fill the validPosIDs
         for (int i : posIDToValidPos.keySet()) {
             Position pos = posIDToValidPos.get(i);
-            Position arrPos = new Position(3 * (pos.getX() - minX + 1), 3 * (-pos.getY() + maxY + 1));
+            Position arrPos = new Position(3 * (pos.x() - minX + 1), 3 * (-pos.y() + maxY + 1));
 
             if (i < 10) {
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = String.valueOf(i);
+                playAreaArr[arrPos.y() + 2][arrPos.x() + 2] = String.valueOf(i);
             }
             else {
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 1] = String.valueOf(i / 10);
-                playAreaArr[arrPos.getY() + 2][arrPos.getX() + 2] = String.valueOf(i % 10);
+                playAreaArr[arrPos.y() + 2][arrPos.x() + 1] = String.valueOf(i / 10);
+                playAreaArr[arrPos.y() + 2][arrPos.x() + 2] = String.valueOf(i % 10);
             }
         }
 
@@ -1388,31 +1441,31 @@ public class TUIView implements View {
         Side currSide = card.getCurrSide();
 
         if (currSide.getBLCorner().isAvailable()) {
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
         else {
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
 
         if (currSide.getBRCorner().isAvailable()) {
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
         else {
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
 
         if (currSide.getTLCorner().isAvailable()) {
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
         else {
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
 
         if (currSide.getTRCorner().isAvailable()) {
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
         else {
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
 
         for (Position p : newIllegalPos) {

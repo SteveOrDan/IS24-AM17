@@ -358,31 +358,31 @@ class MatchControllerTest {
         Side chosenSide = player.getPlayArea().get(pos).getCurrSide();
 
         if (chosenSide.getBLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
 
         if (chosenSide.getBRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
 
         if (chosenSide.getTLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
 
         if (chosenSide.getTRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
 
         for (Position p : newIllegalPos){

@@ -2,29 +2,25 @@ package com.example.pf_soft_ing.utils;
 
 import java.io.Serializable;
 
-public class Position implements Serializable {
-
-    private final int x;
-    private final int y;
-
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
+public record Position(int x, int y) implements Serializable {
 
     /**
      * Getter
+     *
      * @return X value of position
      */
-    public int getX() {
+    @Override
+    public int x() {
         return x;
     }
 
     /**
      * Getter
+     *
      * @return Y value of position
      */
-    public int getY() {
+    @Override
+    public int y() {
         return y;
     }
 
@@ -39,10 +35,4 @@ public class Position implements Serializable {
         return y == position.y;
     }
 
-    @Override
-    public int hashCode() {
-        int result = x;
-        result = 31 * result + y;
-        return result;
-    }
 }

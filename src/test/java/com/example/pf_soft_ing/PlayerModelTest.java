@@ -9,15 +9,11 @@ import com.example.pf_soft_ing.exceptions.cards.PlacingOnInvalidCornerException;
 import com.example.pf_soft_ing.exceptions.cards.PositionAlreadyTakenException;
 import com.example.pf_soft_ing.exceptions.match.MissingResourcesException;
 import com.example.pf_soft_ing.exceptions.player.InvalidPlayerStateException;
-import com.example.pf_soft_ing.network.server.socket.SocketSender;
 import com.example.pf_soft_ing.card.*;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.utils.Position;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 

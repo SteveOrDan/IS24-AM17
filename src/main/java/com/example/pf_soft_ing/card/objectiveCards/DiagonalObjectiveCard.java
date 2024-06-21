@@ -40,13 +40,13 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
             if (playArea.get(pos).getElementType().equals(elementType) && !usedPositions.contains(pos)){
                 Position currPos = pos;
 
-                Position newPos = new Position(pos.getX() + direction, pos.getY() + 1);
+                Position newPos = new Position(pos.x() + direction, pos.y() + 1);
                 PlaceableCard nextCard = playArea.get(newPos);
 
                 while (nextCard != null && nextCard.getElementType().equals(elementType) && !usedPositions.contains(newPos)){
                     currPos = newPos;
 
-                    newPos = new Position(newPos.getX() + direction, newPos.getY() + 1);
+                    newPos = new Position(newPos.x() + direction, newPos.y() + 1);
                     nextCard = playArea.get(newPos);
                 }
 
@@ -55,9 +55,9 @@ public abstract class DiagonalObjectiveCard extends ObjectiveCard {
                 // And I'm also sure that currPos is a valid value (not null)
 
                 // Card adjacent to the curr card
-                Position diagPos1 = new Position(currPos.getX() - direction, currPos.getY() - 1);
+                Position diagPos1 = new Position(currPos.x() - direction, currPos.y() - 1);
                 // Card adjacent to diagCard1
-                Position diagPos2 = new Position(currPos.getX() - 2 * direction, currPos.getY() - 2);
+                Position diagPos2 = new Position(currPos.x() - 2 * direction, currPos.y() - 2);
 
                 PlaceableCard diagCard1 = playArea.get(diagPos1);
                 PlaceableCard diagCard2 = playArea.get(diagPos2);

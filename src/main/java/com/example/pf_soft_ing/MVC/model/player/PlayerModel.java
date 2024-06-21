@@ -403,10 +403,10 @@ public class PlayerModel {
      */
     private ArrayList<CardCorner> getAdjacentCorners(Position pos) throws NoAdjacentCardsException, PlacingOnInvalidCornerException {
         ArrayList<CardCorner> adjacentCorners = new ArrayList<>() {{
-            PlaceableCard TRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() + 1));
-            PlaceableCard BRCard = playArea.get(new Position(pos.getX() + 1, pos.getY() - 1));
-            PlaceableCard BLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() - 1));
-            PlaceableCard TLCard = playArea.get(new Position(pos.getX() - 1, pos.getY() + 1));
+            PlaceableCard TRCard = playArea.get(new Position(pos.x() + 1, pos.y() + 1));
+            PlaceableCard BRCard = playArea.get(new Position(pos.x() + 1, pos.y() - 1));
+            PlaceableCard BLCard = playArea.get(new Position(pos.x() - 1, pos.y() - 1));
+            PlaceableCard TLCard = playArea.get(new Position(pos.x() - 1, pos.y() + 1));
 
             if (TRCard != null) {
                 Side currSide = TRCard.getCurrSide();

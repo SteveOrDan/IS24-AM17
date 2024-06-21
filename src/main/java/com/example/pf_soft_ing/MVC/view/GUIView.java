@@ -1155,10 +1155,10 @@ public class GUIView implements View {
      */
     private AnchorPane createEnemyPlayField(Map<Position, PlaceableCard> playArea) {
         // Calculate number of rows and columns
-        int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
-        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
-        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
-        int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
+        int maxX = playArea.keySet().stream().map(Position::x).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::x).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::y).max(Integer::compareTo).orElse(0);
+        int minY = playArea.keySet().stream().map(Position::y).min(Integer::compareTo).orElse(0);
 
         int columns = maxX - minX + 1;
         int rows = maxY - minY + 1;
@@ -1202,10 +1202,10 @@ public class GUIView implements View {
 
             cardPane.getChildren().add(cardImgV);
 
-            Position gridPos = new Position(pos.getX() - minX, -pos.getY() + maxY);
+            Position gridPos = new Position(pos.x() - minX, -pos.y() + maxY);
 
             // Add card to the grid
-            playAreaGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+            playAreaGrid.add(cardPane, gridPos.x(), gridPos.y());
         }
 
         scrollContent.getChildren().add(playAreaGrid);
@@ -1677,10 +1677,10 @@ public class GUIView implements View {
     private void addPlaceButtons(int ID, Position pos){
         PlaceableCard card = GameResources.getPlaceableCardByID(ID);
 
-        Position blPos = new Position(pos.getX() - 1, pos.getY() - 1);
-        Position brPos = new Position(pos.getX() + 1, pos.getY() - 1);
-        Position tlPos = new Position(pos.getX() - 1, pos.getY() + 1);
-        Position trPos = new Position(pos.getX() + 1, pos.getY() + 1);
+        Position blPos = new Position(pos.x() - 1, pos.y() - 1);
+        Position brPos = new Position(pos.x() + 1, pos.y() - 1);
+        Position tlPos = new Position(pos.x() - 1, pos.y() + 1);
+        Position trPos = new Position(pos.x() + 1, pos.y() + 1);
 
         if (card.getCurrSide().getBLCorner().isAvailable() && !illegalPosList.contains(blPos) && !validPosToButtonPane.containsKey(blPos)){
             addPlaceButtonAtPos(blPos);
@@ -1713,7 +1713,7 @@ public class GUIView implements View {
 
         positionPane.getChildren().add(placeButton);
         Position buttonGridPos = mapToGridPos(pos);
-        playerFieldGrid.add(positionPane, buttonGridPos.getX(), buttonGridPos.getY());
+        playerFieldGrid.add(positionPane, buttonGridPos.x(), buttonGridPos.y());
         validPosToButtonPane.put(pos, positionPane);
     }
 
@@ -1730,31 +1730,31 @@ public class GUIView implements View {
         Side currSide = card.getCurrSide();
 
         if (currSide.getBLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
         }
 
         if (currSide.getBRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() - 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
         }
 
         if (currSide.getTLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() - 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
         }
 
         if (currSide.getTRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newLegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
         else{
-            newIllegalPos.add(new Position(pos.getX() + 1, pos.getY() + 1));
+            newIllegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
         }
 
         for (Position p : newIllegalPos){
@@ -1790,7 +1790,7 @@ public class GUIView implements View {
      * @return Position on the grid
      */
     private Position mapToGridPos(Position mapPos){
-        return new Position(mapPos.getX() + gridRows / 2, gridColumns / 2 - mapPos.getY());
+        return new Position(mapPos.x() + gridRows / 2, gridColumns / 2 - mapPos.y());
     }
 
     /**
@@ -1799,8 +1799,8 @@ public class GUIView implements View {
      * @param pos Position to place the card
      */
     private void placeCardAction(PlaceableCard card, Position pos){
-        if (pos.getX() <= -gridColumns / 2 || pos.getX() >= gridColumns / 2 ||
-                pos.getY() <= -gridRows / 2 || pos.getY() >= gridRows / 2){
+        if (pos.x() <= -gridColumns / 2 || pos.x() >= gridColumns / 2 ||
+                pos.y() <= -gridRows / 2 || pos.y() >= gridRows / 2){
             updateGridDimension();
         }
 
@@ -1820,7 +1820,7 @@ public class GUIView implements View {
         updatePlacementPositions(pos);
 
         // Clear Pane in the grid position
-        playerFieldGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == mapToGridPos(pos).getY() && GridPane.getColumnIndex(node) == mapToGridPos(pos).getX());
+        playerFieldGrid.getChildren().removeIf(node -> GridPane.getRowIndex(node) == mapToGridPos(pos).y() && GridPane.getColumnIndex(node) == mapToGridPos(pos).x());
 
         // Create Pane for card
         Pane cardPane = new Pane();
@@ -1842,7 +1842,7 @@ public class GUIView implements View {
         Position gridPos = mapToGridPos(pos);
 
         // Add card to the grid
-        playerFieldGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+        playerFieldGrid.add(cardPane, gridPos.x(), gridPos.y());
     }
 
     /**
@@ -2745,10 +2745,10 @@ public class GUIView implements View {
         borderRect.setMouseTransparent(true);
 
         // Calculate number of rows and columns
-        int maxX = playArea.keySet().stream().map(Position::getX).max(Integer::compareTo).orElse(0);
-        int minX = playArea.keySet().stream().map(Position::getX).min(Integer::compareTo).orElse(0);
-        int maxY = playArea.keySet().stream().map(Position::getY).max(Integer::compareTo).orElse(0);
-        int minY = playArea.keySet().stream().map(Position::getY).min(Integer::compareTo).orElse(0);
+        int maxX = playArea.keySet().stream().map(Position::x).max(Integer::compareTo).orElse(0);
+        int minX = playArea.keySet().stream().map(Position::x).min(Integer::compareTo).orElse(0);
+        int maxY = playArea.keySet().stream().map(Position::y).max(Integer::compareTo).orElse(0);
+        int minY = playArea.keySet().stream().map(Position::y).min(Integer::compareTo).orElse(0);
 
         int columns = maxX - minX + 1;
         int rows = maxY - minY + 1;
@@ -2799,10 +2799,10 @@ public class GUIView implements View {
 
             cardPane.getChildren().add(cardImgV);
 
-            Position gridPos = new Position(pos.getX() - minX, pos.getY() - minY);
+            Position gridPos = new Position(pos.x() - minX, pos.y() - minY);
 
             // Add card to the grid
-            playAreaGrid.add(cardPane, gridPos.getX(), gridPos.getY());
+            playAreaGrid.add(cardPane, gridPos.x(), gridPos.y());
         }
 
         scrollContent.getChildren().add(playAreaGrid);

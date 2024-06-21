@@ -53,9 +53,9 @@ public abstract class LShapeObjectiveCard extends ObjectiveCard {
             if (playArea.get(pos).getElementType().equals(mainElementType) && !usedPositions.contains(pos)){
 
                 // Card adjacent to the main card
-                Position diagPos = new Position(pos.getX() + xDirection, pos.getY() + yDirection);
+                Position diagPos = new Position(pos.x() + xDirection, pos.y() + yDirection);
                 // Card under or over the other secondary card
-                Position farPos = new Position(pos.getX() + xDirection, pos.getY() + 3 * yDirection);
+                Position farPos = new Position(pos.x() + xDirection, pos.y() + 3 * yDirection);
 
                 PlaceableCard diagCard = playArea.get(diagPos);
                 PlaceableCard farCard = playArea.get(farPos);
