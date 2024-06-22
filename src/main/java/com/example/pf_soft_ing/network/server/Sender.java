@@ -2,8 +2,8 @@ package com.example.pf_soft_ing.network.server;
 
 import com.example.pf_soft_ing.utils.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.MVC.model.game.GameState;
-import com.example.pf_soft_ing.MVC.model.player.TokenColors;
+import com.example.pf_soft_ing.mvc.model.game.GameState;
+import com.example.pf_soft_ing.mvc.model.player.TokenColors;
 
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,6 @@ public interface Sender {
 
     /**
      * Sends all the information needed to start the game.
-     * @param nickname Nickname of the player
      * @param IDtoOpponentNickname Map of player IDs to nicknames
      * @param resDeckCardID ID of the resource deck card
      * @param visibleResCardID1 ID of the first visible resource card
@@ -55,7 +54,7 @@ public interface Sender {
      * @param visibleGoldCardID2 ID of the second visible gold card
      * @param starterCardID ID of the starter card
      */
-    void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname,
+    void sendGameStart(Map<Integer, String> IDtoOpponentNickname,
                        int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                        int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                        int starterCardID);

@@ -4,8 +4,8 @@ import com.example.pf_soft_ing.exceptions.match.InvalidMatchIDException;
 import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.answers.PongMsg;
 import com.example.pf_soft_ing.network.messages.requests.*;
-import com.example.pf_soft_ing.MVC.controller.GameController;
-import com.example.pf_soft_ing.MVC.controller.MatchController;
+import com.example.pf_soft_ing.mvc.controller.GameController;
+import com.example.pf_soft_ing.mvc.controller.MatchController;
 import com.example.pf_soft_ing.network.server.DisconnectionManager;
 import com.example.pf_soft_ing.network.server.Sender;
 

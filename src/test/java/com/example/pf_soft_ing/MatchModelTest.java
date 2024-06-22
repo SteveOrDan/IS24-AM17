@@ -3,7 +3,7 @@ package com.example.pf_soft_ing;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.card.objectiveCards.ObjectiveCard;
 import com.example.pf_soft_ing.exceptions.cards.NotEnoughCardsException;
-import com.example.pf_soft_ing.MVC.model.game.MatchModel;
+import com.example.pf_soft_ing.mvc.model.game.MatchModel;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ class MatchModelTest {
 
         List<PlaceableCard> resourceCardsDeck = new ArrayList<>(matchModel.getResourceCardsDeck().getDeck());
         List<PlaceableCard> goldenCardsDeck = new ArrayList<>(matchModel.getGoldenCardsDeck().getDeck());
-        List<PlaceableCard> starterCardsDeck = new ArrayList<>(matchModel.getStarterCardsDeck().getDeck());
+        List<PlaceableCard> starterCardsDeck = new ArrayList<>(matchModel.getStarterCardsDeck().deck());
         List<ObjectiveCard> objectiveCardsDeck = new ArrayList<>(matchModel.getObjectiveCardsDeck().getDeck());
 
         matchModel.shuffleAllDecks();
@@ -58,7 +58,7 @@ class MatchModelTest {
 
         isSame = true;
         for(PlaceableCard card : starterCardsDeck){
-            if (starterCardsDeck.indexOf(card) != matchModel.getStarterCardsDeck().getDeck().indexOf(card)){
+            if (starterCardsDeck.indexOf(card) != matchModel.getStarterCardsDeck().deck().indexOf(card)){
                 isSame = false;
                 break;
             }
@@ -133,7 +133,7 @@ class MatchModelTest {
         PlaceableCard card = matchModel.drawStarterCard();
 
         assertNotNull(card);
-        assertFalse(matchModel.getStarterCardsDeck().getDeck().contains(card));
+        assertFalse(matchModel.getStarterCardsDeck().deck().contains(card));
     }
 
     @Test

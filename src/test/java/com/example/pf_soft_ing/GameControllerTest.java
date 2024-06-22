@@ -2,11 +2,11 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.match.InvalidMatchIDException;
-import com.example.pf_soft_ing.MVC.model.game.GameState;
-import com.example.pf_soft_ing.MVC.controller.MatchController;
-import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
+import com.example.pf_soft_ing.mvc.model.game.GameState;
+import com.example.pf_soft_ing.mvc.controller.MatchController;
+import com.example.pf_soft_ing.mvc.model.player.PlayerModel;
 import org.junit.jupiter.api.Test;
-import com.example.pf_soft_ing.MVC.controller.GameController;
+import com.example.pf_soft_ing.mvc.controller.GameController;
 
 import static org.junit.jupiter.api.Assertions.*;
 

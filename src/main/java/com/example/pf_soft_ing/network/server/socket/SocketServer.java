@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.network.server.socket;
 
-import com.example.pf_soft_ing.MVC.controller.GameController;
+import com.example.pf_soft_ing.mvc.controller.GameController;
 
 import java.net.ServerSocket;
 import java.net.Socket;

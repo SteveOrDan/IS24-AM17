@@ -1,13 +1,13 @@
 package com.example.pf_soft_ing.network.client;
 
-import com.example.pf_soft_ing.MVC.view.View;
+import com.example.pf_soft_ing.mvc.view.View;
 import com.example.pf_soft_ing.app.GUIApp;
 import com.example.pf_soft_ing.app.TUIApp;
-import com.example.pf_soft_ing.network.client.RMI.ClientRMIReceiver;
-import com.example.pf_soft_ing.network.client.RMI.ClientRMISender;
+import com.example.pf_soft_ing.network.client.rmi.ClientRMIReceiver;
+import com.example.pf_soft_ing.network.client.rmi.ClientRMISender;
 import com.example.pf_soft_ing.network.client.socket.ClientSocketReceiver;
 import com.example.pf_soft_ing.network.client.socket.ClientSocketSender;
-import com.example.pf_soft_ing.network.server.RMI.RMIReceiverInterface;
+import com.example.pf_soft_ing.network.server.rmi.RMIReceiverInterface;
 
 import java.io.*;
 import java.net.Socket;

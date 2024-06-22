@@ -32,18 +32,18 @@ public class ReturnMatchesMsg extends Message {
 
     @Override
     public String toString() {
-        String result = "Matches found:";
+        StringBuilder result = new StringBuilder("Matches found:");
 
         for (Integer matchID : matches.keySet()) {
-            result += "\n\t" + matchID + " with players:";
+            result.append("\n\t").append(matchID).append(" with players:");
 
             for (String player : matches.get(matchID)) {
-                result += "\n\t\t- " + player;
+                result.append("\n\t\t- ").append(player);
             }
 
-            result += "\n";
+            result.append("\n");
         }
 
-        return result;
+        return result.toString();
     }
 }

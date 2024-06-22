@@ -1,8 +1,8 @@
 package com.example.pf_soft_ing;
 
-import com.example.pf_soft_ing.MVC.model.game.GameResources;
-import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
-import com.example.pf_soft_ing.MVC.model.player.PlayerState;
+import com.example.pf_soft_ing.mvc.model.game.GameResources;
+import com.example.pf_soft_ing.mvc.model.player.PlayerModel;
+import com.example.pf_soft_ing.mvc.model.player.PlayerState;
 import com.example.pf_soft_ing.card.side.CardSideType;
 import com.example.pf_soft_ing.exceptions.cards.NoAdjacentCardsException;
 import com.example.pf_soft_ing.exceptions.cards.PlacingOnInvalidCornerException;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerModelTest {
-    // TODO: Fix the tests adding the necessary set state for the player model and using game resources to get the cards
 
     private PlayerModel playerModel;
 

@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.network.client.socket;
 
-import com.example.pf_soft_ing.MVC.view.View;
+import com.example.pf_soft_ing.mvc.view.View;
 import com.example.pf_soft_ing.network.messages.*;
 import com.example.pf_soft_ing.network.messages.answers.*;
 import com.example.pf_soft_ing.network.messages.requests.CloseConnectionMsg;

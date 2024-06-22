@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.app;
 
-import com.example.pf_soft_ing.MVC.view.GUIView;
+import com.example.pf_soft_ing.mvc.view.GUIView;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

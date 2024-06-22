@@ -30,14 +30,14 @@ public class SelectMatchResultMsg extends Message {
 
     @Override
     public String toString() {
-        String res = "Joined match with ID: " + matchID + ". Current players: ";
+        StringBuilder res = new StringBuilder("Joined match with ID: " + matchID + ". Current players: ");
 
         for (String nickname : nicknames) {
-            res += nickname + ", ";
+            res.append(nickname).append(", ");
         }
 
-        res = res.substring(0, res.length() - 2);
+        res = new StringBuilder(res.substring(0, res.length() - 2));
 
-        return res;
+        return res.toString();
     }
 }

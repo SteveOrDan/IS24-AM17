@@ -11,16 +11,15 @@ import com.example.pf_soft_ing.exceptions.player.InvalidPlayerIDException;
 import com.example.pf_soft_ing.exceptions.player.NicknameAlreadyExistsException;
 import com.example.pf_soft_ing.exceptions.player.NicknameNotInMatch;
 import com.example.pf_soft_ing.exceptions.player.SpecifiedPlayerNotDisconnected;
-import com.example.pf_soft_ing.MVC.controller.GameController;
-import com.example.pf_soft_ing.MVC.model.game.GameResources;
-import com.example.pf_soft_ing.MVC.model.game.GameState;
-import com.example.pf_soft_ing.MVC.controller.MatchController;
-import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
-import com.example.pf_soft_ing.MVC.model.player.PlayerState;
-import com.example.pf_soft_ing.MVC.model.player.TokenColors;
+import com.example.pf_soft_ing.mvc.controller.GameController;
+import com.example.pf_soft_ing.mvc.model.game.GameResources;
+import com.example.pf_soft_ing.mvc.model.game.GameState;
+import com.example.pf_soft_ing.mvc.controller.MatchController;
+import com.example.pf_soft_ing.mvc.model.player.PlayerModel;
+import com.example.pf_soft_ing.mvc.model.player.PlayerState;
+import com.example.pf_soft_ing.mvc.model.player.TokenColors;
 import com.example.pf_soft_ing.card.PlaceableCard;
 import com.example.pf_soft_ing.utils.Position;
-import com.example.pf_soft_ing.card.side.Side;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -259,152 +258,6 @@ class MatchControllerTest {
         }
 
         assertEquals(1, firstPlayers);
-    }
-
-    private void placeCardAction(HashMap<Integer, ArrayList<Position>> plIdToLegalPos, HashMap<Integer, ArrayList<Position>> plIdToIllegalPos){
-        PlayerModel currPlayer = getCurrentPlayer();
-        int currPlayerID = getCurrentPlayerId();
-
-        Random rng = new Random();
-
-        ArrayList<Integer> cardIDsInHand = new ArrayList<>();
-
-        for (PlaceableCard card : currPlayer.getHand()){
-            if (card.hasEnoughRequiredResources(currPlayer.getNumOfResourcesArr(), CardSideType.FRONT)){
-                cardIDsInHand.add(card.getID());
-            }
-        }
-
-        CardSideType side = CardSideType.FRONT;
-
-        // If we can't place any card because of missing resources, side is now back
-        if (cardIDsInHand.isEmpty()){
-            side = CardSideType.BACK;
-            for (PlaceableCard card : currPlayer.getHand()){
-                cardIDsInHand.add(card.getID());
-            }
-        }
-
-        int cardIndexInHand = rng.nextInt(cardIDsInHand.size());
-
-        int cardToPlaceID = cardIDsInHand.get(cardIndexInHand);
-
-        int positionIndex = rng.nextInt(plIdToLegalPos.get(currPlayerID).size());
-
-        Position positionToPlace = plIdToLegalPos.get(currPlayerID).get(positionIndex);
-
-        CardSideType finalSide = side;
-        assertDoesNotThrow(()-> matchController.placeCard(currPlayerID, cardToPlaceID, positionToPlace, finalSide));
-
-        // Update legal and illegal positions
-        updateIlLegalPositions(plIdToLegalPos, plIdToIllegalPos, currPlayerID, positionToPlace);
-    }
-
-    private void drawCardAction(){
-        int currPlayerID = getCurrentPlayerId();
-
-        Random rng = new Random();
-
-        // 0: visible resource, 1: deck resource, 2: visible golden, 3: deck golden
-        ArrayList<Integer> drawOptions = new ArrayList<>(){{add(0); add(1); add(2); add(3);}};
-
-        while (getCurrentPlayer().getHand().size() < 3){
-            int rand = rng.nextInt(drawOptions.size());
-
-            if (drawOptions.isEmpty()){
-                break;
-            }
-
-            switch (drawOptions.get(rand)){
-                case 0:
-                    // Draw visible resource
-                    matchController.drawVisibleResourceCard(currPlayerID, rng.nextInt(2));
-                    break;
-                case 1:
-                    // Draw deck resource
-                    try {
-                        matchController.drawResourceCard(currPlayerID);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                case 2:
-                    // Draw visible golden
-                    matchController.drawVisibleGoldenCard(currPlayerID, rng.nextInt(2));
-                    break;
-                case 3:
-                    // Draw deck golden
-                    try {
-                        matchController.drawGoldenCard(currPlayerID);
-                    } catch (Exception e) {
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-            }
-
-            drawOptions.remove(drawOptions.get(rand));
-        }
-    }
-
-    private void updateIlLegalPositions(HashMap<Integer, ArrayList<Position>> plIdToLegalPos,
-                                                              HashMap<Integer, ArrayList<Position>> plIdToIllegalPos,
-                                                              int playerID, Position pos){
-
-        PlayerModel player = matchController.getIDToPlayerMap().get(playerID);
-
-        ArrayList<Position> newLegalPos = new ArrayList<>();
-        ArrayList<Position> newIllegalPos = new ArrayList<>();
-
-        Side chosenSide = player.getPlayArea().get(pos).getCurrSide();
-
-        if (chosenSide.getBLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.x() - 1, pos.y() - 1));
-        }
-
-        if (chosenSide.getBRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.x() + 1, pos.y() - 1));
-        }
-
-        if (chosenSide.getTLCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.x() - 1, pos.y() + 1));
-        }
-
-        if (chosenSide.getTRCorner().isAvailable()){
-            newLegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
-        }
-        else{
-            newIllegalPos.add(new Position(pos.x() + 1, pos.y() + 1));
-        }
-
-        for (Position p : newIllegalPos){
-            if (!plIdToIllegalPos.get(playerID).contains(p)){
-                plIdToIllegalPos.get(playerID).add(p);
-            }
-
-            plIdToLegalPos.get(playerID).remove(p);
-        }
-
-        for (Position p : newLegalPos){
-            if (!plIdToLegalPos.get(playerID).contains(p) && !plIdToIllegalPos.get(playerID).contains(p)){
-                plIdToLegalPos.get(playerID).add(p);
-            }
-        }
-
-        // Set the new card's position as illegal (a card just got placed)
-        plIdToLegalPos.get(playerID).remove(pos);
-
-        if (!plIdToIllegalPos.get(playerID).contains(pos)){
-            plIdToIllegalPos.get(playerID).add(pos);
-        }
     }
 
     private PlayerModel getCurrentPlayer(){

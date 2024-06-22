@@ -2,9 +2,9 @@ package com.example.pf_soft_ing;
 
 import com.example.pf_soft_ing.utils.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.MVC.model.game.GameState;
+import com.example.pf_soft_ing.mvc.model.game.GameState;
 import com.example.pf_soft_ing.network.server.Sender;
-import com.example.pf_soft_ing.MVC.model.player.TokenColors;
+import com.example.pf_soft_ing.mvc.model.player.TokenColors;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ public class TestSender implements Sender {
     }
 
     @Override
-    public void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
+    public void sendGameStart(Map<Integer, String> IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) {
 
     }
 

@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class GameStartMsg extends Message {
 
-    private final String nickname;
     private final Map<Integer, String> IDToNicknameMap;
 
     private final int resDeckCardID;
@@ -19,11 +18,10 @@ public class GameStartMsg extends Message {
 
     private final int starterCardID;
 
-    public GameStartMsg(String nickname, Map<Integer, String> IDToNicknameMap,
+    public GameStartMsg(Map<Integer, String> IDToNicknameMap,
                         int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                         int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                         int starterCardID) {
-        this.nickname = nickname;
         this.IDToNicknameMap = IDToNicknameMap;
 
         this.resDeckCardID = resDeckCardID;
@@ -35,10 +33,6 @@ public class GameStartMsg extends Message {
         this.visibleGoldCardID2 = visibleGoldCardID2;
 
         this.starterCardID = starterCardID;
-    }
-
-    public String getNickname() {
-        return nickname;
     }
 
     public Map<Integer, String> getIDToNicknameMap() {

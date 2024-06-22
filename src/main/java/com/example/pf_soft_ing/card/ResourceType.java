@@ -3,13 +3,13 @@ package com.example.pf_soft_ing.card;
 import com.example.pf_soft_ing.utils.CC;
 
 public enum ResourceType {
-    ANIMAL(0, "A", CC.BLUE, CC.BLUE_BG),
-    PLANT(1, "P", CC.GREEN, CC.GREEN_BG),
-    FUNGI(2, "F", CC.RED, CC.RED_BG),
-    INSECT(3, "I", CC.PURPLE, CC.PURPLE_BG),
-    QUILL(4, "Q", CC.YELLOW, CC.YELLOW_BG),
-    INKWELL(5, "K", CC.YELLOW, CC.YELLOW_BG),
-    MANUSCRIPT(6, "M", CC.YELLOW, CC.YELLOW_BG);
+    ANIMAL(0, "A", CC.BLUE),
+    PLANT(1, "P", CC.GREEN),
+    FUNGI(2, "F", CC.RED),
+    INSECT(3, "I", CC.PURPLE),
+    QUILL(4, "Q", CC.YELLOW),
+    INKWELL(5, "K", CC.YELLOW),
+    MANUSCRIPT(6, "M", CC.YELLOW);
 
     private final int value;
 
@@ -17,13 +17,10 @@ public enum ResourceType {
 
     private final String color;
 
-    private final String bgColor;
-
-    ResourceType(int value, String str, String color, String bgColor){
+    ResourceType(int value, String str, String color){
         this.value = value;
         this.str = str;
         this.color = color;
-        this.bgColor = bgColor;
     }
 
     /**
@@ -49,14 +46,6 @@ public enum ResourceType {
      */
     public String getColor() {
         return color;
-    }
-
-    /**
-     * Getter
-     * @return Background color to display in TUI
-     */
-    public String getBgColor() {
-        return bgColor;
     }
 
     /**

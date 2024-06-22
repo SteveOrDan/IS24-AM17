@@ -108,7 +108,7 @@ sequenceDiagram
 
     Note right of S: Server: Server starts
 
-    S->>Sn: startRMIreceiver()
+    S->>Sn: startRMIReceiver()
 
     Note left of C: Client: Client starts
 
@@ -173,7 +173,7 @@ sequenceDiagram
 
     Note right of G: Server: Check nicknames
     alt Success
-        Note right of G: Server: Create PlayerModel, Decoder,<br>RMIreceiver.addDecoder(client, decoder),<br> Encoder = new RMISender
+        Note right of G: Server: Create PlayerModel, Decoder,<br>RMIReceiver.addDecoder(client, decoder),<br> Encoder = new RMISender
 
         G->>Cn: addNickname(playerID, nickname, opponents)
 

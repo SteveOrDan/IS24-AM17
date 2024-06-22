@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StarterCardsDeck {
-
-    private final List<PlaceableCard> deck;
+public record StarterCardsDeck(List<PlaceableCard> deck) {
 
     public StarterCardsDeck(List<PlaceableCard> deck) {
         this.deck = new ArrayList<>(deck);
@@ -19,14 +17,15 @@ public class StarterCardsDeck {
      * Getter
      * @return List of cards in the deck
      */
-    public List<PlaceableCard> getDeck() {
+    @Override
+    public List<PlaceableCard> deck() {
         return deck;
     }
 
     /**
      * Shuffles the deck
      */
-    public void shuffleDeck(){
+    public void shuffleDeck() {
         Collections.shuffle(deck);
     }
 
@@ -34,22 +33,20 @@ public class StarterCardsDeck {
      * Gets the top card in the deck, removes it from the deck and returns it
      * @return The top card in the deck
      */
-    public PlaceableCard drawCard(){
-        try{
-            if (!deck.isEmpty()){
-                int randIndex = (int)(Math.random() * (deck.size() - 1));
+    public PlaceableCard drawCard() {
+        try {
+            if (!deck.isEmpty()) {
+                int randIndex = (int) (Math.random() * (deck.size() - 1));
 
                 PlaceableCard retCard = deck.get(randIndex);
 
                 deck.remove(retCard);
 
                 return retCard;
-            }
-            else{
+            } else {
                 throw new NotEnoughCardsException();
             }
-        }
-        catch (NotEnoughCardsException e){
+        } catch (NotEnoughCardsException e) {
             System.out.println(e.getMessage());
             return null;
         }

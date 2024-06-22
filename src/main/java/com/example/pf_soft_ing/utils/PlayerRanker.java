@@ -1,6 +1,6 @@
 package com.example.pf_soft_ing.utils;
 
-import com.example.pf_soft_ing.MVC.model.player.PlayerModel;
+import com.example.pf_soft_ing.mvc.model.player.PlayerModel;
 
 import java.util.Comparator;
 

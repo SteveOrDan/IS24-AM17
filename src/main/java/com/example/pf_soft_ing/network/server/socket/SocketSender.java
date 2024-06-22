@@ -3,11 +3,11 @@ package com.example.pf_soft_ing.network.server.socket;
 import com.example.pf_soft_ing.network.server.Sender;
 import com.example.pf_soft_ing.utils.Position;
 import com.example.pf_soft_ing.card.side.CardSideType;
-import com.example.pf_soft_ing.MVC.model.game.GameState;
+import com.example.pf_soft_ing.mvc.model.game.GameState;
 import com.example.pf_soft_ing.network.messages.Message;
 import com.example.pf_soft_ing.network.messages.answers.*;
 import com.example.pf_soft_ing.network.messages.requests.PingMsg;
-import com.example.pf_soft_ing.MVC.model.player.TokenColors;
+import com.example.pf_soft_ing.mvc.model.player.TokenColors;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -61,11 +61,11 @@ public class SocketSender implements Sender {
     }
 
     @Override
-    public void sendGameStart(String nickname, Map<Integer, String> IDtoOpponentNickname,
+    public void sendGameStart(Map<Integer, String> IDtoOpponentNickname,
                               int resDeckCardID, int visibleResCardID1, int visibleResCardID2,
                               int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2,
                               int starterCardID) {
-        sendMessage(new GameStartMsg(nickname, IDtoOpponentNickname,
+        sendMessage(new GameStartMsg(IDtoOpponentNickname,
                 resDeckCardID, visibleResCardID1, visibleResCardID2,
                 goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2,
                 starterCardID));

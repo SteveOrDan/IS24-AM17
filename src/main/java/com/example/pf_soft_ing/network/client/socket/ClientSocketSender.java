@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 
 public class ClientSocketSender implements ClientSender {
 
-    private int playerID;
     private final ObjectOutputStream out;
 
     public ClientSocketSender(ObjectOutputStream out){
@@ -34,7 +33,6 @@ public class ClientSocketSender implements ClientSender {
 
     @Override
     public void setPlayerID(int playerID) {
-        this.playerID = playerID;
     }
 
     @Override
