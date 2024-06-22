@@ -64,6 +64,8 @@ public class GUIView implements View {
     private VBox chatBox;
     private double chatBoxHeight = 0;
 
+    private double filledWithTextChatBoxHeight = 0;
+
     private PlaceableCard starterCard;
 
     private int secretObjectiveCardID;
@@ -1218,29 +1220,13 @@ public class GUIView implements View {
         chatScroll.setLayoutY(0);
         chatScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         chatScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        chatScroll.setStyle("-fx-background-color: #f5f3e5; -fx-border-color: #000000; -fx-border-width: 3px 3px 3px;");
 
         chatBox = new VBox();
-        chatBox.setPrefSize(commonAreaWidth - 110, stageHeight - 150);
+        chatBox.setPrefSize(commonAreaWidth - 100, stageHeight - 150);
         chatBox.setLayoutX(0);
         chatBox.setLayoutY(0);
-
-        // Background
-        Rectangle chatBG = new Rectangle();
-        chatBG.setWidth(commonAreaWidth - 110);
-        chatBG.setHeight(stageHeight - 150);
-        chatBG.setFill(Color.web("#f5f3e5"));
-
-        chatBox.getChildren().add(chatBG);
-
-        // Black edge
-        Rectangle chatEdge = new Rectangle();
-        chatEdge.setWidth(commonAreaWidth - 100);
-        chatEdge.setHeight(stageHeight - 150);
-        chatEdge.setArcWidth(10);
-        chatEdge.setArcHeight(10);
-        chatEdge.setFill(Color.TRANSPARENT);
-        chatEdge.setStrokeWidth(2);
-        chatEdge.setStroke(Color.BLACK);
+        chatBox.setStyle("-fx-background-color: #f5f3e5;");
 
         AnchorPane chatInputPane = new AnchorPane();
         chatInputPane.setPrefSize(commonAreaWidth - 100, 50);
@@ -1289,7 +1275,6 @@ public class GUIView implements View {
         chatPane.getChildren().add(chatScroll);
         chatPane.getChildren().add(chatInputPane);
         chatPane.getChildren().add(closeChatButton);
-        chatPane.getChildren().add(chatEdge);
 
         chatOpen = false;
     }
@@ -2541,9 +2526,17 @@ public class GUIView implements View {
 
             chatBox.getChildren().add(chatLabel);
 
-            chatBoxHeight += 25;
+            if (chatBoxHeight == 0){
+                chatBoxHeight = chatBox.getHeight();
+                filledWithTextChatBoxHeight = 25;
+            } else {
+                filledWithTextChatBoxHeight += 25;
+                if (filledWithTextChatBoxHeight > chatBoxHeight){
+                    chatBoxHeight += 25;
+                }
+            }
             chatBox.setPrefHeight(chatBoxHeight);
-            chatBox.setLayoutY(250 - chatBoxHeight);
+            chatBox.setLayoutY(chatBoxHeight);
         });
     }
 
