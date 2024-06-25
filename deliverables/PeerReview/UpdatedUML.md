@@ -2,7 +2,8 @@
 UML generale
 ```mermaid
 classDiagram
-class PlaceableCard {
+    
+    class PlaceableCard {
         <<Abstract>>
     - String cardType
     - int ID
@@ -175,18 +176,17 @@ class PlaceableCard {
         + boolean isDeckEmpty()
     }
     class StarterCardsDeck{
-        - List~PlaceableCard~ deck
+       <<Record>>
 
-        + List~PlaceableCard~ getDeck()
+        + List~PlaceableCard~ deck()
         + void shuffleDeck()
         + PlaceableCard drawCard()
     }
     class Position {
-        - int x
-        - int y
+       <<Record>>
 
-        + int getX()
-        + int getY()
+        + int X()
+        + int Y()
 
     }
     class CardElementType {
@@ -240,22 +240,20 @@ class PlaceableCard {
     }
     class ResourceType {
         <<Enumeration>>
-        ANIMAL(0, "A", CC.BLUE, CC.BLUE_BG)
-        PLANT(1, "P", CC.GREEN, CC.GREEN_BG)
-        FUNGI(2, "F", CC.RED, CC.RED_BG)
-        INSECT(3, "I", CC.PURPLE, CC.PURPLE_BG)
-        QUILL(4, "Q", CC.YELLOW, CC.YELLOW_BG)
-        INKWELL(5, "K", CC.YELLOW, CC.YELLOW_BG)
-        MANUSCRIPT(6, "M", CC.YELLOW, CC.YELLOW_BG)
+        ANIMAL(0, "A", CC.BLUE)
+        PLANT(1, "P", CC.GREEN)
+        FUNGI(2, "F", CC.RED)
+        INSECT(3, "I", CC.PURPLE)
+        QUILL(4, "Q", CC.YELLOW)
+        INKWELL(5, "K", CC.YELLOW)
+        MANUSCRIPT(6, "M", CC.YELLOW)
 
         - int value
         - String str
         - String color
-        - String bgColor
 
         + int getValue()
         + String getColor()
-        + String getBgColor()
         + ResourceType resourceTypeFromString(String str)
     }
     
@@ -287,6 +285,7 @@ class PlaceableCard {
         - ResourceType resourceType
     }
     ResourceCorner "1" *-- "1" ResourceType
+
 
 class GameState {
     <<Enumeration>>
@@ -404,7 +403,6 @@ class GameState {
     + void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide)
     + List~Integer~ fillPlayerHand(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotEnoughCardsException
     + boolean checkForTurnOrderPhase()
-    + void startTurnOrderPhase()
     + int getCurrPlayerID()
 
     + PlaceableCard drawStarterCard()
@@ -536,8 +534,8 @@ class GameState {
 
     - int currScore
     - int numOfCompletedObjectives
-    - Token token
-    - Token firstPlayerToken
+    - TokenColors token
+    - TokenColors firstPlayerToken
     - PlayerState lastPlayerState
     - PlayerState state
     - Object stateLock
@@ -573,18 +571,12 @@ class GameState {
     }
 
     PlayerModel "1" *-- "1" PlayerState
-    PlayerModel "1" *-- "1" Token
+    PlayerModel  *--  TokenColors
 
-
-    class Token {
-    - color
-    + getColor() void
-    }
-
-    Token "1" *-- "1" TokenColors
 
     class TokenColors {
         <<Enumeration>>
+    NONE
     RED
     BLUE
     GREEN
@@ -625,7 +617,7 @@ class GameState {
     + void createMatchResult(int matchID, String hostNickname)
     + void selectMatchResult(int matchID, List~String~ nicknames)
     + void chooseNicknameResult(String nickname)
-    + void sendGameStart(String nickname, Map~Integer, String~ IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID)
+    + void sendGameStart(Map~Integer, String~ IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID)
     + void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2)
     + void confirmSecretObjective()
     + void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score)
@@ -769,7 +761,7 @@ class GameState {
     }
     DisconnectionManager "1" *-- "1" Sender
     
-class View {
+    class View {
         <<Interface>>
     + void showMatches(Map~Integer, List~String~~ matches)
     + void createMatch(int matchID, String hostNickname)
@@ -877,13 +869,12 @@ class View {
     class ClientRMIInterface {
         <<Interface>>
     + void showMatches(Map~Integer, List~String~~ matchesNicknames, int playerID) throws RemoteException
-    + void placeStarterCard() throws RemoteException
     + void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide, int score) throws RemoteException
     + void sendError(String errorMsg) throws RemoteException
     + void selectMatchResult(int matchID, List~String~ nicknames) throws RemoteException
     + void createMatchResult(int matchID, String hostNickname) throws RemoteException
     + void chooseNicknameResult(String hostNickname) throws RemoteException
-    + void startGame(String nickname, Map~Integer, String~ IDtoNicknameMap, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException
+    + void startGame(Map~Integer, String~ IDtoNicknameMap, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException
     + void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException
     + void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException
     + void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException
@@ -948,7 +939,6 @@ class View {
     class ClientRMISender {
         - RMIReceiverInterface serverInterface
         - ClientRMIInterface client
-        - int playerID
         + void setPlayerID(int playerID)
     }
     ClientRMISender "1" *-- "1" ClientRMIInterface
@@ -1173,18 +1163,17 @@ classDiagram
         + boolean isDeckEmpty()
     }
     class StarterCardsDeck{
-        - List~PlaceableCard~ deck
+       <<Record>>
 
-        + List~PlaceableCard~ getDeck()
+        + List~PlaceableCard~ deck()
         + void shuffleDeck()
         + PlaceableCard drawCard()
     }
     class Position {
-        - int x
-        - int y
+       <<Record>>
 
-        + int getX()
-        + int getY()
+        + int X()
+        + int Y()
 
     }
     class CardElementType {
@@ -1238,22 +1227,20 @@ classDiagram
     }
     class ResourceType {
         <<Enumeration>>
-        ANIMAL(0, "A", CC.BLUE, CC.BLUE_BG)
-        PLANT(1, "P", CC.GREEN, CC.GREEN_BG)
-        FUNGI(2, "F", CC.RED, CC.RED_BG)
-        INSECT(3, "I", CC.PURPLE, CC.PURPLE_BG)
-        QUILL(4, "Q", CC.YELLOW, CC.YELLOW_BG)
-        INKWELL(5, "K", CC.YELLOW, CC.YELLOW_BG)
-        MANUSCRIPT(6, "M", CC.YELLOW, CC.YELLOW_BG)
+        ANIMAL(0, "A", CC.BLUE)
+        PLANT(1, "P", CC.GREEN)
+        FUNGI(2, "F", CC.RED)
+        INSECT(3, "I", CC.PURPLE)
+        QUILL(4, "Q", CC.YELLOW)
+        INKWELL(5, "K", CC.YELLOW)
+        MANUSCRIPT(6, "M", CC.YELLOW)
 
         - int value
         - String str
         - String color
-        - String bgColor
 
         + int getValue()
         + String getColor()
-        + String getBgColor()
         + ResourceType resourceTypeFromString(String str)
     }
     
@@ -1406,7 +1393,6 @@ class GameState {
     + void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide)
     + List~Integer~ fillPlayerHand(int playerID) throws InvalidGameStateException, InvalidPlayerIDException, NotEnoughCardsException
     + boolean checkForTurnOrderPhase()
-    + void startTurnOrderPhase()
     + int getCurrPlayerID()
 
     + PlaceableCard drawStarterCard()
@@ -1538,8 +1524,8 @@ class GameState {
 
     - int currScore
     - int numOfCompletedObjectives
-    - Token token
-    - Token firstPlayerToken
+    - TokenColors token
+    - TokenColors firstPlayerToken
     - PlayerState lastPlayerState
     - PlayerState state
     - Object stateLock
@@ -1575,18 +1561,12 @@ class GameState {
     }
 
     PlayerModel "1" *-- "1" PlayerState
-    PlayerModel "1" *-- "1" Token
+    PlayerModel  *--  TokenColors
 
-
-    class Token {
-    - color
-    + getColor() void
-    }
-
-    Token "1" *-- "1" TokenColors
 
     class TokenColors {
         <<Enumeration>>
+    NONE
     RED
     BLUE
     GREEN
@@ -1627,7 +1607,7 @@ class GameState {
     + void createMatchResult(int matchID, String hostNickname)
     + void selectMatchResult(int matchID, List~String~ nicknames)
     + void chooseNicknameResult(String nickname)
-    + void sendGameStart(String nickname, Map~Integer, String~ IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID)
+    + void sendGameStart(Map~Integer, String~ IDtoOpponentNickname, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID)
     + void sendMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2)
     + void confirmSecretObjective()
     + void placeCard(int playerID, int cardID, Position pos, CardSideType chosenSide, int score)
@@ -1775,7 +1755,6 @@ UML Client
 ```mermaid
 classDiagram
     
-    
     class View {
         <<Interface>>
     + void showMatches(Map~Integer, List~String~~ matches)
@@ -1884,13 +1863,12 @@ classDiagram
     class ClientRMIInterface {
         <<Interface>>
     + void showMatches(Map~Integer, List~String~~ matchesNicknames, int playerID) throws RemoteException
-    + void placeStarterCard() throws RemoteException
     + void placeCardResult(int playerID, int cardID, Position pos, CardSideType chosenSide, int score) throws RemoteException
     + void sendError(String errorMsg) throws RemoteException
     + void selectMatchResult(int matchID, List~String~ nicknames) throws RemoteException
     + void createMatchResult(int matchID, String hostNickname) throws RemoteException
     + void chooseNicknameResult(String hostNickname) throws RemoteException
-    + void startGame(String nickname, Map~Integer, String~ IDtoNicknameMap, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException
+    + void startGame(Map~Integer, String~ IDtoNicknameMap, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2, int starterCardID) throws RemoteException
     + void sendFirstPlayerTurn(int lastPlayerID, int playerID, int[] playerIDs, int[] starterCardIDs, CardSideType[] starterCardSides, TokenColors[] tokenColors, int[][] playerHands, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException
     + void setMissingSetup(int resourceCardID1, int resourceCardID2, int goldenCardID, TokenColors tokenColor, int commonObjectiveCardID1, int commonObjectiveCardID2, int secretObjectiveCardID1, int secretObjectiveCardID2) throws RemoteException
     + void setNewPlayerTurn(int drawnCardID, int lastPlayerID, int newPlayerID, int resDeckCardID, int visibleResCardID1, int visibleResCardID2, int goldDeckCardID, int visibleGoldCardID1, int visibleGoldCardID2) throws RemoteException
@@ -1955,7 +1933,6 @@ classDiagram
     class ClientRMISender {
         - RMIReceiverInterface serverInterface
         - ClientRMIInterface client
-        - int playerID
         + void setPlayerID(int playerID)
     }
     ClientRMISender "1" *-- "1" ClientRMIInterface
