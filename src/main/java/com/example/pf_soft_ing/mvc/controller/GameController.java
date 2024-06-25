@@ -20,8 +20,7 @@ public class GameController {
     }
 
     /**
-     * Sender
-     * @send Map of match IDs with the corresponding nicknames to client
+     * Sends a map of match IDs with the corresponding nicknames to client
      */
     public void getMatches(int playerID) {
         getPlayerSender(playerID).sendMatches(gameModel.getMatches(), playerID);
