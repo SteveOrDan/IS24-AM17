@@ -103,8 +103,8 @@ sequenceDiagram
             Note right of M: Server: Update Game state in: SET_UP
             M->>G: true
             Note right of G: Notifies all players
-            G->>D: sendGameStart(thisNickname, matchController.getIDToNicknameMap(), resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(), goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(), starterCard.getID())
-            D-->>Cn: startGame(nickname, IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
+            G->>D: sendGameStart(matchController.getIDToNicknameMap(), resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(), goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(), starterCard.getID())
+            D-->>Cn: startGame(IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
             
             Note left of Cn: Update player's state in: PLACING_STARTER
             Note left of Cn: Update view
@@ -234,7 +234,7 @@ sequenceDiagram
             Note right of M: Server: Update Game state in: SET_UP
             M->>G: true
             Note right of G: Notifies all players
-            G->>D: sendGameStart(thisNickname, matchController.getIDToNicknameMap(), resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(), goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(), starterCard.getID())
+            G->>D: sendGameStart(matchController.getIDToNicknameMap(), resDeckCardID.getID(), visibleResCards.getFirst().getID(), visibleResCards.get(1).getID(), goldDeckCardID.getID(), visibleGoldCards.getFirst().getID(), visibleGoldCards.get(1).getID(), starterCard.getID())
             D-->>Cn: sendMessage(new GameStartMsg(nickname, IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID));
             
             Note left of Cn: Update player's state in: PLACING_STARTER
@@ -275,9 +275,9 @@ sequenceDiagram
     Note right of G: Server: All players connected
     Note right of G: Server: notifies all players
     
-    G->>Sn : sendGameStart(nickname, IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
+    G->>Sn : sendGameStart(IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
 
-    Sn-->>Cn: startGame(nickname, IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
+    Sn-->>Cn: startGame(IDtoOpponentNickname, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
     
     Cn->>V: startGame(IDtoNicknameMap, resDeckCardID, visibleResCardID1, visibleResCardID2, goldDeckCardID, visibleGoldCardID1, visibleGoldCardID2, starterCardID)
     
