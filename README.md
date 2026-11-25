@@ -5,7 +5,7 @@
 ## Team
 - Abdallah Alkhetiar: [@Zero3474](https://github.com/Zero3474)<br>
 - Daniel Bonardi: [@SteveOrDan](https://github.com/SteveOrDan)<br>
-- Caterina Cardenas: [@caterinacardenasestrada](https://github.com/caterinacardenasestrada)<br>
+- Caterina Cardenas: [@caterinacardenas](https://github.com/caterinacardenas)<br>
 - Simone Ceccherini: [@Simone-Cecche](https://github.com/Simone-Cecche)<br>
 
 ## Implemented functionalities
